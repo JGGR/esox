@@ -1,0 +1,16 @@
+[package]
+name = "esox"
+version = "0.1.0"
+edition = "2021"
+description = "Library for NISECI and HFBI calc"
+license = "GPL-3.0-only"
+exclude = [
+    ".github/**",
+    "templates",
+]
+
+[dependencies]
+chrono = "0.4.42"
+csv = "1.4.0"
+once_cell = "1.21.3"
+serde = { version = "1.0.228", features = ["derive"] }
