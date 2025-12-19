@@ -86,9 +86,7 @@ impl MetricheX3 {
     }
 }
 
-pub fn calculate_x3(
-    c: &CampionamentoNISECI,
-) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
+pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
     let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
 
     // condizione 1

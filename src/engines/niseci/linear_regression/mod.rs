@@ -79,9 +79,7 @@ pub fn gradient_descent_iterate(
     Ok((m_final, b_final))
 }
 
-pub fn calculate_quantita_with_regression(
-    campionamenti: &[Point<i32>],
-) -> Result<u32, String> {
+pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Result<u32, String> {
     // trova m e b della retta
     let (m, b) = match gradient_descent_iterate(campionamenti) {
         Ok((m, b)) => (m, b),

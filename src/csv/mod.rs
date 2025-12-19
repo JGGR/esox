@@ -87,8 +87,7 @@ codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaSta
 
 // This must be kept aligned with RecordCsvCampionamentoHFBI definition.
 // TODO: get this stuff with some macro?
-pub const CAMPIONAMENTO_HFBI_HEADER_FIELDS: [&str; 3] =
-    ["codiceSpecie", "numeroIndividui", "peso"];
+pub const CAMPIONAMENTO_HFBI_HEADER_FIELDS: [&str; 3] = ["codiceSpecie", "numeroIndividui", "peso"];
 pub const CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES: [&str; 3] = ["String", "u32", "f32"];
 pub const CAMPIONAMENTO_HFBI_HEADER: &str = "\
 codiceSpecie;numeroIndividui;peso";

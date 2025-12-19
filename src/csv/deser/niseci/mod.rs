@@ -214,9 +214,7 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
-pub fn parse_csv_riferimento_niseci<R, T>(
-    mut rdr: csv::Reader<R>,
-) -> (Vec<T>, Vec<csv::Error>)
+pub fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
     T: RecordCsvRiferimentoNISECI,
@@ -396,9 +394,7 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
-pub fn parse_csv_campionamento_niseci<R, T>(
-    mut rdr: csv::Reader<R>,
-) -> (Vec<T>, Vec<csv::Error>)
+pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
     T: RecordCsvCampionamentoNISECI + 'static,
@@ -666,9 +662,7 @@ impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     }
 }
 
-pub fn parse_csv_anagrafica_niseci<R, T>(
-    mut rdr: csv::Reader<R>,
-) -> (Vec<T>, Vec<csv::Error>)
+pub fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
     T: RecordCsvAnagraficaNISECI,
