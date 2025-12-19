@@ -86,9 +86,7 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     }
 }
 
-pub fn parse_csv_campionamento_hfbi<R, T>(
-    mut rdr: csv::Reader<R>,
-) -> (Vec<T>, Vec<csv::Error>)
+pub fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
     T: RecordCsvCampionamentoHFBI + 'static,

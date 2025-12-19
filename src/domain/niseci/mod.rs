@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use serde::Serialize;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::fmt;
@@ -26,7 +27,7 @@ use super::location::Location;
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
                                                       // in test builds
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct SpecieNISECI {
     pub id: String,
     pub nome: String,
@@ -481,7 +482,7 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ValoriIntermediSpecieNISECI {
     pub densita_stimata: f32,
     pub quantita_stimata: u32,
@@ -514,7 +515,7 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ValoriIntermediNISECI {
     pub x1: f32,
     pub x2: Option<f32>,
@@ -560,7 +561,7 @@ impl ValoriIntermediNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct RisultatoNISECI {
     valore: Option<f32>,
     rqe: Option<f32>,
@@ -659,7 +660,7 @@ impl MetricheX2A {
 /// le classi eta contengono il numero di esemplari trovati
 /// nel campionamento per ogni specie catturata
 /// suddivisi nelle loro classi di eta (in base alla lunghezza)
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct ClassiEtaSpecieNISECI {
     pub specie: SpecieNISECI,
     pub cl1: u32,
@@ -1000,10 +1001,7 @@ pub struct EsemplariPerCattura {
 }
 
 impl EsemplariPerCattura {
-    pub fn new_prevalorized(
-        numero_passaggio: u8,
-        specie: &SpecieNISECI,
-    ) -> EsemplariPerCattura {
+    pub fn new_prevalorized(numero_passaggio: u8, specie: &SpecieNISECI) -> EsemplariPerCattura {
         let mut mappa: HashMap<u8, u32> = HashMap::new();
         mappa.insert(numero_passaggio, 1);
 

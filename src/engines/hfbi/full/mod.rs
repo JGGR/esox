@@ -1,12 +1,10 @@
-use crate::{
-    engines::hfbi::{
-        bbent::calc_bbent, bn::calc_bn, dbent::calc_dbent, ddom::calc_ddom, dhzp::calc_dhzp,
-        dmig::calc_dmig,
-    },
-};
 use crate::domain::hfbi::{
-        AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, StatoEcologicoHFBI,
-        ValoriIntermediHFBI,
+    AnagraficaHFBI, CampionamentoHFBI, CondizioniRiferimentoHFBI, StatoEcologicoHFBI,
+    ValoriIntermediHFBI,
+};
+use crate::engines::hfbi::{
+    bbent::calc_bbent, bn::calc_bn, dbent::calc_dbent, ddom::calc_ddom, dhzp::calc_dhzp,
+    dmig::calc_dmig,
 };
 
 // WEIGHTS

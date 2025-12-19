@@ -92,12 +92,7 @@ pub struct MetricheX2B {
 }
 
 impl MetricheX2B {
-    pub fn new(
-        id_specie: String,
-        densita_stimata: f32,
-        quantita_stimata: u32,
-        x2_b: f32,
-    ) -> Self {
+    pub fn new(id_specie: String, densita_stimata: f32, quantita_stimata: u32, x2_b: f32) -> Self {
         Self {
             id_specie,
             densita_stimata,
