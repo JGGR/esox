@@ -316,7 +316,8 @@ pub struct VeryItalianRecordCsvCampionamentoNISECI {
     pub num_passaggio: u32,
     pub codice_specie: String,
     pub lunghezza: u32,
-    pub peso: u32,
+    #[serde(deserialize_with = "deserialize_comma_f32")]
+    pub peso: f32,
 }
 
 impl RecordCsvCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
@@ -335,7 +336,7 @@ impl RecordCsvCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
     fn lunghezza(&self) -> u32 {
         self.lunghezza
     }
-    fn peso(&self) -> u32 {
+    fn peso(&self) -> f32 {
         self.peso
     }
 }
@@ -359,7 +360,7 @@ pub struct PlainRecordCsvCampionamentoNISECI {
     pub num_passaggio: u32,
     pub codice_specie: String,
     pub lunghezza: u32,
-    pub peso: u32,
+    pub peso: f32,
 }
 
 impl RecordCsvCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
@@ -378,7 +379,7 @@ impl RecordCsvCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
     fn lunghezza(&self) -> u32 {
         self.lunghezza
     }
-    fn peso(&self) -> u32 {
+    fn peso(&self) -> f32 {
         self.peso
     }
 }

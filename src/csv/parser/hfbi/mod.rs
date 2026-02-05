@@ -90,6 +90,14 @@ pub fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
             errors.push(err);
             continue;
         }
+
+        if !r.peso().is_finite() {
+            let err = RecordCsvCampionamentoHFBIError::ValoreInvalido {
+                msg: format!("Record {idx}: peso non valido (not finite): {}", r.peso()),
+            };
+            errors.push(err);
+            continue;
+        }
         let peso = r.peso();
 
         let hfbi_rec = RecordHFBI {

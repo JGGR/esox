@@ -407,7 +407,7 @@ fn test_valid_recordcsv_campionamento_niseci() {
         num_passaggio: 1,
         codice_specie: "1234".to_string(),
         lunghezza: 100,
-        peso: 100,
+        peso: 100.0,
     };
     let recordcsv_data = vec![record_1];
     let result = check_records_campionamento_niseci(recordcsv_data, riferimento_specie);

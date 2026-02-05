@@ -57,7 +57,7 @@ pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [
     "peso",
 ];
 pub const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] =
-    ["String", "String", "u32", "String", "u32", "u32"];
+    ["String", "String", "u32", "String", "u32", "f32"];
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 
@@ -150,7 +150,7 @@ pub trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
     fn num_passaggio(&self) -> u32;
     fn codice_specie(&self) -> String;
     fn lunghezza(&self) -> u32;
-    fn peso(&self) -> u32;
+    fn peso(&self) -> f32;
 }
 
 pub trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {

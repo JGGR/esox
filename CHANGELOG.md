@@ -1,3 +1,10 @@
+## [0.1.2] - Unreleased
+
+### Changed
+
+- Refactor `RecordCsvCampionamentoNISECI` trait to have `peso` be `f32`
+- Check and refuse `NaN` and `Inf` for `peso` for `RecordNISECI`, `RecordHFBI`
+
 ## [0.1.1] - 2025-12-19
 
 ### Changed

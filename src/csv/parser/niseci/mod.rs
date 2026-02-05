@@ -309,6 +309,14 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
         }
         let passaggio_cattura = r.num_passaggio();
 
+        if !r.peso().is_finite() {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido {
+                msg: format!("Record {idx}: peso non valido (not finite): {}", r.peso()),
+            };
+            errors.push(err);
+            continue;
+        }
+
         let niseci_rec = RecordNISECI {
             specie: matched_specie.clone(),
             passaggio_cattura: passaggio_cattura as u8,

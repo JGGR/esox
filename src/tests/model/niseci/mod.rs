@@ -44,21 +44,21 @@ fn test_calcolo_pesci_per_passaggio() {
         specie: specie_1.clone(),
         passaggio_cattura: 1,
         lunghezza: 100, // in millimetri
-        peso: 100,      // in grammi
+        peso: 100.0,    // in grammi
     };
 
     let record_2 = RecordNISECI {
         specie: specie_1.clone(),
         passaggio_cattura: 2,
         lunghezza: 100, // in millimetri
-        peso: 100,      // in grammi
+        peso: 100.0,    // in grammi
     };
 
     let record_3 = RecordNISECI {
         specie: specie_1.clone(),
         passaggio_cattura: 3,
         lunghezza: 100, // in millimetri
-        peso: 100,      // in grammi
+        peso: 100.0,    // in grammi
     };
 
     let mut c1 = vec![record_1; 20];

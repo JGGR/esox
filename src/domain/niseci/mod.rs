@@ -110,7 +110,7 @@ pub struct RecordNISECI {
     pub passaggio_cattura: u8,
     pub lunghezza: u32,
     /// in millimetri
-    pub peso: u32, // in grammi
+    pub peso: f32, // in grammi
 }
 
 impl fmt::Display for RecordNISECI {
