@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /*
-    Copyright (C) 2024-2025 jgabaut, gioninjo
+    Copyright (C) 2024-2026 jgabaut, gioninjo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -379,55 +379,55 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     let record_1 = RecordNISECI {
         specie: importante_1,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
     let record_2 = RecordNISECI {
         specie: importante_2,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
     let record_3 = RecordNISECI {
         specie: importante_3,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
     let record_4 = RecordNISECI {
         specie: normale_2,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
     let record_5 = RecordNISECI {
         specie: normale_1,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
     let record_6 = RecordNISECI {
         specie: inatteso_1,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
     let record_7 = RecordNISECI {
         specie: inatteso_2,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
     let record_8 = RecordNISECI {
         specie: alloctono_1,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
     let record_9 = RecordNISECI {
         specie: alloctono_2,
         lunghezza: 5,
-        peso: 5,
+        peso: 5.0,
         passaggio_cattura: 1,
     };
 
@@ -479,7 +479,7 @@ pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
         specie: get_trocchio(),
         passaggio_cattura: 2,
         lunghezza: 2,
-        peso: 2,
+        peso: 2.0,
     };
     c.campionamento.push(trocchio);
 
@@ -504,7 +504,7 @@ pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
         specie: get_trocchio(),
         passaggio_cattura: 2,
         lunghezza: 2,
-        peso: 2,
+        peso: 2.0,
     };
     c.campionamento.push(trocchio);
 
@@ -532,7 +532,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 13,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(ciaccio_cl5_c1.clone());
@@ -543,7 +543,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 10,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c1.clone());
@@ -554,7 +554,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 7,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(ciaccio_cl3_c1.clone());
@@ -565,7 +565,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 10,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c2.clone());
@@ -576,7 +576,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 2,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..5 {
         campionamento.push(ciaccio_cl1_c2.clone());
@@ -608,7 +608,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 13,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(ciaccio_cl5_c1.clone());
@@ -619,7 +619,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 10,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c1.clone());
@@ -630,7 +630,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 7,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(ciaccio_cl3_c1.clone());
@@ -641,7 +641,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 4,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(ciaccio_cl2_c2.clone());
@@ -652,7 +652,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
         specie: ciaccio.clone(),
         lunghezza: 4,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..5 {
         campionamento.push(ciaccio_cl1_c2.clone());
@@ -863,7 +863,7 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
         specie: specie.clone(),
         lunghezza: 13,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
@@ -874,7 +874,7 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
         specie: specie.clone(),
         lunghezza: 10,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(cl4_c1.clone());
@@ -885,7 +885,7 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
         specie: specie.clone(),
         lunghezza: 7,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(cl3_c1.clone());
@@ -896,7 +896,7 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
         specie: specie.clone(),
         lunghezza: 4,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
@@ -907,7 +907,7 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
         specie: specie.clone(),
         lunghezza: 4,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..5 {
         campionamento.push(cl1_c2.clone());
@@ -932,7 +932,7 @@ fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> C
         specie: specie.clone(),
         lunghezza: 13,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
@@ -943,7 +943,7 @@ fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> C
         specie: specie.clone(),
         lunghezza: 10,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..20 {
         campionamento.push(cl4_c1.clone());
@@ -954,7 +954,7 @@ fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> C
         specie: specie.clone(),
         lunghezza: 4,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
@@ -982,7 +982,7 @@ fn create_campionamento_mediam_strutturato_data_una_specie(
         specie: specie.clone(),
         lunghezza: 13,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
@@ -993,7 +993,7 @@ fn create_campionamento_mediam_strutturato_data_una_specie(
         specie: specie.clone(),
         lunghezza: 10,
         passaggio_cattura: 1,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..20 {
         campionamento.push(cl4_c1.clone());
@@ -1004,7 +1004,7 @@ fn create_campionamento_mediam_strutturato_data_una_specie(
         specie: specie.clone(),
         lunghezza: 4,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
@@ -1015,7 +1015,7 @@ fn create_campionamento_mediam_strutturato_data_una_specie(
         specie: specie.clone(),
         lunghezza: 4,
         passaggio_cattura: 2,
-        peso: 10,
+        peso: 10.0,
     };
     for _ in 0..5 {
         campionamento.push(cl1_c2.clone());

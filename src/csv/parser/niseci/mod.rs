@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /*
-    Copyright (C) 2024-2025 jgabaut, gioninjo
+    Copyright (C) 2024-2026 jgabaut, gioninjo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -308,6 +308,14 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
             continue;
         }
         let passaggio_cattura = r.num_passaggio();
+
+        if !r.peso().is_finite() {
+            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido {
+                msg: format!("Record {idx}: peso non valido (not finite): {}", r.peso()),
+            };
+            errors.push(err);
+            continue;
+        }
 
         let niseci_rec = RecordNISECI {
             specie: matched_specie.clone(),

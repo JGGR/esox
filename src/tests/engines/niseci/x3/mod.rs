@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /*
-    Copyright (C) 2024-2025 jgabaut, gioninjo
+    Copyright (C) 2024-2026 jgabaut, gioninjo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ fn calculate_x3_alieni_tipo_1_strutt() {
         specie: get_ciaccio(),
         passaggio_cattura: 2,
         lunghezza: 2,
-        peso: 2,
+        peso: 2.0,
     };
     c.campionamento.push(ciaccio);
 
@@ -86,7 +86,7 @@ fn calculate_x3_alieni_tipo_2_strutt() {
         specie: get_ciaccio(),
         passaggio_cattura: 2,
         lunghezza: 2,
-        peso: 2,
+        peso: 2.0,
     };
     c.campionamento.push(ciaccio);
 
@@ -105,7 +105,7 @@ fn calculate_x3_alieni_tipo_3_strutt() {
         specie: get_ciaccio(),
         passaggio_cattura: 2,
         lunghezza: 2,
-        peso: 2,
+        peso: 2.0,
     };
     c.campionamento.push(ciaccio);
 
@@ -124,7 +124,7 @@ fn calculate_x3_alieni_tipo_3_destrutt() {
         specie: get_ciaccio(),
         passaggio_cattura: 2,
         lunghezza: 2,
-        peso: 2,
+        peso: 2.0,
     };
     c.campionamento.push(ciaccio);
 
@@ -143,7 +143,7 @@ fn calculate_x3_alieni_tipo_3_mediam_strutt() {
         specie: get_ciaccio(),
         passaggio_cattura: 2,
         lunghezza: 2,
-        peso: 2,
+        peso: 2.0,
     };
     c.campionamento.push(ciaccio);
 

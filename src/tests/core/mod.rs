@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /*
-    Copyright (C) 2024-2025 jgabaut, gioninjo
+    Copyright (C) 2024-2026 jgabaut, gioninjo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -407,7 +407,7 @@ fn test_valid_recordcsv_campionamento_niseci() {
         num_passaggio: 1,
         codice_specie: "1234".to_string(),
         lunghezza: 100,
-        peso: 100,
+        peso: 100.0,
     };
     let recordcsv_data = vec![record_1];
     let result = check_records_campionamento_niseci(recordcsv_data, riferimento_specie);

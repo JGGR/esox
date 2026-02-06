@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /*
-    Copyright (C) 2024-2025 jgabaut, gioninjo
+    Copyright (C) 2024-2026 jgabaut, gioninjo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,21 +44,21 @@ fn test_calcolo_pesci_per_passaggio() {
         specie: specie_1.clone(),
         passaggio_cattura: 1,
         lunghezza: 100, // in millimetri
-        peso: 100,      // in grammi
+        peso: 100.0,    // in grammi
     };
 
     let record_2 = RecordNISECI {
         specie: specie_1.clone(),
         passaggio_cattura: 2,
         lunghezza: 100, // in millimetri
-        peso: 100,      // in grammi
+        peso: 100.0,    // in grammi
     };
 
     let record_3 = RecordNISECI {
         specie: specie_1.clone(),
         passaggio_cattura: 3,
         lunghezza: 100, // in millimetri
-        peso: 100,      // in grammi
+        peso: 100.0,    // in grammi
     };
 
     let mut c1 = vec![record_1; 20];
