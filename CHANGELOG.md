@@ -22,6 +22,7 @@
 - Moved templates data for tests `from tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
 - Moved constants for StatoEcologicoNISECI `from tests::engines::niseci::full` to `domain::niseci`
 - Bump deps
+- Turn off default features for `chrono`
 
 ## [0.1.2] - 2026-02-06
 

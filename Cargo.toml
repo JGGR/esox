@@ -10,6 +10,6 @@ exclude = [
 ]
 
 [dependencies]
-chrono = "0.4.44"
+chrono = { version = "0.4.44", default-features = false }
 csv = "1.4.0"
 serde = { version = "1.0.228", features = ["derive"] }
