@@ -57,7 +57,7 @@ pub fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
         }
         let codice_specie = r.codice_specie();
         let mut opt_matched_specie = None;
-        for s in &RIFERIMENTO_HFBI {
+        for s in RIFERIMENTO_HFBI.iter() {
             // FIXME: this is O(n^2).
             if s.codice_specie == codice_specie {
                 opt_matched_specie = Some(s);

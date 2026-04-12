@@ -83,7 +83,7 @@ impl SpecieNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct RiferimentoNISECI {
     pub elenco_specie: Vec<SpecieNISECI>,
 }
@@ -105,7 +105,7 @@ impl RiferimentoNISECI {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RecordNISECI {
     pub specie: SpecieNISECI,
     pub passaggio_cattura: u8,
@@ -122,7 +122,7 @@ impl fmt::Display for RecordNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct CampionamentoNISECI {
     pub campionamento: Vec<RecordNISECI>,
 }
@@ -211,7 +211,7 @@ pub struct AlieniIndigeni {
     pub indigeni: u32,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub enum TipoComunitaNISECI {
     Redatta,
     Recuperata,
@@ -247,7 +247,7 @@ impl TryFrom<i32> for TipoComunitaNISECI {
     }
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ComunitaNISECI {
     pub tipo: TipoComunitaNISECI,
     pub fonte: Option<String>,
@@ -293,7 +293,7 @@ impl fmt::Display for ComunitaNISECI {
     }
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub enum AreaNISECI {
     Alpina,
     Mediterranea,
@@ -335,7 +335,7 @@ pub struct AnagraficaNISECIDraft {
     pub larghezza_media_stazione: String,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AnagraficaNISECI {
     pub comunita: ComunitaNISECI,
     pub codice_stazione: String,
@@ -366,7 +366,7 @@ impl fmt::Display for AnagraficaNISECI {
     }
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub enum IdroEcoRegioneNISECI {
     AlpiOccidentali,
     PrealpiDolomiti,

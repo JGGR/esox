@@ -106,8 +106,8 @@ mod full_hfbi_private_tests {
     ) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
-                nome_comune: "Test Specie",
-                codice_specie: codice_specie,
+                nome_comune: "Test Specie".to_string(),
+                codice_specie: codice_specie.to_string(),
                 autoctono: true,
                 gruppo_eco,
                 gruppo_trofico: GruppoTrofHFBI {

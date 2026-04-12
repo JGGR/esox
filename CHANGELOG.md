@@ -18,7 +18,7 @@
 - Drop `once_cell` dependency by replacing `once_cell::sync::Lazy` with `std::sync::LazyLock`
   - Needs `rust 1.80`
 - Make types related to full calc results `Deserialize`
-- Make types related to anagrafica `Deserialize`
+- Make types related to full calc input `Serialize`, `Deserialize`
 - Moved templates data for tests `from tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
 - Moved constants for StatoEcologicoNISECI `from tests::engines::niseci::full` to `domain::niseci`
 - Bump deps

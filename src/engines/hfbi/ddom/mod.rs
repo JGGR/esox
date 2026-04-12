@@ -81,8 +81,8 @@ mod ddom_private_tests {
     fn create_dummy_record(peso: f32) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
-                nome_comune: "Dummy",
-                codice_specie: "DM",
+                nome_comune: "Dummy".to_string(),
+                codice_specie: "DM".to_string(),
                 autoctono: true,
                 gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
                 gruppo_trofico: GruppoTrofHFBI {
