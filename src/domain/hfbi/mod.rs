@@ -15,8 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+use std::sync::LazyLock;
 
 use super::localize::CommaFormat;
 use crate::domain::location::Location;
@@ -895,9 +895,9 @@ impl CondizioniRiferimentoHFBI {
     }
 }
 
-static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<
+static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: LazyLock<
     HashMap<CondizioniRiferimentoKeyHFBI, CondizioniRiferimentoHFBI>,
-> = Lazy::new(|| {
+> = LazyLock::new(|| {
     HashMap::from([
         // M-AT-1 data
         (

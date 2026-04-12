@@ -15,8 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::fmt;
 use serde::Deserialize;
+use std::fmt;
 
 #[derive(Clone, Deserialize)]
 pub struct Location {
