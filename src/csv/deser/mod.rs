@@ -25,12 +25,12 @@ use serde::{de, Deserialize, Deserializer};
 use std::io::{self, Read};
 use std::path::Path;
 
-struct NormalizerReader<R: Read> {
+pub(crate) struct NormalizerReader<R: Read> {
     inner: R,
 }
 
 impl<R: Read> NormalizerReader<R> {
-    fn new(inner: R) -> Self {
+    pub(crate) fn new(inner: R) -> Self {
         Self { inner }
     }
 }

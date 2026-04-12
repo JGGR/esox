@@ -19,6 +19,7 @@ use crate::csv::deser::niseci::{
     check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
     check_riferimento_niseci_reader,
 };
+use crate::csv::deser::NormalizerReader;
 use crate::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci, RecordCsvAnagraficaNISECIError,
@@ -46,8 +47,10 @@ where
     R: Read,
     T: RecordCsvRiferimentoNISECI + 'static,
 {
-    let csv_records = check_riferimento_niseci_reader::<R, T>(reader, has_headers)
-        .map_err(RiferimentoNISECIError::Csv)?;
+    let normalizing_reader = NormalizerReader::new(reader);
+    let csv_records =
+        check_riferimento_niseci_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
+            .map_err(RiferimentoNISECIError::Csv)?;
 
     let specie =
         check_records_riferimento_niseci(csv_records).map_err(RiferimentoNISECIError::Value)?;
@@ -83,8 +86,12 @@ where
     R: Read,
     T: RecordCsvCampionamentoNISECI + 'static,
 {
-    let csv_records = check_campionamento_niseci_reader::<R, T>(reader, has_headers)
-        .map_err(CampionamentoNISECIError::Csv)?;
+    let normalizing_reader = NormalizerReader::new(reader);
+    let csv_records = check_campionamento_niseci_reader::<NormalizerReader<R>, T>(
+        normalizing_reader,
+        has_headers,
+    )
+    .map_err(CampionamentoNISECIError::Csv)?;
 
     let records = check_records_campionamento_niseci(csv_records, riferimento_specie)
         .map_err(CampionamentoNISECIError::Value)?;
@@ -120,8 +127,10 @@ where
     R: Read,
     T: RecordCsvAnagraficaNISECI + 'static,
 {
-    let csv_records = check_anagrafica_niseci_reader::<R, T>(reader, has_headers)
-        .map_err(AnagraficaNISECIError::Csv)?;
+    let normalizing_reader = NormalizerReader::new(reader);
+    let csv_records =
+        check_anagrafica_niseci_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
+            .map_err(AnagraficaNISECIError::Csv)?;
 
     let anagrafica =
         check_records_anagrafica_niseci(csv_records).map_err(AnagraficaNISECIError::Value)?;

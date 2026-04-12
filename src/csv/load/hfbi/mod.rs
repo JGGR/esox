@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use crate::csv::deser::hfbi::{check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader};
+use crate::csv::deser::NormalizerReader;
 use crate::csv::parser::hfbi::{
     check_records_anagrafica_hfbi, check_records_campionamento_hfbi, RecordCsvAnagraficaHFBIError,
     RecordCsvCampionamentoHFBIError,
@@ -39,8 +40,10 @@ where
     R: Read,
     T: RecordCsvCampionamentoHFBI + 'static,
 {
-    let csv_records = check_campionamento_hfbi_reader::<R, T>(reader, has_headers)
-        .map_err(CampionamentoHFBIError::Csv)?;
+    let normalizing_reader = NormalizerReader::new(reader);
+    let csv_records =
+        check_campionamento_hfbi_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
+            .map_err(CampionamentoHFBIError::Csv)?;
 
     let records =
         check_records_campionamento_hfbi(csv_records).map_err(CampionamentoHFBIError::Value)?;
@@ -75,8 +78,10 @@ where
     R: Read,
     T: RecordCsvAnagraficaHFBI + 'static,
 {
-    let csv_records = check_anagrafica_hfbi_reader::<R, T>(reader, has_headers)
-        .map_err(AnagraficaHFBIError::Csv)?;
+    let normalizing_reader = NormalizerReader::new(reader);
+    let csv_records =
+        check_anagrafica_hfbi_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
+            .map_err(AnagraficaHFBIError::Csv)?;
 
     let anagrafica =
         check_records_anagrafica_hfbi(csv_records).map_err(AnagraficaHFBIError::Value)?;
