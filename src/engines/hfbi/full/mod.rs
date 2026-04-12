@@ -85,7 +85,7 @@ pub fn calculate_hfbi(
 }
 
 pub fn calculate_stato_ecologico_hfbi(hfbi: Option<f32>) -> Option<StatoEcologicoHFBI> {
-    hfbi.map(|val| StatoEcologicoHFBI::from(val))
+    hfbi.map(StatoEcologicoHFBI::from)
 }
 
 #[cfg(test)]

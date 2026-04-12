@@ -183,10 +183,7 @@ pub fn calculate_stato_ecologico_niseci(
     area: &AreaNISECI,
 ) -> Option<StatoEcologicoNISECI> {
     let rqe_niseci = calculate_rqe_niseci(niseci);
-    match rqe_niseci {
-        Some(val) => Some(StatoEcologicoNISECI::from((val, area))),
-        None => None,
-    }
+    rqe_niseci.map(|val| StatoEcologicoNISECI::from((val, area)))
 }
 
 fn get_valori_intermedi_specie(

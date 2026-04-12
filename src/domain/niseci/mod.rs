@@ -844,6 +844,12 @@ impl fmt::Display for ClassiEtaSpecieNISECI {
     }
 }
 
+impl Default for ClassiEtaSpecieNISECI {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ClassiEtaSpecieNISECI {
     pub fn new() -> ClassiEtaSpecieNISECI {
         ClassiEtaSpecieNISECI {
@@ -1020,6 +1026,12 @@ pub struct InfoPopolazioniNISECI {
     pub intermediates_map: HashMap<String, InfoIntermediePopolazioniNISECI>,
 }
 
+impl Default for InfoPopolazioniNISECI {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl InfoPopolazioniNISECI {
     pub fn new() -> InfoPopolazioniNISECI {
         InfoPopolazioniNISECI {
@@ -1141,6 +1153,12 @@ pub struct ClassiEtaAlieniNISECI {
     pub map_tipo_3: HashMap<String, ClassiEtaSpecieNISECI>,
     pub tot_specie_aliene: usize,
     pub tot_specie_autoctone: usize,
+}
+
+impl Default for ClassiEtaAlieniNISECI {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl ClassiEtaAlieniNISECI {
