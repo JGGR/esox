@@ -16,8 +16,9 @@
 */
 
 use std::fmt;
+use serde::Deserialize;
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub struct Location {
     pub regione: String,
     pub provincia: String,

@@ -608,7 +608,7 @@ impl CampionamentoHFBI {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
 pub enum TipoLagunaCostieraHFBI {
     MAt1,
     MAt2,
@@ -639,7 +639,7 @@ impl TryFrom<i32> for TipoLagunaCostieraHFBI {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
 pub enum StagioneHFBI {
     Primavera,
     Autunno,
@@ -667,7 +667,7 @@ impl TryFrom<i32> for StagioneHFBI {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash, Deserialize)]
 pub enum HabitatHFBI {
     Vegetato,
     NonVegetato,
@@ -708,7 +708,7 @@ pub struct AnagraficaHFBIDraft {
     pub larghezza_media_transetto: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub struct AnagraficaHFBI {
     pub codice_stazione: String,
     pub corpo_idrico: String,

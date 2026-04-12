@@ -211,7 +211,7 @@ pub struct AlieniIndigeni {
     pub indigeni: u32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub enum TipoComunitaNISECI {
     Redatta,
     Recuperata,
@@ -247,7 +247,7 @@ impl TryFrom<i32> for TipoComunitaNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub struct ComunitaNISECI {
     pub tipo: TipoComunitaNISECI,
     pub fonte: Option<String>,
@@ -293,7 +293,7 @@ impl fmt::Display for ComunitaNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub enum AreaNISECI {
     Alpina,
     Mediterranea,
@@ -335,7 +335,7 @@ pub struct AnagraficaNISECIDraft {
     pub larghezza_media_stazione: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub struct AnagraficaNISECI {
     pub comunita: ComunitaNISECI,
     pub codice_stazione: String,
@@ -366,7 +366,7 @@ impl fmt::Display for AnagraficaNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub enum IdroEcoRegioneNISECI {
     AlpiOccidentali,
     PrealpiDolomiti,

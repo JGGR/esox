@@ -14,7 +14,8 @@
 
 ### Changed
 
-- Make types related to full calc results Deserialize
+- Make types related to full calc results `Deserialize`
+- Make types related to anagrafica `Deserialize`
 - Moved templates data for tests `from tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
 - Moved constants for StatoEcologicoNISECI `from tests::engines::niseci::full` to `domain::niseci`
 - Bump deps
@@ -32,7 +33,7 @@
 
 ### Changed
 
-- Make types related to full calc results Serialize
+- Make types related to full calc results `Serialize`
 
 ## [0.1.0] - 2025-12-18
 
