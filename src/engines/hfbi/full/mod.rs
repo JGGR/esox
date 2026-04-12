@@ -19,11 +19,6 @@ const W_DHZP: f32 = 0.84;
 const HFBI_T: f32 = -0.167;
 const HFBI_S: f32 = 0.150;
 
-const STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE: f32 = 0.94;
-const STATO_ECOLOGICO_HFBI_SOGLIA_BUONO: f32 = 0.55;
-const STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE: f32 = 0.33;
-const STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO: f32 = 0.11;
-
 pub fn calculate_mmi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
@@ -90,24 +85,7 @@ pub fn calculate_hfbi(
 }
 
 pub fn calculate_stato_ecologico_hfbi(hfbi: Option<f32>) -> Option<StatoEcologicoHFBI> {
-    match hfbi {
-        Some(val) => {
-            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE {
-                return Some(StatoEcologicoHFBI::Eccellente);
-            }
-            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_BUONO {
-                return Some(StatoEcologicoHFBI::Buono);
-            }
-            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE {
-                return Some(StatoEcologicoHFBI::Sufficiente);
-            }
-            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO {
-                return Some(StatoEcologicoHFBI::Scarso);
-            }
-            Some(StatoEcologicoHFBI::Cattivo)
-        }
-        None => None,
-    }
+    hfbi.map(|val| StatoEcologicoHFBI::from(val))
 }
 
 #[cfg(test)]

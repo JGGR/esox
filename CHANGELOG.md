@@ -5,10 +5,16 @@
 - Add `csv::load` module
   - New methods wrap over the errors of deser/parse steps
 - Add `get_x3_a()`, `get_x3_b()` to `RisultatoNISECI`
+- Add `to_csv()` for:
+  - `domain::niseci::{RisultatoNISECI, ValoriIntermediNISECI}`
+  - `domain::hfbi::{RisultatoHFBI, ValoriIntermediHFBI}`
+- Add `impl From<(f32, &AreaNISECI)>` to `domain::niseci::StatoEcologicoNISECI`
+- Add `impl From<f32>` to `domain::hfbi::StatoEcologicoHFBI`
 
 ### Changed
 
 - Moved templates data for tests `from tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
+- Moved constants for StatoEcologicoNISECI `from tests::engines::niseci::full` to `domain::niseci`
 - Bump deps
 
 ## [0.1.2] - 2026-02-06

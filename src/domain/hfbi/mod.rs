@@ -18,6 +18,7 @@
 use once_cell::sync::Lazy;
 use serde::Serialize;
 
+use super::localize::CommaFormat;
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone)]
@@ -774,6 +775,26 @@ impl ValoriIntermediHFBI {
         //chopping on newlines from add_console_message()
         println!("Valori intermedi: {{{self}}}");
     }
+
+    pub fn to_csv(&self, comma_csv_separator: bool) -> String {
+        let string_representation = if comma_csv_separator {
+            format!(
+                "bbent, bn, dbent, ddom, dhzp, dmig\n{}, {}, {}, {}, {}, {}",
+                self.bbent, self.bn, self.dbent, self.ddom, self.dhzp, self.dmig
+            )
+        } else {
+            format!(
+                "bbent; bn; dbent; ddom; dhzp; dmig\n{}; {}; {}; {}; {}; {}",
+                self.bbent.comma(),
+                self.bn.comma(),
+                self.dbent.comma(),
+                self.ddom.comma(),
+                self.dhzp.comma(),
+                self.dmig.comma()
+            )
+        };
+        string_representation
+    }
 }
 
 #[derive(Clone, Serialize)]
@@ -808,6 +829,43 @@ impl RisultatoHFBI {
     }
     pub fn get_intermediates(&self) -> ValoriIntermediHFBI {
         self.intermediates.clone()
+    }
+    pub fn to_csv(&self, anagrafica: &AnagraficaHFBI, comma_csv_separator: bool) -> String {
+        let hfbi_opt = self.get_valore();
+        if hfbi_opt.is_none() {
+            return "NC".to_string();
+        }
+        let hfbi = hfbi_opt.unwrap();
+        let intermediates = self.get_intermediates();
+        let stato_ecologico = Some(StatoEcologicoHFBI::from(hfbi));
+        let stato_ecologico_str = match stato_ecologico {
+            Some(val) => {
+                format!("{val}")
+            }
+            None => "NC".to_string(),
+        };
+        let string_representation = if comma_csv_separator {
+            format!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI, Stato ecologico\n{}, {}, {}, {}, {}, {}, {}",
+                    anagrafica.codice_stazione,
+                    anagrafica.stagione,
+                    anagrafica.habitat_vegetato,
+                    anagrafica.tipo_laguna,
+                    intermediates.mmi,
+                    hfbi,
+                    stato_ecologico_str
+            )
+        } else {
+            format!("Codice stazione; stagione; habitat vegetato; tipo laguna; MMI; HFBI; Stato ecologico\n{}; {}; {}; {}; {}; {}; {}",
+                    anagrafica.codice_stazione,
+                    anagrafica.stagione,
+                    anagrafica.habitat_vegetato,
+                    anagrafica.tipo_laguna,
+                    intermediates.mmi.comma(),
+                    hfbi.comma(),
+                    stato_ecologico_str
+            )
+        };
+        string_representation
     }
 }
 
@@ -1047,5 +1105,28 @@ impl fmt::Display for StatoEcologicoHFBI {
             StatoEcologicoHFBI::Cattivo => "Cattivo",
         };
         write!(f, "{}", string_representation)
+    }
+}
+
+const STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE: f32 = 0.94;
+const STATO_ECOLOGICO_HFBI_SOGLIA_BUONO: f32 = 0.55;
+const STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE: f32 = 0.33;
+const STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO: f32 = 0.11;
+
+impl From<f32> for StatoEcologicoHFBI {
+    fn from(val: f32) -> Self {
+        if val >= STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE {
+            return StatoEcologicoHFBI::Eccellente;
+        }
+        if val >= STATO_ECOLOGICO_HFBI_SOGLIA_BUONO {
+            return StatoEcologicoHFBI::Buono;
+        }
+        if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE {
+            return StatoEcologicoHFBI::Sufficiente;
+        }
+        if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO {
+            return StatoEcologicoHFBI::Scarso;
+        }
+        StatoEcologicoHFBI::Cattivo
     }
 }

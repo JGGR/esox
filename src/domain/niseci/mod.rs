@@ -21,6 +21,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::vec::Vec;
 
+use super::localize::CommaFormat;
 use super::location::Location;
 
 #[cfg(test)]
@@ -559,6 +560,75 @@ impl ValoriIntermediNISECI {
         //chopping on newlines from add_console_message()
         println!("Valori intermedi: {{{self}}}");
     }
+
+    pub fn to_csv(&self, comma_csv_separator: bool) -> String {
+        let mut string_representation = if comma_csv_separator {
+            "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2b, rapporto ad/juv, x2a_a, x2a_b".to_string()
+        } else {
+            "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
+        };
+        for (_k, v) in self.specie_specifici.iter() {
+            let rapporto_ad_juv_str = match v.rapporto_ad_juv {
+                Some(v) => {
+                    if comma_csv_separator {
+                        format!("{v}")
+                    } else {
+                        v.comma().to_string()
+                    }
+                }
+                None => "NC".to_string(),
+            };
+            let specie_attesa_str = if v.classi_eta.specie.specie_attesa {
+                "SI".to_string()
+            } else {
+                "NO".to_string()
+            };
+            string_representation = if comma_csv_separator {
+                format!(
+                    "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                    string_representation,
+                    v.classi_eta.specie.id,
+                    v.classi_eta.specie.nome,
+                    v.classi_eta.specie.tipo_autoctono,
+                    v.classi_eta.specie.tipo_alloctono,
+                    specie_attesa_str,
+                    v.classi_eta.cl1,
+                    v.classi_eta.cl2,
+                    v.classi_eta.cl3,
+                    v.classi_eta.cl4,
+                    v.classi_eta.cl5,
+                    v.densita_stimata,
+                    v.quantita_stimata,
+                    v.x2_b,
+                    rapporto_ad_juv_str,
+                    v.x2_a_a,
+                    v.x2_a_b
+                )
+            } else {
+                format!(
+                    "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+                    string_representation,
+                    v.classi_eta.specie.id,
+                    v.classi_eta.specie.nome,
+                    v.classi_eta.specie.tipo_autoctono,
+                    v.classi_eta.specie.tipo_alloctono,
+                    specie_attesa_str,
+                    v.classi_eta.cl1,
+                    v.classi_eta.cl2,
+                    v.classi_eta.cl3,
+                    v.classi_eta.cl4,
+                    v.classi_eta.cl5,
+                    v.densita_stimata.comma(),
+                    v.quantita_stimata,
+                    v.x2_b,
+                    rapporto_ad_juv_str,
+                    v.x2_a_a,
+                    v.x2_a_b
+                )
+            }
+        }
+        string_representation
+    }
 }
 
 #[derive(Clone, Serialize)]
@@ -615,6 +685,94 @@ impl RisultatoNISECI {
     }
     pub fn get_x3_b(&self) -> Option<f32> {
         self.valori_intermedi.x3_b
+    }
+
+    pub fn to_csv(&self, anagrafica: &AnagraficaNISECI, comma_csv_separator: bool) -> String {
+        let niseci = self.get_valore();
+        let niseci_str = match niseci {
+            Some(val) => {
+                if comma_csv_separator {
+                    format!("{val}")
+                } else {
+                    val.comma().to_string()
+                }
+            }
+            None => "NC".to_string(),
+        };
+
+        let rqe_niseci = self.get_rqe();
+        let rqe_niseci_str = match rqe_niseci {
+            Some(val) => {
+                if comma_csv_separator {
+                    format!("{val}")
+                } else {
+                    val.comma().to_string()
+                }
+            }
+            None => "NC".to_string(),
+        };
+        let stato_ecologico =
+            rqe_niseci.map(|val| StatoEcologicoNISECI::from((val, &anagrafica.area)));
+        let stato_ecologico_str = match stato_ecologico {
+            Some(val) => {
+                format!("{val}")
+            }
+            None => "NC".to_string(),
+        };
+        let string_representation = if comma_csv_separator {
+            format!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x3_a, x3_b\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                anagrafica.codice_stazione,
+                anagrafica.date_string,
+                anagrafica.posizione.regione,
+                anagrafica.idro_eco_regione,
+                anagrafica.area,
+                anagrafica.corpo_idrico,
+                niseci_str,
+                rqe_niseci_str,
+                stato_ecologico_str,
+                self.get_x1(),
+                match self.get_x2() {
+                    Some(v) => format!("{v}"),
+                    None => "NC".to_string(),
+                },
+                self.get_x3(),
+                match self.get_x3_a() {
+                    Some(v) => format!("{v}"),
+                    None => "NC".to_string(),
+                },
+                match self.get_x3_b() {
+                    Some(v) => format!("{v}"),
+                    None => "NC".to_string(),
+                }
+            )
+        } else {
+            format!("Codice stazione; Data; Regione; Idroecoregione; Area pertinenza; Bacino; NISECI; RQE NISECI; Stato ecologico; x1; x2; x3; x3_a; x3_b\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+                anagrafica.codice_stazione,
+                anagrafica.date_string,
+                anagrafica.posizione.regione,
+                anagrafica.idro_eco_regione,
+                anagrafica.area,
+                anagrafica.corpo_idrico,
+                niseci_str,
+                rqe_niseci_str,
+                stato_ecologico_str,
+                self.get_x1().comma(),
+                match self.get_x2() {
+                    Some(v) => v.comma().to_string(),
+                    None => "NC".to_string(),
+                },
+                self.get_x3().comma(),
+                match self.get_x3_a() {
+                    Some(v) => v.comma().to_string(),
+                    None => "NC".to_string(),
+                },
+                match self.get_x3_b() {
+                    Some(v) => v.comma().to_string(),
+                    None => "NC".to_string(),
+                }
+            )
+        };
+        string_representation
     }
 }
 
@@ -1050,5 +1208,38 @@ impl fmt::Display for StatoEcologicoNISECI {
             StatoEcologicoNISECI::Cattivo => "Cattivo",
         };
         write!(f, "{}", string_representation)
+    }
+}
+
+const STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO: f32 = 0.8;
+const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA: f32 = 0.52;
+const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
+const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
+const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
+
+impl From<(f32, &AreaNISECI)> for StatoEcologicoNISECI {
+    fn from((val, area): (f32, &AreaNISECI)) -> Self {
+        if val >= STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO {
+            return StatoEcologicoNISECI::Elevato;
+        }
+        match area {
+            AreaNISECI::Alpina => {
+                if val >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA {
+                    return StatoEcologicoNISECI::Buono;
+                }
+            }
+            AreaNISECI::Mediterranea => {
+                if val >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA {
+                    return StatoEcologicoNISECI::Buono;
+                }
+            }
+        }
+        if val >= STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO {
+            return StatoEcologicoNISECI::Moderato;
+        }
+        if val >= STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE {
+            return StatoEcologicoNISECI::Scadente;
+        }
+        StatoEcologicoNISECI::Cattivo
     }
 }

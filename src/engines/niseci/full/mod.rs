@@ -29,11 +29,6 @@ use super::x3::calculate_x3;
 
 const RQE_NISECI_MAGIC_ADDEND: f32 = std::f32::consts::FRAC_2_SQRT_PI;
 const RQE_NISECI_MAGIC_QUOTIENT: f32 = 1.0603;
-const STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO: f32 = 0.8;
-const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA: f32 = 0.52;
-const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
-const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
-const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
 
 pub fn calculate_niseci(
     campionamento: &CampionamentoNISECI,
@@ -189,30 +184,7 @@ pub fn calculate_stato_ecologico_niseci(
 ) -> Option<StatoEcologicoNISECI> {
     let rqe_niseci = calculate_rqe_niseci(niseci);
     match rqe_niseci {
-        Some(val) => {
-            if val >= STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO {
-                return Some(StatoEcologicoNISECI::Elevato);
-            }
-            match area {
-                AreaNISECI::Alpina => {
-                    if val >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA {
-                        return Some(StatoEcologicoNISECI::Buono);
-                    }
-                }
-                AreaNISECI::Mediterranea => {
-                    if val >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA {
-                        return Some(StatoEcologicoNISECI::Buono);
-                    }
-                }
-            }
-            if val >= STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO {
-                return Some(StatoEcologicoNISECI::Moderato);
-            }
-            if val >= STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE {
-                return Some(StatoEcologicoNISECI::Scadente);
-            }
-            Some(StatoEcologicoNISECI::Cattivo)
-        }
+        Some(val) => Some(StatoEcologicoNISECI::from((val, area))),
         None => None,
     }
 }

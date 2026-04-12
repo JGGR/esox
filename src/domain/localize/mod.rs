@@ -14,9 +14,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+pub(crate) trait CommaFormat {
+    fn comma(self) -> String;
+}
 
-pub mod hfbi;
-pub mod index;
-pub(crate) mod localize;
-pub mod location;
-pub mod niseci;
+impl CommaFormat for f32 {
+    fn comma(self) -> String {
+        let mut s = self.to_string();
+        if let Some(pos) = s.find('.') {
+            s.replace_range(pos..=pos, ",");
+        }
+        s
+    }
+}
