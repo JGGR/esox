@@ -11,6 +11,7 @@
 - Add `impl From<(f32, &AreaNISECI)>` to `domain::niseci::StatoEcologicoNISECI`
 - Add `impl From<f32>` to `domain::hfbi::StatoEcologicoHFBI`
 - Add `impl Default` to `domain::niseci::{ClassiEtaSpecieNISECI, ClassiEtaAlieniNISECI, InfoPopolazioniNISECI}`
+- Add `meta::version()` to get crate version
 
 ### Changed
 

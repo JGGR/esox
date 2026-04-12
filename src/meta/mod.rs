@@ -14,10 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-pub mod csv;
-pub mod domain;
-pub mod engines;
-pub mod meta;
-#[cfg(test)]
-mod tests;
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub fn version() -> &'static str {
+    VERSION
+}
