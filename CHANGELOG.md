@@ -4,6 +4,7 @@
 
 - Add `csv::load` module
   - New methods wrap over the errors of deser/parse steps
+- Add `get_x3_a()`, `get_x3_b()` to `RisultatoNISECI`
 
 ### Changed
 

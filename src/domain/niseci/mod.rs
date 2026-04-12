@@ -610,6 +610,12 @@ impl RisultatoNISECI {
     pub fn get_x3(&self) -> f32 {
         self.valori_intermedi.x3
     }
+    pub fn get_x3_a(&self) -> Option<f32> {
+        self.valori_intermedi.x3_a
+    }
+    pub fn get_x3_b(&self) -> Option<f32> {
+        self.valori_intermedi.x3_b
+    }
 }
 
 #[derive(Clone, Copy)]
