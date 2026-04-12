@@ -38,7 +38,20 @@ use crate::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,
     CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER,
 };
+
+use crate::csv::load::hfbi::{
+    load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader,
+};
+use crate::csv::load::niseci::{
+    load_anagrafica_niseci_from_reader, load_campionamento_niseci_from_reader,
+    load_riferimento_niseci_from_reader,
+};
 use crate::domain::niseci::SpecieNISECI;
+use crate::tests::test_utils::{
+    ANAGRAFICA_HFBI_TEMPLATE_DATA, ANAGRAFICA_NISECI_TEMPLATE_DATA,
+    CAMPIONAMENTO_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_NISECI_TEMPLATE_DATA,
+    RIFERIMENTO_NISECI_TEMPLATE_DATA,
+};
 use std::io::Cursor;
 
 #[test]
@@ -278,6 +291,16 @@ fn test_recordcsv_riferimento_niseci_soglie_ad_juv_error() {
 }
 
 #[test]
+fn test_load_riferimento_niseci() {
+    let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
+    let riferimento = load_riferimento_niseci_from_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(
+        riferimento_reader,
+        true,
+    );
+    assert!(riferimento.is_ok());
+}
+
+#[test]
 fn test_csv_campionamento_niseci_found_string_expect_int() {
     let csv_data = format!(
         "{}\n07/07/2019;2190627 Reno 390;1;BA;abc;152",
@@ -416,6 +439,23 @@ fn test_valid_recordcsv_campionamento_niseci() {
 }
 
 #[test]
+fn test_load_campionamento_niseci() {
+    let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
+    let riferimento = load_riferimento_niseci_from_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(
+        riferimento_reader,
+        true,
+    );
+    assert!(riferimento.is_ok());
+    let riferimento_specie = riferimento.unwrap();
+    let campionamento_reader = Cursor::new(CAMPIONAMENTO_NISECI_TEMPLATE_DATA);
+    let campionamento = load_campionamento_niseci_from_reader::<
+        _,
+        VeryItalianRecordCsvCampionamentoNISECI,
+    >(campionamento_reader, true, riferimento_specie);
+    assert!(campionamento.is_ok());
+}
+
+#[test]
 fn test_csv_anagrafica_niseci_found_string_expect_int() {
     let csv_data = format!(
         "{}\nCODICE;CORPO;REGIONE;PROVINCIA;1/1/1111;abc;8;0;;;20;1;BACINO",
@@ -533,6 +573,16 @@ fn test_valid_recordcsv_anagrafica_niseci() {
 }
 
 #[test]
+fn test_load_anagrafica_niseci() {
+    let anagrafica_reader = Cursor::new(ANAGRAFICA_NISECI_TEMPLATE_DATA);
+    let anagrafica = load_anagrafica_niseci_from_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(
+        anagrafica_reader,
+        true,
+    );
+    assert!(anagrafica.is_ok());
+}
+
+#[test]
 fn test_csv_campionamento_hfbi_found_string_expect_int() {
     let csv_data = format!("{}\nAN;foo;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
@@ -622,6 +672,16 @@ fn test_valid_recordcsv_campionamento_hfbi() {
     let result = check_records_campionamento_hfbi(recordcsv_data);
 
     assert!(!result.is_err());
+}
+
+#[test]
+fn test_load_campionamento_hfbi() {
+    let campionamento_reader = Cursor::new(CAMPIONAMENTO_HFBI_TEMPLATE_DATA);
+    let campionamento = load_campionamento_hfbi_from_reader::<
+        _,
+        VeryItalianRecordCsvCampionamentoHFBI,
+    >(campionamento_reader, true);
+    assert!(campionamento.is_ok());
 }
 
 #[test]
@@ -736,4 +796,14 @@ fn test_valid_recordcsv_anagrafica_hfbi() {
     let result = check_records_anagrafica_hfbi(recordcsv_data);
 
     assert!(!result.is_err());
+}
+
+#[test]
+fn test_load_anagrafica_hfbi() {
+    let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
+    let anagrafica = load_anagrafica_hfbi_from_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(
+        anagrafica_reader,
+        true,
+    );
+    assert!(anagrafica.is_ok());
 }

@@ -21,12 +21,8 @@ use crate::csv::deser::hfbi::{
 use crate::csv::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
 use crate::domain::hfbi::CampionamentoHFBI;
 use crate::engines::hfbi::full::calculate_hfbi;
+use crate::tests::test_utils::{ANAGRAFICA_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_HFBI_TEMPLATE_DATA};
 use std::io::Cursor;
-
-const CAMPIONAMENTO_HFBI_TEMPLATE_DATA: &[u8] =
-    include_bytes!("../../../../../templates/campionamento_hfbi.csv");
-const ANAGRAFICA_HFBI_TEMPLATE_DATA: &[u8] =
-    include_bytes!("../../../../../templates/anagrafica_hfbi.csv");
 
 #[test]
 fn calculate_hfbi_template() {

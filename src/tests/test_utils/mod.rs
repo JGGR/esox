@@ -23,6 +23,17 @@ use crate::domain::{
     },
 };
 
+pub const RIFERIMENTO_NISECI_TEMPLATE_DATA: &[u8] =
+    include_bytes!("../../../templates/riferimento_niseci.csv");
+pub const CAMPIONAMENTO_NISECI_TEMPLATE_DATA: &[u8] =
+    include_bytes!("../../../templates/campionamento_niseci.csv");
+pub const ANAGRAFICA_NISECI_TEMPLATE_DATA: &[u8] =
+    include_bytes!("../../../templates/anagrafica_niseci.csv");
+pub const CAMPIONAMENTO_HFBI_TEMPLATE_DATA: &[u8] =
+    include_bytes!("../../../templates/campionamento_hfbi.csv");
+pub const ANAGRAFICA_HFBI_TEMPLATE_DATA: &[u8] =
+    include_bytes!("../../../templates/anagrafica_hfbi.csv");
+
 pub fn create_dummy_anagrafica() -> AnagraficaNISECI {
     return AnagraficaNISECI {
         comunita: ComunitaNISECI {

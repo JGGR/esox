@@ -29,17 +29,11 @@ use crate::{
     engines::niseci::full::calculate_niseci,
     tests::test_utils::{
         create_dummy_anagrafica, create_dummy_campionamento_chopped,
-        create_dummy_campionamento_full, create_dummy_riferimento,
+        create_dummy_campionamento_full, create_dummy_riferimento, ANAGRAFICA_NISECI_TEMPLATE_DATA,
+        CAMPIONAMENTO_NISECI_TEMPLATE_DATA, RIFERIMENTO_NISECI_TEMPLATE_DATA,
     },
 };
 use std::io::Cursor;
-
-const RIFERIMENTO_NISECI_TEMPLATE_DATA: &[u8] =
-    include_bytes!("../../../../../templates/riferimento_niseci.csv");
-const CAMPIONAMENTO_NISECI_TEMPLATE_DATA: &[u8] =
-    include_bytes!("../../../../../templates/campionamento_niseci.csv");
-const ANAGRAFICA_NISECI_TEMPLATE_DATA: &[u8] =
-    include_bytes!("../../../../../templates/anagrafica_niseci.csv");
 
 #[test]
 fn calculate_dummy_niseci_campionamento_full() {

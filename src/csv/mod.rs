@@ -16,6 +16,7 @@
 */
 
 pub mod deser;
+pub mod load;
 pub mod parser;
 
 // This must be kept aligned with RecordCsvRiferimentoNISECI definition.
