@@ -9,6 +9,7 @@
 ### Changed
 
 - Moved templates data for tests `from tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
+- Bump deps
 
 ## [0.1.2] - 2026-02-06
 

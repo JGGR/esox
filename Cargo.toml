@@ -10,7 +10,7 @@ exclude = [
 ]
 
 [dependencies]
-chrono = "0.4.42"
+chrono = "0.4.44"
 csv = "1.4.0"
-once_cell = "1.21.3"
+once_cell = "1.21.4"
 serde = { version = "1.0.228", features = ["derive"] }
