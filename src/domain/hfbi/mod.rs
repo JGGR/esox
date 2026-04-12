@@ -16,7 +16,7 @@
 */
 
 use once_cell::sync::Lazy;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::localize::CommaFormat;
 use crate::domain::location::Location;
@@ -746,7 +746,7 @@ impl fmt::Display for AnagraficaHFBI {
     }
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ValoriIntermediHFBI {
     pub bbent: f32,
     pub bn: f32,
@@ -797,7 +797,7 @@ impl ValoriIntermediHFBI {
     }
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct RisultatoHFBI {
     valore: Option<f32>,
     intermediates: ValoriIntermediHFBI,

@@ -13,6 +13,7 @@
 
 ### Changed
 
+- Make types related to full calc results Deserialize
 - Moved templates data for tests `from tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
 - Moved constants for StatoEcologicoNISECI `from tests::engines::niseci::full` to `domain::niseci`
 - Bump deps
