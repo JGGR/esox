@@ -53,7 +53,45 @@
 //!
 //! Templates for input files are located in the `./templates/` directory.
 //! All templates currently use the alternative (`;`) format.
-//! ```
+//!
+//! ## Example usage
+//!
+//! ### NISECI
+//!
+//!```rust
+//! use std::io::Cursor;
+//! use esox::csv::load::InputFormat;
+//! use esox::csv::load::niseci::*;
+//! use esox::engines::niseci::full::calculate_niseci;
+//! const RIFERIMENTO_DATA: &[u8] =
+//! include_bytes!("../templates/riferimento_niseci.csv");
+//!
+//! let has_headers = true;
+//! let format = InputFormat::Alternative;
+//! let riferimento_reader = Cursor::new(RIFERIMENTO_DATA);
+//! let riferimento = load_riferimento_niseci_from_reader(riferimento_reader, has_headers, format).unwrap();
+//! let campionamento = load_campionamento_niseci_from_path("./templates/campionamento_niseci.csv", has_headers, &riferimento, format).unwrap();
+//! let anagrafica = load_anagrafica_niseci_from_path("./templates/anagrafica_niseci.csv", has_headers, format).unwrap();
+//! let (niseci, intermediates) = calculate_niseci(&campionamento, &riferimento, &anagrafica).unwrap();
+//!```
+//!
+//! ### HFBI
+//!
+//!```rust
+//! use std::io::Cursor;
+//! use esox::csv::load::InputFormat;
+//! use esox::csv::load::hfbi::*;
+//! use esox::engines::hfbi::full::calculate_hfbi;
+//! const CAMPIONAMENTO_DATA: &[u8] =
+//! include_bytes!("../templates/campionamento_hfbi.csv");
+//!
+//! let has_headers = true;
+//! let format = InputFormat::Alternative;
+//! let campionamento_reader = Cursor::new(CAMPIONAMENTO_DATA);
+//! let campionamento = load_campionamento_hfbi_from_reader::<_>(campionamento_reader, has_headers, format).unwrap();
+//! let anagrafica = load_anagrafica_hfbi_from_path("./templates/anagrafica_hfbi.csv", has_headers, format).unwrap();
+//! let (hfbi, intermediates) = calculate_hfbi(&campionamento, &anagrafica).unwrap();
+//!```
 pub mod csv;
 pub mod domain;
 pub mod engines;

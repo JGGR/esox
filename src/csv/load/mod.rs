@@ -17,3 +17,10 @@
 
 pub mod hfbi;
 pub mod niseci;
+
+#[derive(Copy, Clone, Default)]
+pub enum InputFormat {
+    #[default]
+    Standard,
+    Alternative,
+}

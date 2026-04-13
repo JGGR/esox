@@ -27,6 +27,14 @@ use crate::csv::deser::{
     },
     translate_error_message,
 };
+use crate::csv::load::hfbi::{
+    load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader,
+};
+use crate::csv::load::niseci::{
+    load_anagrafica_niseci_from_reader, load_campionamento_niseci_from_reader,
+    load_riferimento_niseci_from_reader,
+};
+use crate::csv::load::InputFormat;
 use crate::csv::parser::{
     hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
     niseci::{
@@ -37,14 +45,6 @@ use crate::csv::parser::{
 use crate::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,
     CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER,
-};
-
-use crate::csv::load::hfbi::{
-    load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader,
-};
-use crate::csv::load::niseci::{
-    load_anagrafica_niseci_from_reader, load_campionamento_niseci_from_reader,
-    load_riferimento_niseci_from_reader,
 };
 use crate::domain::niseci::SpecieNISECI;
 use crate::tests::test_utils::{
@@ -293,9 +293,10 @@ fn test_recordcsv_riferimento_niseci_soglie_ad_juv_error() {
 #[test]
 fn test_load_riferimento_niseci() {
     let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
-    let riferimento = load_riferimento_niseci_from_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(
+    let riferimento = load_riferimento_niseci_from_reader::<_>(
         riferimento_reader,
         true,
+        InputFormat::Alternative,
     );
     assert!(riferimento.is_ok());
 }
@@ -441,17 +442,20 @@ fn test_valid_recordcsv_campionamento_niseci() {
 #[test]
 fn test_load_campionamento_niseci() {
     let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
-    let riferimento = load_riferimento_niseci_from_reader::<_, VeryItalianRecordCsvRiferimentoNISECI>(
+    let riferimento = load_riferimento_niseci_from_reader::<_>(
         riferimento_reader,
         true,
+        InputFormat::Alternative,
     );
     assert!(riferimento.is_ok());
-    let riferimento_specie = riferimento.unwrap();
+    let riferimento = riferimento.unwrap();
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_NISECI_TEMPLATE_DATA);
-    let campionamento = load_campionamento_niseci_from_reader::<
-        _,
-        VeryItalianRecordCsvCampionamentoNISECI,
-    >(campionamento_reader, true, &riferimento_specie);
+    let campionamento = load_campionamento_niseci_from_reader::<_>(
+        campionamento_reader,
+        true,
+        &riferimento,
+        InputFormat::Alternative,
+    );
     assert!(campionamento.is_ok());
 }
 
@@ -575,10 +579,8 @@ fn test_valid_recordcsv_anagrafica_niseci() {
 #[test]
 fn test_load_anagrafica_niseci() {
     let anagrafica_reader = Cursor::new(ANAGRAFICA_NISECI_TEMPLATE_DATA);
-    let anagrafica = load_anagrafica_niseci_from_reader::<_, VeryItalianRecordCsvAnagraficaNISECI>(
-        anagrafica_reader,
-        true,
-    );
+    let anagrafica =
+        load_anagrafica_niseci_from_reader::<_>(anagrafica_reader, true, InputFormat::Alternative);
     assert!(anagrafica.is_ok());
 }
 
@@ -677,10 +679,11 @@ fn test_valid_recordcsv_campionamento_hfbi() {
 #[test]
 fn test_load_campionamento_hfbi() {
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_HFBI_TEMPLATE_DATA);
-    let campionamento = load_campionamento_hfbi_from_reader::<
-        _,
-        VeryItalianRecordCsvCampionamentoHFBI,
-    >(campionamento_reader, true);
+    let campionamento = load_campionamento_hfbi_from_reader::<_>(
+        campionamento_reader,
+        true,
+        InputFormat::Alternative,
+    );
     assert!(campionamento.is_ok());
 }
 
@@ -801,9 +804,7 @@ fn test_valid_recordcsv_anagrafica_hfbi() {
 #[test]
 fn test_load_anagrafica_hfbi() {
     let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
-    let anagrafica = load_anagrafica_hfbi_from_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(
-        anagrafica_reader,
-        true,
-    );
+    let anagrafica =
+        load_anagrafica_hfbi_from_reader::<_>(anagrafica_reader, true, InputFormat::Alternative);
     assert!(anagrafica.is_ok());
 }
