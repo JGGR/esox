@@ -21,7 +21,7 @@
 - Make types related to full calc input `Serialize`, `Deserialize`
 - Add `#[serde(deny_unknown_fields)]` to `Deserialize` types
   - Types with `Deserialize` in `csv::deser` modules did not receive this annotation since it would be a breaking change
-- Moved templates data for tests `from tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
+- Moved templates data for tests from `tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
 - Moved constants for `StatoEcologicoNISECI` from `tests::engines::niseci::full` to `domain::niseci`
 - Bump deps
 - Turn off default features for `chrono`
