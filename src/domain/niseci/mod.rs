@@ -29,6 +29,7 @@ use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_ev
                                                       // in test builds
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SpecieNISECI {
     pub id: String,
     pub nome: String,
@@ -84,6 +85,7 @@ impl SpecieNISECI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RiferimentoNISECI {
     pub elenco_specie: Vec<SpecieNISECI>,
 }
@@ -106,6 +108,7 @@ impl RiferimentoNISECI {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecordNISECI {
     pub specie: SpecieNISECI,
     pub passaggio_cattura: u8,
@@ -123,6 +126,7 @@ impl fmt::Display for RecordNISECI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {
     pub campionamento: Vec<RecordNISECI>,
 }
@@ -212,6 +216,7 @@ pub struct AlieniIndigeni {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum TipoComunitaNISECI {
     Redatta,
     Recuperata,
@@ -248,6 +253,7 @@ impl TryFrom<i32> for TipoComunitaNISECI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComunitaNISECI {
     pub tipo: TipoComunitaNISECI,
     pub fonte: Option<String>,
@@ -294,6 +300,7 @@ impl fmt::Display for ComunitaNISECI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum AreaNISECI {
     Alpina,
     Mediterranea,
@@ -336,6 +343,7 @@ pub struct AnagraficaNISECIDraft {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnagraficaNISECI {
     pub comunita: ComunitaNISECI,
     pub codice_stazione: String,
@@ -367,6 +375,7 @@ impl fmt::Display for AnagraficaNISECI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum IdroEcoRegioneNISECI {
     AlpiOccidentali,
     PrealpiDolomiti,
@@ -484,6 +493,7 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ValoriIntermediSpecieNISECI {
     pub densita_stimata: f32,
     pub quantita_stimata: u32,
@@ -517,6 +527,7 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ValoriIntermediNISECI {
     pub x1: f32,
     pub x2: Option<f32>,
@@ -632,6 +643,7 @@ impl ValoriIntermediNISECI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RisultatoNISECI {
     valore: Option<f32>,
     rqe: Option<f32>,
@@ -825,6 +837,7 @@ impl MetricheX2A {
 /// nel campionamento per ogni specie catturata
 /// suddivisi nelle loro classi di eta (in base alla lunghezza)
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ClassiEtaSpecieNISECI {
     pub specie: SpecieNISECI,
     pub cl1: u32,

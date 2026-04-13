@@ -22,6 +22,7 @@ use super::localize::CommaFormat;
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum GruppoEcoHFBI {
     MigratoriMarini,
     Diadromi,
@@ -46,6 +47,7 @@ impl fmt::Display for GruppoEcoHFBI {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct GruppoTrofHFBI {
     pub microbentivori: f32,
     pub macrobentivori: f32,
@@ -73,6 +75,7 @@ impl fmt::Display for GruppoTrofHFBI {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SpecieHFBI {
     pub nome_comune: String,
     pub codice_specie: String,
@@ -572,6 +575,7 @@ pub static RIFERIMENTO_HFBI: LazyLock<Vec<SpecieHFBI>> = LazyLock::new(|| {
 use std::{collections::HashMap, fmt};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecordHFBI {
     pub specie: SpecieHFBI,
     pub numero_individui: u32, // in millimetri
@@ -589,6 +593,7 @@ impl fmt::Display for RecordHFBI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CampionamentoHFBI {
     pub campionamento: Vec<RecordHFBI>,
 }
@@ -611,6 +616,7 @@ impl CampionamentoHFBI {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum TipoLagunaCostieraHFBI {
     MAt1,
     MAt2,
@@ -642,6 +648,7 @@ impl TryFrom<i32> for TipoLagunaCostieraHFBI {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum StagioneHFBI {
     Primavera,
     Autunno,
@@ -670,6 +677,7 @@ impl TryFrom<i32> for StagioneHFBI {
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum HabitatHFBI {
     Vegetato,
     NonVegetato,
@@ -711,6 +719,7 @@ pub struct AnagraficaHFBIDraft {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AnagraficaHFBI {
     pub codice_stazione: String,
     pub corpo_idrico: String,
@@ -749,6 +758,7 @@ impl fmt::Display for AnagraficaHFBI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ValoriIntermediHFBI {
     pub bbent: f32,
     pub bn: f32,
@@ -800,6 +810,7 @@ impl ValoriIntermediHFBI {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RisultatoHFBI {
     valore: Option<f32>,
     intermediates: ValoriIntermediHFBI,

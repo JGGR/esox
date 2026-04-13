@@ -25,6 +25,8 @@ use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvCampionamentoHFBI {
@@ -56,6 +58,8 @@ impl fmt::Display for VeryItalianRecordCsvCampionamentoHFBI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvCampionamentoHFBI {
@@ -180,6 +184,8 @@ where
     check_campionamento_hfbi_reader(file, has_headers)
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvAnagraficaHFBI {
@@ -252,6 +258,8 @@ impl fmt::Display for VeryItalianRecordCsvAnagraficaHFBI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvAnagraficaHFBI {

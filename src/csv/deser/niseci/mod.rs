@@ -28,6 +28,8 @@ use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvRiferimentoNISECI {
@@ -124,6 +126,8 @@ impl fmt::Display for VeryItalianRecordCsvRiferimentoNISECI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvRiferimentoNISECI {
@@ -308,6 +312,8 @@ where
     check_riferimento_niseci_reader(file, has_headers)
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvCampionamentoNISECI {
@@ -352,6 +358,8 @@ impl fmt::Display for VeryItalianRecordCsvCampionamentoNISECI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvCampionamentoNISECI {
@@ -489,6 +497,8 @@ where
     check_campionamento_niseci_reader(file, has_headers)
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvAnagraficaNISECI {
@@ -577,6 +587,8 @@ impl fmt::Display for VeryItalianRecordCsvAnagraficaNISECI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvAnagraficaNISECI {
