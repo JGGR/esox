@@ -561,8 +561,8 @@ impl ValoriIntermediNISECI {
         println!("Valori intermedi: {{{self}}}");
     }
 
-    pub fn to_csv(&self, comma_csv_separator: bool) -> String {
-        let mut string_representation = if comma_csv_separator {
+    pub fn to_csv(&self, comma_csv_delimiter: bool) -> String {
+        let mut string_representation = if comma_csv_delimiter {
             "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2b, rapporto ad/juv, x2a_a, x2a_b".to_string()
         } else {
             "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
@@ -570,7 +570,7 @@ impl ValoriIntermediNISECI {
         for (_k, v) in self.specie_specifici.iter() {
             let rapporto_ad_juv_str = match v.rapporto_ad_juv {
                 Some(v) => {
-                    if comma_csv_separator {
+                    if comma_csv_delimiter {
                         format!("{v}")
                     } else {
                         v.comma().to_string()
@@ -583,7 +583,7 @@ impl ValoriIntermediNISECI {
             } else {
                 "NO".to_string()
             };
-            string_representation = if comma_csv_separator {
+            string_representation = if comma_csv_delimiter {
                 format!(
                     "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                     string_representation,
@@ -687,11 +687,11 @@ impl RisultatoNISECI {
         self.valori_intermedi.x3_b
     }
 
-    pub fn to_csv(&self, anagrafica: &AnagraficaNISECI, comma_csv_separator: bool) -> String {
+    pub fn to_csv(&self, anagrafica: &AnagraficaNISECI, comma_csv_delimiter: bool) -> String {
         let niseci = self.get_valore();
         let niseci_str = match niseci {
             Some(val) => {
-                if comma_csv_separator {
+                if comma_csv_delimiter {
                     format!("{val}")
                 } else {
                     val.comma().to_string()
@@ -703,7 +703,7 @@ impl RisultatoNISECI {
         let rqe_niseci = self.get_rqe();
         let rqe_niseci_str = match rqe_niseci {
             Some(val) => {
-                if comma_csv_separator {
+                if comma_csv_delimiter {
                     format!("{val}")
                 } else {
                     val.comma().to_string()
@@ -719,7 +719,7 @@ impl RisultatoNISECI {
             }
             None => "NC".to_string(),
         };
-        let string_representation = if comma_csv_separator {
+        let string_representation = if comma_csv_delimiter {
             format!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x3_a, x3_b\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                 anagrafica.codice_stazione,
                 anagrafica.date_string,

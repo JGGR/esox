@@ -778,8 +778,8 @@ impl ValoriIntermediHFBI {
         println!("Valori intermedi: {{{self}}}");
     }
 
-    pub fn to_csv(&self, comma_csv_separator: bool) -> String {
-        let string_representation = if comma_csv_separator {
+    pub fn to_csv(&self, comma_csv_delimiter: bool) -> String {
+        let string_representation = if comma_csv_delimiter {
             format!(
                 "bbent, bn, dbent, ddom, dhzp, dmig\n{}, {}, {}, {}, {}, {}",
                 self.bbent, self.bn, self.dbent, self.ddom, self.dhzp, self.dmig
@@ -832,7 +832,7 @@ impl RisultatoHFBI {
     pub fn get_intermediates(&self) -> ValoriIntermediHFBI {
         self.intermediates.clone()
     }
-    pub fn to_csv(&self, anagrafica: &AnagraficaHFBI, comma_csv_separator: bool) -> String {
+    pub fn to_csv(&self, anagrafica: &AnagraficaHFBI, comma_csv_delimiter: bool) -> String {
         let hfbi_opt = self.get_valore();
         if hfbi_opt.is_none() {
             return "NC".to_string();
@@ -846,7 +846,7 @@ impl RisultatoHFBI {
             }
             None => "NC".to_string(),
         };
-        let string_representation = if comma_csv_separator {
+        let string_representation = if comma_csv_delimiter {
             format!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI, Stato ecologico\n{}, {}, {}, {}, {}, {}, {}",
                     anagrafica.codice_stazione,
                     anagrafica.stagione,
