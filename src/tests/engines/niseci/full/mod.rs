@@ -91,7 +91,7 @@ fn calculate_niseci_template() {
     let campionamento_csv_records = campionamento_csv_check.expect("is_ok() was checked before");
 
     let campionamento_value_check =
-        check_records_campionamento_niseci(campionamento_csv_records, riferimento_specie.clone());
+        check_records_campionamento_niseci(campionamento_csv_records, &riferimento_specie);
 
     assert!(campionamento_value_check.is_ok());
 

@@ -259,7 +259,7 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
 
 pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
-    riferimento_specie: Vec<SpecieNISECI>,
+    riferimento_specie: &Vec<SpecieNISECI>,
 ) -> (Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>) {
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
@@ -275,7 +275,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
         }
         let codice_specie = r.codice_specie();
         let mut opt_matched_specie = None;
-        for s in &riferimento_specie {
+        for s in riferimento_specie {
             // FIXME: this is O(n^2).
             if s.id == codice_specie {
                 opt_matched_specie = Some(s);
@@ -618,7 +618,7 @@ pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
 
 pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
-    riferimento_specie: Vec<SpecieNISECI>,
+    riferimento_specie: &Vec<SpecieNISECI>,
 ) -> Result<Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>> {
     let (records, errors) = parse_recordcsv_campionamento_niseci(records, riferimento_specie);
 

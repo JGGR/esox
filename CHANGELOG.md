@@ -15,6 +15,7 @@
 
 ### Changed
 
+- Make parsing of `CampionamentoNISECI` borrow `&Vec<SpecieNISECI>`
 - Drop `once_cell` dependency by replacing `once_cell::sync::Lazy` with `std::sync::LazyLock`
   - Needs `rust 1.80`
 - Make types related to full calc results `Deserialize`

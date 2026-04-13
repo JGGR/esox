@@ -433,7 +433,7 @@ fn test_valid_recordcsv_campionamento_niseci() {
         peso: 100.0,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_campionamento_niseci(recordcsv_data, riferimento_specie);
+    let result = check_records_campionamento_niseci(recordcsv_data, &riferimento_specie);
 
     assert!(!result.is_err());
 }
@@ -451,7 +451,7 @@ fn test_load_campionamento_niseci() {
     let campionamento = load_campionamento_niseci_from_reader::<
         _,
         VeryItalianRecordCsvCampionamentoNISECI,
-    >(campionamento_reader, true, riferimento_specie);
+    >(campionamento_reader, true, &riferimento_specie);
     assert!(campionamento.is_ok());
 }
 

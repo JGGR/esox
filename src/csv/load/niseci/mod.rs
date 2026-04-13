@@ -80,7 +80,7 @@ pub enum CampionamentoNISECIError {
 pub fn load_campionamento_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
-    riferimento_specie: Vec<SpecieNISECI>,
+    riferimento_specie: &Vec<SpecieNISECI>,
 ) -> Result<Vec<RecordNISECI>, CampionamentoNISECIError>
 where
     R: Read,
@@ -102,7 +102,7 @@ where
 pub fn load_campionamento_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
-    riferimento_specie: Vec<SpecieNISECI>,
+    riferimento_specie: &Vec<SpecieNISECI>,
 ) -> Result<Vec<RecordNISECI>, CampionamentoNISECIError>
 where
     T: RecordCsvCampionamentoNISECI + 'static,
