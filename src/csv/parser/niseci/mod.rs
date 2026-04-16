@@ -72,22 +72,39 @@ impl fmt::Display for RecordCsvRiferimentoNISECIError {
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to return (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>)"
+    note = "v0.2 will change signature to return RiferimentoNISECIParseResult\nConsider using RiferimentoNISECIParseResult::new(records).into_parts()"
 )]
 pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> (Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>) {
-    let (rif, errs) = parse_recordcsv_riferimento_niseci_impl::<T>(records);
+    let (rif, errs) = parse_recordcsv_riferimento_niseci_impl::<T>(records).into_parts();
     (rif.elenco_specie, errs)
+}
+
+pub struct RiferimentoNISECIParseResult(RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>);
+
+impl RiferimentoNISECIParseResult {
+    pub fn new<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> Self {
+        parse_recordcsv_riferimento_niseci_impl(records)
+    }
+    pub fn into_parts(self) -> (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>) {
+        (self.0, self.1)
+    }
+    pub fn value(&self) -> &RiferimentoNISECI {
+        &self.0
+    }
+    pub fn errors(&self) -> &Vec<RecordCsvRiferimentoNISECIError> {
+        &self.1
+    }
 }
 
 /// v0.2 will have this method public without the _impl suffix
 /// Internal transitional API for migrating:
-///   - returning (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>)
+///   - returning RiferimentoNISECIParseResult instead of tuple
 ///     - success field (.0) used to be Vec<SpecieNISECI>
 pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
-) -> (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>) {
+) -> RiferimentoNISECIParseResult {
     let mut specie = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -252,7 +269,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordCsvRiferimentoNIS
         used_id_specie.push(id);
     }
 
-    (
+    RiferimentoNISECIParseResult(
         RiferimentoNISECI {
             elenco_specie: specie,
         },
@@ -277,7 +294,7 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return (CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>)"
+    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECIParseResult\n  Consider using CampionamentoNISECIParseResult::new(records, riferimento).into_parts()"
 )]
 pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
@@ -288,20 +305,44 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
         &RiferimentoNISECI {
             elenco_specie: riferimento_specie,
         },
-    );
+    )
+    .into_parts();
     (camp.campionamento, errs)
+}
+
+pub struct CampionamentoNISECIParseResult(
+    CampionamentoNISECI,
+    Vec<RecordCsvCampionamentoNISECIError>,
+);
+
+impl CampionamentoNISECIParseResult {
+    pub fn new<T: RecordCsvCampionamentoNISECI>(
+        records: Vec<T>,
+        riferimento: &RiferimentoNISECI,
+    ) -> Self {
+        parse_recordcsv_campionamento_niseci_impl(records, riferimento)
+    }
+    pub fn into_parts(self) -> (CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>) {
+        (self.0, self.1)
+    }
+    pub fn value(&self) -> &CampionamentoNISECI {
+        &self.0
+    }
+    pub fn errors(&self) -> &Vec<RecordCsvCampionamentoNISECIError> {
+        &self.1
+    }
 }
 
 /// v0.2 will have this method public without the _impl suffix
 /// Internal transitional API for migrating:
 ///   - borrow over riferimento_specie
 ///   - taking &RiferimentoNISECI over &Vec<SpecieNISECI>
-///   - returning (CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>)
+///   - returning CampionamentoNISECIParseResult instead of tuple
 ///     - success field (.0) used to be Vec<RecordNISECI>
 pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: &RiferimentoNISECI,
-) -> (CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>) {
+) -> CampionamentoNISECIParseResult {
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -366,7 +407,7 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCsvCampionament
         };
         campioni.push(niseci_rec);
     }
-    (
+    CampionamentoNISECIParseResult(
         CampionamentoNISECI {
             campionamento: campioni,
         },
@@ -641,7 +682,7 @@ pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
 pub(crate) fn check_records_riferimento_niseci_impl<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> Result<RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>> {
-    let (rif, errors) = parse_recordcsv_riferimento_niseci_impl(records);
+    let (rif, errors) = parse_recordcsv_riferimento_niseci_impl(records).into_parts();
 
     println!(
         "Riferimento NISECI: Numero record validi: {}",
@@ -697,7 +738,8 @@ pub(crate) fn check_records_campionamento_niseci_impl<T: RecordCsvCampionamentoN
     records: Vec<T>,
     riferimento_specie: &RiferimentoNISECI,
 ) -> Result<CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>> {
-    let (camp, errors) = parse_recordcsv_campionamento_niseci_impl(records, riferimento_specie);
+    let (camp, errors) =
+        parse_recordcsv_campionamento_niseci_impl(records, riferimento_specie).into_parts();
 
     println!(
         "Campionamento NISECI: Numero record validi: {}",
