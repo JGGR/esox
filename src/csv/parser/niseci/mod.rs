@@ -21,8 +21,8 @@ use crate::csv::{
 };
 use crate::domain::location::Location;
 use crate::domain::niseci::{
-    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, RecordNISECI,
-    RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
+    AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
+    RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
 };
 use chrono::format::ParseErrorKind;
 use std::fmt;
@@ -258,26 +258,31 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect &RiferimentoNISECI; adjust callers accordingly"
+    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return (CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>)"
 )]
 pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: Vec<SpecieNISECI>,
 ) -> (Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>) {
-    parse_recordcsv_campionamento_niseci_impl::<T>(
+    let (camp, errs) = parse_recordcsv_campionamento_niseci_impl::<T>(
         records,
         &RiferimentoNISECI {
             elenco_specie: riferimento_specie,
         },
-    )
+    );
+    (camp.campionamento, errs)
 }
 
-/// Internal transitional API for migrating borrow over riferimento_specie.
 /// v0.2 will have this method public without the _impl suffix
+/// Internal transitional API for migrating:
+///   - borrow over riferimento_specie
+///   - taking &RiferimentoNISECI over &Vec<SpecieNISECI>
+///   - returning (CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>)
+///     - success field (.0) used to be Vec<RecordNISECI>
 pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: &RiferimentoNISECI,
-) -> (Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>) {
+) -> (CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>) {
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -342,7 +347,12 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCsvCampionament
         };
         campioni.push(niseci_rec);
     }
-    (campioni, errors)
+    (
+        CampionamentoNISECI {
+            campionamento: campioni,
+        },
+        errors,
+    )
 }
 
 #[derive(Debug)]
@@ -634,7 +644,7 @@ pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect &RiferimentoNISECI; adjust callers accordingly"
+    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECI on success"
 )]
 pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
@@ -646,19 +656,23 @@ pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
             elenco_specie: riferimento_specie,
         },
     )
+    .map(|v| v.campionamento)
 }
 
-/// Internal transitional API for migrating borrow over riferimento_specie.
 /// v0.2 will have this method public without the _impl suffix
+/// Internal transitional API for migrating:
+///   - borrow over riferimento_specie
+///   - taking &RiferimentoNISECI over &Vec<SpecieNISECI>
+///   - returning CampionamentoNISECI for success over Vec<RecordNISECI>
 pub(crate) fn check_records_campionamento_niseci_impl<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: &RiferimentoNISECI,
-) -> Result<Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>> {
-    let (records, errors) = parse_recordcsv_campionamento_niseci_impl(records, riferimento_specie);
+) -> Result<CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>> {
+    let (camp, errors) = parse_recordcsv_campionamento_niseci_impl(records, riferimento_specie);
 
     println!(
         "Campionamento NISECI: Numero record validi: {}",
-        records.len()
+        camp.campionamento.len()
     );
     println!(
         "Campionamento NISECI: Numero record non validi: {}",
@@ -683,7 +697,7 @@ pub(crate) fn check_records_campionamento_niseci_impl<T: RecordCsvCampionamentoN
             println!("  Record: {{{record}}}");
         }
         */
-        Ok(records)
+        Ok(camp)
     }
 }
 

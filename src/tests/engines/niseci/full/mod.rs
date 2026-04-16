@@ -24,7 +24,7 @@ use crate::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
     check_records_riferimento_niseci,
 };
-use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
+use crate::domain::niseci::RiferimentoNISECI;
 use crate::{
     engines::niseci::full::calculate_niseci,
     tests::test_utils::{
@@ -99,7 +99,7 @@ fn calculate_niseci_template() {
 
     assert!(campionamento_value_check.is_ok());
 
-    let campionamento_specie = campionamento_value_check.expect("is_ok() was checked before");
+    let campionamento = campionamento_value_check.expect("is_ok() was checked before");
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_NISECI_TEMPLATE_DATA);
 
@@ -117,10 +117,6 @@ fn calculate_niseci_template() {
     assert!(anagrafica_value_check.is_ok());
 
     let anagrafica = anagrafica_value_check.expect("is_ok() was checked before");
-
-    let campionamento = CampionamentoNISECI {
-        campionamento: campionamento_specie,
-    };
 
     let calc_niseci_res = calculate_niseci(&campionamento, &riferimento, &anagrafica);
 

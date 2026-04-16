@@ -129,12 +129,8 @@ where
     )
     .map_err(CampionamentoNISECIError::Csv)?;
 
-    let records = check_records_campionamento_niseci_impl(csv_records, riferimento)
-        .map_err(CampionamentoNISECIError::Value)?;
-
-    Ok(CampionamentoNISECI {
-        campionamento: records,
-    })
+    check_records_campionamento_niseci_impl(csv_records, riferimento)
+        .map_err(CampionamentoNISECIError::Value)
 }
 
 pub fn load_csv_campionamento_niseci_from_path<T>(
