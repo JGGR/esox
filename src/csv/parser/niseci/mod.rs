@@ -72,7 +72,7 @@ impl fmt::Display for RecordCsvRiferimentoNISECIError {
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to return RiferimentoNISECIParseResult\nConsider using RiferimentoNISECIParseResult::new(records).into_parts()"
+    note = "v0.2 will change signature to return RiferimentoNISECIParseResult\nConsider using RiferimentoNISECI::parse_recordcsv(records).into_parts()"
 )]
 pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
@@ -84,7 +84,7 @@ pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
 pub struct RiferimentoNISECIParseResult(RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>);
 
 impl RiferimentoNISECIParseResult {
-    pub fn new<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> Self {
+    pub fn parse<T: RecordCsvRiferimentoNISECI>(records: Vec<T>) -> Self {
         parse_recordcsv_riferimento_niseci_impl(records)
     }
     pub fn into_parts(self) -> (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>) {
@@ -294,7 +294,7 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECIParseResult\n  Consider using CampionamentoNISECIParseResult::new(records, riferimento).into_parts()"
+    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECIParseResult\n  Consider using CampionamentoNISECI::parse_recordcsv(records, riferimento).into_parts()"
 )]
 pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
@@ -316,7 +316,7 @@ pub struct CampionamentoNISECIParseResult(
 );
 
 impl CampionamentoNISECIParseResult {
-    pub fn new<T: RecordCsvCampionamentoNISECI>(
+    pub fn parse<T: RecordCsvCampionamentoNISECI>(
         records: Vec<T>,
         riferimento: &RiferimentoNISECI,
     ) -> Self {
@@ -669,11 +669,28 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
     Ok(res)
 }
 
-#[deprecated(note = "v0.2 will change signature to return RiferimentoNISECI on success")]
+#[deprecated(
+    note = "v0.2 will change signature to return RiferimentoNISECI on success\nConsider using RiferimentoNISECI::check_recordcsv(records)"
+)]
 pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> Result<Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>> {
     check_records_riferimento_niseci_impl::<T>(records).map(|v| v.elenco_specie)
+}
+
+impl RiferimentoNISECI {
+    pub fn parse_recordcsv<T>(vec: Vec<T>) -> RiferimentoNISECIParseResult
+    where
+        T: RecordCsvRiferimentoNISECI,
+    {
+        RiferimentoNISECIParseResult::parse::<T>(vec)
+    }
+    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvRiferimentoNISECIError>>
+    where
+        T: RecordCsvRiferimentoNISECI,
+    {
+        check_records_riferimento_niseci_impl::<T>(vec)
+    }
 }
 
 /// v0.2 will have this method public without the _impl suffix
@@ -714,7 +731,7 @@ pub(crate) fn check_records_riferimento_niseci_impl<T: RecordCsvRiferimentoNISEC
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECI on success"
+    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECI on success\nConsider using CampionamentoNISECI::check_recordcsv(records, &riferimento)"
 )]
 pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
@@ -727,6 +744,27 @@ pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
         },
     )
     .map(|v| v.campionamento)
+}
+
+impl CampionamentoNISECI {
+    pub fn parse_recordcsv<T>(
+        vec: Vec<T>,
+        rif: &RiferimentoNISECI,
+    ) -> CampionamentoNISECIParseResult
+    where
+        T: RecordCsvCampionamentoNISECI,
+    {
+        CampionamentoNISECIParseResult::parse::<T>(vec, rif)
+    }
+    pub fn check_recordcsv<T>(
+        vec: Vec<T>,
+        rif: &RiferimentoNISECI,
+    ) -> Result<Self, Vec<RecordCsvCampionamentoNISECIError>>
+    where
+        T: RecordCsvCampionamentoNISECI,
+    {
+        check_records_campionamento_niseci_impl::<T>(vec, rif)
+    }
 }
 
 /// v0.2 will have this method public without the _impl suffix
@@ -769,6 +807,21 @@ pub(crate) fn check_records_campionamento_niseci_impl<T: RecordCsvCampionamentoN
         }
         */
         Ok(camp)
+    }
+}
+
+impl AnagraficaNISECI {
+    pub fn parse_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvAnagraficaNISECIError>>
+    where
+        T: RecordCsvAnagraficaNISECI,
+    {
+        parse_recordcsv_anagrafica_niseci::<T>(vec)
+    }
+    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvAnagraficaNISECIError>>
+    where
+        T: RecordCsvAnagraficaNISECI,
+    {
+        check_records_anagrafica_niseci::<T>(vec)
     }
 }
 

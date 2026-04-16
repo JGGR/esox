@@ -42,7 +42,7 @@ impl fmt::Display for RecordCsvCampionamentoHFBIError {
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to return CampionamentoHFBIParseResult\nConsider using CampionamentoHFBIParseResult::new(records).into_parts()"
+    note = "v0.2 will change signature to return CampionamentoHFBIParseResult\nConsider using CampionamentoHFBI::parse_recordcsv(records).into_parts()"
 )]
 pub fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     records: Vec<T>,
@@ -54,7 +54,7 @@ pub fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
 pub struct CampionamentoHFBIParseResult(CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>);
 
 impl CampionamentoHFBIParseResult {
-    pub fn new<T: RecordCsvCampionamentoHFBI>(records: Vec<T>) -> Self {
+    pub fn parse<T: RecordCsvCampionamentoHFBI>(records: Vec<T>) -> Self {
         parse_recordcsv_campionamento_hfbi_impl(records)
     }
     pub fn into_parts(self) -> (CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>) {
@@ -357,11 +357,28 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
     Ok(res)
 }
 
-#[deprecated(note = "v0.2 will change signature to return CampionamentoHFBI on success")]
+#[deprecated(
+    note = "v0.2 will change signature to return CampionamentoHFBI on success\nConsider using CampionamentoHFBI::check_recordcsv(records)"
+)]
 pub fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     records: Vec<T>,
 ) -> Result<Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>> {
     check_records_campionamento_hfbi_impl::<T>(records).map(|v| v.campionamento)
+}
+
+impl CampionamentoHFBI {
+    pub fn parse_recordcsv<T>(vec: Vec<T>) -> CampionamentoHFBIParseResult
+    where
+        T: RecordCsvCampionamentoHFBI,
+    {
+        CampionamentoHFBIParseResult::parse::<T>(vec)
+    }
+    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvCampionamentoHFBIError>>
+    where
+        T: RecordCsvCampionamentoHFBI,
+    {
+        check_records_campionamento_hfbi_impl::<T>(vec)
+    }
 }
 
 /// v0.2 will have this method public without the _impl suffix
@@ -398,6 +415,21 @@ pub(crate) fn check_records_campionamento_hfbi_impl<T: RecordCsvCampionamentoHFB
         }
         */
         Ok(camp)
+    }
+}
+
+impl AnagraficaHFBI {
+    pub fn parse_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvAnagraficaHFBIError>>
+    where
+        T: RecordCsvAnagraficaHFBI,
+    {
+        parse_recordcsv_anagrafica_hfbi::<T>(vec)
+    }
+    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvAnagraficaHFBIError>>
+    where
+        T: RecordCsvAnagraficaHFBI,
+    {
+        check_records_anagrafica_hfbi::<T>(vec)
     }
 }
 

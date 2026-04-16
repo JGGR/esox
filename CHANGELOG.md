@@ -3,12 +3,15 @@
 ### Added
 
 - Add `csv::load` module
-  - New methods to wrap over the errors of deser/parse steps
-  - New API using `InputFormat` instead of being generic over `RecordCsv` traits
+  - New `load_csv_X(...)` methods to wrap over the errors of deser/parse steps
+  - New `load_X(...)` methods using `InputFormat` instead of being generic over `RecordCsv` traits
+- Add `pub fn parse_recordcsv<T>(...)`, `pub fn check_recordcsv<T>(...)` for full calc input types
+  - `domain::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI}`
+  - `domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI}`
 - Add `csv::parser::niseci::{RiferimentoNISECIParseResult, CampionamentoNISECIParseResult}`
   - Wraps over old `parse_recordcsv_{riferimento, campionamento}_niseci()` return value, which used tuples
 - Add `csv::parser::hfbi::CampionamentoHFBIParseResult`
-  - Wraps over old `parse_recordcsv_campionamnto_hfbi()` return value, which used tuples
+  - Wraps over old `parse_recordcsv_campionamento_hfbi()` return value, which used tuples
 - Add `get_x3_a()`, `get_x3_b()` to `RisultatoNISECI`
 - Add `to_csv()` for:
   - `domain::niseci::{RisultatoNISECI, ValoriIntermediNISECI}`
