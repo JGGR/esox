@@ -21,7 +21,7 @@ use crate::csv::deser::niseci::{
     VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
 };
 use crate::csv::parser::niseci::{
-    check_records_anagrafica_niseci, check_records_campionamento_niseci,
+    check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
     check_records_riferimento_niseci,
 };
 use crate::domain::niseci::{CampionamentoNISECI, RiferimentoNISECI};
@@ -90,8 +90,12 @@ fn calculate_niseci_template() {
 
     let campionamento_csv_records = campionamento_csv_check.expect("is_ok() was checked before");
 
+    let riferimento = RiferimentoNISECI {
+        elenco_specie: riferimento_specie,
+    };
+
     let campionamento_value_check =
-        check_records_campionamento_niseci(campionamento_csv_records, &riferimento_specie);
+        check_records_campionamento_niseci_impl(campionamento_csv_records, &riferimento);
 
     assert!(campionamento_value_check.is_ok());
 
@@ -116,9 +120,6 @@ fn calculate_niseci_template() {
 
     let campionamento = CampionamentoNISECI {
         campionamento: campionamento_specie,
-    };
-    let riferimento = RiferimentoNISECI {
-        elenco_specie: riferimento_specie,
     };
 
     let calc_niseci_res = calculate_niseci(&campionamento, &riferimento, &anagrafica);

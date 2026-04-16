@@ -25,7 +25,7 @@ use crate::csv::deser::niseci::{
 use crate::csv::deser::NormalizerReader;
 use crate::csv::load::InputFormat;
 use crate::csv::parser::niseci::{
-    check_records_anagrafica_niseci, check_records_campionamento_niseci,
+    check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
     check_records_riferimento_niseci, RecordCsvAnagraficaNISECIError,
     RecordCsvCampionamentoNISECIError, RecordCsvRiferimentoNISECIError,
 };
@@ -129,7 +129,7 @@ where
     )
     .map_err(CampionamentoNISECIError::Csv)?;
 
-    let records = check_records_campionamento_niseci(csv_records, &riferimento.elenco_specie)
+    let records = check_records_campionamento_niseci_impl(csv_records, riferimento)
         .map_err(CampionamentoNISECIError::Value)?;
 
     Ok(CampionamentoNISECI {

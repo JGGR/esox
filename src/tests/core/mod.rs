@@ -38,7 +38,7 @@ use crate::csv::load::InputFormat;
 use crate::csv::parser::{
     hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
     niseci::{
-        check_records_anagrafica_niseci, check_records_campionamento_niseci,
+        check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
         check_records_riferimento_niseci,
     },
 };
@@ -46,7 +46,7 @@ use crate::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,
     CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER,
 };
-use crate::domain::niseci::SpecieNISECI;
+use crate::domain::niseci::{RiferimentoNISECI, SpecieNISECI};
 use crate::tests::test_utils::{
     ANAGRAFICA_HFBI_TEMPLATE_DATA, ANAGRAFICA_NISECI_TEMPLATE_DATA,
     CAMPIONAMENTO_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_NISECI_TEMPLATE_DATA,
@@ -434,7 +434,12 @@ fn test_valid_recordcsv_campionamento_niseci() {
         peso: 100.0,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_campionamento_niseci(recordcsv_data, &riferimento_specie);
+    let result = check_records_campionamento_niseci_impl(
+        recordcsv_data,
+        &RiferimentoNISECI {
+            elenco_specie: riferimento_specie,
+        },
+    );
 
     assert!(!result.is_err());
 }

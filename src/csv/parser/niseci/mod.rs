@@ -21,8 +21,8 @@ use crate::csv::{
 };
 use crate::domain::location::Location;
 use crate::domain::niseci::{
-    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, RecordNISECI, SpecieNISECI,
-    TipoComunitaNISECI,
+    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, RecordNISECI,
+    RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
 };
 use chrono::format::ParseErrorKind;
 use std::fmt;
@@ -257,9 +257,26 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect &RiferimentoNISECI; adjust callers accordingly"
+)]
 pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
-    riferimento_specie: &Vec<SpecieNISECI>,
+    riferimento_specie: Vec<SpecieNISECI>,
+) -> (Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>) {
+    parse_recordcsv_campionamento_niseci_impl::<T>(
+        records,
+        &RiferimentoNISECI {
+            elenco_specie: riferimento_specie,
+        },
+    )
+}
+
+/// Internal transitional API for migrating borrow over riferimento_specie.
+/// v0.2 will have this method public without the _impl suffix
+pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCsvCampionamentoNISECI>(
+    records: Vec<T>,
+    riferimento_specie: &RiferimentoNISECI,
 ) -> (Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>) {
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
@@ -275,7 +292,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
         }
         let codice_specie = r.codice_specie();
         let mut opt_matched_specie = None;
-        for s in riferimento_specie {
+        for s in &riferimento_specie.elenco_specie {
             // FIXME: this is O(n^2).
             if s.id == codice_specie {
                 opt_matched_specie = Some(s);
@@ -616,11 +633,28 @@ pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect &RiferimentoNISECI; adjust callers accordingly"
+)]
 pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
     records: Vec<T>,
-    riferimento_specie: &Vec<SpecieNISECI>,
+    riferimento_specie: Vec<SpecieNISECI>,
 ) -> Result<Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>> {
-    let (records, errors) = parse_recordcsv_campionamento_niseci(records, riferimento_specie);
+    check_records_campionamento_niseci_impl::<T>(
+        records,
+        &RiferimentoNISECI {
+            elenco_specie: riferimento_specie,
+        },
+    )
+}
+
+/// Internal transitional API for migrating borrow over riferimento_specie.
+/// v0.2 will have this method public without the _impl suffix
+pub(crate) fn check_records_campionamento_niseci_impl<T: RecordCsvCampionamentoNISECI>(
+    records: Vec<T>,
+    riferimento_specie: &RiferimentoNISECI,
+) -> Result<Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>> {
+    let (records, errors) = parse_recordcsv_campionamento_niseci_impl(records, riferimento_specie);
 
     println!(
         "Campionamento NISECI: Numero record validi: {}",
