@@ -20,6 +20,8 @@
 - Deprecation warnings for parsing of `CampionamentoNISECI`, next version will change public API:
   - In: will expect `riferimento_specie` as `&RiferimentoNISECI` (was: `Vec<SpecieNISECI>`)
   - Out: will return `CampionamentoNISECI` on success branches (was: `Vec<RecordNISECI>` on success branches)
+- Deprecation warnings for parsing of `CampionamentoHFBI`, next version will change public API:
+  - Out: will return `CampionamentoHFBI` on success branches (was: `Vec<RecordHFBI>` on success branches)
 - Drop `once_cell` dependency by replacing `once_cell::sync::Lazy` with `std::sync::LazyLock`
   - Needs `rust 1.80`
 - Make types related to full calc results `Deserialize`

@@ -18,7 +18,8 @@
 use crate::csv::parser::parse_date;
 use crate::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI};
 use crate::domain::hfbi::{
-    AnagraficaHFBI, HabitatHFBI, RecordHFBI, StagioneHFBI, TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI,
+    AnagraficaHFBI, CampionamentoHFBI, HabitatHFBI, RecordHFBI, StagioneHFBI,
+    TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI,
 };
 use crate::domain::location::Location;
 use chrono::format::ParseErrorKind;
@@ -40,9 +41,23 @@ impl fmt::Display for RecordCsvCampionamentoHFBIError {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to return (CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>)"
+)]
 pub fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     records: Vec<T>,
 ) -> (Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>) {
+    let (camp, errs) = parse_recordcsv_campionamento_hfbi_impl::<T>(records);
+    (camp.campionamento, errs)
+}
+
+/// v0.2 will have this method public without the _impl suffix
+/// Internal transitional API for migrating:
+///   - returning (CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>)
+///     - success field (.0) used to be Vec<RecordHFBI>
+pub(crate) fn parse_recordcsv_campionamento_hfbi_impl<T: RecordCsvCampionamentoHFBI>(
+    records: Vec<T>,
+) -> (CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>) {
     let mut campioni = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -107,7 +122,12 @@ pub fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
         };
         campioni.push(hfbi_rec);
     }
-    (campioni, errors)
+    (
+        CampionamentoHFBI {
+            campionamento: campioni,
+        },
+        errors,
+    )
 }
 
 #[derive(Debug)]
@@ -320,14 +340,24 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
     Ok(res)
 }
 
+#[deprecated(note = "v0.2 will change signature to return CampionamentoHFBI on success")]
 pub fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     records: Vec<T>,
 ) -> Result<Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>> {
-    let (records, errors) = parse_recordcsv_campionamento_hfbi(records);
+    check_records_campionamento_hfbi_impl::<T>(records).map(|v| v.campionamento)
+}
+
+/// v0.2 will have this method public without the _impl suffix
+/// Internal transitional API for migrating:
+///   - returning CampionamentoHFBI for success over Vec<RecordHFBI>
+pub(crate) fn check_records_campionamento_hfbi_impl<T: RecordCsvCampionamentoHFBI>(
+    records: Vec<T>,
+) -> Result<CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>> {
+    let (camp, errors) = parse_recordcsv_campionamento_hfbi_impl(records);
 
     println!(
         "Campionamento HFBI: Numero record validi: {}",
-        records.len()
+        camp.campionamento.len()
     );
     println!(
         "Campionamento HFBI: Numero record non validi: {}",
@@ -350,7 +380,7 @@ pub fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
             println!("  Record: {{{record}}}");
         }
         */
-        Ok(records)
+        Ok(camp)
     }
 }
 

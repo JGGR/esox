@@ -22,8 +22,8 @@ use crate::csv::deser::hfbi::{
 use crate::csv::deser::NormalizerReader;
 use crate::csv::load::InputFormat;
 use crate::csv::parser::hfbi::{
-    check_records_anagrafica_hfbi, check_records_campionamento_hfbi, RecordCsvAnagraficaHFBIError,
-    RecordCsvCampionamentoHFBIError,
+    check_records_anagrafica_hfbi, check_records_campionamento_hfbi_impl,
+    RecordCsvAnagraficaHFBIError, RecordCsvCampionamentoHFBIError,
 };
 use crate::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI};
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
@@ -49,12 +49,7 @@ where
     let csv_records =
         check_campionamento_hfbi_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
             .map_err(CampionamentoHFBIError::Csv)?;
-    let records =
-        check_records_campionamento_hfbi(csv_records).map_err(CampionamentoHFBIError::Value)?;
-
-    Ok(CampionamentoHFBI {
-        campionamento: records,
-    })
+    check_records_campionamento_hfbi_impl(csv_records).map_err(CampionamentoHFBIError::Value)
 }
 
 pub fn load_csv_campionamento_hfbi_from_path<T>(

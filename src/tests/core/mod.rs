@@ -36,7 +36,7 @@ use crate::csv::load::niseci::{
 };
 use crate::csv::load::InputFormat;
 use crate::csv::parser::{
-    hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
+    hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi_impl},
     niseci::{
         check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
         check_records_riferimento_niseci_impl,
@@ -676,7 +676,7 @@ fn test_valid_recordcsv_campionamento_hfbi() {
         numero_individui: 10,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_campionamento_hfbi(recordcsv_data);
+    let result = check_records_campionamento_hfbi_impl(recordcsv_data);
 
     assert!(!result.is_err());
 }

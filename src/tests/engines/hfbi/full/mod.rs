@@ -18,8 +18,9 @@ use crate::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
     VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
 };
-use crate::csv::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
-use crate::domain::hfbi::CampionamentoHFBI;
+use crate::csv::parser::hfbi::{
+    check_records_anagrafica_hfbi, check_records_campionamento_hfbi_impl,
+};
 use crate::engines::hfbi::full::calculate_hfbi;
 use crate::tests::test_utils::{ANAGRAFICA_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_HFBI_TEMPLATE_DATA};
 use std::io::Cursor;
@@ -37,11 +38,12 @@ fn calculate_hfbi_template() {
 
     let campionamento_csv_records = campionamento_csv_check.expect("is_ok() was checked before");
 
-    let campionamento_value_check = check_records_campionamento_hfbi(campionamento_csv_records);
+    let campionamento_value_check =
+        check_records_campionamento_hfbi_impl(campionamento_csv_records);
 
     assert!(campionamento_value_check.is_ok());
 
-    let campionamento_specie = campionamento_value_check.expect("is_ok() was checked before");
+    let campionamento = campionamento_value_check.expect("is_ok() was checked before");
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
 
@@ -60,9 +62,6 @@ fn calculate_hfbi_template() {
 
     let anagrafica = anagrafica_value_check.expect("is_ok() was checked before");
 
-    let campionamento = CampionamentoHFBI {
-        campionamento: campionamento_specie,
-    };
     let calc_hfbi_res = calculate_hfbi(&campionamento, &anagrafica);
 
     assert!(calc_hfbi_res.is_ok());
