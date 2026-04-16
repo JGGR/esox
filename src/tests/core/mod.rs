@@ -39,7 +39,7 @@ use crate::csv::parser::{
     hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
     niseci::{
         check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
-        check_records_riferimento_niseci,
+        check_records_riferimento_niseci_impl,
     },
 };
 use crate::csv::{
@@ -225,7 +225,7 @@ fn test_valid_recordcsv_riferimento_niseci() {
         dens_soglia2: 0.2,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_riferimento_niseci(recordcsv_data);
+    let result = check_records_riferimento_niseci_impl(recordcsv_data);
 
     assert!(!result.is_err());
 }
@@ -252,7 +252,7 @@ fn test_recordcsv_riferimento_niseci_soglie_cl_error() {
         dens_soglia2: 0.2,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_riferimento_niseci(recordcsv_data);
+    let result = check_records_riferimento_niseci_impl(recordcsv_data);
 
     assert!(result.is_err());
 
@@ -282,7 +282,7 @@ fn test_recordcsv_riferimento_niseci_soglie_ad_juv_error() {
         dens_soglia2: 0.2,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_riferimento_niseci(recordcsv_data);
+    let result = check_records_riferimento_niseci_impl(recordcsv_data);
 
     assert!(result.is_err());
 

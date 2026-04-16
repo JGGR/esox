@@ -15,6 +15,8 @@
 
 ### Changed
 
+- Deprecation warnings for parsing of `RiferimentoNISECI`, next version will change public API:
+  - Out: will return `RiferimentoNISECI` on success branches (was: `Vec<SpecieNISECI>` on success branches)
 - Deprecation warnings for parsing of `CampionamentoNISECI`, next version will change public API:
   - In: will expect `riferimento_specie` as `&RiferimentoNISECI` (was: `Vec<SpecieNISECI>`)
   - Out: will return `CampionamentoNISECI` on success branches (was: `Vec<RecordNISECI>` on success branches)

@@ -22,9 +22,8 @@ use crate::csv::deser::niseci::{
 };
 use crate::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
-    check_records_riferimento_niseci,
+    check_records_riferimento_niseci_impl,
 };
-use crate::domain::niseci::RiferimentoNISECI;
 use crate::{
     engines::niseci::full::calculate_niseci,
     tests::test_utils::{
@@ -73,11 +72,11 @@ fn calculate_niseci_template() {
 
     let riferimento_csv_records = riferimento_csv_check.expect("is_ok() was checked before");
 
-    let riferimento_value_check = check_records_riferimento_niseci(riferimento_csv_records);
+    let riferimento_value_check = check_records_riferimento_niseci_impl(riferimento_csv_records);
 
     assert!(riferimento_value_check.is_ok());
 
-    let riferimento_specie = riferimento_value_check.expect("is_ok() was checked before");
+    let riferimento = riferimento_value_check.expect("is_ok() was checked before");
 
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_NISECI_TEMPLATE_DATA);
 
@@ -89,10 +88,6 @@ fn calculate_niseci_template() {
     assert!(campionamento_csv_check.is_ok());
 
     let campionamento_csv_records = campionamento_csv_check.expect("is_ok() was checked before");
-
-    let riferimento = RiferimentoNISECI {
-        elenco_specie: riferimento_specie,
-    };
 
     let campionamento_value_check =
         check_records_campionamento_niseci_impl(campionamento_csv_records, &riferimento);

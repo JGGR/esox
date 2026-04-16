@@ -71,9 +71,23 @@ impl fmt::Display for RecordCsvRiferimentoNISECIError {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to return (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>)"
+)]
 pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> (Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>) {
+    let (rif, errs) = parse_recordcsv_riferimento_niseci_impl::<T>(records);
+    (rif.elenco_specie, errs)
+}
+
+/// v0.2 will have this method public without the _impl suffix
+/// Internal transitional API for migrating:
+///   - returning (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>)
+///     - success field (.0) used to be Vec<SpecieNISECI>
+pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordCsvRiferimentoNISECI>(
+    records: Vec<T>,
+) -> (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>) {
     let mut specie = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
@@ -238,7 +252,12 @@ pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
         used_id_specie.push(id);
     }
 
-    (specie, errors)
+    (
+        RiferimentoNISECI {
+            elenco_specie: specie,
+        },
+        errors,
+    )
 }
 
 #[derive(Debug)]
@@ -609,14 +628,24 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
     Ok(res)
 }
 
+#[deprecated(note = "v0.2 will change signature to return RiferimentoNISECI on success")]
 pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> Result<Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>> {
-    let (records, errors) = parse_recordcsv_riferimento_niseci(records);
+    check_records_riferimento_niseci_impl::<T>(records).map(|v| v.elenco_specie)
+}
+
+/// v0.2 will have this method public without the _impl suffix
+/// Internal transitional API for migrating:
+///   - returning RiferimentoNISECI for success over Vec<SpecieNISECI>
+pub(crate) fn check_records_riferimento_niseci_impl<T: RecordCsvRiferimentoNISECI>(
+    records: Vec<T>,
+) -> Result<RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>> {
+    let (rif, errors) = parse_recordcsv_riferimento_niseci_impl(records);
 
     println!(
         "Riferimento NISECI: Numero record validi: {}",
-        records.len()
+        rif.elenco_specie.len()
     );
     println!(
         "Riferimento NISECI: Numero record non validi: {}",
@@ -639,7 +668,7 @@ pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
             println!("  Record: {{{record}}}");
         }
         */
-        Ok(records)
+        Ok(rif)
     }
 }
 

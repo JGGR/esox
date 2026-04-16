@@ -26,7 +26,7 @@ use crate::csv::deser::NormalizerReader;
 use crate::csv::load::InputFormat;
 use crate::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
-    check_records_riferimento_niseci, RecordCsvAnagraficaNISECIError,
+    check_records_riferimento_niseci_impl, RecordCsvAnagraficaNISECIError,
     RecordCsvCampionamentoNISECIError, RecordCsvRiferimentoNISECIError,
 };
 use crate::csv::{
@@ -55,11 +55,7 @@ where
     let csv_records =
         check_riferimento_niseci_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
             .map_err(RiferimentoNISECIError::Csv)?;
-    let species =
-        check_records_riferimento_niseci(csv_records).map_err(RiferimentoNISECIError::Value)?;
-    Ok(RiferimentoNISECI {
-        elenco_specie: species,
-    })
+    check_records_riferimento_niseci_impl(csv_records).map_err(RiferimentoNISECIError::Value)
 }
 
 pub fn load_csv_riferimento_niseci_from_path<T>(
