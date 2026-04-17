@@ -68,12 +68,12 @@ fn calculate_hfbi_template() {
 
     let (hfbi, intermediates) = calc_hfbi_res.expect("is_ok() was checked before");
 
-    assert_eq!(hfbi, 1.3);
-    assert_eq!(intermediates.mmi, 0.362);
+    assert_eq!(hfbi, 1.167);
+    assert_eq!(intermediates.mmi, 0.342);
     assert_eq!(intermediates.bbent, 3.638);
     assert_eq!(intermediates.bn, 1.587);
     assert_eq!(intermediates.dbent, 0.154);
-    assert_eq!(intermediates.ddom, 0.551);
+    assert_eq!(intermediates.ddom, 0.399);
     assert_eq!(intermediates.dhzp, 0.417);
     assert_eq!(intermediates.dmig, 0.421);
 }

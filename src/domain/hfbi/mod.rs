@@ -614,6 +614,8 @@ impl fmt::Display for CampionamentoHFBI {
 
 impl CampionamentoHFBI {
     pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
+        let mut campionamento = campionamento;
+        campionamento.sort_by(|a, b| b.peso.total_cmp(&a.peso));
         #[allow(deprecated)]
         Self { campionamento }
     }

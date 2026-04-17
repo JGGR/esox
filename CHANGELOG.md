@@ -23,6 +23,8 @@
 
 ### Changed
 
+- Fix: ensure proper sorting inside `engines::hfbi::ddom::calc_ddom()`
+- Fix: ensure proper sorting inside `domain::hfbi::CampionamentoHFBI::new()`
 - Deprecation warnings for parsing of `RiferimentoNISECI`, next version will change public API:
   - Out: will return `RiferimentoNISECI` on success branches (was: `Vec<SpecieNISECI>` on success branches)
 - Deprecation warnings for parsing of `CampionamentoNISECI`, next version will change public API:
