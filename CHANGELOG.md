@@ -19,12 +19,17 @@
 - Add `impl From<(f32, &AreaNISECI)>` to `domain::niseci::StatoEcologicoNISECI`
 - Add `impl From<f32>` to `domain::hfbi::StatoEcologicoHFBI`
 - Add `impl Default` to `domain::niseci::{ClassiEtaSpecieNISECI, ClassiEtaAlieniNISECI, InfoPopolazioniNISECI}`
+- Add new methods to `CampionamentoHFBI`
+  - `sort_by_peso_desc(&mut self)`
+  - `sorted_by_peso_desc(&self) -> impl Iterator<Item = &RecordHFBI>`
 - Add `meta::version()` to get crate version
 
 ### Changed
 
 - Fix: ensure proper sorting inside `engines::hfbi::ddom::calc_ddom()`
 - Fix: ensure proper sorting inside `domain::hfbi::CampionamentoHFBI::new()`
+  - To avoid invalid instances (not sorted by descending `peso` we have to fully control construction
+  - `v0.2` will change visibility of fields
 - Deprecation warnings for parsing of `RiferimentoNISECI`, next version will change public API:
   - Out: will return `RiferimentoNISECI` on success branches (was: `Vec<SpecieNISECI>` on success branches)
 - Deprecation warnings for parsing of `CampionamentoNISECI`, next version will change public API:

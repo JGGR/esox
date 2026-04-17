@@ -614,14 +614,26 @@ impl fmt::Display for CampionamentoHFBI {
 
 impl CampionamentoHFBI {
     pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
-        let mut campionamento = campionamento;
-        campionamento.sort_by(|a, b| b.peso.total_cmp(&a.peso));
         #[allow(deprecated)]
-        Self { campionamento }
+        let mut sorted = Self { campionamento };
+        sorted.sort_by_peso_desc();
+        sorted
     }
     pub fn as_vec(&self) -> &Vec<RecordHFBI> {
         #[allow(deprecated)]
         &self.campionamento
+    }
+    pub fn sort_by_peso_desc(&mut self) {
+        #[allow(deprecated)]
+        self.campionamento.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+    }
+    pub fn sorted_by_peso_desc(&self) -> impl Iterator<Item = &RecordHFBI> {
+        #[allow(deprecated)]
+        let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
+
+        v.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+
+        v.into_iter()
     }
 }
 

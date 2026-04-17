@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, RecordHFBI};
+use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 
 pub fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let (s90, b90): (u32, f32) = calc_s90_b90(campionamento, anagrafica);
@@ -32,11 +32,9 @@ fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) 
 
     let biomassa_90 = biomassa_tot * 0.9;
 
-    let mut sorted: Vec<&RecordHFBI> = campionamento.into_iter().collect();
-    sorted.sort_by(|a, b| b.peso.total_cmp(&a.peso));
     let mut n_specie_90: u32 = 0;
     let mut biomassa_tmp: f32 = 0.0;
-    for cattura in sorted {
+    for cattura in campionamento.sorted_by_peso_desc() {
         biomassa_tmp += cattura.peso;
         n_specie_90 += 1;
         if biomassa_tmp > biomassa_90 {
