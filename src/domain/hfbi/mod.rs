@@ -619,7 +619,10 @@ impl CampionamentoHFBI {
     pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
         #[allow(deprecated)]
         let mut sorted = Self { campionamento };
-        sorted.sort_by_peso_desc();
+        #[allow(deprecated)]
+        sorted
+            .campionamento
+            .sort_by(|a, b| b.peso.total_cmp(&a.peso));
         sorted
     }
     pub fn as_vec(&self) -> Vec<&RecordHFBI> {
@@ -1299,7 +1302,7 @@ mod domain_hfbi_private_tests {
     }
 
     #[test]
-    fn test_from_campionamentohfbi_vec_recordhfbi_order_invariant() {
+    fn test_from_campionamentohfbi_to_vec_recordhfbi_order_invariant() {
         #[allow(deprecated)]
         let campione = CampionamentoHFBI {
             campionamento: vec![
@@ -1340,8 +1343,9 @@ mod domain_hfbi_private_tests {
 
         campione.sort_by_peso_desc();
 
+        #[allow(deprecated)]
         let actual: Vec<(&str, f32)> = campione
-            .as_vec()
+            .campionamento
             .iter()
             .map(|r| (r.specie.codice_specie.as_str(), r.peso))
             .collect();
