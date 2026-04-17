@@ -592,6 +592,9 @@ impl fmt::Display for RecordHFBI {
     }
 }
 
+/// Since calculations of HFBI rely on iteration order, this type must enforce
+/// the internal invariant that records are sorted by descending `peso`.
+/// v0.2 will change visibility of internals to avoid improper construction / mutation.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoHFBI {
