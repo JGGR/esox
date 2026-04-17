@@ -152,6 +152,44 @@ mod full_hfbi_private_tests {
     // ===================================================================
 
     #[test]
+    fn test_mmi_order_independent() {
+        let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
+        let campione = CampionamentoHFBI::new(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+        ]);
+        let mut sorted = campione.clone();
+        sorted.sort_by_peso_desc();
+        let mmi = calculate_mmi(&campione, &anagrafica).expect("Failed mmi calc");
+        let mmi_sorted = calculate_mmi(&sorted, &anagrafica).expect("Failed mmi_sorted calc");
+        assert!((mmi.mmi - mmi_sorted.mmi).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_hfbi_order_independent() {
+        let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
+        let campione = CampionamentoHFBI::new(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+        ]);
+        let mut sorted = campione.clone();
+        sorted.sort_by_peso_desc();
+        let (hfbi, _intermediates) =
+            calculate_hfbi(&campione, &anagrafica).expect("Failed mmi calc");
+        let (hfbi_sorted, _intermediates_sorted) =
+            calculate_hfbi(&sorted, &anagrafica).expect("Failed mmi_sorted calc");
+        assert!((hfbi - hfbi_sorted).abs() < EPSILON);
+    }
+
+    #[test]
     fn test_mmi_and_hfbi() {
         let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
         // We will create a non-empty campione with specific data.

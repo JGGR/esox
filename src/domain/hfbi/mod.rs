@@ -622,9 +622,13 @@ impl CampionamentoHFBI {
         sorted.sort_by_peso_desc();
         sorted
     }
-    pub fn as_vec(&self) -> &Vec<RecordHFBI> {
+    pub fn as_vec(&self) -> Vec<&RecordHFBI> {
         #[allow(deprecated)]
-        &self.campionamento
+        let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
+
+        v.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+
+        v
     }
     pub fn sort_by_peso_desc(&mut self) {
         #[allow(deprecated)]
@@ -643,17 +647,25 @@ impl CampionamentoHFBI {
 impl From<CampionamentoHFBI> for Vec<RecordHFBI> {
     fn from(val: CampionamentoHFBI) -> Self {
         #[allow(deprecated)]
-        val.campionamento
+        let mut v = val.campionamento;
+
+        v.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+
+        v
     }
 }
 
 impl<'a> IntoIterator for &'a CampionamentoHFBI {
     type Item = &'a RecordHFBI;
-    type IntoIter = std::slice::Iter<'a, RecordHFBI>;
+    type IntoIter = std::vec::IntoIter<&'a RecordHFBI>;
 
     fn into_iter(self) -> Self::IntoIter {
         #[allow(deprecated)]
-        self.campionamento.iter()
+        let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
+
+        v.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+
+        v.into_iter()
     }
 }
 
@@ -1183,5 +1195,184 @@ impl From<f32> for StatoEcologicoHFBI {
             return StatoEcologicoHFBI::Scarso;
         }
         StatoEcologicoHFBI::Cattivo
+    }
+}
+
+#[cfg(test)]
+mod domain_hfbi_private_tests {
+    use super::*;
+    fn create_specie_record(
+        codice_specie: &'static str,
+        gruppo_eco: GruppoEcoHFBI,
+        peso: f32,
+    ) -> RecordHFBI {
+        RecordHFBI {
+            specie: SpecieHFBI {
+                nome_comune: "Test Specie".to_string(),
+                codice_specie: codice_specie.to_string(),
+                autoctono: true,
+                gruppo_eco,
+                gruppo_trofico: GruppoTrofHFBI {
+                    microbentivori: 0.0,
+                    macrobentivori: 0.0,
+                    iperbentivori: 0.0,
+                    erbivori: 0.0,
+                    detritivori: 0.0,
+                    planctivori: 0.0,
+                    onnivori: 0.0,
+                },
+            },
+            numero_individui: 1,
+            peso,
+        }
+    }
+    #[test]
+    fn test_campionamentohfbi_new_order_invariant() {
+        let campione = CampionamentoHFBI::new(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+        ]);
+
+        #[allow(deprecated)]
+        let actual: Vec<(&str, f32)> = campione
+            .campionamento
+            .iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_campionamentohfbi_as_vec_order_invariant() {
+        #[allow(deprecated)]
+        let campione = CampionamentoHFBI {
+            campionamento: vec![
+                // Species 2: Migratory, contributes to most metrics
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+                // Species 3: Resident, not dominant
+                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+                // Species 1: Migratory, dominant, contributes to all metrics
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+            ],
+        };
+
+        let actual: Vec<(&str, f32)> = campione
+            .as_vec()
+            .iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_campionamentohfbi_into_iter_order_invariant() {
+        #[allow(deprecated)]
+        let campione = CampionamentoHFBI {
+            campionamento: vec![
+                // Species 2: Migratory, contributes to most metrics
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+                // Species 3: Resident, not dominant
+                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+                // Species 1: Migratory, dominant, contributes to all metrics
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+            ],
+        };
+
+        let actual: Vec<(&str, f32)> = campione
+            .into_iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_from_campionamentohfbi_vec_recordhfbi_order_invariant() {
+        #[allow(deprecated)]
+        let campione = CampionamentoHFBI {
+            campionamento: vec![
+                // Species 2: Migratory, contributes to most metrics
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+                // Species 3: Resident, not dominant
+                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+                // Species 1: Migratory, dominant, contributes to all metrics
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+            ],
+        };
+
+        let into: Vec<RecordHFBI> = campione.into();
+
+        let actual: Vec<(&str, f32)> = into
+            .iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_campionamentohfbi_sort_by_peso_desc() {
+        #[allow(deprecated)]
+        let mut campione = CampionamentoHFBI {
+            campionamento: vec![
+                // Species 2: Migratory, contributes to most metrics
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+                // Species 3: Resident, not dominant
+                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+                // Species 1: Migratory, dominant, contributes to all metrics
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+            ],
+        };
+
+        campione.sort_by_peso_desc();
+
+        let actual: Vec<(&str, f32)> = campione
+            .as_vec()
+            .iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_campionamentohfbi_sorted_by_peso_desc() {
+        #[allow(deprecated)]
+        let campione = CampionamentoHFBI {
+            campionamento: vec![
+                // Species 2: Migratory, contributes to most metrics
+                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+                // Species 3: Resident, not dominant
+                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+                // Species 1: Migratory, dominant, contributes to all metrics
+                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+            ],
+        };
+
+        let sorted = campione.sorted_by_peso_desc();
+
+        let actual: Vec<(&str, f32)> = sorted
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
     }
 }
