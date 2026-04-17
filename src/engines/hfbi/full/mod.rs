@@ -19,6 +19,8 @@ const W_DHZP: f32 = 0.84;
 const HFBI_T: f32 = -0.167;
 const HFBI_S: f32 = 0.150;
 
+/// This calculation is order-dependent due to calc_ddom() being order-dependent.
+/// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
 pub fn calculate_mmi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
@@ -70,6 +72,11 @@ pub fn calculate_mmi(
     Ok(intermediates)
 }
 
+/// This calculation is order-dependent due to:
+/// - calc_mmi() being order-dependent
+///   - Due to calc_ddom() being order-dependent
+///
+/// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
 pub fn calculate_hfbi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
@@ -154,28 +161,22 @@ mod full_hfbi_private_tests {
     #[test]
     fn test_mmi_order_invariant() {
         let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
-        #[allow(deprecated)]
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                // Species 2: Migratory, contributes to most metrics
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
-                // Species 3: Resident, not dominant
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
-                // Species 1: Migratory, dominant, contributes to all metrics
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
-            ],
-        };
-        #[allow(deprecated)]
-        let sorted = CampionamentoHFBI {
-            campionamento: vec![
-                // Species 1: Migratory, dominant, contributes to all metrics
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
-                // Species 2: Migratory, contributes to most metrics
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
-                // Species 3: Resident, not dominant
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
+        ]);
+        let sorted = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
+        ]);
         let mmi = calculate_mmi(&campione, &anagrafica).expect("Failed mmi calc");
         let mmi_sorted = calculate_mmi(&sorted, &anagrafica).expect("Failed mmi_sorted calc");
         assert!((mmi.mmi - mmi_sorted.mmi).abs() < EPSILON);
@@ -184,28 +185,22 @@ mod full_hfbi_private_tests {
     #[test]
     fn test_hfbi_order_invariant() {
         let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
-        #[allow(deprecated)]
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                // Species 2: Migratory, contributes to most metrics
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
-                // Species 3: Resident, not dominant
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
-                // Species 1: Migratory, dominant, contributes to all metrics
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
-            ],
-        };
-        #[allow(deprecated)]
-        let sorted = CampionamentoHFBI {
-            campionamento: vec![
-                // Species 1: Migratory, dominant, contributes to all metrics
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
-                // Species 2: Migratory, contributes to most metrics
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
-                // Species 3: Resident, not dominant
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
+        ]);
+        let sorted = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
+        ]);
         let (hfbi, _intermediates) =
             calculate_hfbi(&campione, &anagrafica).expect("Failed mmi calc");
         let (hfbi_sorted, _intermediates_sorted) =

@@ -1233,7 +1233,7 @@ mod domain_hfbi_private_tests {
     impl CampionamentoHFBI {
         /// Test helper to build unsorted instances
         #[cfg(test)]
-        fn new_raw_unsorted(campionamento: Vec<RecordHFBI>) -> Self {
+        pub(crate) fn new_raw_unsorted(campionamento: Vec<RecordHFBI>) -> Self {
             #[allow(deprecated)]
             Self { campionamento }
         }

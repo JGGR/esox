@@ -17,6 +17,8 @@
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 
+/// This calculation is order-dependent due to calc_s90_b90() being order-dependent.
+/// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
 pub fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let (s90, b90): (u32, f32) = calc_s90_b90(campionamento, anagrafica);
 
@@ -24,6 +26,8 @@ pub fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI)
     (1000.0 * ddom).round() / 1000.0
 }
 
+/// This calculation is order-dependent.
+/// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
 fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> (u32, f32) {
     let mut biomassa_tot = 0.0;
     for cattura in campionamento {
@@ -105,22 +109,16 @@ mod ddom_private_tests {
     #[test]
     fn test_s90_b90_order_invariant() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        #[allow(deprecated)]
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_dummy_record(1.0),
-                create_dummy_record(1.0),
-                create_dummy_record(900.0),
-            ],
-        };
-        #[allow(deprecated)]
-        let sorted = CampionamentoHFBI {
-            campionamento: vec![
-                create_dummy_record(900.0),
-                create_dummy_record(1.0),
-                create_dummy_record(1.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            create_dummy_record(1.0),
+            create_dummy_record(1.0),
+            create_dummy_record(900.0),
+        ]);
+        let sorted = CampionamentoHFBI::new_raw_unsorted(vec![
+            create_dummy_record(900.0),
+            create_dummy_record(1.0),
+            create_dummy_record(1.0),
+        ]);
         let (n_specie_90, b90) = calc_s90_b90(&campione, &anagrafica);
         let (n_specie_90_sorted, b90_sorted) = calc_s90_b90(&sorted, &anagrafica);
         assert!((b90 - b90_sorted).abs() < EPSILON);
@@ -130,22 +128,16 @@ mod ddom_private_tests {
     #[test]
     fn test_ddom_order_invariant() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        #[allow(deprecated)]
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_dummy_record(1.0),
-                create_dummy_record(1.0),
-                create_dummy_record(900.0),
-            ],
-        };
-        #[allow(deprecated)]
-        let sorted = CampionamentoHFBI {
-            campionamento: vec![
-                create_dummy_record(900.0),
-                create_dummy_record(1.0),
-                create_dummy_record(1.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            create_dummy_record(1.0),
+            create_dummy_record(1.0),
+            create_dummy_record(900.0),
+        ]);
+        let sorted = CampionamentoHFBI::new_raw_unsorted(vec![
+            create_dummy_record(900.0),
+            create_dummy_record(1.0),
+            create_dummy_record(1.0),
+        ]);
         let ddom = calc_ddom(&campione, &anagrafica);
         let ddom_sorted = calc_ddom(&sorted, &anagrafica);
         assert!((ddom - ddom_sorted).abs() < EPSILON);
