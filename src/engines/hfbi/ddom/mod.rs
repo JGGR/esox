@@ -103,6 +103,55 @@ mod ddom_private_tests {
     // --- Tests for the private helper function: calc_s90_b90 ---
 
     #[test]
+    fn test_s90_b90_order_invariant() {
+        let anagrafica = create_test_anagrafica(100.0, 5.0);
+        #[allow(deprecated)]
+        let campione = CampionamentoHFBI {
+            campionamento: vec![
+                create_dummy_record(1.0),
+                create_dummy_record(1.0),
+                create_dummy_record(900.0),
+            ],
+        };
+        #[allow(deprecated)]
+        let sorted = CampionamentoHFBI {
+            campionamento: vec![
+                create_dummy_record(900.0),
+                create_dummy_record(1.0),
+                create_dummy_record(1.0),
+            ],
+        };
+        let (n_specie_90, b90) = calc_s90_b90(&campione, &anagrafica);
+        let (n_specie_90_sorted, b90_sorted) = calc_s90_b90(&sorted, &anagrafica);
+        assert!((b90 - b90_sorted).abs() < EPSILON);
+        assert!(n_specie_90 == n_specie_90_sorted);
+    }
+
+    #[test]
+    fn test_ddom_order_invariant() {
+        let anagrafica = create_test_anagrafica(100.0, 5.0);
+        #[allow(deprecated)]
+        let campione = CampionamentoHFBI {
+            campionamento: vec![
+                create_dummy_record(1.0),
+                create_dummy_record(1.0),
+                create_dummy_record(900.0),
+            ],
+        };
+        #[allow(deprecated)]
+        let sorted = CampionamentoHFBI {
+            campionamento: vec![
+                create_dummy_record(900.0),
+                create_dummy_record(1.0),
+                create_dummy_record(1.0),
+            ],
+        };
+        let ddom = calc_ddom(&campione, &anagrafica);
+        let ddom_sorted = calc_ddom(&sorted, &anagrafica);
+        assert!((ddom - ddom_sorted).abs() < EPSILON);
+    }
+
+    #[test]
     fn test_s90_b90_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI::new(vec![]);

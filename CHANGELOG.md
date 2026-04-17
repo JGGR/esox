@@ -23,7 +23,8 @@
   - `sort_by_peso_desc(&mut self)`
   - `sorted_by_peso_desc(&self) -> impl Iterator<Item = &RecordHFBI>`
 - Add `meta::version()` to get crate version
-- Add tests for order invariant on `CampionamentoHFBI` methods
+- Add tests for order invariant on `CampionamentoHFBI` access/iteration methods
+- Add tests for order invariant on `calc_ddom()`, `calculate_hfbi()`, `calculate_mmi()`, `calc_s90_b90()`
 
 ### Changed
 
