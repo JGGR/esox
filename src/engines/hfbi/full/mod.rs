@@ -155,16 +155,14 @@ mod full_hfbi_private_tests {
     fn test_mmi_and_hfbi() {
         let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
         // We will create a non-empty campione with specific data.
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                // Species 1: Migratory, dominant, contributes to all metrics
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
-                // Species 2: Migratory, contributes to most metrics
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
-                // Species 3: Resident, not dominant
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+        ]);
 
         // We can't know the exact intermediate values without re-implementing all the
         // functions here. But we can ensure the logic flows and produces a valid, finite number.

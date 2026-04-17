@@ -222,9 +222,7 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     elenco_specie.push(inatteso_1);
     elenco_specie.push(inatteso_2);
 
-    RiferimentoNISECI {
-        elenco_specie: elenco_specie,
-    }
+    RiferimentoNISECI::new(elenco_specie)
 }
 
 /// campionamento che ha dentro tutte le specie autoctone attese
@@ -453,9 +451,7 @@ pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     campionamento.push(record_8);
     campionamento.push(record_9);
 
-    CampionamentoNISECI {
-        campionamento: campionamento,
-    }
+    CampionamentoNISECI::new(campionamento)
 }
 
 /// campionamento che non contiene tutte le specie
@@ -464,11 +460,21 @@ pub fn create_dummy_campionamento_chopped() -> CampionamentoNISECI {
     // uso il full campionamento e vado poi a togliere alcuni record
     let campionamento = create_dummy_campionamento_full();
 
-    let mut chopped = campionamento.campionamento.clone();
+    let mut chopped: Vec<RecordNISECI> = campionamento.into();
     chopped.remove(1);
 
-    CampionamentoNISECI {
-        campionamento: chopped,
+    CampionamentoNISECI::new(chopped)
+}
+
+#[cfg(test)]
+impl CampionamentoNISECI {
+    pub(crate) fn push(&mut self, value: RecordNISECI) {
+        #[allow(deprecated)]
+        self.campionamento.push(value);
+    }
+    pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
+        #[allow(deprecated)]
+        &mut self.campionamento
     }
 }
 
@@ -492,7 +498,7 @@ pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
         lunghezza: 2,
         peso: 2.0,
     };
-    c.campionamento.push(trocchio);
+    c.push(trocchio);
 
     c
 }
@@ -517,7 +523,7 @@ pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
         lunghezza: 2,
         peso: 2.0,
     };
-    c.campionamento.push(trocchio);
+    c.push(trocchio);
 
     c
 }
@@ -593,9 +599,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
         campionamento.push(ciaccio_cl1_c2.clone());
     }
 
-    CampionamentoNISECI {
-        campionamento: campionamento,
-    }
+    CampionamentoNISECI::new(campionamento)
 }
 
 /// In questo campionamento troverai:
@@ -669,9 +673,7 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
         campionamento.push(ciaccio_cl1_c2.clone());
     }
 
-    CampionamentoNISECI {
-        campionamento: campionamento,
-    }
+    CampionamentoNISECI::new(campionamento)
 }
 
 /// In questo campionamento troverai:
@@ -768,7 +770,7 @@ pub fn create_massive_campionamento_ciacci_con_trocchi_strutt() -> Campionamento
     let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
     let mut c_trocchi = create_massive_campionamento_solo_tipo_alloctono_1_strutt();
 
-    c_trocchi.campionamento.append(&mut c_ciacci.campionamento);
+    c_trocchi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
     c_trocchi
 }
@@ -790,7 +792,7 @@ pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoN
     let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
     let mut c_bronzi = create_massive_campionamento_solo_tipo_alloctono_2_strutt();
 
-    c_bronzi.campionamento.append(&mut c_ciacci.campionamento);
+    c_bronzi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
     c_bronzi
 }
@@ -812,7 +814,7 @@ pub fn create_massive_campionamento_ciacci_con_tappi_strutt() -> CampionamentoNI
     let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
     let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_strutt();
 
-    c_tappi.campionamento.append(&mut c_ciacci.campionamento);
+    c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
     c_tappi
 }
@@ -832,7 +834,7 @@ pub fn create_massive_campionamento_ciacci_con_tappi_destrutt() -> Campionamento
     let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
     let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_destrutt();
 
-    c_tappi.campionamento.append(&mut c_ciacci.campionamento);
+    c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
     c_tappi
 }
@@ -853,7 +855,7 @@ pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> Campiona
     let mut c_ciacci = create_massive_campionamento_ciacci_solo_autoctoni_1();
     let mut c_tappi = create_massive_campionamento_solo_tipo_alloctono_3_mediam_strutt();
 
-    c_tappi.campionamento.append(&mut c_ciacci.campionamento);
+    c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
     c_tappi
 }
@@ -924,9 +926,7 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
         campionamento.push(cl1_c2.clone());
     }
 
-    CampionamentoNISECI {
-        campionamento: campionamento,
-    }
+    CampionamentoNISECI::new(campionamento)
 }
 
 /// In questo campionamento troverai:
@@ -971,9 +971,7 @@ fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> C
         campionamento.push(cl2_c2.clone());
     }
 
-    CampionamentoNISECI {
-        campionamento: campionamento,
-    }
+    CampionamentoNISECI::new(campionamento)
 }
 
 /// In questo campionamento troverai:
@@ -1032,9 +1030,7 @@ fn create_campionamento_mediam_strutturato_data_una_specie(
         campionamento.push(cl1_c2.clone());
     }
 
-    CampionamentoNISECI {
-        campionamento: campionamento,
-    }
+    CampionamentoNISECI::new(campionamento)
 }
 
 /// id == 1

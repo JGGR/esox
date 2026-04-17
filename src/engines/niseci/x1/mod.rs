@@ -27,7 +27,7 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
 
     // creo un set delle specie campionate
     let mut specie_campionate_map: HashMap<String, &RecordNISECI> = HashMap::new();
-    for camp in &campionamento.campionamento {
+    for camp in campionamento.as_vec() {
         if camp.specie.specie_attesa {
             specie_campionate_map
                 .entry(camp.specie.id.clone())
@@ -50,7 +50,7 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
     // per evitare doppioni, anche se non dovrebbero esserci,
     // ricavo il set delle specie attese
     let mut specie_attese_map: HashMap<String, &SpecieNISECI> = HashMap::new();
-    for specie in &riferimento.elenco_specie {
+    for specie in riferimento.as_vec() {
         if specie.specie_attesa {
             specie_attese_map.entry(specie.id.clone()).or_insert(specie);
         }

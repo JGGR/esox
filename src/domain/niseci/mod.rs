@@ -87,13 +87,16 @@ impl SpecieNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RiferimentoNISECI {
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, RiferimentoNISECI::new() to construct"
+    )]
     pub elenco_specie: Vec<SpecieNISECI>,
 }
 
 impl fmt::Display for RiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_representation = "RiferimentoNISECI: {".to_string();
-        for s in &self.elenco_specie {
+        for s in self {
             string_representation = format!("{string_representation}\n  {{{s}}},");
         }
         string_representation = format!("{string_representation}\n}}");
@@ -103,7 +106,29 @@ impl fmt::Display for RiferimentoNISECI {
 
 impl RiferimentoNISECI {
     pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
+        #[allow(deprecated)]
         Self { elenco_specie }
+    }
+    pub fn as_vec(&self) -> &Vec<SpecieNISECI> {
+        #[allow(deprecated)]
+        &self.elenco_specie
+    }
+}
+
+impl From<RiferimentoNISECI> for Vec<SpecieNISECI> {
+    fn from(val: RiferimentoNISECI) -> Self {
+        #[allow(deprecated)]
+        val.elenco_specie
+    }
+}
+
+impl<'a> IntoIterator for &'a RiferimentoNISECI {
+    type Item = &'a SpecieNISECI;
+    type IntoIter = std::slice::Iter<'a, SpecieNISECI>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        #[allow(deprecated)]
+        self.elenco_specie.iter()
     }
 }
 
@@ -128,13 +153,16 @@ impl fmt::Display for RecordNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, CampionamentoNISECI::new() to construct"
+    )]
     pub campionamento: Vec<RecordNISECI>,
 }
 
 impl fmt::Display for CampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_representation = "CampionaNISECI: {".to_string();
-        for r in &self.campionamento {
+        for r in self {
             string_representation = format!("{string_representation}\n  {{{r}}},");
         }
         string_representation = format!("{string_representation}\n}}");
@@ -146,14 +174,14 @@ impl CampionamentoNISECI {
     #[cfg(test)]
     pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
         let mut max_pass = 0;
-        for record in self.campionamento.iter() {
+        for record in self {
             if record.passaggio_cattura > max_pass {
                 max_pass = record.passaggio_cattura;
             }
         }
 
         let mut passaggi: Vec<i32> = vec![0; max_pass as usize];
-        for record in self.campionamento.iter() {
+        for record in self {
             passaggi[(record.passaggio_cattura - 1) as usize] += 1;
         }
 
@@ -170,7 +198,13 @@ impl CampionamentoNISECI {
     }
 
     pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
+        #[allow(deprecated)]
         Self { campionamento }
+    }
+
+    pub fn as_vec(&self) -> &Vec<RecordNISECI> {
+        #[allow(deprecated)]
+        &self.campionamento
     }
 
     pub fn get_numero_pesci_alieni_e_indigeni(&self) -> AlieniIndigeni {
@@ -179,7 +213,7 @@ impl CampionamentoNISECI {
             indigeni: 0,
         };
 
-        for pesce in &self.campionamento {
+        for pesce in self {
             if pesce.specie.tipo_alloctono > 0 && pesce.specie.tipo_alloctono <= 3 {
                 alieni_indigeni.alieni += 1;
             } else if pesce.specie.tipo_autoctono == 1 || pesce.specie.tipo_autoctono == 2 {
@@ -193,7 +227,7 @@ impl CampionamentoNISECI {
     pub fn get_tot_specie_autoctone_attese(&self) -> usize {
         let mut map: HashMap<String, bool> = HashMap::new();
 
-        for cattura in &self.campionamento {
+        for cattura in self {
             if cattura.specie.specie_attesa
                 && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
             {
@@ -207,6 +241,23 @@ impl CampionamentoNISECI {
         }
 
         map.len()
+    }
+}
+
+impl From<CampionamentoNISECI> for Vec<RecordNISECI> {
+    fn from(val: CampionamentoNISECI) -> Self {
+        #[allow(deprecated)]
+        val.campionamento
+    }
+}
+
+impl<'a> IntoIterator for &'a CampionamentoNISECI {
+    type Item = &'a RecordNISECI;
+    type IntoIter = std::slice::Iter<'a, RecordNISECI>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        #[allow(deprecated)]
+        self.campionamento.iter()
     }
 }
 

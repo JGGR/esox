@@ -48,7 +48,7 @@ pub fn parse_recordcsv_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     records: Vec<T>,
 ) -> (Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>) {
     let (camp, errs) = parse_recordcsv_campionamento_hfbi_impl::<T>(records).into_parts();
-    (camp.campionamento, errs)
+    (camp.into(), errs)
 }
 
 pub struct CampionamentoHFBIParseResult(CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>);
@@ -139,12 +139,7 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi_impl<T: RecordCsvCampionamentoH
         };
         campioni.push(hfbi_rec);
     }
-    CampionamentoHFBIParseResult(
-        CampionamentoHFBI {
-            campionamento: campioni,
-        },
-        errors,
-    )
+    CampionamentoHFBIParseResult(CampionamentoHFBI::new(campioni), errors)
 }
 
 #[derive(Debug)]
@@ -363,7 +358,7 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
 pub fn check_records_campionamento_hfbi<T: RecordCsvCampionamentoHFBI>(
     records: Vec<T>,
 ) -> Result<Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>> {
-    check_records_campionamento_hfbi_impl::<T>(records).map(|v| v.campionamento)
+    check_records_campionamento_hfbi_impl::<T>(records).map(|v| v.into())
 }
 
 impl CampionamentoHFBI {
@@ -391,7 +386,7 @@ pub(crate) fn check_records_campionamento_hfbi_impl<T: RecordCsvCampionamentoHFB
 
     println!(
         "Campionamento HFBI: Numero record validi: {}",
-        camp.campionamento.len()
+        camp.as_vec().len()
     );
     println!(
         "Campionamento HFBI: Numero record non validi: {}",

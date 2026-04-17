@@ -595,13 +595,16 @@ impl fmt::Display for RecordHFBI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoHFBI {
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, CampionamentoHFBI::new() to construct"
+    )]
     pub campionamento: Vec<RecordHFBI>,
 }
 
 impl fmt::Display for CampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_representation = "CampionaHFBI: {".to_string();
-        for r in &self.campionamento {
+        for r in self {
             string_representation = format!("{string_representation}\n  {{{r}}},");
         }
         string_representation = format!("{string_representation}\n}}");
@@ -611,7 +614,29 @@ impl fmt::Display for CampionamentoHFBI {
 
 impl CampionamentoHFBI {
     pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
+        #[allow(deprecated)]
         Self { campionamento }
+    }
+    pub fn as_vec(&self) -> &Vec<RecordHFBI> {
+        #[allow(deprecated)]
+        &self.campionamento
+    }
+}
+
+impl From<CampionamentoHFBI> for Vec<RecordHFBI> {
+    fn from(val: CampionamentoHFBI) -> Self {
+        #[allow(deprecated)]
+        val.campionamento
+    }
+}
+
+impl<'a> IntoIterator for &'a CampionamentoHFBI {
+    type Item = &'a RecordHFBI;
+    type IntoIter = std::slice::Iter<'a, RecordHFBI>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        #[allow(deprecated)]
+        self.campionamento.iter()
     }
 }
 

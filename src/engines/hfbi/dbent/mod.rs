@@ -23,7 +23,7 @@ pub fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> 
     let mut specie_sbent;
     let mut bbent = 0.0;
     let area = anagrafica.larghezza_media_transetto * anagrafica.lunghezza_media_transetto;
-    for specie in &campione.campionamento {
+    for specie in campione {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
@@ -112,9 +112,7 @@ mod dbent_private_tests {
     #[test]
     fn test_dbent_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![],
-        };
+        let campione = CampionamentoHFBI::new(vec![]);
         let result = calc_dbent(&campione, &anagrafica);
         assert!(
             (result - 0.0).abs() < EPSILON,
@@ -126,14 +124,12 @@ mod dbent_private_tests {
     #[test]
     fn test_dbent_sbent_is_near_zero() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(
-                GruppoEcoHFBI::ResidentiDiEstuario,
-                0.0,
-                0.0,
-                100.0,
-            )],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_specie_record(
+            GruppoEcoHFBI::ResidentiDiEstuario,
+            0.0,
+            0.0,
+            100.0,
+        )]);
         let result = calc_dbent(&campione, &anagrafica);
         assert!(
             (result - 0.0).abs() < EPSILON,
@@ -145,12 +141,10 @@ mod dbent_private_tests {
     #[test]
     fn test_dbent_sbent_is_near_point_two() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::Diadromi, 0.15, 0.05, 100.0),
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.0, 0.0, 50.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_specie_record(GruppoEcoHFBI::Diadromi, 0.15, 0.05, 100.0),
+            create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.0, 0.0, 50.0),
+        ]);
         let result = calc_dbent(&campione, &anagrafica);
         assert!(
             (result - 0.01).abs() < EPSILON,
@@ -162,13 +156,11 @@ mod dbent_private_tests {
     #[test]
     fn test_dbent_standard_calculation() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.8, 0.7, 200.0),
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.0, 150.0),
-                create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 1.0, 1.0, 50.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.8, 0.7, 200.0),
+            create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.0, 150.0),
+            create_specie_record(GruppoEcoHFBI::OccasionaliMarini, 1.0, 1.0, 50.0),
+        ]);
 
         let sbent = 2.0;
         let bbent = 75.0_f32.ln();

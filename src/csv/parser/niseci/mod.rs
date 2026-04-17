@@ -78,7 +78,7 @@ pub fn parse_recordcsv_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> (Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>) {
     let (rif, errs) = parse_recordcsv_riferimento_niseci_impl::<T>(records).into_parts();
-    (rif.elenco_specie, errs)
+    (rif.into(), errs)
 }
 
 pub struct RiferimentoNISECIParseResult(RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>);
@@ -269,12 +269,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordCsvRiferimentoNIS
         used_id_specie.push(id);
     }
 
-    RiferimentoNISECIParseResult(
-        RiferimentoNISECI {
-            elenco_specie: specie,
-        },
-        errors,
-    )
+    RiferimentoNISECIParseResult(RiferimentoNISECI::new(specie), errors)
 }
 
 #[derive(Debug)]
@@ -302,12 +297,10 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
 ) -> (Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>) {
     let (camp, errs) = parse_recordcsv_campionamento_niseci_impl::<T>(
         records,
-        &RiferimentoNISECI {
-            elenco_specie: riferimento_specie,
-        },
+        &RiferimentoNISECI::new(riferimento_specie),
     )
     .into_parts();
-    (camp.campionamento, errs)
+    (camp.into(), errs)
 }
 
 pub struct CampionamentoNISECIParseResult(
@@ -357,7 +350,7 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCsvCampionament
         }
         let codice_specie = r.codice_specie();
         let mut opt_matched_specie = None;
-        for s in &riferimento_specie.elenco_specie {
+        for s in riferimento_specie {
             // FIXME: this is O(n^2).
             if s.id == codice_specie {
                 opt_matched_specie = Some(s);
@@ -407,12 +400,7 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCsvCampionament
         };
         campioni.push(niseci_rec);
     }
-    CampionamentoNISECIParseResult(
-        CampionamentoNISECI {
-            campionamento: campioni,
-        },
-        errors,
-    )
+    CampionamentoNISECIParseResult(CampionamentoNISECI::new(campioni), errors)
 }
 
 #[derive(Debug)]
@@ -675,7 +663,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
 pub fn check_records_riferimento_niseci<T: RecordCsvRiferimentoNISECI>(
     records: Vec<T>,
 ) -> Result<Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>> {
-    check_records_riferimento_niseci_impl::<T>(records).map(|v| v.elenco_specie)
+    check_records_riferimento_niseci_impl::<T>(records).map(|v| v.into())
 }
 
 impl RiferimentoNISECI {
@@ -703,7 +691,7 @@ pub(crate) fn check_records_riferimento_niseci_impl<T: RecordCsvRiferimentoNISEC
 
     println!(
         "Riferimento NISECI: Numero record validi: {}",
-        rif.elenco_specie.len()
+        rif.as_vec().len()
     );
     println!(
         "Riferimento NISECI: Numero record non validi: {}",
@@ -739,11 +727,9 @@ pub fn check_records_campionamento_niseci<T: RecordCsvCampionamentoNISECI>(
 ) -> Result<Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>> {
     check_records_campionamento_niseci_impl::<T>(
         records,
-        &RiferimentoNISECI {
-            elenco_specie: riferimento_specie,
-        },
+        &RiferimentoNISECI::new(riferimento_specie),
     )
-    .map(|v| v.campionamento)
+    .map(|v| v.into())
 }
 
 impl CampionamentoNISECI {
@@ -781,7 +767,7 @@ pub(crate) fn check_records_campionamento_niseci_impl<T: RecordCsvCampionamentoN
 
     println!(
         "Campionamento NISECI: Numero record validi: {}",
-        camp.campionamento.len()
+        camp.as_vec().len()
     );
     println!(
         "Campionamento NISECI: Numero record non validi: {}",

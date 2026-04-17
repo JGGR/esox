@@ -24,7 +24,7 @@ pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f
 
     let mut specie_map: HashMap<String, SpecieHFBI> = HashMap::with_capacity(10);
     // trovo il numero di specie trovate
-    for cattura in &campione.campionamento {
+    for cattura in campione {
         match cattura.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi | GruppoEcoHFBI::MigratoriMarini => {
                 specie_map.insert(
@@ -52,7 +52,7 @@ pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f
 
 fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut biomig = 0.0;
-    for specie in &campione.campionamento {
+    for specie in campione {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi | GruppoEcoHFBI::MigratoriMarini => biomig += specie.peso,
             _ => {}
@@ -125,9 +125,7 @@ mod dmig_private_tests {
     #[test]
     fn test_bmig_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![],
-        };
+        let campione = CampionamentoHFBI::new(vec![]);
         // biomig = 0 -> ln(1) = 0
         assert!((calc_bmig(&campione, &anagrafica) - 0.0).abs() < EPSILON);
     }
@@ -135,9 +133,11 @@ mod dmig_private_tests {
     #[test]
     fn test_bmig_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0)],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_specie_record(
+            "SP1",
+            GruppoEcoHFBI::Diadromi,
+            100.0,
+        )]);
         // biomig > 0, area = 0 -> division by zero -> infinity
         assert!(calc_bmig(&campione, &anagrafica).is_infinite());
     }
@@ -145,13 +145,11 @@ mod dmig_private_tests {
     #[test]
     fn test_bmig_standard_case() {
         let anagrafica = create_test_anagrafica(20.0, 5.0); // area = 100
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150.0), // biomig += 150
-                create_specie_record("SP2", GruppoEcoHFBI::ResidentiDiEstuario, 100.0), // ignored
-                create_specie_record("SP3", GruppoEcoHFBI::MigratoriMarini, 50.0), // biomig += 50
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150.0), // biomig += 150
+            create_specie_record("SP2", GruppoEcoHFBI::ResidentiDiEstuario, 100.0), // ignored
+            create_specie_record("SP3", GruppoEcoHFBI::MigratoriMarini, 50.0), // biomig += 50
+        ]);
         // biomig = 150 + 50 = 200
         // expected = ln((200 / 100) * 100 + 1) = ln(201)
         let expected = 200.0_f32;
@@ -164,13 +162,11 @@ mod dmig_private_tests {
     #[test]
     fn test_dmig_smig_is_zero() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(
-                "SP1",
-                GruppoEcoHFBI::ResidentiDiEstuario,
-                100.0,
-            )],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_specie_record(
+            "SP1",
+            GruppoEcoHFBI::ResidentiDiEstuario,
+            100.0,
+        )]);
         // No migratory species, so smig = 0. Should return 0.0
         assert!((calc_dmig(&campione, &anagrafica) - 0.0).abs() < EPSILON);
     }
@@ -178,12 +174,10 @@ mod dmig_private_tests {
     #[test]
     fn test_dmig_smig_is_one() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0),
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Same species
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0),
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Same species
+        ]);
         // Only one unique migratory species, so smig = 1. Should return 0.01
         assert!((calc_dmig(&campione, &anagrafica) - 0.01).abs() < EPSILON);
     }
@@ -191,12 +185,10 @@ mod dmig_private_tests {
     #[test]
     fn test_dmig_bmig_is_infinity() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0),
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 50.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 100.0),
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 50.0),
+        ]);
         // bmig is infinity. Formula is ln(((smig-1)/inf)+1) = ln(1) = 0
         assert!((calc_dmig(&campione, &anagrafica) - 0.0).abs() < EPSILON);
     }
@@ -204,14 +196,12 @@ mod dmig_private_tests {
     #[test]
     fn test_dmig_standard_case_smig_greater_than_one() {
         let anagrafica = create_test_anagrafica(20.0, 5.0); // area = 100
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150.0),
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 250.0),
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Duplicate species
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 300.0), // Ignored
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 150.0),
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 250.0),
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Duplicate species
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 300.0), // Ignored
+        ]);
 
         // bmig calculation:
         // biomig = 150 + 250 + 50 = 450

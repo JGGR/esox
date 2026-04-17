@@ -26,7 +26,7 @@ pub fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI)
 
 fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> (u32, f32) {
     let mut biomassa_tot = 0.0;
-    for cattura in &campionamento.campionamento {
+    for cattura in campionamento {
         biomassa_tot += cattura.peso;
     }
 
@@ -34,7 +34,7 @@ fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) 
 
     let mut n_specie_90: u32 = 0;
     let mut biomassa_tmp: f32 = 0.0;
-    for cattura in &campionamento.campionamento {
+    for cattura in campionamento {
         biomassa_tmp += cattura.peso;
         n_specie_90 += 1;
         if biomassa_tmp > biomassa_90 {
@@ -105,9 +105,7 @@ mod ddom_private_tests {
     #[test]
     fn test_s90_b90_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![],
-        };
+        let campione = CampionamentoHFBI::new(vec![]);
         let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
 
         assert_eq!(s90, 0);
@@ -118,9 +116,7 @@ mod ddom_private_tests {
     #[test]
     fn test_s90_b90_single_species() {
         let anagrafica = create_test_anagrafica(10.0, 10.0); // area = 100
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_dummy_record(200.0)],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_dummy_record(200.0)]);
         let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
 
         // n_specie_90 is 1 because the loop runs once and breaks.
@@ -134,9 +130,7 @@ mod ddom_private_tests {
     #[test]
     fn test_s90_b90_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_dummy_record(100.0)],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_dummy_record(100.0)]);
         let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
 
         assert_eq!(s90, 1);
@@ -149,9 +143,7 @@ mod ddom_private_tests {
     #[test]
     fn test_ddom_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![],
-        };
+        let campione = CampionamentoHFBI::new(vec![]);
         let result = calc_ddom(&campione, &anagrafica);
         // s90=0, b90=0. Formula is ln(((0-1)/0)+1) = ln(-inf) = NaN
         assert!(result.is_nan());
@@ -160,9 +152,7 @@ mod ddom_private_tests {
     #[test]
     fn test_ddom_single_species() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_dummy_record(100.0)],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_dummy_record(100.0)]);
         let result = calc_ddom(&campione, &anagrafica);
         // s90=1. Formula is ln(((1-1)/b90)+1) = ln(1) = 0
         assert!((result - 0.0).abs() < EPSILON);
@@ -171,9 +161,8 @@ mod ddom_private_tests {
     #[test]
     fn test_ddom_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_dummy_record(100.0), create_dummy_record(50.0)],
-        };
+        let campione =
+            CampionamentoHFBI::new(vec![create_dummy_record(100.0), create_dummy_record(50.0)]);
         let result = calc_ddom(&campione, &anagrafica);
         // b90 is infinity. Formula is ln(((s90-1)/inf)+1) = ln(0+1) = ln(1) = 0
         assert!((result - 0.0).abs() < EPSILON);
@@ -182,14 +171,12 @@ mod ddom_private_tests {
     #[test]
     fn test_ddom_standard_case() {
         let anagrafica = create_test_anagrafica(10.0, 10.0); // area = 100
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_dummy_record(100.0),
-                create_dummy_record(50.0),
-                create_dummy_record(30.0),
-                create_dummy_record(20.0), // 90% threshold (180) is crossed here
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_dummy_record(100.0),
+            create_dummy_record(50.0),
+            create_dummy_record(30.0),
+            create_dummy_record(20.0), // 90% threshold (180) is crossed here
+        ]);
         // From calc_s90_b90:
         // biomassa_tot = 200, biomassa_90 = 180.
         // Loop adds weights: 100, 150, 180, 200. It breaks after the 4th species.

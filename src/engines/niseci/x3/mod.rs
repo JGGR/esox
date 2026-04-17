@@ -247,7 +247,7 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
     let mut classi_eta = ClassiEtaAlieniNISECI::new();
 
     // riempo l'hashmap con solo le specie alloctone campionate
-    for cattura in &c.campionamento {
+    for cattura in c.as_vec() {
         if cattura.specie.tipo_alloctono == 1 {
             match classi_eta.map_tipo_1.entry(cattura.specie.id.clone()) {
                 Entry::Occupied(mut entry) => {
