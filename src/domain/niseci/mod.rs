@@ -23,6 +23,7 @@ use std::vec::Vec;
 
 use super::localize::CommaFormat;
 use super::location::Location;
+use super::posf32::PositiveF32;
 
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
@@ -404,23 +405,85 @@ pub struct AnagraficaNISECI {
     pub bacino_appartenenza: String,
     pub idro_eco_regione: IdroEcoRegioneNISECI,
     pub posizione: Location,
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaNISECI::new() to construct"
+    )]
     pub lunghezza_media_stazione: f32,
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaNISECI::new() to construct"
+    )]
     pub larghezza_media_stazione: f32,
 }
 
 impl AnagraficaNISECI {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        comunita: ComunitaNISECI,
+        codice_stazione: String,
+        date_string: String,
+        area: AreaNISECI,
+        corpo_idrico: String,
+        bacino_appartenenza: String,
+        idro_eco_regione: IdroEcoRegioneNISECI,
+        posizione: Location,
+        lunghezza_media_stazione: PositiveF32,
+        larghezza_media_stazione: PositiveF32,
+    ) -> Self {
+        Self {
+            comunita,
+            codice_stazione,
+            date_string,
+            area,
+            corpo_idrico,
+            bacino_appartenenza,
+            idro_eco_regione,
+            posizione,
+            #[allow(deprecated)]
+            lunghezza_media_stazione: *lunghezza_media_stazione,
+            #[allow(deprecated)]
+            larghezza_media_stazione: *larghezza_media_stazione,
+        }
+    }
     pub fn get_lunghezza_media(&self) -> f32 {
+        #[allow(deprecated)]
         self.lunghezza_media_stazione
     }
+    pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), ()> {
+        if !val.is_finite() {
+            return Err(());
+        }
+        if val <= 0.0 {
+            return Err(());
+        }
+        #[allow(deprecated)]
+        {
+            self.lunghezza_media_stazione = val;
+        }
+        Ok(())
+    }
     pub fn get_larghezza_media(&self) -> f32 {
+        #[allow(deprecated)]
         self.larghezza_media_stazione
+    }
+    pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), ()> {
+        if !val.is_finite() {
+            return Err(());
+        }
+        if val <= 0.0 {
+            return Err(());
+        }
+        #[allow(deprecated)]
+        {
+            self.larghezza_media_stazione = val;
+        }
+        Ok(())
     }
 }
 
 impl fmt::Display for AnagraficaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!("AnagraficaNISECI: {{ comunita: {{{}}}, codice_stazione {{{}}}, area: {{{}}}, corpo_idrico: {{{}}}, bacino_appartenenza: {{{}}}, idro_eco_regione: {{{}}}, posizione: {{{}}}, lunghezza_stazione: {{{}}}, larghezza_stazione: {{{}}} }}",
-        self.comunita, self.codice_stazione, self.area, self.corpo_idrico, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.lunghezza_media_stazione, self.larghezza_media_stazione);
+        self.comunita, self.codice_stazione, self.area, self.corpo_idrico, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.get_lunghezza_media(), self.get_larghezza_media());
         write!(f, "{}", string_representation)
     }
 }
@@ -1323,5 +1386,58 @@ impl From<(f32, &AreaNISECI)> for StatoEcologicoNISECI {
             return StatoEcologicoNISECI::Scadente;
         }
         StatoEcologicoNISECI::Cattivo
+    }
+}
+
+#[cfg(test)]
+mod domain_niseci_private_tests {
+    use super::*;
+    #[cfg(test)]
+    impl AnagraficaNISECI {
+        /// Test helper to build unchecked instances
+        #[cfg(test)]
+        pub(crate) fn new_raw_unchecked(
+            comunita: ComunitaNISECI,
+            codice_stazione: String,
+            date_string: String,
+            area: AreaNISECI,
+            corpo_idrico: String,
+            bacino_appartenenza: String,
+            idro_eco_regione: IdroEcoRegioneNISECI,
+            posizione: Location,
+            lunghezza_media_stazione: f32,
+            larghezza_media_stazione: f32,
+        ) -> Self {
+            Self {
+                comunita,
+                codice_stazione,
+                date_string,
+                area,
+                corpo_idrico,
+                bacino_appartenenza,
+                idro_eco_regione,
+                posizione,
+                #[allow(deprecated)]
+                lunghezza_media_stazione,
+                #[allow(deprecated)]
+                larghezza_media_stazione,
+            }
+        }
+        /// Test helper to mutate lunghezza with no checks
+        #[cfg(test)]
+        pub(crate) fn set_lunghezza_unchecked(&mut self, val: f32) {
+            #[allow(deprecated)]
+            {
+                self.lunghezza_media_stazione = val;
+            }
+        }
+        /// Test helper to mutate larghezza with no checks
+        #[cfg(test)]
+        pub(crate) fn set_larghezza_unchecked(&mut self, val: f32) {
+            #[allow(deprecated)]
+            {
+                self.larghezza_media_stazione = val;
+            }
+        }
     }
 }

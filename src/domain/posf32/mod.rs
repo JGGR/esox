@@ -14,10 +14,31 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+use std::ops::Deref;
 
-pub mod hfbi;
-pub mod index;
-pub(crate) mod localize;
-pub mod location;
-pub mod niseci;
-pub mod posf32;
+#[derive(Debug, Clone, Copy)]
+#[repr(transparent)]
+pub struct PositiveF32(f32);
+
+impl PositiveF32 {
+    pub fn new(value: f32) -> Result<Self, ()> {
+        if value.is_finite() && value > 0.0 {
+            Ok(Self(value))
+        } else {
+            Err(())
+        }
+    }
+}
+
+impl Deref for PositiveF32 {
+    type Target = f32;
+    fn deref(&self) -> &f32 {
+        &self.0
+    }
+}
+
+impl From<PositiveF32> for f32 {
+    fn from(v: PositiveF32) -> Self {
+        v.0
+    }
+}

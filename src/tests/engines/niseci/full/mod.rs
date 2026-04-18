@@ -153,8 +153,8 @@ fn calc_templates_with_area(
     let anagrafica_reader = Cursor::new(ANAGRAFICA_NISECI_TEMPLATE_DATA);
     let mut anagrafica = load_anagrafica_niseci_from_reader(anagrafica_reader, has_headers, format)
         .expect("Failed loading template AnagraficaNISECI");
-    anagrafica.lunghezza_media_stazione = x;
-    anagrafica.larghezza_media_stazione = y;
+    anagrafica.set_lunghezza_unchecked(x);
+    anagrafica.set_larghezza_unchecked(y);
 
     let calc_niseci_res = calculate_niseci(&campionamento, &riferimento, &anagrafica);
 

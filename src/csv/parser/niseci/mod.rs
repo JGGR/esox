@@ -24,6 +24,7 @@ use crate::domain::niseci::{
     AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
     RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
 };
+use crate::domain::posf32::PositiveF32;
 use chrono::format::ParseErrorKind;
 use std::fmt;
 
@@ -532,15 +533,31 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
         errors.push(err);
     }
 
-    if r.larghezza_stazione() < 0.0 {
+    let lunghezza = PositiveF32::new(r.lunghezza_stazione()).unwrap_or_else(|_| {
         let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
             msg: format!(
-                "Larghezza stazione troppo bassa: {}",
+                "Lunghezza stazione non finito e positivo: {}",
+                r.lunghezza_stazione()
+            ),
+        };
+        errors.push(err);
+        PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32")
+        // It looks like we still take this value but we will return with Err since errors is not
+        // empty
+    });
+
+    let larghezza = PositiveF32::new(r.larghezza_stazione()).unwrap_or_else(|_| {
+        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+            msg: format!(
+                "Larghezza stazione non finito e positivo: {}",
                 r.larghezza_stazione()
             ),
         };
         errors.push(err);
-    }
+        PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32")
+        // It looks like we still take this value but we will return with Err since errors is not
+        // empty
+    });
 
     let mut tipo_comunita = TipoComunitaNISECI::Redatta;
     match r.tipo_comunita() {
@@ -635,25 +652,25 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
         return Err(errors);
     }
 
-    let res = AnagraficaNISECI {
-        comunita: ComunitaNISECI {
+    let res = AnagraficaNISECI::new(
+        ComunitaNISECI {
             tipo: tipo_comunita,
             fonte: Some(r.fonte()),
             numero_protocollo: Some(r.numero_protocollo()),
         },
-        codice_stazione: r.codice_stazione(),
-        date_string: r.data(), // Formato gg/mm/aaaa
+        r.codice_stazione(),
+        r.data(), // Formato gg/mm/aaaa
         area,
-        corpo_idrico: r.corpo_idrico(),
-        bacino_appartenenza: r.nome_bacino(),
+        r.corpo_idrico(),
+        r.nome_bacino(),
         idro_eco_regione,
-        posizione: Location {
+        Location {
             regione: r.regione(),
             provincia: r.provincia(),
         },
-        lunghezza_media_stazione: r.lunghezza_stazione(),
-        larghezza_media_stazione: r.larghezza_stazione(),
-    };
+        lunghezza,
+        larghezza,
+    );
     Ok(res)
 }
 

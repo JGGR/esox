@@ -174,21 +174,21 @@ fn calculate_x2_test_1() {
         tipo: TipoComunitaNISECI::Dm260_2010,
     };
 
-    let anagrafica = AnagraficaNISECI {
-        bacino_appartenenza: "dummy".to_string(),
-        area: AreaNISECI::Alpina,
-        codice_stazione: "Foo".to_string(),
-        date_string: "Never".to_string(),
-        comunita: comunita,
-        idro_eco_regione: IdroEcoRegioneNISECI::AlpiCentroOrientali,
-        larghezza_media_stazione: 1.0,
-        lunghezza_media_stazione: 10.0,
-        corpo_idrico: "canaletta".to_string(),
-        posizione: Location {
+    let anagrafica = AnagraficaNISECI::new_raw_unchecked(
+        comunita,
+        "dummy".to_string(),
+        "Never".to_string(),
+        AreaNISECI::Alpina,
+        "Foo".to_string(),
+        "canaletta".to_string(),
+        IdroEcoRegioneNISECI::AlpiCentroOrientali,
+        Location {
             regione: "sardninaia".to_string(),
             provincia: "oristano".to_string(),
         },
-    };
+        1.0,
+        10.0,
+    );
 
     let x2 = calculate_x2(&campionamento, &anagrafica, true);
 
@@ -207,21 +207,21 @@ fn calculate_x2_test_1() {
         tipo: TipoComunitaNISECI::Dm260_2010,
     };
 
-    let anagrafica = AnagraficaNISECI {
-        bacino_appartenenza: "dummy".to_string(),
-        area: AreaNISECI::Alpina,
-        codice_stazione: "Foo".to_string(),
-        date_string: "Never".to_string(),
-        comunita: comunita,
-        idro_eco_regione: IdroEcoRegioneNISECI::AlpiCentroOrientali,
-        larghezza_media_stazione: 1.0,
-        lunghezza_media_stazione: 10.0,
-        corpo_idrico: "canaletta".to_string(),
-        posizione: Location {
+    let anagrafica = AnagraficaNISECI::new_raw_unchecked(
+        comunita,
+        "dummy".to_string(),
+        "Never".to_string(),
+        AreaNISECI::Alpina,
+        "Foo".to_string(),
+        "canaletta".to_string(),
+        IdroEcoRegioneNISECI::AlpiCentroOrientali,
+        Location {
             regione: "sardninaia".to_string(),
             provincia: "oristano".to_string(),
         },
-    };
+        1.0,
+        10.0,
+    );
 
     let x2 = calculate_x2(&campionamento, &anagrafica, true);
 

@@ -35,25 +35,25 @@ pub const ANAGRAFICA_HFBI_TEMPLATE_DATA: &[u8] =
     include_bytes!("../../../templates/anagrafica_hfbi.csv");
 
 pub fn create_dummy_anagrafica() -> AnagraficaNISECI {
-    return AnagraficaNISECI {
-        comunita: ComunitaNISECI {
+    return AnagraficaNISECI::new_raw_unchecked(
+        ComunitaNISECI {
             tipo: TipoComunitaNISECI::Redatta,
             fonte: None,
             numero_protocollo: None,
         },
-        codice_stazione: "foo".to_string(),
-        date_string: "foo".to_string(),
-        area: AreaNISECI::Alpina,
-        corpo_idrico: "foo".to_string(),
-        bacino_appartenenza: "foo".to_string(),
-        idro_eco_regione: IdroEcoRegioneNISECI::Toscana,
-        posizione: Location {
+        "foo".to_string(),
+        "foo".to_string(),
+        AreaNISECI::Alpina,
+        "foo".to_string(),
+        "foo".to_string(),
+        IdroEcoRegioneNISECI::Toscana,
+        Location {
             regione: "foo".to_string(),
             provincia: "foo".to_string(),
         },
-        lunghezza_media_stazione: 0.0,
-        larghezza_media_stazione: 0.0,
-    };
+        0.0,
+        0.0,
+    );
 }
 
 pub fn create_dummy_riferimento() -> RiferimentoNISECI {
