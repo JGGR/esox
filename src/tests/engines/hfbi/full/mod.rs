@@ -108,7 +108,7 @@ fn calc_templates_with_area(
 }
 
 #[test]
-fn calculate_hfbi_template_zeroarea() {
+fn calculate_hfbi_template_zero_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
 
@@ -174,4 +174,26 @@ fn calculate_hfbi_template_subzero_infinite_area() {
     assert_eq!(intermediates.ddom, f32::INFINITY);
     assert_eq!(intermediates.dhzp, 0.0);
     assert_eq!(intermediates.dmig, 0.0);
+}
+
+#[test]
+fn calculate_hfbi_template_quietnan_area() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+
+    // From https://doc.rust-lang.org/std/primitive.f32.html#associatedconstant.NAN
+    // This constant is guaranteed to be a quiet NaN (on targets that follow
+    // the Rust assumptions that the quiet/signaling bit being set to 1
+    // indicates a quiet NaN)
+    let quiet_nan = f32::NAN;
+    let (hfbi, intermediates) = calc_templates_with_area(has_headers, format, quiet_nan, 1.0);
+
+    assert!(hfbi.is_nan());
+    assert!(intermediates.mmi.is_nan());
+    assert!(intermediates.bbent.is_nan());
+    assert_eq!(intermediates.bn, 1.587);
+    assert!(intermediates.dbent.is_nan());
+    assert!(intermediates.ddom.is_nan());
+    assert!(intermediates.dhzp.is_nan());
+    assert!(intermediates.dmig.is_nan());
 }

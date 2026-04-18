@@ -164,7 +164,7 @@ fn calc_templates_with_area(
 }
 
 #[test]
-fn calculate_niseci_template_zeroarea() {
+fn calculate_niseci_template_zero_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
     let (niseci, intermediates) = calc_templates_with_area(has_headers, format, 0.0, 0.0);
@@ -205,6 +205,23 @@ fn calculate_niseci_template_subzero_infinite_area() {
     let format = InputFormat::Alternative;
     let (niseci, intermediates) =
         calc_templates_with_area(has_headers, format, f32::NEG_INFINITY, 1.0);
+
+    assert_eq!(niseci, Some(0.065));
+    assert_eq!(intermediates.x1, 0.429);
+    assert_eq!(intermediates.x2, Some(0.0));
+    assert_eq!(intermediates.x3, 1.0);
+}
+
+#[test]
+fn calculate_niseci_template_quietnan_area() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+    // From https://doc.rust-lang.org/std/primitive.f32.html#associatedconstant.NAN
+    // This constant is guaranteed to be a quiet NaN (on targets that follow
+    // the Rust assumptions that the quiet/signaling bit being set to 1
+    // indicates a quiet NaN)
+    let quiet_nan = f32::NAN;
+    let (niseci, intermediates) = calc_templates_with_area(has_headers, format, quiet_nan, 1.0);
 
     assert_eq!(niseci, Some(0.065));
     assert_eq!(intermediates.x1, 0.429);

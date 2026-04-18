@@ -27,14 +27,15 @@
 - Add tests for order invariant on `calc_ddom()`, `calculate_hfbi()`, `calculate_mmi()`, `calc_s90_b90()`
 - Add tests for weird area cases for `calculate_niseci()`, `calculate_hfbi()`, using template files with explicit setting of `Anagrafica{NISECI,HFBI}` width/length fields
   - Zero
-  - Negative area
+  - Negative
   - Infinity / negative infinity
+  - Quiet NaN (using likely quiet NaN from `f32::NAN`)
 
 ### Changed
 
 - Fix: ensure proper sorting inside `engines::hfbi::ddom::calc_ddom()`
 - Fix: ensure proper sorting inside `domain::hfbi::CampionamentoHFBI::new()`
-  - To avoid invalid instances (not sorted by descending `peso` we have to fully control construction
+  - To avoid invalid instances (not sorted by descending `peso`) we have to fully control construction
   - `v0.2` will change visibility of fields
 - Deprecation warnings for parsing of `RiferimentoNISECI`, next version will change public API:
   - Out: will return `RiferimentoNISECI` on success branches (was: `Vec<SpecieNISECI>` on success branches)
