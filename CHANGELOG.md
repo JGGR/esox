@@ -25,6 +25,7 @@
 - Add `meta::version()` to get crate version
 - Add tests for order invariant on `CampionamentoHFBI` access/iteration methods
 - Add tests for order invariant on `calc_ddom()`, `calculate_hfbi()`, `calculate_mmi()`, `calc_s90_b90()`
+- Add tests for zero, subzero area cases for `calculate_niseci()`, `calculate_hfbi()`
 
 ### Changed
 

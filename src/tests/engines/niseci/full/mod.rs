@@ -20,11 +20,19 @@ use crate::csv::deser::niseci::{
     check_riferimento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI,
     VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
 };
+use crate::csv::load::{
+    niseci::{
+        load_anagrafica_niseci_from_reader, load_campionamento_niseci_from_reader,
+        load_riferimento_niseci_from_reader,
+    },
+    InputFormat,
+};
 use crate::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
     check_records_riferimento_niseci_impl,
 };
 use crate::{
+    domain::niseci::ValoriIntermediNISECI,
     engines::niseci::full::calculate_niseci,
     tests::test_utils::{
         create_dummy_anagrafica, create_dummy_campionamento_chopped,
@@ -122,5 +130,59 @@ fn calculate_niseci_template() {
     assert_eq!(niseci, Some(0.209));
     assert_eq!(intermediates.x1, 0.429);
     assert_eq!(intermediates.x2, Some(0.267));
+    assert_eq!(intermediates.x3, 1.0);
+}
+
+fn calc_templates_with_area(
+    has_headers: bool,
+    format: InputFormat,
+    x: f32,
+    y: f32,
+) -> (Option<f32>, ValoriIntermediNISECI) {
+    let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
+    let riferimento = load_riferimento_niseci_from_reader(riferimento_reader, has_headers, format)
+        .expect("Failed loading template RiferimentoNISECI");
+    let campionamento_reader = Cursor::new(CAMPIONAMENTO_NISECI_TEMPLATE_DATA);
+    let campionamento = load_campionamento_niseci_from_reader(
+        campionamento_reader,
+        has_headers,
+        &riferimento,
+        format,
+    )
+    .expect("Failed loading template CampionamentoNISECI");
+    let anagrafica_reader = Cursor::new(ANAGRAFICA_NISECI_TEMPLATE_DATA);
+    let mut anagrafica = load_anagrafica_niseci_from_reader(anagrafica_reader, has_headers, format)
+        .expect("Failed loading template AnagraficaNISECI");
+    anagrafica.lunghezza_media_stazione = x;
+    anagrafica.larghezza_media_stazione = y;
+
+    let calc_niseci_res = calculate_niseci(&campionamento, &riferimento, &anagrafica);
+
+    assert!(calc_niseci_res.is_ok());
+    let (niseci, intermediates) = calc_niseci_res.expect("is_ok() was checked before");
+    (niseci, intermediates)
+}
+
+#[test]
+fn calculate_niseci_template_zeroarea() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+    let (niseci, intermediates) = calc_templates_with_area(has_headers, format, 0.0, 0.0);
+
+    assert_eq!(niseci, Some(0.266));
+    assert_eq!(intermediates.x1, 0.429);
+    assert_eq!(intermediates.x2, Some(0.4));
+    assert_eq!(intermediates.x3, 1.0);
+}
+
+#[test]
+fn calculate_niseci_template_subzero_area() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+    let (niseci, intermediates) = calc_templates_with_area(has_headers, format, -1.0, 100.0);
+
+    assert_eq!(niseci, Some(0.065));
+    assert_eq!(intermediates.x1, 0.429);
+    assert_eq!(intermediates.x2, Some(0.0));
     assert_eq!(intermediates.x3, 1.0);
 }

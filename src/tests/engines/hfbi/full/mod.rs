@@ -18,9 +18,14 @@ use crate::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
     VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
 };
+use crate::csv::load::{
+    hfbi::{load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader},
+    InputFormat,
+};
 use crate::csv::parser::hfbi::{
     check_records_anagrafica_hfbi, check_records_campionamento_hfbi_impl,
 };
+use crate::domain::hfbi::ValoriIntermediHFBI;
 use crate::engines::hfbi::full::calculate_hfbi;
 use crate::tests::test_utils::{ANAGRAFICA_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_HFBI_TEMPLATE_DATA};
 use std::io::Cursor;
@@ -76,4 +81,62 @@ fn calculate_hfbi_template() {
     assert_eq!(intermediates.ddom, 0.399);
     assert_eq!(intermediates.dhzp, 0.417);
     assert_eq!(intermediates.dmig, 0.421);
+}
+
+fn calc_templates_with_area(
+    has_headers: bool,
+    format: InputFormat,
+    x: f32,
+    y: f32,
+) -> (f32, ValoriIntermediHFBI) {
+    let campionamento_reader = Cursor::new(CAMPIONAMENTO_HFBI_TEMPLATE_DATA);
+    let campionamento =
+        load_campionamento_hfbi_from_reader(campionamento_reader, has_headers, format)
+            .expect("Failed loading template CampionamentoHFBI");
+    let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
+    let mut anagrafica = load_anagrafica_hfbi_from_reader(anagrafica_reader, has_headers, format)
+        .expect("Failed loading template AnagraficaHFBI");
+    anagrafica.lunghezza_media_transetto = x;
+    anagrafica.larghezza_media_transetto = y;
+
+    let calc_hfbi_res = calculate_hfbi(&campionamento, &anagrafica);
+
+    assert!(calc_hfbi_res.is_ok());
+
+    let (hfbi, intermediates) = calc_hfbi_res.expect("is_ok() was checked before");
+    (hfbi, intermediates)
+}
+
+#[test]
+fn calculate_hfbi_template_zeroarea() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+
+    let (hfbi, intermediates) = calc_templates_with_area(has_headers, format, 0.0, 0.0);
+
+    assert!(hfbi.is_nan());
+    assert!(intermediates.mmi.is_nan());
+    assert_eq!(intermediates.bbent, f32::INFINITY);
+    assert_eq!(intermediates.bn, 1.587);
+    assert!(intermediates.dbent.is_nan());
+    assert_eq!(intermediates.ddom, 0.0);
+    assert_eq!(intermediates.dhzp, 0.0);
+    assert_eq!(intermediates.dmig, 0.0);
+}
+
+#[test]
+fn calculate_hfbi_template_subzero_area() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+
+    let (hfbi, intermediates) = calc_templates_with_area(has_headers, format, -1.0, 100.0);
+
+    assert!(hfbi.is_nan());
+    assert!(intermediates.mmi.is_nan());
+    assert!(intermediates.bbent.is_nan());
+    assert_eq!(intermediates.bn, 1.587);
+    assert!(intermediates.dbent.is_nan());
+    assert!(intermediates.ddom.is_nan());
+    assert!(intermediates.dhzp.is_nan());
+    assert!(intermediates.dmig.is_nan());
 }
