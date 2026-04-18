@@ -186,3 +186,28 @@ fn calculate_niseci_template_subzero_area() {
     assert_eq!(intermediates.x2, Some(0.0));
     assert_eq!(intermediates.x3, 1.0);
 }
+
+#[test]
+fn calculate_niseci_template_infinite_area() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+    let (niseci, intermediates) = calc_templates_with_area(has_headers, format, f32::INFINITY, 1.0);
+
+    assert_eq!(niseci, Some(0.065));
+    assert_eq!(intermediates.x1, 0.429);
+    assert_eq!(intermediates.x2, Some(0.0));
+    assert_eq!(intermediates.x3, 1.0);
+}
+
+#[test]
+fn calculate_niseci_template_subzero_infinite_area() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+    let (niseci, intermediates) =
+        calc_templates_with_area(has_headers, format, f32::NEG_INFINITY, 1.0);
+
+    assert_eq!(niseci, Some(0.065));
+    assert_eq!(intermediates.x1, 0.429);
+    assert_eq!(intermediates.x2, Some(0.0));
+    assert_eq!(intermediates.x3, 1.0);
+}

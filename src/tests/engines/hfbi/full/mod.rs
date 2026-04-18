@@ -140,3 +140,38 @@ fn calculate_hfbi_template_subzero_area() {
     assert!(intermediates.dhzp.is_nan());
     assert!(intermediates.dmig.is_nan());
 }
+
+#[test]
+fn calculate_hfbi_template_infinite_area() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+
+    let (hfbi, intermediates) = calc_templates_with_area(has_headers, format, f32::INFINITY, 1.0);
+
+    assert_eq!(hfbi, f32::INFINITY);
+    assert_eq!(intermediates.mmi, f32::INFINITY);
+    assert_eq!(intermediates.bbent, 0.0);
+    assert_eq!(intermediates.bn, 1.587);
+    assert_eq!(intermediates.dbent, 0.0);
+    assert_eq!(intermediates.ddom, f32::INFINITY);
+    assert_eq!(intermediates.dhzp, 0.0);
+    assert_eq!(intermediates.dmig, 0.0);
+}
+
+#[test]
+fn calculate_hfbi_template_subzero_infinite_area() {
+    let has_headers = true;
+    let format = InputFormat::Alternative;
+
+    let (hfbi, intermediates) =
+        calc_templates_with_area(has_headers, format, f32::NEG_INFINITY, 1.0);
+
+    assert_eq!(hfbi, f32::INFINITY);
+    assert_eq!(intermediates.mmi, f32::INFINITY);
+    assert_eq!(intermediates.bbent, 0.0);
+    assert_eq!(intermediates.bn, 1.587);
+    assert_eq!(intermediates.dbent, 0.0);
+    assert_eq!(intermediates.ddom, f32::INFINITY);
+    assert_eq!(intermediates.dhzp, 0.0);
+    assert_eq!(intermediates.dmig, 0.0);
+}
