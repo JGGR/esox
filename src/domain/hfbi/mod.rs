@@ -602,6 +602,7 @@ pub struct CampionamentoHFBI {
     #[deprecated(
         note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, CampionamentoHFBI::new() to construct"
     )]
+    #[serde(deserialize_with = "deserialize_vec_record_hfbi_sorted")]
     pub campionamento: Vec<RecordHFBI>,
 }
 
@@ -616,21 +617,38 @@ impl fmt::Display for CampionamentoHFBI {
     }
 }
 
+/// Private helper trait to have the sorting directly on Vec
+trait SortedRecordsHFBI {
+    fn sort_by_peso_desc(&mut self);
+}
+
+/// Private helper impl to have the sorting directly on Vec
+impl SortedRecordsHFBI for Vec<RecordHFBI> {
+    fn sort_by_peso_desc(&mut self) {
+        self.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+    }
+}
+
+/// Private helper impl to have the sorting directly on Vec
+impl SortedRecordsHFBI for Vec<&RecordHFBI> {
+    fn sort_by_peso_desc(&mut self) {
+        self.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+    }
+}
+
 impl CampionamentoHFBI {
     pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
         #[allow(deprecated)]
         let mut sorted = Self { campionamento };
         #[allow(deprecated)]
-        sorted
-            .campionamento
-            .sort_by(|a, b| b.peso.total_cmp(&a.peso));
+        sorted.campionamento.sort_by_peso_desc();
         sorted
     }
     pub fn as_vec(&self) -> Vec<&RecordHFBI> {
         #[allow(deprecated)]
         let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
 
-        v.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+        v.sort_by_peso_desc();
 
         v
     }
@@ -642,7 +660,7 @@ impl CampionamentoHFBI {
         #[allow(deprecated)]
         let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
 
-        v.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+        v.sort_by_peso_desc();
 
         v.into_iter()
     }
@@ -653,7 +671,7 @@ impl From<CampionamentoHFBI> for Vec<RecordHFBI> {
         #[allow(deprecated)]
         let mut v = val.campionamento;
 
-        v.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+        v.sort_by_peso_desc();
 
         v
     }
@@ -667,10 +685,20 @@ impl<'a> IntoIterator for &'a CampionamentoHFBI {
         #[allow(deprecated)]
         let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
 
-        v.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+        v.sort_by_peso_desc();
 
         v.into_iter()
     }
+}
+
+/// Custom field deserialize holding the order invariant for returned instances
+fn deserialize_vec_record_hfbi_sorted<'de, D>(deserializer: D) -> Result<Vec<RecordHFBI>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let mut v = Vec::<RecordHFBI>::deserialize(deserializer)?;
+    v.sort_by_peso_desc();
+    Ok(v)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]

@@ -52,6 +52,7 @@
   - Needs `rust 1.80`
 - Make types related to full calc results `Deserialize`
 - Make types related to full calc input `Serialize`, `Deserialize`
+  - Custom deser for records field of `CampionamentoHFBI`
   - Custom deser for length/width fields of `AnagraficaNISECI` and `AnagraficaHFBI`
 - Add `#[serde(deny_unknown_fields)]` to `Deserialize` types
   - Types with `Deserialize` in `csv::deser` modules did not receive this annotation since it would be a breaking change
