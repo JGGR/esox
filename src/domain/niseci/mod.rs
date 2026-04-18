@@ -23,7 +23,7 @@ use std::vec::Vec;
 
 use super::localize::CommaFormat;
 use super::location::Location;
-use super::posf32::PositiveF32;
+use super::posf32::{deserialize_positive_f32, PositiveF32};
 
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
@@ -408,10 +408,12 @@ pub struct AnagraficaNISECI {
     #[deprecated(
         note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaNISECI::new() to construct"
     )]
+    #[serde(deserialize_with = "deserialize_positive_f32")]
     pub lunghezza_media_stazione: f32,
     #[deprecated(
         note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaNISECI::new() to construct"
     )]
+    #[serde(deserialize_with = "deserialize_positive_f32")]
     pub larghezza_media_stazione: f32,
 }
 

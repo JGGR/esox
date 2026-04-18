@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+use serde::{de, Deserialize, Deserializer};
 use std::ops::Deref;
 
 #[derive(Debug, Clone, Copy)]
@@ -40,5 +41,18 @@ impl Deref for PositiveF32 {
 impl From<PositiveF32> for f32 {
     fn from(v: PositiveF32) -> Self {
         v.0
+    }
+}
+
+pub(crate) fn deserialize_positive_f32<'de, D>(deserializer: D) -> Result<f32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let v = f32::deserialize(deserializer)?;
+
+    if v.is_finite() && v > 0.0 {
+        Ok(v)
+    } else {
+        Err(de::Error::custom("expected a positive, finite f32"))
     }
 }

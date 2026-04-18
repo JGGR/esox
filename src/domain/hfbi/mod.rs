@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
 use super::localize::CommaFormat;
-use super::posf32::PositiveF32;
+use super::posf32::{deserialize_positive_f32, PositiveF32};
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -789,10 +789,12 @@ pub struct AnagraficaHFBI {
     #[deprecated(
         note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaHFBI::new() to construct"
     )]
+    #[serde(deserialize_with = "deserialize_positive_f32")]
     pub lunghezza_media_transetto: f32,
     #[deprecated(
         note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaHFBI::new() to construct"
     )]
+    #[serde(deserialize_with = "deserialize_positive_f32")]
     pub larghezza_media_transetto: f32,
 }
 
