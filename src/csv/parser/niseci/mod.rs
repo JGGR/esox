@@ -72,6 +72,8 @@ impl fmt::Display for RecordCsvRiferimentoNISECIError {
     }
 }
 
+impl std::error::Error for RecordCsvRiferimentoNISECIError {}
+
 #[deprecated(
     note = "v0.2 will change signature to return RiferimentoNISECIParseResult\nConsider using RiferimentoNISECI::parse_recordcsv(records).into_parts()"
 )]
@@ -289,6 +291,8 @@ impl fmt::Display for RecordCsvCampionamentoNISECIError {
     }
 }
 
+impl std::error::Error for RecordCsvCampionamentoNISECIError {}
+
 #[deprecated(
     note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECIParseResult\n  Consider using CampionamentoNISECI::parse_recordcsv(records, riferimento).into_parts()"
 )]
@@ -419,6 +423,8 @@ impl fmt::Display for RecordCsvAnagraficaNISECIError {
         write!(f, "{}", string_representation)
     }
 }
+
+impl std::error::Error for RecordCsvAnagraficaNISECIError {}
 
 pub fn parse_recordcsv_anagrafica_niseci<T: RecordCsvAnagraficaNISECI>(
     records: Vec<T>,

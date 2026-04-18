@@ -33,6 +33,7 @@ use crate::csv::{
     RecordCsvAnagraficaNISECI, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI,
 };
 use crate::domain::niseci::{AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI};
+use std::fmt;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -42,6 +43,21 @@ pub enum RiferimentoNISECIError {
     Csv(Vec<csv::Error>),
     Value(Vec<RecordCsvRiferimentoNISECIError>),
 }
+
+impl fmt::Display for RiferimentoNISECIError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            RiferimentoNISECIError::Csv(_) => {
+                write!(f, "CSV parsing error for Riferimento NISECI")
+            }
+            RiferimentoNISECIError::Value(_) => {
+                write!(f, "value validation error for Riferimento NISECI")
+            }
+        }
+    }
+}
+
+impl std::error::Error for RiferimentoNISECIError {}
 
 pub fn load_csv_riferimento_niseci_from_reader<R, T>(
     reader: R,
@@ -108,6 +124,21 @@ pub enum CampionamentoNISECIError {
     Csv(Vec<csv::Error>),
     Value(Vec<RecordCsvCampionamentoNISECIError>),
 }
+
+impl fmt::Display for CampionamentoNISECIError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CampionamentoNISECIError::Csv(_) => {
+                write!(f, "CSV parsing error for Campionamento NISECI")
+            }
+            CampionamentoNISECIError::Value(_) => {
+                write!(f, "value validation error for Campionamento NISECI")
+            }
+        }
+    }
+}
+
+impl std::error::Error for CampionamentoNISECIError {}
 
 pub fn load_csv_campionamento_niseci_from_reader<R, T>(
     reader: R,
@@ -181,6 +212,21 @@ pub enum AnagraficaNISECIError {
     Csv(Vec<csv::Error>),
     Value(Vec<RecordCsvAnagraficaNISECIError>),
 }
+
+impl fmt::Display for AnagraficaNISECIError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AnagraficaNISECIError::Csv(_) => {
+                write!(f, "CSV parsing error for Anagrafica NISECI")
+            }
+            AnagraficaNISECIError::Value(_) => {
+                write!(f, "value validation error for Anagrafica NISECI")
+            }
+        }
+    }
+}
+
+impl std::error::Error for AnagraficaNISECIError {}
 
 pub fn load_csv_anagrafica_niseci_from_reader<R, T>(
     reader: R,

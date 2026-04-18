@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use serde::{de, Deserialize, Deserializer};
+use std::fmt;
 use std::ops::Deref;
 
 #[derive(Debug)]
@@ -22,6 +23,17 @@ pub enum PositiveF32Error {
     NotFinite,
     NotPositive,
 }
+
+impl fmt::Display for PositiveF32Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PositiveF32Error::NotFinite => write!(f, "value is not finite"),
+            PositiveF32Error::NotPositive => write!(f, "value is not positive"),
+        }
+    }
+}
+
+impl std::error::Error for PositiveF32Error {}
 
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]

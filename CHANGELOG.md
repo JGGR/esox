@@ -32,6 +32,7 @@
   - Negative
   - Infinity / negative infinity
   - Quiet NaN (using likely quiet NaN from `f32::NAN`)
+- Add empty `impl std::error::Error` for most custom errors
 
 ### Changed
 

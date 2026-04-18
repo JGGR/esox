@@ -27,6 +27,7 @@ use crate::csv::parser::hfbi::{
 };
 use crate::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI};
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
+use std::fmt;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -36,6 +37,21 @@ pub enum CampionamentoHFBIError {
     Csv(Vec<csv::Error>),
     Value(Vec<RecordCsvCampionamentoHFBIError>),
 }
+
+impl fmt::Display for CampionamentoHFBIError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CampionamentoHFBIError::Csv(_) => {
+                write!(f, "CSV parsing error for CampionamentoHFBI")
+            }
+            CampionamentoHFBIError::Value(_) => {
+                write!(f, "value validation error for CampionamentoHFBI")
+            }
+        }
+    }
+}
+
+impl std::error::Error for CampionamentoHFBIError {}
 
 pub fn load_csv_campionamento_hfbi_from_reader<R, T>(
     reader: R,
@@ -102,6 +118,21 @@ pub enum AnagraficaHFBIError {
     Csv(Vec<csv::Error>),
     Value(Vec<RecordCsvAnagraficaHFBIError>),
 }
+
+impl fmt::Display for AnagraficaHFBIError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AnagraficaHFBIError::Csv(_) => {
+                write!(f, "CSV parsing error for AnagraficaHFBI")
+            }
+            AnagraficaHFBIError::Value(_) => {
+                write!(f, "value validation error for AnagraficaHFBI")
+            }
+        }
+    }
+}
+
+impl std::error::Error for AnagraficaHFBIError {}
 
 pub fn load_csv_anagrafica_hfbi_from_reader<R, T>(
     reader: R,

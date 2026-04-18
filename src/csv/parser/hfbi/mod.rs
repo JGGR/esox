@@ -42,6 +42,8 @@ impl fmt::Display for RecordCsvCampionamentoHFBIError {
     }
 }
 
+impl std::error::Error for RecordCsvCampionamentoHFBIError {}
+
 #[deprecated(
     note = "v0.2 will change signature to return CampionamentoHFBIParseResult\nConsider using CampionamentoHFBI::parse_recordcsv(records).into_parts()"
 )]
@@ -158,6 +160,8 @@ impl fmt::Display for RecordCsvAnagraficaHFBIError {
         write!(f, "{}", string_representation)
     }
 }
+
+impl std::error::Error for RecordCsvAnagraficaHFBIError {}
 
 pub fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
     records: Vec<T>,
