@@ -17,17 +17,25 @@
 use serde::{de, Deserialize, Deserializer};
 use std::ops::Deref;
 
+#[derive(Debug)]
+pub enum PositiveF32Error {
+    NotFinite,
+    NotPositive,
+}
+
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
 pub struct PositiveF32(f32);
 
 impl PositiveF32 {
-    pub fn new(value: f32) -> Result<Self, ()> {
-        if value.is_finite() && value > 0.0 {
-            Ok(Self(value))
-        } else {
-            Err(())
+    pub fn new(value: f32) -> Result<Self, PositiveF32Error> {
+        if !value.is_finite() {
+            return Err(PositiveF32Error::NotFinite);
         }
+        if value <= 0.0 {
+            return Err(PositiveF32Error::NotPositive);
+        }
+        Ok(Self(value))
     }
 }
 

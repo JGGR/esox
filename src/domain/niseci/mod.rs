@@ -23,7 +23,7 @@ use std::vec::Vec;
 
 use super::localize::CommaFormat;
 use super::location::Location;
-use super::posf32::{deserialize_positive_f32, PositiveF32};
+use super::posf32::{deserialize_positive_f32, PositiveF32, PositiveF32Error};
 
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
@@ -450,12 +450,12 @@ impl AnagraficaNISECI {
         #[allow(deprecated)]
         self.lunghezza_media_stazione
     }
-    pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), ()> {
+    pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
         if !val.is_finite() {
-            return Err(());
+            return Err(PositiveF32Error::NotFinite);
         }
         if val <= 0.0 {
-            return Err(());
+            return Err(PositiveF32Error::NotPositive);
         }
         #[allow(deprecated)]
         {
@@ -467,12 +467,12 @@ impl AnagraficaNISECI {
         #[allow(deprecated)]
         self.larghezza_media_stazione
     }
-    pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), ()> {
+    pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
         if !val.is_finite() {
-            return Err(());
+            return Err(PositiveF32Error::NotFinite);
         }
         if val <= 0.0 {
-            return Err(());
+            return Err(PositiveF32Error::NotPositive);
         }
         #[allow(deprecated)]
         {

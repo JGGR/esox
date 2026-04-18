@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
 use super::localize::CommaFormat;
-use super::posf32::{deserialize_positive_f32, PositiveF32};
+use super::posf32::{deserialize_positive_f32, PositiveF32, PositiveF32Error};
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -857,12 +857,13 @@ impl AnagraficaHFBI {
         #[allow(deprecated)]
         self.lunghezza_media_transetto
     }
-    pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), ()> {
+
+    pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
         if !val.is_finite() {
-            return Err(());
+            return Err(PositiveF32Error::NotFinite);
         }
         if val <= 0.0 {
-            return Err(());
+            return Err(PositiveF32Error::NotPositive);
         }
         #[allow(deprecated)]
         {
@@ -875,12 +876,12 @@ impl AnagraficaHFBI {
         self.larghezza_media_transetto
     }
 
-    pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), ()> {
+    pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
         if !val.is_finite() {
-            return Err(());
+            return Err(PositiveF32Error::NotFinite);
         }
         if val <= 0.0 {
-            return Err(());
+            return Err(PositiveF32Error::NotPositive);
         }
         #[allow(deprecated)]
         {
