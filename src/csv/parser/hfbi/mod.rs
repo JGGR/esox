@@ -22,6 +22,7 @@ use crate::domain::hfbi::{
     TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI,
 };
 use crate::domain::location::Location;
+use crate::domain::posf32::PositiveF32;
 use chrono::format::ParseErrorKind;
 use std::fmt;
 
@@ -261,25 +262,31 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
         },
     }
 
-    if r.lunghezza_stazione() < 0.0 {
+    let lunghezza = PositiveF32::new(r.lunghezza_stazione()).unwrap_or_else(|_| {
         let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
             msg: format!(
-                "Lunghezza stazione troppo bassa: {}",
+                "Lunghezza stazione non finito e positivo: {}",
                 r.lunghezza_stazione()
             ),
         };
         errors.push(err);
-    }
+        PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32")
+        // It looks like we still take this value but we will return with Err since errors is not
+        // empty
+    });
 
-    if r.larghezza_stazione() < 0.0 {
+    let larghezza = PositiveF32::new(r.larghezza_stazione()).unwrap_or_else(|_| {
         let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
             msg: format!(
-                "Larghezza stazione troppo bassa: {}",
+                "Larghezza stazione non finito e positivo: {}",
                 r.larghezza_stazione()
             ),
         };
         errors.push(err);
-    }
+        PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32")
+        // It looks like we still take this value but we will return with Err since errors is not
+        // empty
+    });
 
     let mut stagione = StagioneHFBI::Primavera;
     match r.stagione() {
@@ -335,20 +342,20 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordCsvAnagraficaHFBI>(
         return Err(errors);
     }
 
-    let res = AnagraficaHFBI {
-        codice_stazione: r.codice_stazione(),
-        date_string: r.data(), // Formato gg/mm/aaaa
-        corpo_idrico: r.corpo_idrico(),
-        posizione: Location {
+    let res = AnagraficaHFBI::new(
+        r.codice_stazione(),
+        r.corpo_idrico(),
+        Location {
             regione: r.regione(),
             provincia: r.provincia(),
         },
-        lunghezza_media_transetto: r.lunghezza_stazione(),
-        larghezza_media_transetto: r.larghezza_stazione(),
-        stagione,
-        habitat_vegetato: habitat,
+        r.data(), // Formato gg/mm/aaaa
         tipo_laguna,
-    };
+        stagione,
+        habitat,
+        lunghezza,
+        larghezza,
+    );
     Ok(res)
 }
 

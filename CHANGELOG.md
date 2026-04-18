@@ -22,7 +22,7 @@
 - Add new methods to `CampionamentoHFBI`
   - `sort_by_peso_desc(&mut self)`
   - `sorted_by_peso_desc(&self) -> impl Iterator<Item = &RecordHFBI>`
-- Add checked construction to `AnagraficaHFBI`
+- Add checked construction to `AnagraficaNISECI`, `AnagraficaHFBI`
   - Uses thin `PositiveF32` (refuses <=0, NaN, infinities)
 - Add `meta::version()` to get crate version
 - Add tests for order invariant on `CampionamentoHFBI` access/iteration methods
@@ -46,7 +46,8 @@
   - Out: will return `CampionamentoNISECI` on success branches (was: `Vec<RecordNISECI>` on success branches)
 - Deprecation warnings for parsing of `CampionamentoHFBI`, next version will change public API:
   - Out: will return `CampionamentoHFBI` on success branches (was: `Vec<RecordHFBI>` on success branches)
-- Deprecation warnings for visibility of `RiferimentoNISECI`, `CampionamentoNISECI`, `AnagraficaNISECI`, `CampionamentoHFBI` fields
+- Deprecation warnings for visibility of `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
+- Deprecation warnings for visibility of `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
 - Drop `once_cell` dependency by replacing `once_cell::sync::Lazy` with `std::sync::LazyLock`
   - Needs `rust 1.80`
 - Make types related to full calc results `Deserialize`

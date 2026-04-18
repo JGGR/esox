@@ -46,7 +46,7 @@ fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) 
         }
     }
 
-    let area: f32 = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
+    let area: f32 = anagrafica.get_lunghezza_media() * anagrafica.get_larghezza_media();
     let b90: f32 = ((biomassa_90 / area) * 100.0 + 1.0).ln();
 
     (n_specie_90, b90)
@@ -65,20 +65,20 @@ mod ddom_private_tests {
 
     // Helper to create AnagraficaHFBI for tests
     fn create_test_anagrafica(lunghezza: f32, larghezza: f32) -> AnagraficaHFBI {
-        AnagraficaHFBI {
-            codice_stazione: "TestStazione".to_string(),
-            corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location {
+        AnagraficaHFBI::new_raw_unchecked(
+            "TestStazione".to_string(),
+            "TestCorpoIdrico".to_string(),
+            Location {
                 regione: "Test".to_string(),
                 provincia: "Test".to_string(),
             },
-            date_string: "01/01/2025".to_string(),
-            tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
-            stagione: StagioneHFBI::Primavera,
-            habitat_vegetato: HabitatHFBI::NonVegetato,
-            lunghezza_media_transetto: lunghezza,
-            larghezza_media_transetto: larghezza,
-        }
+            "01/01/2025".to_string(),
+            TipoLagunaCostieraHFBI::MAt1,
+            StagioneHFBI::Primavera,
+            HabitatHFBI::NonVegetato,
+            lunghezza,
+            larghezza,
+        )
     }
 
     // Helper to create a dummy RecordHFBI, as only the peso is relevant here

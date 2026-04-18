@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
 use super::localize::CommaFormat;
+use super::posf32::PositiveF32;
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -785,16 +786,77 @@ pub struct AnagraficaHFBI {
     pub tipo_laguna: TipoLagunaCostieraHFBI,
     pub stagione: StagioneHFBI,
     pub habitat_vegetato: HabitatHFBI,
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaHFBI::new() to construct"
+    )]
     pub lunghezza_media_transetto: f32,
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaHFBI::new() to construct"
+    )]
     pub larghezza_media_transetto: f32,
 }
 
 impl AnagraficaHFBI {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        codice_stazione: String,
+        corpo_idrico: String,
+        posizione: Location,
+        date_string: String,
+        tipo_laguna: TipoLagunaCostieraHFBI,
+        stagione: StagioneHFBI,
+        habitat_vegetato: HabitatHFBI,
+        lunghezza_media_transetto: PositiveF32,
+        larghezza_media_transetto: PositiveF32,
+    ) -> Self {
+        Self {
+            codice_stazione,
+            corpo_idrico,
+            posizione,
+            date_string,
+            tipo_laguna,
+            stagione,
+            habitat_vegetato,
+            #[allow(deprecated)]
+            lunghezza_media_transetto: *lunghezza_media_transetto,
+            #[allow(deprecated)]
+            larghezza_media_transetto: *larghezza_media_transetto,
+        }
+    }
     pub fn get_lunghezza_media(&self) -> f32 {
+        #[allow(deprecated)]
         self.lunghezza_media_transetto
     }
+    pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), ()> {
+        if !val.is_finite() {
+            return Err(());
+        }
+        if val <= 0.0 {
+            return Err(());
+        }
+        #[allow(deprecated)]
+        {
+            self.lunghezza_media_transetto = val;
+        }
+        Ok(())
+    }
     pub fn get_larghezza_media(&self) -> f32 {
+        #[allow(deprecated)]
         self.larghezza_media_transetto
+    }
+
+    pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), ()> {
+        if !val.is_finite() {
+            return Err(());
+        }
+        if val <= 0.0 {
+            return Err(());
+        }
+        #[allow(deprecated)]
+        {
+            self.larghezza_media_transetto = val;
+        }
+        Ok(())
     }
 
     pub fn get_cond_riferimento_key(&self) -> CondizioniRiferimentoKeyHFBI {
@@ -809,7 +871,7 @@ impl AnagraficaHFBI {
 impl fmt::Display for AnagraficaHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!("AnagraficaHFBI: {{ codice_stazione {{{}}}, corpo_idrico: {{{}}}, posizione: {{{}}}, data: {{{}}}, tipo_laguna: {{{}}}, stagione: {{{}}}, habitat: {{{}}}, lunghezza_transetto: {{{}}}, larghezza_transetto: {{{}}} }}",
-        self.codice_stazione, self.corpo_idrico, self.posizione, self.date_string, self.tipo_laguna, self.stagione, self.habitat_vegetato, self.lunghezza_media_transetto, self.larghezza_media_transetto);
+        self.codice_stazione, self.corpo_idrico, self.posizione, self.date_string, self.tipo_laguna, self.stagione, self.habitat_vegetato, self.get_lunghezza_media(), self.get_larghezza_media());
         write!(f, "{}", string_representation)
     }
 }
@@ -1236,6 +1298,53 @@ mod domain_hfbi_private_tests {
         pub(crate) fn new_raw_unsorted(campionamento: Vec<RecordHFBI>) -> Self {
             #[allow(deprecated)]
             Self { campionamento }
+        }
+    }
+    #[cfg(test)]
+    impl AnagraficaHFBI {
+        /// Test helper to build unchecked instances
+        #[cfg(test)]
+        pub(crate) fn new_raw_unchecked(
+            codice_stazione: String,
+            corpo_idrico: String,
+            posizione: Location,
+            date_string: String,
+            tipo_laguna: TipoLagunaCostieraHFBI,
+            stagione: StagioneHFBI,
+            habitat_vegetato: HabitatHFBI,
+            lunghezza_media_transetto: f32,
+            larghezza_media_transetto: f32,
+        ) -> Self {
+            Self {
+                codice_stazione,
+                corpo_idrico,
+                posizione,
+                date_string,
+                tipo_laguna,
+                stagione,
+                habitat_vegetato,
+                #[allow(deprecated)]
+                lunghezza_media_transetto,
+                #[allow(deprecated)]
+                larghezza_media_transetto,
+            }
+        }
+
+        /// Test helper to mutate lunghezza with no checks
+        #[cfg(test)]
+        pub(crate) fn set_lunghezza_unchecked(&mut self, val: f32) {
+            #[allow(deprecated)]
+            {
+                self.lunghezza_media_transetto = val;
+            }
+        }
+        /// Test helper to mutate larghezza with no checks
+        #[cfg(test)]
+        pub(crate) fn set_larghezza_unchecked(&mut self, val: f32) {
+            #[allow(deprecated)]
+            {
+                self.larghezza_media_transetto = val;
+            }
         }
     }
     #[test]

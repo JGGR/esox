@@ -96,8 +96,8 @@ fn calc_templates_with_area(
     let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
     let mut anagrafica = load_anagrafica_hfbi_from_reader(anagrafica_reader, has_headers, format)
         .expect("Failed loading template AnagraficaHFBI");
-    anagrafica.lunghezza_media_transetto = x;
-    anagrafica.larghezza_media_transetto = y;
+    anagrafica.set_lunghezza_unchecked(x);
+    anagrafica.set_larghezza_unchecked(y);
 
     let calc_hfbi_res = calculate_hfbi(&campionamento, &anagrafica);
 

@@ -22,7 +22,7 @@ pub fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> 
     let mut densita_biomassa;
     let mut specie_sbent;
     let mut bbent = 0.0;
-    let area = anagrafica.larghezza_media_transetto * anagrafica.lunghezza_media_transetto;
+    let area = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
     for specie in campione {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
@@ -64,20 +64,20 @@ mod dbent_private_tests {
 
     // Helper function to create AnagraficaHFBI
     fn create_test_anagrafica(lunghezza: f32, larghezza: f32) -> AnagraficaHFBI {
-        AnagraficaHFBI {
-            codice_stazione: "TestStazione".to_string(),
-            corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location {
+        AnagraficaHFBI::new_raw_unchecked(
+            "TestStazione".to_string(),
+            "TestCorpoIdrico".to_string(),
+            Location {
                 regione: "Test".to_string(),
                 provincia: "Test".to_string(),
             },
-            date_string: "01/01/2025".to_string(),
-            tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
-            stagione: StagioneHFBI::Primavera,
-            habitat_vegetato: HabitatHFBI::NonVegetato,
-            lunghezza_media_transetto: lunghezza,
-            larghezza_media_transetto: larghezza,
-        }
+            "01/01/2025".to_string(),
+            TipoLagunaCostieraHFBI::MAt1,
+            StagioneHFBI::Primavera,
+            HabitatHFBI::NonVegetato,
+            lunghezza,
+            larghezza,
+        )
     }
 
     // CORRECTED helper to create a species record

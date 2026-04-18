@@ -57,7 +57,7 @@ fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
         }
     }
 
-    let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
+    let area = anagrafica.get_lunghezza_media() * anagrafica.get_larghezza_media();
 
     (biohzp / area) * 100.0
 }
@@ -75,20 +75,20 @@ mod dhzp_private_tests {
 
     // Helper to create AnagraficaHFBI for tests
     fn create_test_anagrafica(lunghezza: f32, larghezza: f32) -> AnagraficaHFBI {
-        AnagraficaHFBI {
-            codice_stazione: "TestStazione".to_string(),
-            corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location {
+        AnagraficaHFBI::new_raw_unchecked(
+            "TestStazione".to_string(),
+            "TestCorpoIdrico".to_string(),
+            Location {
                 regione: "Test".to_string(),
                 provincia: "Test".to_string(),
             },
-            date_string: "01/01/2025".to_string(),
-            tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
-            stagione: StagioneHFBI::Primavera,
-            habitat_vegetato: HabitatHFBI::NonVegetato,
-            lunghezza_media_transetto: lunghezza,
-            larghezza_media_transetto: larghezza,
-        }
+            "01/01/2025".to_string(),
+            TipoLagunaCostieraHFBI::MAt1,
+            StagioneHFBI::Primavera,
+            HabitatHFBI::NonVegetato,
+            lunghezza,
+            larghezza,
+        )
     }
 
     // Helper to create a species record, specifying the hyperbentivore value

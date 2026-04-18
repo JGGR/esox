@@ -138,20 +138,20 @@ mod full_hfbi_private_tests {
 
     // Test helper to create a minimal Anagrafica struct.
     fn create_test_anagrafica(codice_stazione: &str) -> AnagraficaHFBI {
-        AnagraficaHFBI {
-            codice_stazione: codice_stazione.to_string(),
-            corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location {
+        AnagraficaHFBI::new_raw_unchecked(
+            codice_stazione.to_string(),
+            "TestCorpoIdrico".to_string(),
+            Location {
                 regione: "Test".to_string(),
                 provincia: "Test".to_string(),
             },
-            date_string: "01/01/2025".to_string(),
-            tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
-            stagione: StagioneHFBI::Primavera,
-            habitat_vegetato: HabitatHFBI::NonVegetato,
-            lunghezza_media_transetto: 100.0,
-            larghezza_media_transetto: 100.0,
-        }
+            "01/01/2025".to_string(),
+            TipoLagunaCostieraHFBI::MAt1,
+            StagioneHFBI::Primavera,
+            HabitatHFBI::NonVegetato,
+            100.0,
+            100.0,
+        )
     }
 
     // ===================================================================
