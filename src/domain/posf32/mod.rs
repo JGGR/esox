@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+#[cfg(feature = "experimental")]
 use serde::{de, Deserialize, Deserializer};
 use std::fmt;
 use std::ops::Deref;
@@ -64,6 +65,7 @@ impl From<PositiveF32> for f32 {
     }
 }
 
+#[cfg(feature = "experimental")]
 pub(crate) fn deserialize_positive_f32<'de, D>(deserializer: D) -> Result<f32, D::Error>
 where
     D: Deserializer<'de>,

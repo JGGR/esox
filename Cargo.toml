@@ -9,6 +9,9 @@ exclude = [
     "templates",
 ]
 
+[features]
+experimental = []
+
 [dependencies]
 chrono = { version = "0.4.44", default-features = false }
 csv = "1.4.0"

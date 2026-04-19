@@ -23,7 +23,9 @@ use std::vec::Vec;
 
 use super::localize::CommaFormat;
 use super::location::Location;
-use super::posf32::{deserialize_positive_f32, PositiveF32, PositiveF32Error};
+use super::posf32::{PositiveF32, PositiveF32Error};
+#[cfg(feature = "experimental")]
+use super::posf32::deserialize_positive_f32;
 
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
@@ -85,7 +87,8 @@ impl SpecieNISECI {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct RiferimentoNISECI {
     #[deprecated(
@@ -151,7 +154,8 @@ impl fmt::Display for RecordNISECI {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {
     #[deprecated(
@@ -394,7 +398,8 @@ pub struct AnagraficaNISECIDraft {
     pub larghezza_media_stazione: String,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct AnagraficaNISECI {
     pub comunita: ComunitaNISECI,

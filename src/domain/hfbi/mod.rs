@@ -19,7 +19,9 @@ use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
 use super::localize::CommaFormat;
-use super::posf32::{deserialize_positive_f32, PositiveF32, PositiveF32Error};
+use super::posf32::{PositiveF32, PositiveF32Error};
+#[cfg(feature = "experimental")]
+use super::posf32::deserialize_positive_f32;
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -596,7 +598,8 @@ impl fmt::Display for RecordHFBI {
 /// Since calculations of HFBI rely on iteration order, this type must enforce
 /// the internal invariant that records are sorted by descending `peso`.
 /// v0.2 will change visibility of internals to avoid improper construction / mutation.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoHFBI {
     #[deprecated(
@@ -692,6 +695,7 @@ impl<'a> IntoIterator for &'a CampionamentoHFBI {
 }
 
 /// Custom field deserialize holding the order invariant for returned instances
+#[cfg(feature = "experimental")]
 fn deserialize_vec_record_hfbi_sorted<'de, D>(deserializer: D) -> Result<Vec<RecordHFBI>, D::Error>
 where
     D: serde::Deserializer<'de>,
@@ -804,7 +808,8 @@ pub struct AnagraficaHFBIDraft {
     pub larghezza_media_transetto: String,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct AnagraficaHFBI {
     pub codice_stazione: String,

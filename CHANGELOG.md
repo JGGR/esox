@@ -33,6 +33,8 @@
   - Infinity / negative infinity
   - Quiet NaN (using likely quiet NaN from `f32::NAN`)
 - Add empty `impl std::error::Error` for most custom errors
+- Add `experimental` feature
+  - For now it guards `Deserialize` on input types since it's not properly tested
 
 ### Changed
 
@@ -52,9 +54,9 @@
 - Drop `once_cell` dependency by replacing `once_cell::sync::Lazy` with `std::sync::LazyLock`
   - Needs `rust 1.80`
 - Make types related to full calc results `Deserialize`
-- Make types related to full calc input `Serialize`, `Deserialize`
-  - Custom deser for records field of `CampionamentoHFBI`
-  - Custom deser for length/width fields of `AnagraficaNISECI` and `AnagraficaHFBI`
+- Make types related to full calc input `Serialize`, `Deserialize` (experimental)
+  - Custom deser for records field of `CampionamentoHFBI` (experimental)
+  - Custom deser for length/width fields of `AnagraficaNISECI` and `AnagraficaHFBI` (experimental)
 - Add `#[serde(deny_unknown_fields)]` to `Deserialize` types
   - Types with `Deserialize` in `csv::deser` modules did not receive this annotation since it would be a breaking change
 - Moved templates data for tests from `tests::engines::{hfbi, niseci}::full` to `tests::test_utils`
