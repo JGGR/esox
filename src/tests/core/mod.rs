@@ -35,18 +35,16 @@ use crate::csv::load::niseci::{
     load_riferimento_niseci_from_reader,
 };
 use crate::csv::load::InputFormat;
-use crate::csv::parser::{
-    hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi_impl},
-    niseci::{
-        check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
-        check_records_riferimento_niseci_impl,
-    },
-};
 use crate::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,
     CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER,
 };
 use crate::domain::niseci::{RiferimentoNISECI, SpecieNISECI};
+use crate::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
+use crate::parser::niseci::{
+    check_records_anagrafica_niseci, check_records_campionamento_niseci,
+    check_records_riferimento_niseci,
+};
 use crate::tests::test_utils::{
     ANAGRAFICA_HFBI_TEMPLATE_DATA, ANAGRAFICA_NISECI_TEMPLATE_DATA,
     CAMPIONAMENTO_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_NISECI_TEMPLATE_DATA,
@@ -225,7 +223,7 @@ fn test_valid_recordcsv_riferimento_niseci() {
         dens_soglia2: 0.2,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_riferimento_niseci_impl(recordcsv_data);
+    let result = check_records_riferimento_niseci(recordcsv_data);
 
     assert!(!result.is_err());
 }
@@ -252,7 +250,7 @@ fn test_recordcsv_riferimento_niseci_soglie_cl_error() {
         dens_soglia2: 0.2,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_riferimento_niseci_impl(recordcsv_data);
+    let result = check_records_riferimento_niseci(recordcsv_data);
 
     assert!(result.is_err());
 
@@ -282,7 +280,7 @@ fn test_recordcsv_riferimento_niseci_soglie_ad_juv_error() {
         dens_soglia2: 0.2,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_riferimento_niseci_impl(recordcsv_data);
+    let result = check_records_riferimento_niseci(recordcsv_data);
 
     assert!(result.is_err());
 
@@ -434,7 +432,7 @@ fn test_valid_recordcsv_campionamento_niseci() {
         peso: 100.0,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_campionamento_niseci_impl(
+    let result = check_records_campionamento_niseci(
         recordcsv_data,
         &RiferimentoNISECI::new(riferimento_specie),
     );
@@ -674,7 +672,7 @@ fn test_valid_recordcsv_campionamento_hfbi() {
         numero_individui: 10,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_campionamento_hfbi_impl(recordcsv_data);
+    let result = check_records_campionamento_hfbi(recordcsv_data);
 
     assert!(!result.is_err());
 }

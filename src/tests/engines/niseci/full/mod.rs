@@ -27,9 +27,9 @@ use crate::csv::load::{
     },
     InputFormat,
 };
-use crate::csv::parser::niseci::{
-    check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
-    check_records_riferimento_niseci_impl,
+use crate::parser::niseci::{
+    check_records_anagrafica_niseci, check_records_campionamento_niseci,
+    check_records_riferimento_niseci,
 };
 use crate::{
     domain::niseci::ValoriIntermediNISECI,
@@ -80,7 +80,7 @@ fn calculate_niseci_template() {
 
     let riferimento_csv_records = riferimento_csv_check.expect("is_ok() was checked before");
 
-    let riferimento_value_check = check_records_riferimento_niseci_impl(riferimento_csv_records);
+    let riferimento_value_check = check_records_riferimento_niseci(riferimento_csv_records);
 
     assert!(riferimento_value_check.is_ok());
 
@@ -98,7 +98,7 @@ fn calculate_niseci_template() {
     let campionamento_csv_records = campionamento_csv_check.expect("is_ok() was checked before");
 
     let campionamento_value_check =
-        check_records_campionamento_niseci_impl(campionamento_csv_records, &riferimento);
+        check_records_campionamento_niseci(campionamento_csv_records, &riferimento);
 
     assert!(campionamento_value_check.is_ok());
 

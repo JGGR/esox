@@ -24,14 +24,12 @@ use crate::csv::deser::niseci::{
 };
 use crate::csv::deser::NormalizerReader;
 use crate::csv::load::InputFormat;
-use crate::csv::parser::niseci::{
-    check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
-    check_records_riferimento_niseci_impl,
-};
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use crate::domain::niseci::{AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI};
 use crate::parser::niseci::{
-    RecordAnagraficaNISECIError, RecordCampionamentoNISECIError, RecordRiferimentoNISECIError,
+    check_records_anagrafica_niseci, check_records_campionamento_niseci,
+    check_records_riferimento_niseci, RecordAnagraficaNISECIError, RecordCampionamentoNISECIError,
+    RecordRiferimentoNISECIError,
 };
 use std::fmt;
 use std::fs::File;
@@ -71,7 +69,7 @@ where
     let csv_records =
         check_riferimento_niseci_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
             .map_err(RiferimentoNISECIError::Csv)?;
-    check_records_riferimento_niseci_impl(csv_records).map_err(RiferimentoNISECIError::Value)
+    check_records_riferimento_niseci(csv_records).map_err(RiferimentoNISECIError::Value)
 }
 
 pub fn load_csv_riferimento_niseci_from_path<T>(
@@ -156,7 +154,7 @@ where
     )
     .map_err(CampionamentoNISECIError::Csv)?;
 
-    check_records_campionamento_niseci_impl(csv_records, riferimento)
+    check_records_campionamento_niseci(csv_records, riferimento)
         .map_err(CampionamentoNISECIError::Value)
 }
 

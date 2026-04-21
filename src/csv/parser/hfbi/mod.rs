@@ -16,9 +16,10 @@
 */
 
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
-use crate::parser::hfbi::{parse_records_campionamento_hfbi, CampionamentoHFBIParseResult, parse_records_anagrafica_hfbi,RecordCampionamentoHFBIError,RecordAnagraficaHFBIError};
-use crate::domain::hfbi::{
-    AnagraficaHFBI, CampionamentoHFBI, RecordHFBI,
+use crate::domain::hfbi::{AnagraficaHFBI, RecordHFBI};
+use crate::parser::hfbi::{
+    parse_records_anagrafica_hfbi, parse_records_campionamento_hfbi, RecordAnagraficaHFBIError,
+    RecordCampionamentoHFBIError,
 };
 
 #[deprecated(
@@ -48,112 +49,16 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to return CampionamentoHFBI on success\nConsider using CampionamentoHFBI::check_recordcsv(records)"
+    note = "v0.2 will change signature to return CampionamentoHFBI on success\nConsider using CampionamentoHFBI::check_records(records)"
 )]
 pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
 ) -> Result<Vec<RecordHFBI>, Vec<RecordCampionamentoHFBIError>> {
-    check_records_campionamento_hfbi_impl::<T>(records).map(|v| v.into())
-}
-
-impl CampionamentoHFBI {
-    pub fn parse_records<T>(vec: Vec<T>) -> CampionamentoHFBIParseResult
-    where
-        T: RecordCampionamentoHFBI,
-    {
-        CampionamentoHFBIParseResult::parse::<T>(vec)
-    }
-    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
-    where
-        T: RecordCampionamentoHFBI,
-    {
-        check_records_campionamento_hfbi_impl::<T>(vec)
-    }
-}
-
-/// v0.2 will have this method public without the _impl suffix
-/// Internal transitional API for migrating:
-///   - returning CampionamentoHFBI for success over Vec<RecordHFBI>
-pub(crate) fn check_records_campionamento_hfbi_impl<T: RecordCampionamentoHFBI>(
-    records: Vec<T>,
-) -> Result<CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>> {
-    let (camp, errors) = parse_records_campionamento_hfbi(records).into_parts();
-
-    println!(
-        "Campionamento HFBI: Numero record validi: {}",
-        camp.as_vec().len()
-    );
-    println!(
-        "Campionamento HFBI: Numero record non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
-        eprintln!("Errori incontrati durante l'elaborazione dei record per campionamento HFBI: {{");
-        //TODO: add process_record_campionamentoNISECI_errors()
-        for error in &errors {
-            eprintln!("  {}", error);
-        }
-        eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record del campionamento HFBI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(camp)
-    }
-}
-
-impl AnagraficaHFBI {
-    pub fn parse_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaHFBIError>>
-    where
-        T: RecordAnagraficaHFBI,
-    {
-        parse_recordcsv_anagrafica_hfbi::<T>(vec)
-    }
-    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaHFBIError>>
-    where
-        T: RecordAnagraficaHFBI,
-    {
-        check_records_anagrafica_hfbi::<T>(vec)
-    }
+    crate::parser::hfbi::check_records_campionamento_hfbi::<T>(records).map(|v| v.into())
 }
 
 pub fn check_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     records: Vec<T>,
 ) -> Result<AnagraficaHFBI, Vec<RecordAnagraficaHFBIError>> {
-    let res = parse_recordcsv_anagrafica_hfbi(records);
-
-    match res {
-        Ok(anagrafica) => {
-            println!("Anagrafica HFBI: {}", anagrafica);
-            //TODO: handle verbosity
-            //println!("Tutti i record dell'anagrafica HFBI sono stati processati con successo!");
-            /*
-            for record in &records {
-                println!("  Record: {{{record}}}");
-            }
-            */
-            Ok(anagrafica)
-        }
-        Err(errors) => {
-            println!(
-                "Anagrafica HFBI: Numero record non validi: {}",
-                errors.len()
-            );
-            eprintln!(
-                "Errori incontrati durante l'elaborazione dei record per anagrafica HFBI: {{"
-            );
-            //TODO: add process_record_anagraficaHFBI_errors()
-            for error in &errors {
-                eprintln!("  {}", error);
-            }
-            eprintln!("}}");
-            Err(errors)
-        }
-    }
+    crate::parser::hfbi::check_records_anagrafica_hfbi::<T>(records)
 }

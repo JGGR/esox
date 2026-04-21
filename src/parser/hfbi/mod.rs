@@ -15,13 +15,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::fmt;
-use crate::domain::hfbi::{HabitatHFBI, AnagraficaHFBI, TipoLagunaCostieraHFBI, CampionamentoHFBI, RIFERIMENTO_HFBI, RecordHFBI, StagioneHFBI};
-use crate::deser::{RecordCampionamentoHFBI, RecordAnagraficaHFBI};
-use crate::parser::parse_date;
-use chrono::format::ParseErrorKind;
+use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
+use crate::domain::hfbi::{
+    AnagraficaHFBI, CampionamentoHFBI, HabitatHFBI, RecordHFBI, StagioneHFBI,
+    TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI,
+};
 use crate::domain::location::Location;
 use crate::domain::posf32::PositiveF32;
+use crate::parser::parse_date;
+use chrono::format::ParseErrorKind;
+use std::fmt;
 
 #[derive(Debug)]
 pub enum RecordCampionamentoHFBIError {
@@ -58,7 +61,7 @@ impl CampionamentoHFBIParseResult {
     }
 }
 
-/// v0.2 will have this method public without the _impl suffix
+/// v0.2 will have this method public
 /// Internal transitional API for migrating:
 ///   - returning CampionamentoHFBIParseResult instead of tuple
 ///     - success field (.0) used to be Vec<RecordHFBI>
@@ -348,4 +351,106 @@ pub fn parse_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
         larghezza,
     );
     Ok(res)
+}
+
+/// v0.2 will have this method public
+/// Internal transitional API for migrating:
+///   - returning CampionamentoHFBI for success over Vec<RecordHFBI>
+pub(crate) fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
+    records: Vec<T>,
+) -> Result<CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>> {
+    let (camp, errors) = parse_records_campionamento_hfbi(records).into_parts();
+
+    println!(
+        "Campionamento HFBI: Numero record validi: {}",
+        camp.as_vec().len()
+    );
+    println!(
+        "Campionamento HFBI: Numero record non validi: {}",
+        errors.len()
+    );
+
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione dei record per campionamento HFBI: {{");
+        //TODO: add process_record_campionamentoNISECI_errors()
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        eprintln!("}}");
+        Err(errors)
+    } else {
+        //TODO: handle verbosity
+        //println!("Tutti i record del campionamento HFBI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        Ok(camp)
+    }
+}
+
+pub fn check_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
+    records: Vec<T>,
+) -> Result<AnagraficaHFBI, Vec<RecordAnagraficaHFBIError>> {
+    let res = parse_records_anagrafica_hfbi(records);
+
+    match res {
+        Ok(anagrafica) => {
+            println!("Anagrafica HFBI: {}", anagrafica);
+            //TODO: handle verbosity
+            //println!("Tutti i record dell'anagrafica HFBI sono stati processati con successo!");
+            /*
+            for record in &records {
+                println!("  Record: {{{record}}}");
+            }
+            */
+            Ok(anagrafica)
+        }
+        Err(errors) => {
+            println!(
+                "Anagrafica HFBI: Numero record non validi: {}",
+                errors.len()
+            );
+            eprintln!(
+                "Errori incontrati durante l'elaborazione dei record per anagrafica HFBI: {{"
+            );
+            //TODO: add process_record_anagraficaHFBI_errors()
+            for error in &errors {
+                eprintln!("  {}", error);
+            }
+            eprintln!("}}");
+            Err(errors)
+        }
+    }
+}
+
+impl CampionamentoHFBI {
+    pub fn parse_records<T>(vec: Vec<T>) -> CampionamentoHFBIParseResult
+    where
+        T: RecordCampionamentoHFBI,
+    {
+        CampionamentoHFBIParseResult::parse::<T>(vec)
+    }
+    pub fn check_record<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
+    where
+        T: RecordCampionamentoHFBI,
+    {
+        check_records_campionamento_hfbi::<T>(vec)
+    }
+}
+
+impl AnagraficaHFBI {
+    pub fn parse_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaHFBIError>>
+    where
+        T: RecordAnagraficaHFBI,
+    {
+        parse_records_anagrafica_hfbi::<T>(vec)
+    }
+    pub fn check_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaHFBIError>>
+    where
+        T: RecordAnagraficaHFBI,
+    {
+        check_records_anagrafica_hfbi::<T>(vec)
+    }
 }

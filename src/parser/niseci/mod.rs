@@ -89,7 +89,7 @@ fn check_soglie_ad_juv<T: RecordRiferimentoNISECI>(r: &T) -> bool {
     false
 }
 
-/// v0.2 will have this method public without the _impl suffix
+/// v0.2 will have this method public
 /// Internal transitional API for migrating:
 ///   - returning RiferimentoNISECIParseResult instead of tuple
 ///     - success field (.0) used to be Vec<SpecieNISECI>
@@ -301,7 +301,7 @@ impl CampionamentoNISECIParseResult {
     }
 }
 
-/// v0.2 will have this method public without the _impl suffix
+/// v0.2 will have this method public
 /// Internal transitional API for migrating:
 ///   - borrow over riferimento_specie
 ///   - taking &RiferimentoNISECI over &Vec<SpecieNISECI>
@@ -648,4 +648,167 @@ pub fn parse_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
         larghezza,
     );
     Ok(res)
+}
+
+/// v0.2 will have this method public
+/// Internal transitional API for migrating:
+///   - returning RiferimentoNISECI for success over Vec<SpecieNISECI>
+pub(crate) fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
+    records: Vec<T>,
+) -> Result<RiferimentoNISECI, Vec<RecordRiferimentoNISECIError>> {
+    let (rif, errors) = parse_records_riferimento_niseci(records).into_parts();
+
+    println!(
+        "Riferimento NISECI: Numero record validi: {}",
+        rif.as_vec().len()
+    );
+    println!(
+        "Riferimento NISECI: Numero record non validi: {}",
+        errors.len()
+    );
+
+    if !errors.is_empty() {
+        eprintln!("Errori incontrati durante l'elaborazione dei record per riferimento NISECI: {{");
+        //TODO: add process_record_riferimentoNISECI_errors()
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        eprintln!("}}");
+        Err(errors)
+    } else {
+        //TODO: handle verbosity
+        //println!("Tutti i record del riferimento NISECI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        Ok(rif)
+    }
+}
+
+/// v0.2 will have this method public
+/// Internal transitional API for migrating:
+///   - borrow over riferimento_specie
+///   - taking &RiferimentoNISECI over &Vec<SpecieNISECI>
+///   - returning CampionamentoNISECI for success over Vec<RecordNISECI>
+pub(crate) fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
+    records: Vec<T>,
+    riferimento_specie: &RiferimentoNISECI,
+) -> Result<CampionamentoNISECI, Vec<RecordCampionamentoNISECIError>> {
+    let (camp, errors) =
+        parse_records_campionamento_niseci(records, riferimento_specie).into_parts();
+
+    println!(
+        "Campionamento NISECI: Numero record validi: {}",
+        camp.as_vec().len()
+    );
+    println!(
+        "Campionamento NISECI: Numero record non validi: {}",
+        errors.len()
+    );
+
+    if !errors.is_empty() {
+        eprintln!(
+            "Errori incontrati durante l'elaborazione dei record per campionamento NISECI: {{"
+        );
+        //TODO: add process_record_campionamentoNISECI_errors()
+        for error in &errors {
+            eprintln!("  {}", error);
+        }
+        eprintln!("}}");
+        Err(errors)
+    } else {
+        //TODO: handle verbosity
+        //println!("Tutti i record del campionamento NISECI sono stati processati con successo!");
+        /*
+        for record in &records {
+            println!("  Record: {{{record}}}");
+        }
+        */
+        Ok(camp)
+    }
+}
+
+pub fn check_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
+    records: Vec<T>,
+) -> Result<AnagraficaNISECI, Vec<RecordAnagraficaNISECIError>> {
+    let res = parse_records_anagrafica_niseci(records);
+
+    match res {
+        Ok(anagrafica) => {
+            println!("Anagrafica NISECI: {}", anagrafica);
+            //TODO: handle verbosity
+            //println!("Tutti i record dell'anagrafica NISECI sono stati processati con successo!");
+            /*
+            for record in &records {
+                println!("  Record: {{{record}}}");
+            }
+            */
+            Ok(anagrafica)
+        }
+        Err(errors) => {
+            println!(
+                "Anagrafica NISECI: Numero record non validi: {}",
+                errors.len()
+            );
+            eprintln!(
+                "Errori incontrati durante l'elaborazione dei record per anagrafica NISECI: {{"
+            );
+            //TODO: add process_record_anagraficaNISECI_errors()
+            for error in &errors {
+                eprintln!("  {}", error);
+            }
+            eprintln!("}}");
+            Err(errors)
+        }
+    }
+}
+
+impl RiferimentoNISECI {
+    pub fn parse_records<T>(vec: Vec<T>) -> RiferimentoNISECIParseResult
+    where
+        T: RecordRiferimentoNISECI,
+    {
+        RiferimentoNISECIParseResult::parse::<T>(vec)
+    }
+    pub fn check_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordRiferimentoNISECIError>>
+    where
+        T: RecordRiferimentoNISECI,
+    {
+        check_records_riferimento_niseci::<T>(vec)
+    }
+}
+
+impl CampionamentoNISECI {
+    pub fn parse_records<T>(vec: Vec<T>, rif: &RiferimentoNISECI) -> CampionamentoNISECIParseResult
+    where
+        T: RecordCampionamentoNISECI,
+    {
+        CampionamentoNISECIParseResult::parse::<T>(vec, rif)
+    }
+    pub fn check_records<T>(
+        vec: Vec<T>,
+        rif: &RiferimentoNISECI,
+    ) -> Result<Self, Vec<RecordCampionamentoNISECIError>>
+    where
+        T: RecordCampionamentoNISECI,
+    {
+        check_records_campionamento_niseci::<T>(vec, rif)
+    }
+}
+
+impl AnagraficaNISECI {
+    pub fn parse_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaNISECIError>>
+    where
+        T: RecordAnagraficaNISECI,
+    {
+        parse_records_anagrafica_niseci::<T>(vec)
+    }
+    pub fn check_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaNISECIError>>
+    where
+        T: RecordAnagraficaNISECI,
+    {
+        check_records_anagrafica_niseci::<T>(vec)
+    }
 }

@@ -22,11 +22,9 @@ use crate::csv::load::{
     hfbi::{load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader},
     InputFormat,
 };
-use crate::csv::parser::hfbi::{
-    check_records_anagrafica_hfbi, check_records_campionamento_hfbi_impl,
-};
 use crate::domain::hfbi::ValoriIntermediHFBI;
 use crate::engines::hfbi::full::calculate_hfbi;
+use crate::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
 use crate::tests::test_utils::{ANAGRAFICA_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_HFBI_TEMPLATE_DATA};
 use std::io::Cursor;
 
@@ -43,8 +41,7 @@ fn calculate_hfbi_template() {
 
     let campionamento_csv_records = campionamento_csv_check.expect("is_ok() was checked before");
 
-    let campionamento_value_check =
-        check_records_campionamento_hfbi_impl(campionamento_csv_records);
+    let campionamento_value_check = check_records_campionamento_hfbi(campionamento_csv_records);
 
     assert!(campionamento_value_check.is_ok());
 
