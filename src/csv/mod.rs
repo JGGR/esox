@@ -113,26 +113,26 @@ pub const ANAGRAFICA_HFBI_HEADER_FIELD_TYPES: [&str; 10] = [
 pub const ANAGRAFICA_HFBI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;stagione;habitat;tipoLaguna";
 
-#[deprecated(note = "v0.2 will drop this reexport.\nConsider using deser::TipoRecord")]
+#[deprecated(note = "v0.2 will drop this reexport.\nConsider using esox::deser::TipoRecord")]
 pub use crate::deser::TipoRecord as TipoRecordCsv;
 
 #[deprecated(
-    note = "v0.2 will drop this reexport.\nConsider using deser::RecordAnagraficaHFBI"
+    note = "v0.2 will drop this reexport.\nConsider using esox::deser::RecordAnagraficaHFBI"
 )]
 pub use crate::deser::RecordAnagraficaHFBI as RecordCsvAnagraficaHFBI;
 #[deprecated(
-    note = "v0.2 will drop this reexport.\nConsider using deser::RecordAnagraficaNISECI"
+    note = "v0.2 will drop this reexport.\nConsider using esox::deser::RecordAnagraficaNISECI"
 )]
 pub use crate::deser::RecordAnagraficaNISECI as RecordCsvAnagraficaNISECI;
 #[deprecated(
-    note = "v0.2 will drop this reexport.\nConsider using deser::RecordCampionamentoHFBI"
+    note = "v0.2 will drop this reexport.\nConsider using esox::deser::RecordCampionamentoHFBI"
 )]
 pub use crate::deser::RecordCampionamentoHFBI as RecordCsvCampionamentoHFBI;
 #[deprecated(
-    note = "v0.2 will drop this reexport.\nConsider using deser::RecordCampionamentoNISECI"
+    note = "v0.2 will drop this reexport.\nConsider using esox::deser::RecordCampionamentoNISECI"
 )]
 pub use crate::deser::RecordCampionamentoNISECI as RecordCsvCampionamentoNISECI;
 #[deprecated(
-    note = "v0.2 will drop this reexport.\nConsider using deser::RecordRiferimentoNISECI"
+    note = "v0.2 will drop this reexport.\nConsider using esox::deser::RecordRiferimentoNISECI"
 )]
 pub use crate::deser::RecordRiferimentoNISECI as RecordCsvRiferimentoNISECI;

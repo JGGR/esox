@@ -26,11 +26,13 @@ use crate::csv::deser::NormalizerReader;
 use crate::csv::load::InputFormat;
 use crate::csv::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci_impl,
-    check_records_riferimento_niseci_impl, RecordCsvAnagraficaNISECIError,
-    RecordCsvCampionamentoNISECIError, RecordCsvRiferimentoNISECIError,
+    check_records_riferimento_niseci_impl,
 };
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use crate::domain::niseci::{AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI};
+use crate::parser::niseci::{
+    RecordAnagraficaNISECIError, RecordCampionamentoNISECIError, RecordRiferimentoNISECIError,
+};
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
@@ -39,7 +41,7 @@ use std::path::Path;
 #[derive(Debug)]
 pub enum RiferimentoNISECIError {
     Csv(Vec<csv::Error>),
-    Value(Vec<RecordCsvRiferimentoNISECIError>),
+    Value(Vec<RecordRiferimentoNISECIError>),
 }
 
 impl fmt::Display for RiferimentoNISECIError {
@@ -120,7 +122,7 @@ pub fn load_riferimento_niseci_from_path(
 #[derive(Debug)]
 pub enum CampionamentoNISECIError {
     Csv(Vec<csv::Error>),
-    Value(Vec<RecordCsvCampionamentoNISECIError>),
+    Value(Vec<RecordCampionamentoNISECIError>),
 }
 
 impl fmt::Display for CampionamentoNISECIError {
@@ -208,7 +210,7 @@ pub fn load_campionamento_niseci_from_path(
 #[derive(Debug)]
 pub enum AnagraficaNISECIError {
     Csv(Vec<csv::Error>),
-    Value(Vec<RecordCsvAnagraficaNISECIError>),
+    Value(Vec<RecordAnagraficaNISECIError>),
 }
 
 impl fmt::Display for AnagraficaNISECIError {

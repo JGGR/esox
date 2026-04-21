@@ -24,49 +24,37 @@ use crate::domain::hfbi::{
 use crate::domain::location::Location;
 use crate::domain::posf32::PositiveF32;
 use chrono::format::ParseErrorKind;
-use std::fmt;
 
-#[derive(Debug)]
-pub enum RecordCsvCampionamentoHFBIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
-}
+use crate::parser::hfbi::RecordCampionamentoHFBIError;
 
-impl fmt::Display for RecordCsvCampionamentoHFBIError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = match self {
-            RecordCsvCampionamentoHFBIError::ValoreInvalido { msg } => {
-                format!("Errore record campionamento HFBI: {}", msg)
-            }
-        };
-        write!(f, "{}", string_representation)
-    }
-}
-
-impl std::error::Error for RecordCsvCampionamentoHFBIError {}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::parser::hfbi::RecordCampionamentoHFBIError instead"
+)]
+pub use crate::parser::hfbi::RecordCampionamentoHFBIError as RecordCsvCampionamentoHFBIError;
 
 #[deprecated(
     note = "v0.2 will change signature to return CampionamentoHFBIParseResult\nConsider using CampionamentoHFBI::parse_recordcsv(records).into_parts()"
 )]
 pub fn parse_recordcsv_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
-) -> (Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>) {
+) -> (Vec<RecordHFBI>, Vec<RecordCampionamentoHFBIError>) {
     let (camp, errs) = parse_recordcsv_campionamento_hfbi_impl::<T>(records).into_parts();
     (camp.into(), errs)
 }
 
-pub struct CampionamentoHFBIParseResult(CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>);
+pub struct CampionamentoHFBIParseResult(CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>);
 
 impl CampionamentoHFBIParseResult {
     pub fn parse<T: RecordCampionamentoHFBI>(records: Vec<T>) -> Self {
         parse_recordcsv_campionamento_hfbi_impl(records)
     }
-    pub fn into_parts(self) -> (CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>) {
+    pub fn into_parts(self) -> (CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>) {
         (self.0, self.1)
     }
     pub fn value(&self) -> &CampionamentoHFBI {
         &self.0
     }
-    pub fn errors(&self) -> &Vec<RecordCsvCampionamentoHFBIError> {
+    pub fn errors(&self) -> &Vec<RecordCampionamentoHFBIError> {
         &self.1
     }
 }
@@ -84,7 +72,7 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi_impl<T: RecordCampionamentoHFBI
     for r in records {
         idx += 1;
         if r.codice_specie().is_empty() {
-            let err = RecordCsvCampionamentoHFBIError::ValoreInvalido {
+            let err = RecordCampionamentoHFBIError::ValoreInvalido {
                 msg: format!("Record {idx}: codice_specie non valido (lunghezza < 1)"),
             };
             errors.push(err);
@@ -104,7 +92,7 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi_impl<T: RecordCampionamentoHFBI
         if let Some(specie) = opt_matched_specie {
             matched_specie = specie;
         } else {
-            let err = RecordCsvCampionamentoHFBIError::ValoreInvalido {
+            let err = RecordCampionamentoHFBIError::ValoreInvalido {
                 msg: format!(
                     "Record {idx}: codice_specie non valido (non presente nel riferimento): {}",
                     codice_specie
@@ -116,7 +104,7 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi_impl<T: RecordCampionamentoHFBI
 
         //TODO: update this abomination when records change to have an integer directly
         if r.numero_individui() < 1 {
-            let err = RecordCsvCampionamentoHFBIError::ValoreInvalido {
+            let err = RecordCampionamentoHFBIError::ValoreInvalido {
                 msg: format!(
                     "Record {idx}: numero_individui non valido (<1): {}",
                     r.numero_individui()
@@ -127,7 +115,7 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi_impl<T: RecordCampionamentoHFBI
         }
 
         if !r.peso().is_finite() {
-            let err = RecordCsvCampionamentoHFBIError::ValoreInvalido {
+            let err = RecordCampionamentoHFBIError::ValoreInvalido {
                 msg: format!("Record {idx}: peso non valido (not finite): {}", r.peso()),
             };
             errors.push(err);
@@ -145,36 +133,25 @@ pub(crate) fn parse_recordcsv_campionamento_hfbi_impl<T: RecordCampionamentoHFBI
     CampionamentoHFBIParseResult(CampionamentoHFBI::new(campioni), errors)
 }
 
-#[derive(Debug)]
-pub enum RecordCsvAnagraficaHFBIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
-}
+use crate::parser::hfbi::RecordAnagraficaHFBIError;
 
-impl fmt::Display for RecordCsvAnagraficaHFBIError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = match self {
-            RecordCsvAnagraficaHFBIError::ValoreInvalido { msg } => {
-                format!("Errore record anagrafica HFBI: {}", msg)
-            }
-        };
-        write!(f, "{}", string_representation)
-    }
-}
-
-impl std::error::Error for RecordCsvAnagraficaHFBIError {}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::parser::hfbi::RecordAnagraficaHFBIError instead"
+)]
+pub use crate::parser::hfbi::RecordAnagraficaHFBIError as RecordCsvAnagraficaHFBIError;
 
 pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     records: Vec<T>,
-) -> Result<AnagraficaHFBI, Vec<RecordCsvAnagraficaHFBIError>> {
+) -> Result<AnagraficaHFBI, Vec<RecordAnagraficaHFBIError>> {
     let mut errors = Vec::new();
     if records.len() > 1 {
-        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+        let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: format!("Troppi record: {}, atteso 1", records.len()),
         };
         errors.push(err);
     }
     if records.is_empty() {
-        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+        let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: "Nessun record trovato: atteso 1".to_string(),
         };
         errors.push(err);
@@ -184,28 +161,28 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     let r = records.first().unwrap();
 
     if r.codice_stazione().is_empty() {
-        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+        let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: format!("Codice stazione troppo corto: {}", r.codice_stazione()),
         };
         errors.push(err);
     }
 
     if r.corpo_idrico().is_empty() {
-        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+        let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: format!("Corpo idrico troppo corto: {}", r.corpo_idrico()),
         };
         errors.push(err);
     }
 
     if r.regione().is_empty() {
-        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+        let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: format!("Regione troppo corta: {}", r.regione()),
         };
         errors.push(err);
     }
 
     if r.provincia().is_empty() {
-        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+        let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: format!("Provincia troppo corta: {}", r.provincia()),
         };
         errors.push(err);
@@ -215,50 +192,50 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
         Ok(_) => {}
         Err(e) => match e.kind() {
             ParseErrorKind::OutOfRange => {
-                let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+                let err = RecordAnagraficaHFBIError::ValoreInvalido {
                     msg: "Data fornita non valida: fuori range".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::Impossible => {
-                let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+                let err = RecordAnagraficaHFBIError::ValoreInvalido {
                     msg: "Data fornita non valida: valori non possibili".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::NotEnough => {
-                let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+                let err = RecordAnagraficaHFBIError::ValoreInvalido {
                     msg: "Data fornita non valida: specifica insufficiente".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::Invalid => {
-                let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+                let err = RecordAnagraficaHFBIError::ValoreInvalido {
                     msg: "Data fornita non valida: presenza di caratteri non attesi".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::TooShort => {
-                let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+                let err = RecordAnagraficaHFBIError::ValoreInvalido {
                     msg: "Data fornita non valida: terminazione prematura dell'input".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::TooLong => {
-                let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+                let err = RecordAnagraficaHFBIError::ValoreInvalido {
                     msg: "Data fornita non valida: input in eccesso".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::BadFormat => {
-                let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+                let err = RecordAnagraficaHFBIError::ValoreInvalido {
                     msg: "Data fornita non valida: errore nella specifica di formattazione"
                         .to_string(),
                 };
                 errors.push(err);
             }
             _ => {
-                let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+                let err = RecordAnagraficaHFBIError::ValoreInvalido {
                     msg: "Data fornita non valida: errore sconosciuto".to_string(),
                 };
                 errors.push(err);
@@ -267,7 +244,7 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     }
 
     let lunghezza = PositiveF32::new(r.lunghezza_stazione()).unwrap_or_else(|_| {
-        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+        let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: format!(
                 "Lunghezza stazione non finito e positivo: {}",
                 r.lunghezza_stazione()
@@ -280,7 +257,7 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     });
 
     let larghezza = PositiveF32::new(r.larghezza_stazione()).unwrap_or_else(|_| {
-        let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+        let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: format!(
                 "Larghezza stazione non finito e positivo: {}",
                 r.larghezza_stazione()
@@ -301,7 +278,7 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
             stagione = StagioneHFBI::Autunno;
         }
         _ => {
-            let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+            let err = RecordAnagraficaHFBIError::ValoreInvalido {
                 msg: format!("Stagione HFBI non valido: {}, atteso [0, 1]", r.stagione()),
             };
             errors.push(err);
@@ -312,7 +289,7 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
         0 => HabitatHFBI::Vegetato,
         1 => HabitatHFBI::NonVegetato,
         _ => {
-            let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+            let err = RecordAnagraficaHFBIError::ValoreInvalido {
                 msg: format!("HabitatHFBI non valido: {}, atteso [0, 1]", r.habitat()),
             };
             errors.push(err);
@@ -332,7 +309,7 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
             tipo_laguna = TipoLagunaCostieraHFBI::MAt3;
         }
         _ => {
-            let err = RecordCsvAnagraficaHFBIError::ValoreInvalido {
+            let err = RecordAnagraficaHFBIError::ValoreInvalido {
                 msg: format!(
                     "TipoLagunaCostieraHFBI non valido: {}, atteso [1, 3]",
                     r.tipo_laguna()
@@ -368,7 +345,7 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
 )]
 pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
-) -> Result<Vec<RecordHFBI>, Vec<RecordCsvCampionamentoHFBIError>> {
+) -> Result<Vec<RecordHFBI>, Vec<RecordCampionamentoHFBIError>> {
     check_records_campionamento_hfbi_impl::<T>(records).map(|v| v.into())
 }
 
@@ -379,7 +356,7 @@ impl CampionamentoHFBI {
     {
         CampionamentoHFBIParseResult::parse::<T>(vec)
     }
-    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvCampionamentoHFBIError>>
+    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
     where
         T: RecordCampionamentoHFBI,
     {
@@ -392,7 +369,7 @@ impl CampionamentoHFBI {
 ///   - returning CampionamentoHFBI for success over Vec<RecordHFBI>
 pub(crate) fn check_records_campionamento_hfbi_impl<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
-) -> Result<CampionamentoHFBI, Vec<RecordCsvCampionamentoHFBIError>> {
+) -> Result<CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>> {
     let (camp, errors) = parse_recordcsv_campionamento_hfbi_impl(records).into_parts();
 
     println!(
@@ -425,13 +402,13 @@ pub(crate) fn check_records_campionamento_hfbi_impl<T: RecordCampionamentoHFBI>(
 }
 
 impl AnagraficaHFBI {
-    pub fn parse_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvAnagraficaHFBIError>>
+    pub fn parse_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaHFBIError>>
     where
         T: RecordAnagraficaHFBI,
     {
         parse_recordcsv_anagrafica_hfbi::<T>(vec)
     }
-    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvAnagraficaHFBIError>>
+    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaHFBIError>>
     where
         T: RecordAnagraficaHFBI,
     {
@@ -441,7 +418,7 @@ impl AnagraficaHFBI {
 
 pub fn check_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     records: Vec<T>,
-) -> Result<AnagraficaHFBI, Vec<RecordCsvAnagraficaHFBIError>> {
+) -> Result<AnagraficaHFBI, Vec<RecordAnagraficaHFBIError>> {
     let res = parse_recordcsv_anagrafica_hfbi(records);
 
     match res {

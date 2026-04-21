@@ -24,7 +24,6 @@ use crate::domain::niseci::{
 };
 use crate::domain::posf32::PositiveF32;
 use chrono::format::ParseErrorKind;
-use std::fmt;
 
 fn check_soglie_cl<T: RecordRiferimentoNISECI>(r: &T) -> bool {
     if r.cl_soglia1() < r.cl_soglia2()
@@ -46,55 +45,36 @@ fn check_soglie_ad_juv<T: RecordRiferimentoNISECI>(r: &T) -> bool {
     false
 }
 
-#[derive(Debug)]
-pub enum RecordCsvRiferimentoNISECIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
-    SoglieCLNonCrescenti { msg: String },
-    SoglieADJUVNonCrescenti { msg: String },
-}
+use crate::parser::niseci::RecordRiferimentoNISECIError;
 
-impl fmt::Display for RecordCsvRiferimentoNISECIError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = match self {
-            RecordCsvRiferimentoNISECIError::ValoreInvalido { msg } => {
-                format!("Errore record riferimento NISECI: {}", msg)
-            }
-            RecordCsvRiferimentoNISECIError::SoglieCLNonCrescenti { msg } => {
-                format!("Errore record riferimento NISECI: {}", msg)
-            }
-            RecordCsvRiferimentoNISECIError::SoglieADJUVNonCrescenti { msg } => {
-                format!("Errore record riferimento NISECI: {}", msg)
-            }
-        };
-        write!(f, "{}", string_representation)
-    }
-}
-
-impl std::error::Error for RecordCsvRiferimentoNISECIError {}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::parser::niseci::RecordRiferimentoNISECIError instead"
+)]
+pub use crate::parser::niseci::RecordRiferimentoNISECIError as RecordCsvRiferimentoNISECIError;
 
 #[deprecated(
     note = "v0.2 will change signature to return RiferimentoNISECIParseResult\nConsider using RiferimentoNISECI::parse_recordcsv(records).into_parts()"
 )]
 pub fn parse_recordcsv_riferimento_niseci<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
-) -> (Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>) {
+) -> (Vec<SpecieNISECI>, Vec<RecordRiferimentoNISECIError>) {
     let (rif, errs) = parse_recordcsv_riferimento_niseci_impl::<T>(records).into_parts();
     (rif.into(), errs)
 }
 
-pub struct RiferimentoNISECIParseResult(RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>);
+pub struct RiferimentoNISECIParseResult(RiferimentoNISECI, Vec<RecordRiferimentoNISECIError>);
 
 impl RiferimentoNISECIParseResult {
     pub fn parse<T: RecordRiferimentoNISECI>(records: Vec<T>) -> Self {
         parse_recordcsv_riferimento_niseci_impl(records)
     }
-    pub fn into_parts(self) -> (RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>) {
+    pub fn into_parts(self) -> (RiferimentoNISECI, Vec<RecordRiferimentoNISECIError>) {
         (self.0, self.1)
     }
     pub fn value(&self) -> &RiferimentoNISECI {
         &self.0
     }
-    pub fn errors(&self) -> &Vec<RecordCsvRiferimentoNISECIError> {
+    pub fn errors(&self) -> &Vec<RecordRiferimentoNISECIError> {
         &self.1
     }
 }
@@ -119,7 +99,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
             }
             "AUT" => {}
             _ => {
-                let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+                let err = RecordRiferimentoNISECIError::ValoreInvalido {
                     msg: format!(
                         "Record {idx}: origine invalida (non \"AUT\" o \"ALL\"): {}",
                         r.origine()
@@ -139,7 +119,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
                     tipo_autoctono = r.tipo_autoctono() as u8;
                 }
                 _ => {
-                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+                    let err = RecordRiferimentoNISECIError::ValoreInvalido {
                         msg: format!(
                             "Record {idx}: tipo_autoctono non valido (non 1 o 2): {}",
                             r.tipo_autoctono()
@@ -157,7 +137,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
                     tipo_alloctono = r.allo_nocivita() as u8;
                 }
                 _ => {
-                    let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+                    let err = RecordRiferimentoNISECIError::ValoreInvalido {
                         msg: format!(
                             "Record {idx}: allo_nocivita non valido (non [0..3]): {}",
                             r.allo_nocivita()
@@ -170,7 +150,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
         }
 
         if r.codice_specie().is_empty() {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
                 msg: format!("Record {idx}: codice_specie non valido (lunghezza < 1)"),
             };
             errors.push(err);
@@ -180,7 +160,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
         let id = r.codice_specie();
 
         if used_id_specie.contains(&id) {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
                 msg: format!("Record {idx}: codice_specie non valido (ridefinizione)"),
             };
             errors.push(err);
@@ -193,7 +173,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
 
         // Check dens_soglia
         if r.dens_soglia1() < 0.0 {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
                 msg: format!("Record {idx}: dens_soglia1 non valido (< 0)"),
             };
             errors.push(err);
@@ -201,7 +181,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
         }
 
         if r.dens_soglia1().abs() < epsilon && specie_attesa {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
                 msg: format!("Record {idx}: dens_soglia1 non valido (== 0) per una specie attesa"),
             };
             errors.push(err);
@@ -209,7 +189,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
         }
 
         if r.dens_soglia2() < 0.0 {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
                 msg: format!("Record {idx}: dens_soglia2 non valido (< 0)"),
             };
             errors.push(err);
@@ -217,7 +197,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
         }
 
         if r.dens_soglia2().abs() < epsilon && specie_attesa {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
                 msg: format!("Record {idx}: dens_soglia2 non valido (== 0) per una specie attesa"),
             };
             errors.push(err);
@@ -225,7 +205,7 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
         }
 
         if r.dens_soglia1() >= r.dens_soglia2() && specie_attesa {
-            let err = RecordCsvRiferimentoNISECIError::ValoreInvalido {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
                 msg: format!(
                     "Record {idx}: dens_soglia1 maggiore di dens_soglia2 per una specie attesa"
                 ),
@@ -235,14 +215,14 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
         }
 
         if !check_soglie_cl(&r) {
-            let err = RecordCsvRiferimentoNISECIError::SoglieCLNonCrescenti {
+            let err = RecordRiferimentoNISECIError::SoglieCLNonCrescenti {
                 msg: format!("Record {idx}: soglie CL non crescenti"),
             };
             errors.push(err);
             continue;
         }
         if !check_soglie_ad_juv(&r) {
-            let err = RecordCsvRiferimentoNISECIError::SoglieADJUVNonCrescenti {
+            let err = RecordRiferimentoNISECIError::SoglieADJUVNonCrescenti {
                 msg: format!("Record {idx}: soglie AD/JUV non crescenti"),
             };
             errors.push(err);
@@ -273,23 +253,12 @@ pub(crate) fn parse_recordcsv_riferimento_niseci_impl<T: RecordRiferimentoNISECI
     RiferimentoNISECIParseResult(RiferimentoNISECI::new(specie), errors)
 }
 
-#[derive(Debug)]
-pub enum RecordCsvCampionamentoNISECIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
-}
+use crate::parser::niseci::RecordCampionamentoNISECIError;
 
-impl fmt::Display for RecordCsvCampionamentoNISECIError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = match self {
-            RecordCsvCampionamentoNISECIError::ValoreInvalido { msg } => {
-                format!("Errore record campionamento NISECI: {}", msg)
-            }
-        };
-        write!(f, "{}", string_representation)
-    }
-}
-
-impl std::error::Error for RecordCsvCampionamentoNISECIError {}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::parser::niseci::RecordCampionamentoNISECIError instead"
+)]
+pub use crate::parser::niseci::RecordCampionamentoNISECIError as RecordCsvCampionamentoNISECIError;
 
 #[deprecated(
     note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECIParseResult\n  Consider using CampionamentoNISECI::parse_recordcsv(records, riferimento).into_parts()"
@@ -297,7 +266,7 @@ impl std::error::Error for RecordCsvCampionamentoNISECIError {}
 pub fn parse_recordcsv_campionamento_niseci<T: RecordCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: Vec<SpecieNISECI>,
-) -> (Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>) {
+) -> (Vec<RecordNISECI>, Vec<RecordCampionamentoNISECIError>) {
     let (camp, errs) = parse_recordcsv_campionamento_niseci_impl::<T>(
         records,
         &RiferimentoNISECI::new(riferimento_specie),
@@ -306,10 +275,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCampionamentoNISECI>(
     (camp.into(), errs)
 }
 
-pub struct CampionamentoNISECIParseResult(
-    CampionamentoNISECI,
-    Vec<RecordCsvCampionamentoNISECIError>,
-);
+pub struct CampionamentoNISECIParseResult(CampionamentoNISECI, Vec<RecordCampionamentoNISECIError>);
 
 impl CampionamentoNISECIParseResult {
     pub fn parse<T: RecordCampionamentoNISECI>(
@@ -318,13 +284,13 @@ impl CampionamentoNISECIParseResult {
     ) -> Self {
         parse_recordcsv_campionamento_niseci_impl(records, riferimento)
     }
-    pub fn into_parts(self) -> (CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>) {
+    pub fn into_parts(self) -> (CampionamentoNISECI, Vec<RecordCampionamentoNISECIError>) {
         (self.0, self.1)
     }
     pub fn value(&self) -> &CampionamentoNISECI {
         &self.0
     }
-    pub fn errors(&self) -> &Vec<RecordCsvCampionamentoNISECIError> {
+    pub fn errors(&self) -> &Vec<RecordCampionamentoNISECIError> {
         &self.1
     }
 }
@@ -345,7 +311,7 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCampionamentoNI
     for r in records {
         idx += 1;
         if r.codice_specie().is_empty() {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido {
+            let err = RecordCampionamentoNISECIError::ValoreInvalido {
                 msg: format!("Record {idx}: codice_specie non valido (lunghezza < 1)"),
             };
             errors.push(err);
@@ -365,7 +331,7 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCampionamentoNI
         if let Some(specie) = opt_matched_specie {
             matched_specie = specie;
         } else {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido {
+            let err = RecordCampionamentoNISECIError::ValoreInvalido {
                 msg: format!(
                     "Record {idx}: codice_specie non valido (non presente nel riferimento): {}",
                     codice_specie
@@ -376,7 +342,7 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCampionamentoNI
         }
 
         if r.num_passaggio() < 1 {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido {
+            let err = RecordCampionamentoNISECIError::ValoreInvalido {
                 msg: format!(
                     "Record {idx}: num_passaggio non valido (<1): {}",
                     r.num_passaggio()
@@ -388,7 +354,7 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCampionamentoNI
         let passaggio_cattura = r.num_passaggio();
 
         if !r.peso().is_finite() {
-            let err = RecordCsvCampionamentoNISECIError::ValoreInvalido {
+            let err = RecordCampionamentoNISECIError::ValoreInvalido {
                 msg: format!("Record {idx}: peso non valido (not finite): {}", r.peso()),
             };
             errors.push(err);
@@ -406,36 +372,25 @@ pub(crate) fn parse_recordcsv_campionamento_niseci_impl<T: RecordCampionamentoNI
     CampionamentoNISECIParseResult(CampionamentoNISECI::new(campioni), errors)
 }
 
-#[derive(Debug)]
-pub enum RecordCsvAnagraficaNISECIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
-}
+use crate::parser::niseci::RecordAnagraficaNISECIError;
 
-impl fmt::Display for RecordCsvAnagraficaNISECIError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = match self {
-            RecordCsvAnagraficaNISECIError::ValoreInvalido { msg } => {
-                format!("Errore record anagrafica NISECI: {}", msg)
-            }
-        };
-        write!(f, "{}", string_representation)
-    }
-}
-
-impl std::error::Error for RecordCsvAnagraficaNISECIError {}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::parser::niseci::RecordAnagraficaNISECIError instead"
+)]
+pub use crate::parser::niseci::RecordAnagraficaNISECIError as RecordCsvAnagraficaNISECIError;
 
 pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     records: Vec<T>,
-) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
+) -> Result<AnagraficaNISECI, Vec<RecordAnagraficaNISECIError>> {
     let mut errors = Vec::new();
     if records.len() > 1 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!("Troppi record: {}, atteso 1", records.len()),
         };
         errors.push(err);
     }
     if records.is_empty() {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: "Nessun record trovato: atteso 1".to_string(),
         };
         errors.push(err);
@@ -445,28 +400,28 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     let r = records.first().unwrap();
 
     if r.codice_stazione().is_empty() {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!("Codice stazione troppo corto: {}", r.codice_stazione()),
         };
         errors.push(err);
     }
 
     if r.corpo_idrico().is_empty() {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!("Corpo idrico troppo corto: {}", r.corpo_idrico()),
         };
         errors.push(err);
     }
 
     if r.regione().is_empty() {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!("Regione troppo corta: {}", r.regione()),
         };
         errors.push(err);
     }
 
     if r.provincia().is_empty() {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!("Provincia troppo corta: {}", r.provincia()),
         };
         errors.push(err);
@@ -476,50 +431,50 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
         Ok(_) => {}
         Err(e) => match e.kind() {
             ParseErrorKind::OutOfRange => {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: "Data fornita non valida: fuori range".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::Impossible => {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: "Data fornita non valida: valori non possibili".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::NotEnough => {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: "Data fornita non valida: specifica insufficiente".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::Invalid => {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: "Data fornita non valida: presenza di caratteri non attesi".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::TooShort => {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: "Data fornita non valida: terminazione prematura dell'input".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::TooLong => {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: "Data fornita non valida: input in eccesso".to_string(),
                 };
                 errors.push(err);
             }
             ParseErrorKind::BadFormat => {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: "Data fornita non valida: errore nella specifica di formattazione"
                         .to_string(),
                 };
                 errors.push(err);
             }
             _ => {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: "Data fornita non valida: errore sconosciuto".to_string(),
                 };
                 errors.push(err);
@@ -528,7 +483,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     }
 
     if r.lunghezza_stazione() < 0.0 {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!(
                 "Lunghezza stazione troppo bassa: {}",
                 r.lunghezza_stazione()
@@ -538,7 +493,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     }
 
     let lunghezza = PositiveF32::new(r.lunghezza_stazione()).unwrap_or_else(|_| {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!(
                 "Lunghezza stazione non finito e positivo: {}",
                 r.lunghezza_stazione()
@@ -551,7 +506,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     });
 
     let larghezza = PositiveF32::new(r.larghezza_stazione()).unwrap_or_else(|_| {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!(
                 "Larghezza stazione non finito e positivo: {}",
                 r.larghezza_stazione()
@@ -576,7 +531,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
             tipo_comunita = TipoComunitaNISECI::AffinataDalMase;
         }
         _ => {
-            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+            let err = RecordAnagraficaNISECIError::ValoreInvalido {
                 msg: format!(
                     "Tipo comunita NISECI non valido: {}, atteso [0, 3]",
                     r.tipo_comunita()
@@ -589,7 +544,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     match tipo_comunita {
         TipoComunitaNISECI::Recuperata => {
             if r.fonte().is_empty() {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: format!("Fonte troppo corta: {}", r.fonte()),
                 };
                 errors.push(err);
@@ -597,7 +552,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
         }
         TipoComunitaNISECI::AffinataDalMase => {
             if r.numero_protocollo().is_empty() {
-                let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+                let err = RecordAnagraficaNISECIError::ValoreInvalido {
                     msg: format!("Numero protocollo troppo corto: {}", r.numero_protocollo()),
                 };
                 errors.push(err);
@@ -629,7 +584,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
         19 => IdroEcoRegioneNISECI::Sicilia,
         20 => IdroEcoRegioneNISECI::Sardegna,
         _ => {
-            let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+            let err = RecordAnagraficaNISECIError::ValoreInvalido {
                 msg: format!(
                     "IdroEcoRegioneNISECI non valido: {}, atteso [0, 20]",
                     r.idro_eco_regione()
@@ -646,7 +601,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     }
 
     if r.nome_bacino().is_empty() {
-        let err = RecordCsvAnagraficaNISECIError::ValoreInvalido {
+        let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: format!("Nome bacino troppo corto: {}", r.nome_bacino()),
         };
         errors.push(err);
@@ -683,7 +638,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
 )]
 pub fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
-) -> Result<Vec<SpecieNISECI>, Vec<RecordCsvRiferimentoNISECIError>> {
+) -> Result<Vec<SpecieNISECI>, Vec<RecordRiferimentoNISECIError>> {
     check_records_riferimento_niseci_impl::<T>(records).map(|v| v.into())
 }
 
@@ -694,7 +649,7 @@ impl RiferimentoNISECI {
     {
         RiferimentoNISECIParseResult::parse::<T>(vec)
     }
-    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvRiferimentoNISECIError>>
+    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordRiferimentoNISECIError>>
     where
         T: RecordRiferimentoNISECI,
     {
@@ -707,7 +662,7 @@ impl RiferimentoNISECI {
 ///   - returning RiferimentoNISECI for success over Vec<SpecieNISECI>
 pub(crate) fn check_records_riferimento_niseci_impl<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
-) -> Result<RiferimentoNISECI, Vec<RecordCsvRiferimentoNISECIError>> {
+) -> Result<RiferimentoNISECI, Vec<RecordRiferimentoNISECIError>> {
     let (rif, errors) = parse_recordcsv_riferimento_niseci_impl(records).into_parts();
 
     println!(
@@ -745,7 +700,7 @@ pub(crate) fn check_records_riferimento_niseci_impl<T: RecordRiferimentoNISECI>(
 pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: Vec<SpecieNISECI>,
-) -> Result<Vec<RecordNISECI>, Vec<RecordCsvCampionamentoNISECIError>> {
+) -> Result<Vec<RecordNISECI>, Vec<RecordCampionamentoNISECIError>> {
     check_records_campionamento_niseci_impl::<T>(
         records,
         &RiferimentoNISECI::new(riferimento_specie),
@@ -766,7 +721,7 @@ impl CampionamentoNISECI {
     pub fn check_recordcsv<T>(
         vec: Vec<T>,
         rif: &RiferimentoNISECI,
-    ) -> Result<Self, Vec<RecordCsvCampionamentoNISECIError>>
+    ) -> Result<Self, Vec<RecordCampionamentoNISECIError>>
     where
         T: RecordCampionamentoNISECI,
     {
@@ -782,7 +737,7 @@ impl CampionamentoNISECI {
 pub(crate) fn check_records_campionamento_niseci_impl<T: RecordCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: &RiferimentoNISECI,
-) -> Result<CampionamentoNISECI, Vec<RecordCsvCampionamentoNISECIError>> {
+) -> Result<CampionamentoNISECI, Vec<RecordCampionamentoNISECIError>> {
     let (camp, errors) =
         parse_recordcsv_campionamento_niseci_impl(records, riferimento_specie).into_parts();
 
@@ -818,13 +773,13 @@ pub(crate) fn check_records_campionamento_niseci_impl<T: RecordCampionamentoNISE
 }
 
 impl AnagraficaNISECI {
-    pub fn parse_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvAnagraficaNISECIError>>
+    pub fn parse_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaNISECIError>>
     where
         T: RecordAnagraficaNISECI,
     {
         parse_recordcsv_anagrafica_niseci::<T>(vec)
     }
-    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCsvAnagraficaNISECIError>>
+    pub fn check_recordcsv<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaNISECIError>>
     where
         T: RecordAnagraficaNISECI,
     {
@@ -834,7 +789,7 @@ impl AnagraficaNISECI {
 
 pub fn check_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     records: Vec<T>,
-) -> Result<AnagraficaNISECI, Vec<RecordCsvAnagraficaNISECIError>> {
+) -> Result<AnagraficaNISECI, Vec<RecordAnagraficaNISECIError>> {
     let res = parse_recordcsv_anagrafica_niseci(records);
 
     match res {

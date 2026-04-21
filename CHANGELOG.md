@@ -15,6 +15,8 @@
 - Add `deser` module
   - Holds refactored `Record` traits and `TipoRecord` enum
   - Previous definitions in `csv` are now a deprecated reexport
+- Add `parser` module
+  - Holds refactored `RecordError` enums
 - Add `get_x3_a()`, `get_x3_b()` to `RisultatoNISECI`
 - Add `to_csv()` for:
   - `domain::niseci::{RisultatoNISECI, ValoriIntermediNISECI}`
@@ -55,6 +57,7 @@
 - Deprecation warnings for visibility of `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
 - Deprecation warnings for visibility of `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
 - Deprecation warnings for visibility of `csv::RecordCsv*` traits, `csv::TipoRecordCsv`
+- Deprecation warnings for visibility of `csv::parser::{niseci,hfbi}::RecordCsv*Error` error enums
 - Drop `once_cell` dependency by replacing `once_cell::sync::Lazy` with `std::sync::LazyLock`
   - Needs `rust 1.80`
 - Make types related to full calc results `Deserialize`

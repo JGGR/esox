@@ -97,5 +97,6 @@ pub mod deser;
 pub mod domain;
 pub mod engines;
 pub mod meta;
+pub mod parser;
 #[cfg(test)]
 mod tests;

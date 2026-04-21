@@ -23,10 +23,10 @@ use crate::csv::deser::NormalizerReader;
 use crate::csv::load::InputFormat;
 use crate::csv::parser::hfbi::{
     check_records_anagrafica_hfbi, check_records_campionamento_hfbi_impl,
-    RecordCsvAnagraficaHFBIError, RecordCsvCampionamentoHFBIError,
 };
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
+use crate::parser::hfbi::{RecordAnagraficaHFBIError, RecordCampionamentoHFBIError};
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
@@ -35,7 +35,7 @@ use std::path::Path;
 #[derive(Debug)]
 pub enum CampionamentoHFBIError {
     Csv(Vec<csv::Error>),
-    Value(Vec<RecordCsvCampionamentoHFBIError>),
+    Value(Vec<RecordCampionamentoHFBIError>),
 }
 
 impl fmt::Display for CampionamentoHFBIError {
@@ -116,7 +116,7 @@ pub fn load_campionamento_hfbi_from_path(
 #[derive(Debug)]
 pub enum AnagraficaHFBIError {
     Csv(Vec<csv::Error>),
-    Value(Vec<RecordCsvAnagraficaHFBIError>),
+    Value(Vec<RecordAnagraficaHFBIError>),
 }
 
 impl fmt::Display for AnagraficaHFBIError {
