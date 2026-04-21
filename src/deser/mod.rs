@@ -14,6 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+#[derive(Copy, Clone)]
+pub enum TipoRecord {
+    RiferimentoNISECI,
+    CampionamentoNISECI,
+    AnagraficaNISECI,
+    CampionamentoHFBI,
+    AnagraficaHFBI,
+}
+
 pub trait RecordRiferimentoNISECI: serde::de::DeserializeOwned {
     #[allow(dead_code)]
     fn nome_comune(&self) -> String;

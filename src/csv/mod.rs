@@ -113,14 +113,8 @@ pub const ANAGRAFICA_HFBI_HEADER_FIELD_TYPES: [&str; 10] = [
 pub const ANAGRAFICA_HFBI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;stagione;habitat;tipoLaguna";
 
-#[derive(Copy, Clone)]
-pub enum TipoRecordCsv {
-    RiferimentoNISECI,
-    CampionamentoNISECI,
-    AnagraficaNISECI,
-    CampionamentoHFBI,
-    AnagraficaHFBI,
-}
+#[deprecated(note = "v0.2 will drop this reexport.\nConsider using deser::TipoRecord")]
+pub use crate::deser::TipoRecord as TipoRecordCsv;
 
 #[deprecated(
     note = "v0.2 will drop this reexport.\nConsider using deser::RecordAnagraficaHFBI"
