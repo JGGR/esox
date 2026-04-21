@@ -20,7 +20,7 @@ use super::{
     CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS,
     RIFERIMENTO_NISECI_HEADER_FIELDS,
 };
-use crate::csv::TipoRecordCsv;
+use crate::deser::TipoRecord;
 use serde::{de, Deserialize, Deserializer};
 use std::io::{self, Read};
 use std::path::Path;
@@ -90,7 +90,7 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     res
 }
 
-pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> Vec<String> {
+pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec<String> {
     let mut res = Vec::new();
     for error in errors {
         match error.kind() {
@@ -102,7 +102,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                         // f is u64 starting from 0
                         let field_idx = f as usize;
                         match tipo_csv {
-                            TipoRecordCsv::RiferimentoNISECI => {
+                            TipoRecord::RiferimentoNISECI => {
                                 if field_idx < RIFERIMENTO_NISECI_HEADER_FIELDS.len() {
                                     field_str = format!(
                                         "{} ({})",
@@ -112,7 +112,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                                     field_str = "???".to_string();
                                 }
                             }
-                            TipoRecordCsv::CampionamentoNISECI => {
+                            TipoRecord::CampionamentoNISECI => {
                                 if field_idx < CAMPIONAMENTO_NISECI_HEADER_FIELDS.len() {
                                     field_str = format!(
                                         "{} ({})",
@@ -122,7 +122,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                                     field_str = "???".to_string();
                                 }
                             }
-                            TipoRecordCsv::AnagraficaNISECI => {
+                            TipoRecord::AnagraficaNISECI => {
                                 if field_idx < ANAGRAFICA_NISECI_HEADER_FIELDS.len() {
                                     field_str = format!(
                                         "{} ({})",
@@ -132,7 +132,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                                     field_str = "???".to_string();
                                 }
                             }
-                            TipoRecordCsv::CampionamentoHFBI => {
+                            TipoRecord::CampionamentoHFBI => {
                                 if field_idx < CAMPIONAMENTO_HFBI_HEADER_FIELDS.len() {
                                     field_str = format!(
                                         "{} ({})",
@@ -142,7 +142,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecordCsv) -> 
                                     field_str = "???".to_string();
                                 }
                             }
-                            TipoRecordCsv::AnagraficaHFBI => {
+                            TipoRecord::AnagraficaHFBI => {
                                 if field_idx < ANAGRAFICA_HFBI_HEADER_FIELDS.len() {
                                     field_str = format!(
                                         "{} ({})",

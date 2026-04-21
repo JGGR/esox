@@ -29,9 +29,7 @@ use crate::csv::parser::niseci::{
     check_records_riferimento_niseci_impl, RecordCsvAnagraficaNISECIError,
     RecordCsvCampionamentoNISECIError, RecordCsvRiferimentoNISECIError,
 };
-use crate::csv::{
-    RecordCsvAnagraficaNISECI, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI,
-};
+use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use crate::domain::niseci::{AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI};
 use std::fmt;
 use std::fs::File;
@@ -65,7 +63,7 @@ pub fn load_csv_riferimento_niseci_from_reader<R, T>(
 ) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
 where
     R: Read,
-    T: RecordCsvRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
     let csv_records =
@@ -79,7 +77,7 @@ pub fn load_csv_riferimento_niseci_from_path<T>(
     has_headers: bool,
 ) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
 where
-    T: RecordCsvRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI + 'static,
 {
     let file =
         File::open(path).map_err(|e| RiferimentoNISECIError::Csv(vec![csv::Error::from(e)]))?;
@@ -147,7 +145,7 @@ pub fn load_csv_campionamento_niseci_from_reader<R, T>(
 ) -> Result<CampionamentoNISECI, CampionamentoNISECIError>
 where
     R: Read,
-    T: RecordCsvCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
     let csv_records = check_campionamento_niseci_reader::<NormalizerReader<R>, T>(
@@ -166,7 +164,7 @@ pub fn load_csv_campionamento_niseci_from_path<T>(
     riferimento: &RiferimentoNISECI,
 ) -> Result<CampionamentoNISECI, CampionamentoNISECIError>
 where
-    T: RecordCsvCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI + 'static,
 {
     let file =
         File::open(path).map_err(|e| CampionamentoNISECIError::Csv(vec![csv::Error::from(e)]))?;
@@ -234,7 +232,7 @@ pub fn load_csv_anagrafica_niseci_from_reader<R, T>(
 ) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
 where
     R: Read,
-    T: RecordCsvAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -249,7 +247,7 @@ pub fn load_csv_anagrafica_niseci_from_path<T>(
     has_headers: bool,
 ) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
 where
-    T: RecordCsvAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI + 'static,
 {
     let file =
         File::open(path).map_err(|e| AnagraficaNISECIError::Csv(vec![csv::Error::from(e)]))?;

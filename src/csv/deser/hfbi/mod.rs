@@ -18,7 +18,7 @@
 use crate::csv::deser::{
     check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
 };
-use crate::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI, TipoRecordCsv};
+use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI, TipoRecord};
 use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
@@ -36,7 +36,7 @@ pub struct VeryItalianRecordCsvCampionamentoHFBI {
     pub peso: f32,
 }
 
-impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
+impl RecordCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
     fn codice_specie(&self) -> String {
         self.codice_specie.clone()
     }
@@ -51,7 +51,7 @@ impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
 impl fmt::Display for VeryItalianRecordCsvCampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
+            "RecordCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
               self.codice_specie, self.numero_individui, self.peso
         );
         write!(f, "{}", string_representation)
@@ -68,7 +68,7 @@ pub struct PlainRecordCsvCampionamentoHFBI {
     pub peso: f32,
 }
 
-impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
+impl RecordCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
     fn codice_specie(&self) -> String {
         self.codice_specie.clone()
     }
@@ -83,7 +83,7 @@ impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
 impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
+            "RecordCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
               self.codice_specie, self.numero_individui, self.peso
         );
         write!(f, "{}", string_representation)
@@ -93,7 +93,7 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
 pub fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCsvCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + 'static,
 {
     let mut records = Vec::new();
     let mut errors = Vec::new();
@@ -113,7 +113,7 @@ pub fn check_campionamento_hfbi_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -146,7 +146,7 @@ where
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoHFBI);
+        let processed_errors = process_csv_errors(&errors, TipoRecord::CampionamentoHFBI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento HFBI: {{");
         for e in processed_errors {
             eprintln!("{e}");
@@ -170,7 +170,7 @@ pub fn check_campionamento_hfbi_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
@@ -203,7 +203,7 @@ pub struct VeryItalianRecordCsvAnagraficaHFBI {
     pub tipo_laguna: u32,
 }
 
-impl RecordCsvAnagraficaHFBI for VeryItalianRecordCsvAnagraficaHFBI {
+impl RecordAnagraficaHFBI for VeryItalianRecordCsvAnagraficaHFBI {
     fn codice_stazione(&self) -> String {
         self.codice_stazione.clone()
     }
@@ -275,7 +275,7 @@ pub struct PlainRecordCsvAnagraficaHFBI {
     pub tipo_laguna: u32,
 }
 
-impl RecordCsvAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
+impl RecordAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
     fn codice_stazione(&self) -> String {
         self.codice_stazione.clone()
     }
@@ -333,7 +333,7 @@ impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
 pub fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCsvAnagraficaHFBI,
+    T: RecordAnagraficaHFBI,
 {
     let mut records = Vec::new();
     let mut errors = Vec::new();
@@ -353,7 +353,7 @@ pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -386,7 +386,7 @@ where
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::AnagraficaHFBI);
+        let processed_errors = process_csv_errors(&errors, TipoRecord::AnagraficaHFBI);
         eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica HFBI: {{");
         for e in processed_errors {
             eprintln!("{e}");
@@ -410,7 +410,7 @@ pub fn check_anagrafica_hfbi_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());

@@ -25,7 +25,7 @@ use crate::csv::parser::hfbi::{
     check_records_anagrafica_hfbi, check_records_campionamento_hfbi_impl,
     RecordCsvAnagraficaHFBIError, RecordCsvCampionamentoHFBIError,
 };
-use crate::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI};
+use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 use std::fmt;
 use std::fs::File;
@@ -59,7 +59,7 @@ pub fn load_csv_campionamento_hfbi_from_reader<R, T>(
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
     R: Read,
-    T: RecordCsvCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
     let csv_records =
@@ -73,7 +73,7 @@ pub fn load_csv_campionamento_hfbi_from_path<T>(
     has_headers: bool,
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
-    T: RecordCsvCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + 'static,
 {
     let file =
         File::open(path).map_err(|e| CampionamentoHFBIError::Csv(vec![csv::Error::from(e)]))?;
@@ -140,7 +140,7 @@ pub fn load_csv_anagrafica_hfbi_from_reader<R, T>(
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
     R: Read,
-    T: RecordCsvAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -155,7 +155,7 @@ pub fn load_csv_anagrafica_hfbi_from_path<T>(
     has_headers: bool,
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
-    T: RecordCsvAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + 'static,
 {
     let file = File::open(path).map_err(|e| AnagraficaHFBIError::Csv(vec![csv::Error::from(e)]))?;
 
