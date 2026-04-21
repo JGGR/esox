@@ -15,5 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use chrono::NaiveDate;
+
+pub fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
+    let normalized = date_str.replace("/", "-"); // Replace all / with -
+    NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")
+}
+
 pub mod hfbi;
 pub mod niseci;

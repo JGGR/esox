@@ -17,6 +17,7 @@
   - Previous definitions in `csv` are now a deprecated reexport
 - Add `parser` module
   - Holds refactored `RecordError` enums
+  - Holds renamed `parse_records` methods
 - Add `get_x3_a()`, `get_x3_b()` to `RisultatoNISECI`
 - Add `to_csv()` for:
   - `domain::niseci::{RisultatoNISECI, ValoriIntermediNISECI}`
