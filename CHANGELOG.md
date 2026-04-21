@@ -12,6 +12,9 @@
   - Wraps over old `parse_recordcsv_{riferimento, campionamento}_niseci()` return value, which used tuples
 - Add `csv::parser::hfbi::CampionamentoHFBIParseResult`
   - Wraps over old `parse_recordcsv_campionamento_hfbi()` return value, which used tuples
+- Add `deser` module
+  - Holds refactored `Record` traits
+  - Previous definition in `csv` are now a deprecated reexport
 - Add `get_x3_a()`, `get_x3_b()` to `RisultatoNISECI`
 - Add `to_csv()` for:
   - `domain::niseci::{RisultatoNISECI, ValoriIntermediNISECI}`
@@ -51,6 +54,7 @@
   - Out: will return `CampionamentoHFBI` on success branches (was: `Vec<RecordHFBI>` on success branches)
 - Deprecation warnings for visibility of `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
 - Deprecation warnings for visibility of `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
+- Deprecation warnings for visibility of `csv::RecordCsv*` traits
 - Drop `once_cell` dependency by replacing `once_cell::sync::Lazy` with `std::sync::LazyLock`
   - Needs `rust 1.80`
 - Make types related to full calc results `Deserialize`

@@ -23,9 +23,9 @@ use std::vec::Vec;
 
 use super::localize::CommaFormat;
 use super::location::Location;
-use super::posf32::{PositiveF32, PositiveF32Error};
 #[cfg(feature = "experimental")]
 use super::posf32::deserialize_positive_f32;
+use super::posf32::{PositiveF32, PositiveF32Error};
 
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only

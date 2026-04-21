@@ -122,69 +122,23 @@ pub enum TipoRecordCsv {
     AnagraficaHFBI,
 }
 
-pub trait RecordCsvRiferimentoNISECI: serde::de::DeserializeOwned {
-    #[allow(dead_code)]
-    fn nome_comune(&self) -> String;
-    fn nome_latino(&self) -> String;
-    fn codice_specie(&self) -> String;
-    fn origine(&self) -> String;
-    fn tipo_autoctono(&self) -> u32;
-    fn allo_nocivita(&self) -> u32;
-    fn specie_attesa(&self) -> u32;
-    fn cl_soglia1(&self) -> u32;
-    fn cl_soglia2(&self) -> u32;
-    fn cl_soglia3(&self) -> u32;
-    fn cl_soglia4(&self) -> u32;
-    fn ad_juv_soglia1(&self) -> f32;
-    fn ad_juv_soglia2(&self) -> f32;
-    fn ad_juv_soglia3(&self) -> f32;
-    fn ad_juv_soglia4(&self) -> f32;
-    fn dens_soglia1(&self) -> f32;
-    fn dens_soglia2(&self) -> f32;
-}
-
-pub trait RecordCsvCampionamentoNISECI: serde::de::DeserializeOwned {
-    #[allow(dead_code)]
-    fn data(&self) -> String;
-    #[allow(dead_code)]
-    fn stazione(&self) -> String;
-    fn num_passaggio(&self) -> u32;
-    fn codice_specie(&self) -> String;
-    fn lunghezza(&self) -> u32;
-    fn peso(&self) -> f32;
-}
-
-pub trait RecordCsvAnagraficaNISECI: serde::de::DeserializeOwned {
-    fn codice_stazione(&self) -> String;
-    fn corpo_idrico(&self) -> String;
-    fn regione(&self) -> String;
-    fn provincia(&self) -> String;
-    fn data(&self) -> String;
-    fn lunghezza_stazione(&self) -> f32;
-    fn larghezza_stazione(&self) -> f32;
-    fn tipo_comunita(&self) -> u32;
-    fn fonte(&self) -> String;
-    fn numero_protocollo(&self) -> String;
-    fn idro_eco_regione(&self) -> u32;
-    fn area_alpina(&self) -> u32;
-    fn nome_bacino(&self) -> String;
-}
-
-pub trait RecordCsvCampionamentoHFBI: serde::de::DeserializeOwned {
-    fn codice_specie(&self) -> String;
-    fn numero_individui(&self) -> u32;
-    fn peso(&self) -> f32;
-}
-
-pub trait RecordCsvAnagraficaHFBI: serde::de::DeserializeOwned {
-    fn codice_stazione(&self) -> String;
-    fn corpo_idrico(&self) -> String;
-    fn regione(&self) -> String;
-    fn provincia(&self) -> String;
-    fn data(&self) -> String;
-    fn lunghezza_stazione(&self) -> f32;
-    fn larghezza_stazione(&self) -> f32;
-    fn stagione(&self) -> u32;
-    fn habitat(&self) -> u32;
-    fn tipo_laguna(&self) -> u32;
-}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using deser::RecordAnagraficaHFBI"
+)]
+pub use crate::deser::RecordAnagraficaHFBI as RecordCsvAnagraficaHFBI;
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using deser::RecordAnagraficaNISECI"
+)]
+pub use crate::deser::RecordAnagraficaNISECI as RecordCsvAnagraficaNISECI;
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using deser::RecordCampionamentoHFBI"
+)]
+pub use crate::deser::RecordCampionamentoHFBI as RecordCsvCampionamentoHFBI;
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using deser::RecordCampionamentoNISECI"
+)]
+pub use crate::deser::RecordCampionamentoNISECI as RecordCsvCampionamentoNISECI;
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using deser::RecordRiferimentoNISECI"
+)]
+pub use crate::deser::RecordRiferimentoNISECI as RecordCsvRiferimentoNISECI;

@@ -19,9 +19,9 @@ use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 
 use super::localize::CommaFormat;
-use super::posf32::{PositiveF32, PositiveF32Error};
 #[cfg(feature = "experimental")]
 use super::posf32::deserialize_positive_f32;
+use super::posf32::{PositiveF32, PositiveF32Error};
 use crate::domain::location::Location;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

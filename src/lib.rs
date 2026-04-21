@@ -93,6 +93,7 @@
 //! let (hfbi, intermediates) = calculate_hfbi(&campionamento, &anagrafica).unwrap();
 //!```
 pub mod csv;
+pub mod deser;
 pub mod domain;
 pub mod engines;
 pub mod meta;
