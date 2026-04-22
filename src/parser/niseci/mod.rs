@@ -660,7 +660,7 @@ pub(crate) fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
 
     println!(
         "Riferimento NISECI: Numero record validi: {}",
-        rif.as_vec().len()
+        rif.into_iter().collect::<Vec<_>>().len()
     );
     println!(
         "Riferimento NISECI: Numero record non validi: {}",
@@ -701,7 +701,7 @@ pub(crate) fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
 
     println!(
         "Campionamento NISECI: Numero record validi: {}",
-        camp.as_vec().len()
+        camp.into_iter().collect::<Vec<_>>().len()
     );
     println!(
         "Campionamento NISECI: Numero record non validi: {}",

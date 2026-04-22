@@ -647,14 +647,6 @@ impl CampionamentoHFBI {
         sorted.campionamento.sort_by_peso_desc();
         sorted
     }
-    pub fn as_vec(&self) -> Vec<&RecordHFBI> {
-        #[allow(deprecated)]
-        let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
-
-        v.sort_by_peso_desc();
-
-        v
-    }
     pub fn sort_by_peso_desc(&mut self) {
         #[allow(deprecated)]
         self.campionamento.sort_by(|a, b| b.peso.total_cmp(&a.peso));
@@ -1397,28 +1389,6 @@ mod domain_hfbi_private_tests {
         #[allow(deprecated)]
         let actual: Vec<(&str, f32)> = campione
             .campionamento
-            .iter()
-            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
-            .collect();
-
-        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
-
-        assert_eq!(actual, expected);
-    }
-
-    #[test]
-    fn test_campionamentohfbi_as_vec_order_invariant() {
-        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
-            // Species 2: Migratory, contributes to most metrics
-            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
-            // Species 3: Resident, not dominant
-            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
-            // Species 1: Migratory, dominant, contributes to all metrics
-            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
-        ]);
-
-        let actual: Vec<(&str, f32)> = campione
-            .as_vec()
             .iter()
             .map(|r| (r.specie.codice_specie.as_str(), r.peso))
             .collect();

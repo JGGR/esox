@@ -363,7 +363,7 @@ pub(crate) fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
 
     println!(
         "Campionamento HFBI: Numero record validi: {}",
-        camp.as_vec().len()
+        camp.into_iter().collect::<Vec<_>>().len()
     );
     println!(
         "Campionamento HFBI: Numero record non validi: {}",

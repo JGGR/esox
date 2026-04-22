@@ -113,10 +113,6 @@ impl RiferimentoNISECI {
         #[allow(deprecated)]
         Self { elenco_specie }
     }
-    pub fn as_vec(&self) -> &Vec<SpecieNISECI> {
-        #[allow(deprecated)]
-        &self.elenco_specie
-    }
 }
 
 impl From<RiferimentoNISECI> for Vec<SpecieNISECI> {
@@ -205,11 +201,6 @@ impl CampionamentoNISECI {
     pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
         #[allow(deprecated)]
         Self { campionamento }
-    }
-
-    pub fn as_vec(&self) -> &Vec<RecordNISECI> {
-        #[allow(deprecated)]
-        &self.campionamento
     }
 
     pub fn get_numero_pesci_alieni_e_indigeni(&self) -> AlieniIndigeni {

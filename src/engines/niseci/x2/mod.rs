@@ -153,7 +153,7 @@ pub fn calculate_x2(
     let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
 
     let mut specie_campionate_set: HashMap<String, bool> = HashMap::new();
-    for cattura in campionamento.as_vec() {
+    for cattura in campionamento {
         if (cattura.specie.specie_attesa == require_specie_attesa)
             && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
         {
@@ -206,7 +206,7 @@ pub fn calculate_x2_per_alloctone(
     let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
 
     let mut specie_campionate_set: HashMap<String, bool> = HashMap::new();
-    for cattura in campionamento.as_vec() {
+    for cattura in campionamento {
         if cattura.specie.tipo_alloctono > 0 {
             match specie_campionate_set.entry(cattura.specie.id.clone()) {
                 Entry::Occupied(_) => {}
@@ -279,7 +279,7 @@ fn calculate_sommatoria_x2_a(
     let mut classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI> = HashMap::with_capacity(10);
 
     // riempo l'hashmap con solo le specie autoctone campionate
-    for cattura in c.as_vec() {
+    for cattura in c {
         if (cattura.specie.specie_attesa == require_specie_attesa)
             && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
         {
@@ -307,7 +307,7 @@ fn calculate_sommatoria_x2_b(
     let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
         HashMap::with_capacity(10);
 
-    for cattura in c.as_vec() {
+    for cattura in c {
         if (cattura.specie.specie_attesa == require_specie_attesa)
             && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
         {
@@ -339,7 +339,7 @@ fn calculate_sommatoria_x2_a_per_alloctone(
     let mut classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI> = HashMap::with_capacity(10);
 
     // riempo l'hashmap con solo le specie autoctone campionate
-    for cattura in c.as_vec() {
+    for cattura in c {
         if cattura.specie.tipo_alloctono > 0 {
             match classi_eta_map.entry(cattura.specie.id.clone()) {
                 Entry::Occupied(mut entry) => {
@@ -364,7 +364,7 @@ fn calculate_sommatoria_x2_b_per_alloctone(
     let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
         HashMap::with_capacity(10);
 
-    for cattura in c.as_vec() {
+    for cattura in c {
         if cattura.specie.tipo_alloctono > 0 {
             match esemplari_per_cattura_map.entry(cattura.specie.id.clone()) {
                 Entry::Occupied(mut occupied_entry) => {
