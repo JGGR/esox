@@ -130,7 +130,7 @@ where
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecord::CampionamentoHFBI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::CampionamentoHFBI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento HFBI: {{");
         for e in processed_errors {
             eprintln!("{e}");
@@ -341,7 +341,7 @@ where
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecord::AnagraficaHFBI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::AnagraficaHFBI);
         eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica HFBI: {{");
         for e in processed_errors {
             eprintln!("{e}");

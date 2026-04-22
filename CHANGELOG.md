@@ -43,6 +43,8 @@
 - Add empty `impl std::error::Error` for most custom errors
 - Add `experimental` feature
   - For now it guards `Deserialize` on input types since it's not properly tested
+- Add `json` feature
+  - For now it provides `json::deser` module
 
 ### Changed
 

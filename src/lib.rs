@@ -96,6 +96,8 @@ pub mod csv;
 pub mod deser;
 pub mod domain;
 pub mod engines;
+#[cfg(feature = "json")]
+pub(crate) mod json;
 pub mod meta;
 pub mod parser;
 #[cfg(test)]

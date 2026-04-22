@@ -411,7 +411,7 @@ where
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecord::CampionamentoNISECI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::CampionamentoNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
@@ -654,7 +654,7 @@ where
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecord::AnagraficaNISECI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::AnagraficaNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");

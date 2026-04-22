@@ -12,8 +12,11 @@ exclude = [
 
 [features]
 experimental = []
+json = ["dep:json", "dep:serde_json"]
 
 [dependencies]
 chrono = { version = "0.4.44", default-features = false }
 csv = "1.4.0"
+json = { version = "0.12.4", optional = true }
 serde = { version = "1.0.228", features = ["derive"] }
+serde_json = { version = "1.0.149", optional = true }
