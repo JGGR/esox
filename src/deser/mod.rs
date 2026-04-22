@@ -89,3 +89,20 @@ pub trait RecordAnagraficaHFBI: serde::de::DeserializeOwned {
     fn habitat(&self) -> u32;
     fn tipo_laguna(&self) -> u32;
 }
+
+pub fn parse_serialized_records<I, T, E>(iter: I) -> (Vec<T>, Vec<E>)
+where
+    I: IntoIterator<Item = Result<T, E>>,
+{
+    let mut records = Vec::new();
+    let mut errors = Vec::new();
+
+    for result in iter {
+        match result {
+            Ok(record) => records.push(record),
+            Err(e) => errors.push(e),
+        }
+    }
+
+    (records, errors)
+}

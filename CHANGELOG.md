@@ -9,6 +9,7 @@
   - `domain::niseci::{RiferimentoNISECI, CampionamentoNISECI, AnagraficaNISECI}`
   - `domain::hfbi::{CampionamentoHFBI, AnagraficaHFBI}`
 - Add `deser` module
+  - New `parse_serialized_records()`, more generic
   - Holds refactored `Record` traits and `TipoRecord` enum
   - Previous definitions in `csv` are now a deprecated reexport
 - Add `parser` module

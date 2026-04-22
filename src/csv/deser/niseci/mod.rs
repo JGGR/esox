@@ -19,7 +19,8 @@ use crate::csv::deser::{
     check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
 };
 use crate::deser::{
-    RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI, TipoRecord,
+    parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
+    RecordRiferimentoNISECI, TipoRecord,
 };
 use std::any::TypeId;
 use std::fmt;
@@ -222,17 +223,8 @@ where
     R: std::io::Read,
     T: RecordRiferimentoNISECI,
 {
-    let mut records = Vec::new();
-    let mut errors = Vec::new();
-
-    for result in rdr.deserialize() {
-        match result {
-            Ok(record) => records.push(record),
-            Err(e) => errors.push(e),
-        }
-    }
-
-    (records, errors)
+    let iter = rdr.deserialize();
+    parse_serialized_records(iter)
 }
 
 pub fn check_riferimento_niseci_reader<R: Read, T>(
@@ -407,17 +399,8 @@ where
     R: std::io::Read,
     T: RecordCampionamentoNISECI + 'static,
 {
-    let mut records = Vec::new();
-    let mut errors = Vec::new();
-
-    for result in rdr.deserialize() {
-        match result {
-            Ok(record) => records.push(record),
-            Err(e) => errors.push(e),
-        }
-    }
-
-    (records, errors)
+    let iter = rdr.deserialize();
+    parse_serialized_records(iter)
 }
 
 pub fn check_campionamento_niseci_reader<R: Read, T>(
@@ -679,17 +662,8 @@ where
     R: std::io::Read,
     T: RecordAnagraficaNISECI,
 {
-    let mut records = Vec::new();
-    let mut errors = Vec::new();
-
-    for result in rdr.deserialize() {
-        match result {
-            Ok(record) => records.push(record),
-            Err(e) => errors.push(e),
-        }
-    }
-
-    (records, errors)
+    let iter = rdr.deserialize();
+    parse_serialized_records(iter)
 }
 
 pub fn check_anagrafica_niseci_reader<R: Read, T>(
