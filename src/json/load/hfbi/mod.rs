@@ -35,12 +35,6 @@ pub enum CampionamentoHFBIError {
     Value(Vec<RecordCampionamentoHFBIError>),
 }
 
-impl From<Vec<serde_json::Error>> for CampionamentoHFBIError {
-    fn from(errs: Vec<serde_json::Error>) -> Self {
-        CampionamentoHFBIError::Json(errs)
-    }
-}
-
 impl From<JsonDeserError> for CampionamentoHFBIError {
     fn from(err: JsonDeserError) -> Self {
         match err {
@@ -100,12 +94,6 @@ pub enum AnagraficaHFBIError {
     Json(Vec<serde_json::Error>),
     JsonArray(serde_json::Error),
     Value(Vec<RecordAnagraficaHFBIError>),
-}
-
-impl From<Vec<serde_json::Error>> for AnagraficaHFBIError {
-    fn from(errs: Vec<serde_json::Error>) -> Self {
-        AnagraficaHFBIError::Json(errs)
-    }
 }
 
 impl From<JsonDeserError> for AnagraficaHFBIError {

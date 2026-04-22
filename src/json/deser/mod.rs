@@ -35,23 +35,11 @@ pub enum JsonDispatchError {
     JsonArray(serde_json::Error),
 }
 
-impl From<std::io::Error> for JsonDispatchError {
-    fn from(err: std::io::Error) -> Self {
-        JsonDispatchError::Io(err)
-    }
-}
-
 #[derive(Debug)]
 pub enum JsonDeserError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
     JsonArray(serde_json::Error),
-}
-
-impl From<Vec<serde_json::Error>> for JsonDeserError {
-    fn from(errs: Vec<serde_json::Error>) -> Self {
-        JsonDeserError::Json(errs)
-    }
 }
 
 use serde::de::DeserializeOwned;

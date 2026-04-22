@@ -40,12 +40,6 @@ pub enum RiferimentoNISECIError {
     Value(Vec<RecordRiferimentoNISECIError>),
 }
 
-impl From<Vec<serde_json::Error>> for RiferimentoNISECIError {
-    fn from(errs: Vec<serde_json::Error>) -> Self {
-        RiferimentoNISECIError::Json(errs)
-    }
-}
-
 impl From<JsonDeserError> for RiferimentoNISECIError {
     fn from(err: JsonDeserError) -> Self {
         match err {
@@ -105,12 +99,6 @@ pub enum CampionamentoNISECIError {
     Json(Vec<serde_json::Error>),
     JsonArray(serde_json::Error),
     Value(Vec<RecordCampionamentoNISECIError>),
-}
-
-impl From<Vec<serde_json::Error>> for CampionamentoNISECIError {
-    fn from(errs: Vec<serde_json::Error>) -> Self {
-        CampionamentoNISECIError::Json(errs)
-    }
 }
 
 impl From<JsonDeserError> for CampionamentoNISECIError {
@@ -175,12 +163,6 @@ pub enum AnagraficaNISECIError {
     Json(Vec<serde_json::Error>),
     JsonArray(serde_json::Error),
     Value(Vec<RecordAnagraficaNISECIError>),
-}
-
-impl From<Vec<serde_json::Error>> for AnagraficaNISECIError {
-    fn from(errs: Vec<serde_json::Error>) -> Self {
-        AnagraficaNISECIError::Json(errs)
-    }
 }
 
 impl From<JsonDeserError> for AnagraficaNISECIError {
