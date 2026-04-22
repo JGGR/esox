@@ -36,7 +36,7 @@ where
         |res| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -58,7 +58,7 @@ where
         |res| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -82,7 +82,7 @@ where
         |res| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -104,7 +104,7 @@ where
         |res| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -128,7 +128,7 @@ where
         |res: Result<Vec<T>, _>| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -150,7 +150,7 @@ where
         |res: Result<Vec<T>, _>| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -173,6 +173,7 @@ where
     let file = File::open(path)?;
     check_riferimento_niseci_reader(file).map_err(|e| match e {
         JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
+        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
         JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
     })
 }
@@ -186,6 +187,7 @@ where
     let file = File::open(path)?;
     check_campionamento_niseci_reader(file).map_err(|e| match e {
         JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
+        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
         JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
     })
 }
@@ -197,6 +199,7 @@ where
     let file = File::open(path)?;
     check_anagrafica_niseci_reader(file).map_err(|e| match e {
         JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
+        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
         JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
     })
 }

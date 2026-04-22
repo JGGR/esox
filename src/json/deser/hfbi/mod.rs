@@ -36,7 +36,7 @@ where
         |res| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -58,7 +58,7 @@ where
         |res| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -81,6 +81,7 @@ where
     let file = File::open(path)?;
     check_campionamento_hfbi_reader(file).map_err(|e| match e {
         JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
+        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
         JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
     })
 }
@@ -95,7 +96,7 @@ where
         |res| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -117,7 +118,7 @@ where
         |res| match res {
             Ok(v) => Ok(v),
             Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::Json(errs)) => Err(JsonDeserError::Json(errs)),
+            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -138,6 +139,7 @@ where
     let file = File::open(path)?;
     check_anagrafica_hfbi_reader(file).map_err(|e| match e {
         JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
+        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
         JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
     })
 }

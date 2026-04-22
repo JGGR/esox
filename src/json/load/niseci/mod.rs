@@ -36,6 +36,7 @@ use std::path::Path;
 pub enum RiferimentoNISECIError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
     Value(Vec<RecordRiferimentoNISECIError>),
 }
 
@@ -49,6 +50,7 @@ impl From<JsonDeserError> for RiferimentoNISECIError {
     fn from(err: JsonDeserError) -> Self {
         match err {
             JsonDeserError::Json(errs) => RiferimentoNISECIError::Json(errs),
+            JsonDeserError::JsonArray(err) => RiferimentoNISECIError::JsonArray(err),
             JsonDeserError::Io(e) => RiferimentoNISECIError::Io(e),
         }
     }
@@ -62,6 +64,9 @@ impl fmt::Display for RiferimentoNISECIError {
             }
             RiferimentoNISECIError::Json(_) => {
                 write!(f, "JSON parsing error for Riferimento NISECI")
+            }
+            RiferimentoNISECIError::JsonArray(_) => {
+                write!(f, "JSON array parsing error for Riferimento NISECI")
             }
             RiferimentoNISECIError::Value(_) => {
                 write!(f, "value validation error for Riferimento NISECI")
@@ -98,6 +103,7 @@ where
 pub enum CampionamentoNISECIError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
     Value(Vec<RecordCampionamentoNISECIError>),
 }
 
@@ -111,6 +117,7 @@ impl From<JsonDeserError> for CampionamentoNISECIError {
     fn from(err: JsonDeserError) -> Self {
         match err {
             JsonDeserError::Json(errs) => CampionamentoNISECIError::Json(errs),
+            JsonDeserError::JsonArray(err) => CampionamentoNISECIError::JsonArray(err),
             JsonDeserError::Io(e) => CampionamentoNISECIError::Io(e),
         }
     }
@@ -124,6 +131,9 @@ impl fmt::Display for CampionamentoNISECIError {
             }
             CampionamentoNISECIError::Json(_) => {
                 write!(f, "JSON parsing error for Campionamento NISECI")
+            }
+            CampionamentoNISECIError::JsonArray(_) => {
+                write!(f, "JSON array parsing error for Campionamento NISECI")
             }
             CampionamentoNISECIError::Value(_) => {
                 write!(f, "value validation error for Campionamento NISECI")
@@ -163,6 +173,7 @@ where
 pub enum AnagraficaNISECIError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
     Value(Vec<RecordAnagraficaNISECIError>),
 }
 
@@ -176,6 +187,7 @@ impl From<JsonDeserError> for AnagraficaNISECIError {
     fn from(err: JsonDeserError) -> Self {
         match err {
             JsonDeserError::Json(errs) => AnagraficaNISECIError::Json(errs),
+            JsonDeserError::JsonArray(err) => AnagraficaNISECIError::JsonArray(err),
             JsonDeserError::Io(e) => AnagraficaNISECIError::Io(e),
         }
     }
@@ -189,6 +201,9 @@ impl fmt::Display for AnagraficaNISECIError {
             }
             AnagraficaNISECIError::Json(_) => {
                 write!(f, "JSON parsing error for Anagrafica NISECI")
+            }
+            AnagraficaNISECIError::JsonArray(_) => {
+                write!(f, "JSON array parsing error for Anagrafica NISECI")
             }
             AnagraficaNISECIError::Value(_) => {
                 write!(f, "value validation error for Anagrafica NISECI")

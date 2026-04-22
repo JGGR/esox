@@ -21,6 +21,7 @@ pub mod niseci;
 pub enum JsonPathCheckError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
 }
 
 impl From<std::io::Error> for JsonPathCheckError {
@@ -31,7 +32,7 @@ impl From<std::io::Error> for JsonPathCheckError {
 
 pub enum JsonDispatchError {
     Io(std::io::Error),
-    Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
 }
 
 impl From<std::io::Error> for JsonDispatchError {
@@ -44,6 +45,7 @@ impl From<std::io::Error> for JsonDispatchError {
 pub enum JsonDeserError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
 }
 
 impl From<Vec<serde_json::Error>> for JsonDeserError {
@@ -95,7 +97,7 @@ where
     match first {
         Some(b'[') => {
             let res = serde_json::from_reader::<_, Vec<T>>(reader)
-                .map_err(|e| JsonDispatchError::Json(vec![e]));
+                .map_err(|e| JsonDispatchError::JsonArray(e));
             array_fn(res)
         }
         _ => {

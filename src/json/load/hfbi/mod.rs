@@ -31,6 +31,7 @@ use std::path::Path;
 pub enum CampionamentoHFBIError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
     Value(Vec<RecordCampionamentoHFBIError>),
 }
 
@@ -44,6 +45,7 @@ impl From<JsonDeserError> for CampionamentoHFBIError {
     fn from(err: JsonDeserError) -> Self {
         match err {
             JsonDeserError::Json(errs) => CampionamentoHFBIError::Json(errs),
+            JsonDeserError::JsonArray(err) => CampionamentoHFBIError::JsonArray(err),
             JsonDeserError::Io(e) => CampionamentoHFBIError::Io(e),
         }
     }
@@ -57,6 +59,9 @@ impl fmt::Display for CampionamentoHFBIError {
             }
             CampionamentoHFBIError::Json(_) => {
                 write!(f, "JSON parsing error for CampionamentoHFBI")
+            }
+            CampionamentoHFBIError::JsonArray(_) => {
+                write!(f, "JSON array parsing error for CampionamentoHFBI")
             }
             CampionamentoHFBIError::Value(_) => {
                 write!(f, "value validation error for CampionamentoHFBI")
@@ -93,6 +98,7 @@ where
 pub enum AnagraficaHFBIError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
     Value(Vec<RecordAnagraficaHFBIError>),
 }
 
@@ -106,6 +112,7 @@ impl From<JsonDeserError> for AnagraficaHFBIError {
     fn from(err: JsonDeserError) -> Self {
         match err {
             JsonDeserError::Json(errs) => AnagraficaHFBIError::Json(errs),
+            JsonDeserError::JsonArray(err) => AnagraficaHFBIError::JsonArray(err),
             JsonDeserError::Io(e) => AnagraficaHFBIError::Io(e),
         }
     }
@@ -119,6 +126,9 @@ impl fmt::Display for AnagraficaHFBIError {
             }
             AnagraficaHFBIError::Json(_) => {
                 write!(f, "JSON parsing error for AnagraficaHFBI")
+            }
+            AnagraficaHFBIError::JsonArray(_) => {
+                write!(f, "JSON array parsing error for AnagraficaHFBI")
             }
             AnagraficaHFBIError::Value(_) => {
                 write!(f, "value validation error for AnagraficaHFBI")
