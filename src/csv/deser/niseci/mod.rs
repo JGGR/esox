@@ -19,8 +19,8 @@ use crate::csv::deser::{
     check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
 };
 use crate::deser::{
-    parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
-    RecordRiferimentoNISECI, TipoRecord,
+    parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
+    RecordCampionamentoNISECI, RecordRiferimentoNISECI, TipoRecord,
 };
 use std::any::TypeId;
 use std::fmt;
@@ -244,44 +244,24 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_riferimento_niseci(rdr);
-
-    println!(
-        "Riferimento NISECI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Riferimento NISECI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecord::RiferimentoNISECI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::RiferimentoNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv del riferimento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv del riferimento NISECI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_riferimento_niseci_path<T>(
@@ -420,22 +400,12 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_campionamento_niseci(rdr);
-
-    println!(
-        "Campionamento NISECI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Campionamento NISECI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
@@ -447,17 +417,7 @@ where
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv del campionamento NISECI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_campionamento_niseci_path<T>(
@@ -683,22 +643,12 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_anagrafica_niseci(rdr);
-
-    println!(
-        "Anagrafica NISECI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Anagrafica NISECI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
@@ -710,17 +660,7 @@ where
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_anagrafica_niseci_path<T>(

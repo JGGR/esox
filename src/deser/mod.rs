@@ -106,3 +106,20 @@ where
 
     (records, errors)
 }
+
+pub fn validate_serialized_records<T, E, F>(
+    iter: impl IntoIterator<Item = Result<T, E>>,
+    on_error: F,
+) -> Result<Vec<T>, Vec<E>>
+where
+    F: Fn(&Vec<E>),
+{
+    let (records, errors) = parse_serialized_records(iter);
+
+    if !errors.is_empty() {
+        on_error(&errors);
+        Err(errors)
+    } else {
+        Ok(records)
+    }
+}

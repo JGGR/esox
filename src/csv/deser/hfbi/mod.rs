@@ -19,7 +19,8 @@ use crate::csv::deser::{
     check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
 };
 use crate::deser::{
-    parse_serialized_records, RecordAnagraficaHFBI, RecordCampionamentoHFBI, TipoRecord,
+    parse_serialized_records, validate_serialized_records, RecordAnagraficaHFBI,
+    RecordCampionamentoHFBI, TipoRecord,
 };
 use std::any::TypeId;
 use std::fmt;
@@ -118,22 +119,12 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_campionamento_hfbi(rdr);
-
-    println!(
-        "Campionamento HFBI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Campionamento HFBI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
@@ -145,17 +136,7 @@ where
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv del campionamento HFBI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_campionamento_hfbi_path<T>(
@@ -349,22 +330,12 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_anagrafica_hfbi(rdr);
-
-    println!(
-        "Anagrafica HFBI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Anagrafica HFBI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
@@ -376,17 +347,7 @@ where
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv dell'anagrafica HFBI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_anagrafica_hfbi_path<T>(
