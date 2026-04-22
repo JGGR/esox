@@ -45,7 +45,14 @@ where
     FStream: FnOnce(Deserializer<serde_json::de::IoRead<BufReader<R>>>) -> Out,
 {
     let mut reader = BufReader::new(reader);
-    let peek = reader.fill_buf().unwrap_or(&[]);
+    let peek = match reader.fill_buf() {
+        Ok(buf) => buf,
+        Err(e) => {
+            // turn IO failure into serde's error domain
+            let err = serde_json::Error::io(e);
+            return array_fn(Err(err));
+        }
+    };
 
     let first = peek.iter().copied().find(|b| !b.is_ascii_whitespace());
 
