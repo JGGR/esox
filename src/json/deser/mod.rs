@@ -18,14 +18,37 @@
 pub mod hfbi;
 pub mod niseci;
 
-pub enum JsonCheckError {
+pub enum JsonPathCheckError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
 }
 
-impl From<std::io::Error> for JsonCheckError {
+impl From<std::io::Error> for JsonPathCheckError {
     fn from(err: std::io::Error) -> Self {
-        JsonCheckError::Io(err)
+        JsonPathCheckError::Io(err)
+    }
+}
+
+pub enum JsonDispatchError {
+    Io(std::io::Error),
+    Json(Vec<serde_json::Error>),
+}
+
+impl From<std::io::Error> for JsonDispatchError {
+    fn from(err: std::io::Error) -> Self {
+        JsonDispatchError::Io(err)
+    }
+}
+
+#[derive(Debug)]
+pub enum JsonDeserError {
+    Io(std::io::Error),
+    Json(Vec<serde_json::Error>),
+}
+
+impl From<Vec<serde_json::Error>> for JsonDeserError {
+    fn from(errs: Vec<serde_json::Error>) -> Self {
+        JsonDeserError::Json(errs)
     }
 }
 
@@ -56,14 +79,14 @@ fn dispatch_json_input<R, T, FArray, FStream, Out>(
 where
     R: Read,
     T: DeserializeOwned,
-    FArray: FnOnce(Result<Vec<T>, JsonCheckError>) -> Out,
+    FArray: FnOnce(Result<Vec<T>, JsonDispatchError>) -> Out,
     FStream: FnOnce(Deserializer<serde_json::de::IoRead<BufReader<R>>>) -> Out,
 {
     let mut reader = BufReader::new(reader);
     let peek = match reader.fill_buf() {
         Ok(buf) => buf,
         Err(e) => {
-            return array_fn(Err(JsonCheckError::Io(e)));
+            return array_fn(Err(JsonDispatchError::Io(e)));
         }
     };
 
@@ -72,7 +95,7 @@ where
     match first {
         Some(b'[') => {
             let res = serde_json::from_reader::<_, Vec<T>>(reader)
-                .map_err(|e| JsonCheckError::Json(vec![e]));
+                .map_err(|e| JsonDispatchError::Json(vec![e]));
             array_fn(res)
         }
         _ => {

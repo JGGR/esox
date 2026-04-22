@@ -17,6 +17,7 @@
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 use crate::json::deser::hfbi::{check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader};
+use crate::json::deser::JsonDeserError;
 use crate::parser::hfbi::{
     check_records_anagrafica_hfbi, check_records_campionamento_hfbi, RecordAnagraficaHFBIError,
     RecordCampionamentoHFBIError,
@@ -36,6 +37,15 @@ pub enum CampionamentoHFBIError {
 impl From<Vec<serde_json::Error>> for CampionamentoHFBIError {
     fn from(errs: Vec<serde_json::Error>) -> Self {
         CampionamentoHFBIError::Json(errs)
+    }
+}
+
+impl From<JsonDeserError> for CampionamentoHFBIError {
+    fn from(err: JsonDeserError) -> Self {
+        match err {
+            JsonDeserError::Json(errs) => CampionamentoHFBIError::Json(errs),
+            JsonDeserError::Io(e) => CampionamentoHFBIError::Io(e),
+        }
     }
 }
 
@@ -89,6 +99,15 @@ pub enum AnagraficaHFBIError {
 impl From<Vec<serde_json::Error>> for AnagraficaHFBIError {
     fn from(errs: Vec<serde_json::Error>) -> Self {
         AnagraficaHFBIError::Json(errs)
+    }
+}
+
+impl From<JsonDeserError> for AnagraficaHFBIError {
+    fn from(err: JsonDeserError) -> Self {
+        match err {
+            JsonDeserError::Json(errs) => AnagraficaHFBIError::Json(errs),
+            JsonDeserError::Io(e) => AnagraficaHFBIError::Io(e),
+        }
     }
 }
 

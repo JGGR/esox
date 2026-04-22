@@ -21,6 +21,7 @@ use crate::json::deser::niseci::{
     check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
     check_riferimento_niseci_reader,
 };
+use crate::json::deser::JsonDeserError;
 use crate::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci, RecordAnagraficaNISECIError, RecordCampionamentoNISECIError,
@@ -41,6 +42,15 @@ pub enum RiferimentoNISECIError {
 impl From<Vec<serde_json::Error>> for RiferimentoNISECIError {
     fn from(errs: Vec<serde_json::Error>) -> Self {
         RiferimentoNISECIError::Json(errs)
+    }
+}
+
+impl From<JsonDeserError> for RiferimentoNISECIError {
+    fn from(err: JsonDeserError) -> Self {
+        match err {
+            JsonDeserError::Json(errs) => RiferimentoNISECIError::Json(errs),
+            JsonDeserError::Io(e) => RiferimentoNISECIError::Io(e),
+        }
     }
 }
 
@@ -97,6 +107,15 @@ impl From<Vec<serde_json::Error>> for CampionamentoNISECIError {
     }
 }
 
+impl From<JsonDeserError> for CampionamentoNISECIError {
+    fn from(err: JsonDeserError) -> Self {
+        match err {
+            JsonDeserError::Json(errs) => CampionamentoNISECIError::Json(errs),
+            JsonDeserError::Io(e) => CampionamentoNISECIError::Io(e),
+        }
+    }
+}
+
 impl fmt::Display for CampionamentoNISECIError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -150,6 +169,15 @@ pub enum AnagraficaNISECIError {
 impl From<Vec<serde_json::Error>> for AnagraficaNISECIError {
     fn from(errs: Vec<serde_json::Error>) -> Self {
         AnagraficaNISECIError::Json(errs)
+    }
+}
+
+impl From<JsonDeserError> for AnagraficaNISECIError {
+    fn from(err: JsonDeserError) -> Self {
+        match err {
+            JsonDeserError::Json(errs) => AnagraficaNISECIError::Json(errs),
+            JsonDeserError::Io(e) => AnagraficaNISECIError::Io(e),
+        }
     }
 }
 
