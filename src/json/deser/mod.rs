@@ -18,13 +18,45 @@
 pub mod hfbi;
 pub mod niseci;
 
-pub enum JsonPathCheckError {
+pub enum JsonCheckError {
     Io(std::io::Error),
     Json(Vec<serde_json::Error>),
 }
 
-impl From<std::io::Error> for JsonPathCheckError {
+impl From<std::io::Error> for JsonCheckError {
     fn from(err: std::io::Error) -> Self {
-        JsonPathCheckError::Io(err)
+        JsonCheckError::Io(err)
+    }
+}
+
+use serde::de::DeserializeOwned;
+use serde_json::Deserializer;
+use std::io::{BufRead, BufReader, Read};
+
+fn dispatch_json_input<R, T, FArray, FStream, Out>(
+    reader: R,
+    array_fn: FArray,
+    stream_fn: FStream,
+) -> Out
+where
+    R: Read,
+    T: DeserializeOwned,
+    FArray: FnOnce(Result<Vec<T>, serde_json::Error>) -> Out,
+    FStream: FnOnce(Deserializer<serde_json::de::IoRead<BufReader<R>>>) -> Out,
+{
+    let mut reader = BufReader::new(reader);
+    let peek = reader.fill_buf().unwrap_or(&[]);
+
+    let first = peek.iter().copied().find(|b| !b.is_ascii_whitespace());
+
+    match first {
+        Some(b'[') => {
+            let res = serde_json::from_reader::<_, Vec<T>>(reader);
+            array_fn(res)
+        }
+        _ => {
+            let iter = Deserializer::from_reader(reader);
+            stream_fn(iter)
+        }
     }
 }
