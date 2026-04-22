@@ -33,6 +33,21 @@ use serde::de::DeserializeOwned;
 use serde_json::Deserializer;
 use std::io::{BufRead, BufReader, Read};
 
+/// Dispatches JSON input to either a bulk array handler or a streaming handler.
+///
+/// This helper inspects the first non-whitespace byte of the input to determine
+/// whether it represents a top-level JSON array (`[...]`) or a sequence of
+/// whitespace-separated JSON values.
+///
+/// If the input begins with `[`, the entire stream is deserialized into
+/// `Vec<T>` and passed to `array_fn`. Otherwise, a `serde_json::Deserializer`
+/// is constructed and passed to `stream_fn` for incremental processing.
+///
+/// I/O errors encountered while peeking are converted into `serde_json::Error`
+/// and routed through `array_fn`.
+///
+/// This function is intended for internal use in implementing APIs that accept
+/// both batched and streaming JSON inputs.
 fn dispatch_json_input<R, T, FArray, FStream, Out>(
     reader: R,
     array_fn: FArray,
@@ -41,16 +56,14 @@ fn dispatch_json_input<R, T, FArray, FStream, Out>(
 where
     R: Read,
     T: DeserializeOwned,
-    FArray: FnOnce(Result<Vec<T>, serde_json::Error>) -> Out,
+    FArray: FnOnce(Result<Vec<T>, JsonCheckError>) -> Out,
     FStream: FnOnce(Deserializer<serde_json::de::IoRead<BufReader<R>>>) -> Out,
 {
     let mut reader = BufReader::new(reader);
     let peek = match reader.fill_buf() {
         Ok(buf) => buf,
         Err(e) => {
-            // turn IO failure into serde's error domain
-            let err = serde_json::Error::io(e);
-            return array_fn(Err(err));
+            return array_fn(Err(JsonCheckError::Io(e)));
         }
     };
 
@@ -58,7 +71,8 @@ where
 
     match first {
         Some(b'[') => {
-            let res = serde_json::from_reader::<_, Vec<T>>(reader);
+            let res = serde_json::from_reader::<_, Vec<T>>(reader)
+                .map_err(|e| JsonCheckError::Json(vec![e]));
             array_fn(res)
         }
         _ => {

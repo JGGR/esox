@@ -31,9 +31,10 @@ where
 {
     dispatch_json_input(
         reader,
-        |res: Result<Vec<T>, _>| match res {
+        |res| match res {
             Ok(v) => (v, vec![]),
-            Err(e) => (vec![], vec![e]),
+            Err(JsonCheckError::Io(e)) => (vec![], vec![serde_json::Error::io(e)]),
+            Err(JsonCheckError::Json(errs)) => (vec![], errs),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -50,9 +51,10 @@ where
 {
     dispatch_json_input(
         reader,
-        |res: Result<Vec<T>, _>| match res {
+        |res| match res {
             Ok(v) => Ok(v),
-            Err(e) => Err(vec![e]),
+            Err(JsonCheckError::Io(e)) => Err(vec![serde_json::Error::io(e)]),
+            Err(JsonCheckError::Json(errs)) => Err(errs),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -80,9 +82,10 @@ where
 {
     dispatch_json_input(
         reader,
-        |res: Result<Vec<T>, _>| match res {
+        |res| match res {
             Ok(v) => (v, vec![]),
-            Err(e) => (vec![], vec![e]),
+            Err(JsonCheckError::Io(e)) => (vec![], vec![serde_json::Error::io(e)]),
+            Err(JsonCheckError::Json(errs)) => (vec![], errs),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
@@ -97,9 +100,10 @@ where
 {
     dispatch_json_input(
         reader,
-        |res: Result<Vec<T>, _>| match res {
+        |res| match res {
             Ok(v) => Ok(v),
-            Err(e) => Err(vec![e]),
+            Err(JsonCheckError::Io(e)) => Err(vec![serde_json::Error::io(e)]),
+            Err(JsonCheckError::Json(errs)) => Err(errs),
         },
         |deser| {
             let iter = deser.into_iter::<T>();
