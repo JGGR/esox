@@ -18,13 +18,18 @@
 use crate::csv::deser::{
     check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
 };
-use crate::csv::{RecordCsvAnagraficaHFBI, RecordCsvCampionamentoHFBI, TipoRecordCsv};
+use crate::deser::{
+    parse_serialized_records, validate_serialized_records, RecordAnagraficaHFBI,
+    RecordCampionamentoHFBI, TipoRecord,
+};
 use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvCampionamentoHFBI {
@@ -34,7 +39,7 @@ pub struct VeryItalianRecordCsvCampionamentoHFBI {
     pub peso: f32,
 }
 
-impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
+impl RecordCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
     fn codice_specie(&self) -> String {
         self.codice_specie.clone()
     }
@@ -49,13 +54,15 @@ impl RecordCsvCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
 impl fmt::Display for VeryItalianRecordCsvCampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
+            "RecordCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
               self.codice_specie, self.numero_individui, self.peso
         );
         write!(f, "{}", string_representation)
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvCampionamentoHFBI {
@@ -64,7 +71,7 @@ pub struct PlainRecordCsvCampionamentoHFBI {
     pub peso: f32,
 }
 
-impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
+impl RecordCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
     fn codice_specie(&self) -> String {
         self.codice_specie.clone()
     }
@@ -79,7 +86,7 @@ impl RecordCsvCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
 impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
+            "RecordCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
               self.codice_specie, self.numero_individui, self.peso
         );
         write!(f, "{}", string_representation)
@@ -89,19 +96,10 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
 pub fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCsvCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + 'static,
 {
-    let mut records = Vec::new();
-    let mut errors = Vec::new();
-
-    for result in rdr.deserialize() {
-        match result {
-            Ok(record) => records.push(record),
-            Err(e) => errors.push(e),
-        }
-    }
-
-    (records, errors)
+    let iter = rdr.deserialize();
+    parse_serialized_records(iter)
 }
 
 pub fn check_campionamento_hfbi_reader<R: Read, T>(
@@ -109,7 +107,7 @@ pub fn check_campionamento_hfbi_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -121,44 +119,24 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_campionamento_hfbi(rdr);
-
-    println!(
-        "Campionamento HFBI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Campionamento HFBI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoHFBI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::CampionamentoHFBI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento HFBI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv del campionamento HFBI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_campionamento_hfbi_path<T>(
@@ -166,7 +144,7 @@ pub fn check_campionamento_hfbi_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
@@ -180,6 +158,8 @@ where
     check_campionamento_hfbi_reader(file, has_headers)
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvAnagraficaHFBI {
@@ -197,7 +177,7 @@ pub struct VeryItalianRecordCsvAnagraficaHFBI {
     pub tipo_laguna: u32,
 }
 
-impl RecordCsvAnagraficaHFBI for VeryItalianRecordCsvAnagraficaHFBI {
+impl RecordAnagraficaHFBI for VeryItalianRecordCsvAnagraficaHFBI {
     fn codice_stazione(&self) -> String {
         self.codice_stazione.clone()
     }
@@ -252,6 +232,8 @@ impl fmt::Display for VeryItalianRecordCsvAnagraficaHFBI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvAnagraficaHFBI {
@@ -267,7 +249,7 @@ pub struct PlainRecordCsvAnagraficaHFBI {
     pub tipo_laguna: u32,
 }
 
-impl RecordCsvAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
+impl RecordAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
     fn codice_stazione(&self) -> String {
         self.codice_stazione.clone()
     }
@@ -325,19 +307,10 @@ impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
 pub fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCsvAnagraficaHFBI,
+    T: RecordAnagraficaHFBI,
 {
-    let mut records = Vec::new();
-    let mut errors = Vec::new();
-
-    for result in rdr.deserialize() {
-        match result {
-            Ok(record) => records.push(record),
-            Err(e) => errors.push(e),
-        }
-    }
-
-    (records, errors)
+    let iter = rdr.deserialize();
+    parse_serialized_records(iter)
 }
 
 pub fn check_anagrafica_hfbi_reader<R: Read, T>(
@@ -345,7 +318,7 @@ pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -357,44 +330,24 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_anagrafica_hfbi(rdr);
-
-    println!(
-        "Anagrafica HFBI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Anagrafica HFBI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::AnagraficaHFBI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::AnagraficaHFBI);
         eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica HFBI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv dell'anagrafica HFBI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_anagrafica_hfbi_path<T>(
@@ -402,7 +355,7 @@ pub fn check_anagrafica_hfbi_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());

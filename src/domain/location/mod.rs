@@ -15,9 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Location {
     pub regione: String,
     pub provincia: String,

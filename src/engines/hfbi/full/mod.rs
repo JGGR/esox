@@ -19,11 +19,8 @@ const W_DHZP: f32 = 0.84;
 const HFBI_T: f32 = -0.167;
 const HFBI_S: f32 = 0.150;
 
-const STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE: f32 = 0.94;
-const STATO_ECOLOGICO_HFBI_SOGLIA_BUONO: f32 = 0.55;
-const STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE: f32 = 0.33;
-const STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO: f32 = 0.11;
-
+/// This calculation is order-dependent due to calc_ddom() being order-dependent.
+/// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
 pub fn calculate_mmi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
@@ -75,6 +72,11 @@ pub fn calculate_mmi(
     Ok(intermediates)
 }
 
+/// This calculation is order-dependent due to:
+/// - calc_mmi() being order-dependent
+///   - Due to calc_ddom() being order-dependent
+///
+/// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
 pub fn calculate_hfbi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
@@ -90,24 +92,7 @@ pub fn calculate_hfbi(
 }
 
 pub fn calculate_stato_ecologico_hfbi(hfbi: Option<f32>) -> Option<StatoEcologicoHFBI> {
-    match hfbi {
-        Some(val) => {
-            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE {
-                return Some(StatoEcologicoHFBI::Eccellente);
-            }
-            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_BUONO {
-                return Some(StatoEcologicoHFBI::Buono);
-            }
-            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE {
-                return Some(StatoEcologicoHFBI::Sufficiente);
-            }
-            if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO {
-                return Some(StatoEcologicoHFBI::Scarso);
-            }
-            Some(StatoEcologicoHFBI::Cattivo)
-        }
-        None => None,
-    }
+    hfbi.map(StatoEcologicoHFBI::from)
 }
 
 #[cfg(test)]
@@ -128,8 +113,8 @@ mod full_hfbi_private_tests {
     ) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
-                nome_comune: "Test Specie",
-                codice_specie: codice_specie,
+                nome_comune: "Test Specie".to_string(),
+                codice_specie: codice_specie.to_string(),
                 autoctono: true,
                 gruppo_eco,
                 gruppo_trofico: GruppoTrofHFBI {
@@ -153,20 +138,20 @@ mod full_hfbi_private_tests {
 
     // Test helper to create a minimal Anagrafica struct.
     fn create_test_anagrafica(codice_stazione: &str) -> AnagraficaHFBI {
-        AnagraficaHFBI {
-            codice_stazione: codice_stazione.to_string(),
-            corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location {
+        AnagraficaHFBI::new_raw_unchecked(
+            codice_stazione.to_string(),
+            "TestCorpoIdrico".to_string(),
+            Location {
                 regione: "Test".to_string(),
                 provincia: "Test".to_string(),
             },
-            date_string: "01/01/2025".to_string(),
-            tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
-            stagione: StagioneHFBI::Primavera,
-            habitat_vegetato: HabitatHFBI::NonVegetato,
-            lunghezza_media_transetto: 100.0,
-            larghezza_media_transetto: 100.0,
-        }
+            "01/01/2025".to_string(),
+            TipoLagunaCostieraHFBI::MAt1,
+            StagioneHFBI::Primavera,
+            HabitatHFBI::NonVegetato,
+            100.0,
+            100.0,
+        )
     }
 
     // ===================================================================
@@ -174,19 +159,67 @@ mod full_hfbi_private_tests {
     // ===================================================================
 
     #[test]
+    fn test_mmi_order_invariant() {
+        let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
+        ]);
+        let sorted = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
+        ]);
+        let mmi = calculate_mmi(&campione, &anagrafica).expect("Failed mmi calc");
+        let mmi_sorted = calculate_mmi(&sorted, &anagrafica).expect("Failed mmi_sorted calc");
+        assert!((mmi.mmi - mmi_sorted.mmi).abs() < EPSILON);
+    }
+
+    #[test]
+    fn test_hfbi_order_invariant() {
+        let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
+        ]);
+        let sorted = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 900.0),
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 1.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 1.0),
+        ]);
+        let (hfbi, _intermediates) =
+            calculate_hfbi(&campione, &anagrafica).expect("Failed mmi calc");
+        let (hfbi_sorted, _intermediates_sorted) =
+            calculate_hfbi(&sorted, &anagrafica).expect("Failed mmi_sorted calc");
+        assert!((hfbi - hfbi_sorted).abs() < EPSILON);
+    }
+
+    #[test]
     fn test_mmi_and_hfbi() {
         let anagrafica = create_test_anagrafica("OK_STATION_INTEGRATION");
         // We will create a non-empty campione with specific data.
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                // Species 1: Migratory, dominant, contributes to all metrics
-                create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
-                // Species 2: Migratory, contributes to most metrics
-                create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
-                // Species 3: Resident, not dominant
-                create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+        ]);
 
         // We can't know the exact intermediate values without re-implementing all the
         // functions here. But we can ensure the logic flows and produces a valid, finite number.

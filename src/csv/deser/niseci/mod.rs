@@ -18,9 +18,9 @@
 use crate::csv::deser::{
     check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
 };
-use crate::csv::{
-    RecordCsvAnagraficaNISECI, RecordCsvCampionamentoNISECI, RecordCsvRiferimentoNISECI,
-    TipoRecordCsv,
+use crate::deser::{
+    parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
+    RecordCampionamentoNISECI, RecordRiferimentoNISECI, TipoRecord,
 };
 use std::any::TypeId;
 use std::fmt;
@@ -28,6 +28,8 @@ use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvRiferimentoNISECI {
@@ -56,7 +58,7 @@ pub struct VeryItalianRecordCsvRiferimentoNISECI {
     pub dens_soglia2: f32,
 }
 
-impl RecordCsvRiferimentoNISECI for VeryItalianRecordCsvRiferimentoNISECI {
+impl RecordRiferimentoNISECI for VeryItalianRecordCsvRiferimentoNISECI {
     fn nome_comune(&self) -> String {
         self.nome_comune.clone()
     }
@@ -113,7 +115,7 @@ impl RecordCsvRiferimentoNISECI for VeryItalianRecordCsvRiferimentoNISECI {
 impl fmt::Display for VeryItalianRecordCsvRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
+            "RecordRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
               self.nome_comune, self.nome_latino, self.codice_specie, self.origine,
               self.tipo_autoctono, self.allo_nocivita, self.specie_attesa,
               self.cl_soglia1, self.cl_soglia2, self.cl_soglia3, self.cl_soglia4,
@@ -124,6 +126,8 @@ impl fmt::Display for VeryItalianRecordCsvRiferimentoNISECI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvRiferimentoNISECI {
@@ -146,7 +150,7 @@ pub struct PlainRecordCsvRiferimentoNISECI {
     pub dens_soglia2: f32,
 }
 
-impl RecordCsvRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
+impl RecordRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
     fn nome_comune(&self) -> String {
         self.nome_comune.clone()
     }
@@ -203,7 +207,7 @@ impl RecordCsvRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
 impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
+            "RecordRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
               self.nome_comune, self.nome_latino, self.codice_specie, self.origine,
               self.tipo_autoctono, self.allo_nocivita, self.specie_attesa,
               self.cl_soglia1, self.cl_soglia2, self.cl_soglia3, self.cl_soglia4,
@@ -217,19 +221,10 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
 pub fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCsvRiferimentoNISECI,
+    T: RecordRiferimentoNISECI,
 {
-    let mut records = Vec::new();
-    let mut errors = Vec::new();
-
-    for result in rdr.deserialize() {
-        match result {
-            Ok(record) => records.push(record),
-            Err(e) => errors.push(e),
-        }
-    }
-
-    (records, errors)
+    let iter = rdr.deserialize();
+    parse_serialized_records(iter)
 }
 
 pub fn check_riferimento_niseci_reader<R: Read, T>(
@@ -237,7 +232,7 @@ pub fn check_riferimento_niseci_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -249,44 +244,24 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_riferimento_niseci(rdr);
-
-    println!(
-        "Riferimento NISECI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Riferimento NISECI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::RiferimentoNISECI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::RiferimentoNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv del riferimento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv del riferimento NISECI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_riferimento_niseci_path<T>(
@@ -294,7 +269,7 @@ pub fn check_riferimento_niseci_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
@@ -308,6 +283,8 @@ where
     check_riferimento_niseci_reader(file, has_headers)
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvCampionamentoNISECI {
@@ -320,7 +297,7 @@ pub struct VeryItalianRecordCsvCampionamentoNISECI {
     pub peso: f32,
 }
 
-impl RecordCsvCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
+impl RecordCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
     fn data(&self) -> String {
         self.data.clone()
     }
@@ -344,7 +321,7 @@ impl RecordCsvCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
 impl fmt::Display for VeryItalianRecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
+            "RecordCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
               self.data, self.stazione, self.num_passaggio,
               self.codice_specie, self.lunghezza, self.peso
         );
@@ -352,6 +329,8 @@ impl fmt::Display for VeryItalianRecordCsvCampionamentoNISECI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvCampionamentoNISECI {
@@ -363,7 +342,7 @@ pub struct PlainRecordCsvCampionamentoNISECI {
     pub peso: f32,
 }
 
-impl RecordCsvCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
+impl RecordCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
     fn data(&self) -> String {
         self.data.clone()
     }
@@ -387,7 +366,7 @@ impl RecordCsvCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
 impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
-            "RecordCsvCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
+            "RecordCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
               self.data, self.stazione, self.num_passaggio,
               self.codice_specie, self.lunghezza, self.peso
         );
@@ -398,19 +377,10 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
 pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCsvCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI + 'static,
 {
-    let mut records = Vec::new();
-    let mut errors = Vec::new();
-
-    for result in rdr.deserialize() {
-        match result {
-            Ok(record) => records.push(record),
-            Err(e) => errors.push(e),
-        }
-    }
-
-    (records, errors)
+    let iter = rdr.deserialize();
+    parse_serialized_records(iter)
 }
 
 pub fn check_campionamento_niseci_reader<R: Read, T>(
@@ -418,7 +388,7 @@ pub fn check_campionamento_niseci_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -430,44 +400,24 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_campionamento_niseci(rdr);
-
-    println!(
-        "Campionamento NISECI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Campionamento NISECI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::CampionamentoNISECI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::CampionamentoNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv del campionamento NISECI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_campionamento_niseci_path<T>(
@@ -475,7 +425,7 @@ pub fn check_campionamento_niseci_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
@@ -489,6 +439,8 @@ where
     check_campionamento_niseci_reader(file, has_headers)
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCsvAnagraficaNISECI {
@@ -509,7 +461,7 @@ pub struct VeryItalianRecordCsvAnagraficaNISECI {
     pub nome_bacino: String,
 }
 
-impl RecordCsvAnagraficaNISECI for VeryItalianRecordCsvAnagraficaNISECI {
+impl RecordAnagraficaNISECI for VeryItalianRecordCsvAnagraficaNISECI {
     fn codice_stazione(&self) -> String {
         self.codice_stazione.clone()
     }
@@ -577,6 +529,8 @@ impl fmt::Display for VeryItalianRecordCsvAnagraficaNISECI {
     }
 }
 
+/// Currently allows unknown fields; will switch to
+/// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvAnagraficaNISECI {
@@ -595,7 +549,7 @@ pub struct PlainRecordCsvAnagraficaNISECI {
     pub nome_bacino: String,
 }
 
-impl RecordCsvAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
+impl RecordAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
     fn codice_stazione(&self) -> String {
         self.codice_stazione.clone()
     }
@@ -666,19 +620,10 @@ impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
 pub fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCsvAnagraficaNISECI,
+    T: RecordAnagraficaNISECI,
 {
-    let mut records = Vec::new();
-    let mut errors = Vec::new();
-
-    for result in rdr.deserialize() {
-        match result {
-            Ok(record) => records.push(record),
-            Err(e) => errors.push(e),
-        }
-    }
-
-    (records, errors)
+    let iter = rdr.deserialize();
+    parse_serialized_records(iter)
 }
 
 pub fn check_anagrafica_niseci_reader<R: Read, T>(
@@ -686,7 +631,7 @@ pub fn check_anagrafica_niseci_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -698,44 +643,24 @@ where
         _ => b',',
     };
 
-    let rdr = csv::ReaderBuilder::new()
+    let mut rdr = csv::ReaderBuilder::new()
         .delimiter(delimiter)
         .has_headers(has_headers)
         .from_reader(normalizing_reader);
-    let (records, errors) = parse_csv_anagrafica_niseci(rdr);
-
-    println!(
-        "Anagrafica NISECI: Numero record csv validi: {}",
-        records.len()
-    );
-    println!(
-        "Anagrafica NISECI: Numero record csv non validi: {}",
-        errors.len()
-    );
-
-    if !errors.is_empty() {
+    let iter = rdr.deserialize();
+    validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
             eprintln!("  {}", error);
         }
         */
-        let processed_errors = process_csv_errors(&errors, TipoRecordCsv::AnagraficaNISECI);
+        let processed_errors = process_csv_errors(errors, TipoRecord::AnagraficaNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
-        Err(errors)
-    } else {
-        //TODO: handle verbosity
-        //println!("Tutti i record csv dell'anagrafica NISECI sono stati processati con successo!");
-        /*
-        for record in &records {
-            println!("  Record: {{{record}}}");
-        }
-        */
-        Ok(records)
-    }
+    })
 }
 
 pub fn check_anagrafica_niseci_path<T>(
@@ -743,7 +668,7 @@ pub fn check_anagrafica_niseci_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCsvAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI + 'static,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());

@@ -20,7 +20,7 @@ use crate::domain::hfbi::CampionamentoHFBI;
 pub fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
     let mut b = 0.0;
     let mut n = 0.0;
-    for specie in &campione.campionamento {
+    for specie in campione {
         b += specie.peso;
         n += specie.numero_individui as f32;
     }
@@ -42,8 +42,8 @@ mod bn_private_tests {
     fn create_dummy_record(peso: f32) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
-                nome_comune: "Dummy",
-                codice_specie: "DM",
+                nome_comune: "Dummy".to_string(),
+                codice_specie: "DM".to_string(),
                 autoctono: true,
                 gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario, // This field is not used by calc_bn
                 gruppo_trofico: GruppoTrofHFBI {
@@ -64,9 +64,7 @@ mod bn_private_tests {
 
     #[test]
     fn test_calc_bn_empty_campionamento() {
-        let campione = CampionamentoHFBI {
-            campionamento: vec![],
-        };
+        let campione = CampionamentoHFBI::new(vec![]);
         let result = calc_bn(&campione);
         // For an empty input, b=0 and n=0. The division 0.0 / 0.0 results in NaN (Not a Number).
         assert!(
@@ -78,9 +76,7 @@ mod bn_private_tests {
 
     #[test]
     fn test_calc_bn_single_specie() {
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_dummy_record(150.0)],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_dummy_record(150.0)]);
         let result = calc_bn(&campione);
         // b = 150.0, n = 1.0
         // expected = ((150.0 / 1.0) + 1.0).ln() = 151.0.ln()
@@ -95,13 +91,11 @@ mod bn_private_tests {
 
     #[test]
     fn test_calc_bn_multiple_species() {
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_dummy_record(100.0),
-                create_dummy_record(200.0),
-                create_dummy_record(50.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_dummy_record(100.0),
+            create_dummy_record(200.0),
+            create_dummy_record(50.0),
+        ]);
         let result = calc_bn(&campione);
         // b = 100 + 200 + 50 = 350.0
         // n = 3.0

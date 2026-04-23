@@ -19,7 +19,7 @@ use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
 pub fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
     let mut biobent = 0.0;
-    for specie in &campione.campionamento {
+    for specie in campione {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
             | GruppoEcoHFBI::MigratoriMarini
@@ -36,7 +36,7 @@ pub fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> 
         return 0.0;
     }
 
-    let area = anagrafica.lunghezza_media_transetto * anagrafica.larghezza_media_transetto;
+    let area = anagrafica.get_lunghezza_media() * anagrafica.get_larghezza_media();
 
     let bbent = ((biobent / area) * 100.0 + 1.0).ln();
 
@@ -58,20 +58,20 @@ mod bbent_private_tests {
 
     // Helper function to create AnagraficaHFBI
     fn create_test_anagrafica(lunghezza: f32, larghezza: f32) -> AnagraficaHFBI {
-        AnagraficaHFBI {
-            codice_stazione: "TestStazione".to_string(),
-            corpo_idrico: "TestCorpoIdrico".to_string(),
-            posizione: Location {
+        AnagraficaHFBI::new_raw_unchecked(
+            "TestStazione".to_string(),
+            "TestCorpoIdrico".to_string(),
+            Location {
                 regione: "TestRegione".to_string(),
                 provincia: "TestProvincia".to_string(),
             },
-            date_string: "01/01/2025".to_string(),
-            tipo_laguna: TipoLagunaCostieraHFBI::MAt1,
-            stagione: StagioneHFBI::Primavera,
-            habitat_vegetato: HabitatHFBI::NonVegetato,
-            lunghezza_media_transetto: lunghezza,
-            larghezza_media_transetto: larghezza,
-        }
+            "01/01/2025".to_string(),
+            TipoLagunaCostieraHFBI::MAt1,
+            StagioneHFBI::Primavera,
+            HabitatHFBI::NonVegetato,
+            lunghezza,
+            larghezza,
+        )
     }
 
     // Helper to create a species record
@@ -83,8 +83,8 @@ mod bbent_private_tests {
     ) -> RecordHFBI {
         RecordHFBI {
             specie: SpecieHFBI {
-                nome_comune: "Test Specie",
-                codice_specie: "TS",
+                nome_comune: "Test Specie".to_string(),
+                codice_specie: "TS".to_string(),
                 autoctono: true,
                 gruppo_eco,
                 gruppo_trofico: GruppoTrofHFBI {
@@ -105,9 +105,7 @@ mod bbent_private_tests {
     #[test]
     fn test_calc_bbent_empty_campionamento() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![],
-        };
+        let campione = CampionamentoHFBI::new(vec![]);
         let result = calc_bbent(&campione, &anagrafica);
         let expected = 0.0;
         assert!(
@@ -121,14 +119,12 @@ mod bbent_private_tests {
     #[test]
     fn test_calc_bbent_with_irrelevant_species() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(
-                GruppoEcoHFBI::OccasionaliMarini,
-                0.5,
-                0.5,
-                100.0,
-            )],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_specie_record(
+            GruppoEcoHFBI::OccasionaliMarini,
+            0.5,
+            0.5,
+            100.0,
+        )]);
         let result = calc_bbent(&campione, &anagrafica);
         let expected = 0.0;
         assert!(
@@ -142,14 +138,12 @@ mod bbent_private_tests {
     #[test]
     fn test_calc_bbent_with_single_relevant_specie() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(
-                GruppoEcoHFBI::ResidentiDiEstuario,
-                0.4,
-                0.6,
-                200.0,
-            )],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_specie_record(
+            GruppoEcoHFBI::ResidentiDiEstuario,
+            0.4,
+            0.6,
+            200.0,
+        )]);
         let result = calc_bbent(&campione, &anagrafica);
         let expected = (1000.0 * 41.0_f32.ln()).round() / 1000.0;
         assert!(
@@ -163,14 +157,12 @@ mod bbent_private_tests {
     #[test]
     fn test_calc_bbent_with_mixed_gruppoeco() {
         let anagrafica = create_test_anagrafica(80.0, 5.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![
-                create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.5, 150.0),
-                create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.2, 0.3, 100.0),
-                create_specie_record(GruppoEcoHFBI::OccasionaliDiAcqueDolci, 1.0, 0.0, 500.0),
-                create_specie_record(GruppoEcoHFBI::Diadromi, 0.8, 0.2, 200.0),
-            ],
-        };
+        let campione = CampionamentoHFBI::new(vec![
+            create_specie_record(GruppoEcoHFBI::ResidentiDiEstuario, 0.5, 0.5, 150.0),
+            create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.2, 0.3, 100.0),
+            create_specie_record(GruppoEcoHFBI::OccasionaliDiAcqueDolci, 1.0, 0.0, 500.0),
+            create_specie_record(GruppoEcoHFBI::Diadromi, 0.8, 0.2, 200.0),
+        ]);
         let result = calc_bbent(&campione, &anagrafica);
         let expected = (1000.0 * 101.0_f32.ln()).round() / 1000.0;
         assert!(
@@ -184,14 +176,12 @@ mod bbent_private_tests {
     #[test]
     fn test_calc_bbent_division_by_zero_area() {
         let anagrafica = create_test_anagrafica(100.0, 0.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![create_specie_record(
-                GruppoEcoHFBI::ResidentiDiEstuario,
-                1.0,
-                0.0,
-                100.0,
-            )],
-        };
+        let campione = CampionamentoHFBI::new(vec![create_specie_record(
+            GruppoEcoHFBI::ResidentiDiEstuario,
+            1.0,
+            0.0,
+            100.0,
+        )]);
         let result = calc_bbent(&campione, &anagrafica);
         assert!(
             result.is_infinite(),
@@ -202,9 +192,7 @@ mod bbent_private_tests {
     #[test]
     fn test_calc_bbent_division_by_zero_area_and_zero_biobent() {
         let anagrafica = create_test_anagrafica(0.0, 10.0);
-        let campione = CampionamentoHFBI {
-            campionamento: vec![],
-        };
+        let campione = CampionamentoHFBI::new(vec![]);
         let result = calc_bbent(&campione, &anagrafica);
         let expected = 0.0;
         assert!(

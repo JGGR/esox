@@ -27,18 +27,29 @@ use crate::csv::deser::{
     },
     translate_error_message,
 };
-use crate::csv::parser::{
-    hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi},
-    niseci::{
-        check_records_anagrafica_niseci, check_records_campionamento_niseci,
-        check_records_riferimento_niseci,
-    },
+use crate::csv::load::hfbi::{
+    load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader,
 };
+use crate::csv::load::niseci::{
+    load_anagrafica_niseci_from_reader, load_campionamento_niseci_from_reader,
+    load_riferimento_niseci_from_reader,
+};
+use crate::csv::load::InputFormat;
 use crate::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,
     CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER,
 };
-use crate::domain::niseci::SpecieNISECI;
+use crate::domain::niseci::{RiferimentoNISECI, SpecieNISECI};
+use crate::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
+use crate::parser::niseci::{
+    check_records_anagrafica_niseci, check_records_campionamento_niseci,
+    check_records_riferimento_niseci,
+};
+use crate::tests::test_utils::{
+    ANAGRAFICA_HFBI_TEMPLATE_DATA, ANAGRAFICA_NISECI_TEMPLATE_DATA,
+    CAMPIONAMENTO_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_NISECI_TEMPLATE_DATA,
+    RIFERIMENTO_NISECI_TEMPLATE_DATA,
+};
 use std::io::Cursor;
 
 #[test]
@@ -278,6 +289,17 @@ fn test_recordcsv_riferimento_niseci_soglie_ad_juv_error() {
 }
 
 #[test]
+fn test_load_riferimento_niseci() {
+    let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
+    let riferimento = load_riferimento_niseci_from_reader::<_>(
+        riferimento_reader,
+        true,
+        InputFormat::Alternative,
+    );
+    assert!(riferimento.is_ok());
+}
+
+#[test]
 fn test_csv_campionamento_niseci_found_string_expect_int() {
     let csv_data = format!(
         "{}\n07/07/2019;2190627 Reno 390;1;BA;abc;152",
@@ -410,9 +432,32 @@ fn test_valid_recordcsv_campionamento_niseci() {
         peso: 100.0,
     };
     let recordcsv_data = vec![record_1];
-    let result = check_records_campionamento_niseci(recordcsv_data, riferimento_specie);
+    let result = check_records_campionamento_niseci(
+        recordcsv_data,
+        &RiferimentoNISECI::new(riferimento_specie),
+    );
 
     assert!(!result.is_err());
+}
+
+#[test]
+fn test_load_campionamento_niseci() {
+    let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
+    let riferimento = load_riferimento_niseci_from_reader::<_>(
+        riferimento_reader,
+        true,
+        InputFormat::Alternative,
+    );
+    assert!(riferimento.is_ok());
+    let riferimento = riferimento.unwrap();
+    let campionamento_reader = Cursor::new(CAMPIONAMENTO_NISECI_TEMPLATE_DATA);
+    let campionamento = load_campionamento_niseci_from_reader::<_>(
+        campionamento_reader,
+        true,
+        &riferimento,
+        InputFormat::Alternative,
+    );
+    assert!(campionamento.is_ok());
 }
 
 #[test]
@@ -533,6 +578,14 @@ fn test_valid_recordcsv_anagrafica_niseci() {
 }
 
 #[test]
+fn test_load_anagrafica_niseci() {
+    let anagrafica_reader = Cursor::new(ANAGRAFICA_NISECI_TEMPLATE_DATA);
+    let anagrafica =
+        load_anagrafica_niseci_from_reader::<_>(anagrafica_reader, true, InputFormat::Alternative);
+    assert!(anagrafica.is_ok());
+}
+
+#[test]
 fn test_csv_campionamento_hfbi_found_string_expect_int() {
     let csv_data = format!("{}\nAN;foo;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
@@ -622,6 +675,17 @@ fn test_valid_recordcsv_campionamento_hfbi() {
     let result = check_records_campionamento_hfbi(recordcsv_data);
 
     assert!(!result.is_err());
+}
+
+#[test]
+fn test_load_campionamento_hfbi() {
+    let campionamento_reader = Cursor::new(CAMPIONAMENTO_HFBI_TEMPLATE_DATA);
+    let campionamento = load_campionamento_hfbi_from_reader::<_>(
+        campionamento_reader,
+        true,
+        InputFormat::Alternative,
+    );
+    assert!(campionamento.is_ok());
 }
 
 #[test]
@@ -736,4 +800,12 @@ fn test_valid_recordcsv_anagrafica_hfbi() {
     let result = check_records_anagrafica_hfbi(recordcsv_data);
 
     assert!(!result.is_err());
+}
+
+#[test]
+fn test_load_anagrafica_hfbi() {
+    let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
+    let anagrafica =
+        load_anagrafica_hfbi_from_reader::<_>(anagrafica_reader, true, InputFormat::Alternative);
+    assert!(anagrafica.is_ok());
 }

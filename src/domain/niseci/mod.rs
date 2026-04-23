@@ -15,19 +15,24 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::fmt;
 use std::vec::Vec;
 
+use super::localize::CommaFormat;
 use super::location::Location;
+#[cfg(feature = "experimental")]
+use super::posf32::deserialize_positive_f32;
+use super::posf32::{PositiveF32, PositiveF32Error};
 
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
                                                       // in test builds
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SpecieNISECI {
     pub id: String,
     pub nome: String,
@@ -82,15 +87,20 @@ impl SpecieNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
+#[serde(deny_unknown_fields)]
 pub struct RiferimentoNISECI {
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, RiferimentoNISECI::new() to construct"
+    )]
     pub elenco_specie: Vec<SpecieNISECI>,
 }
 
 impl fmt::Display for RiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_representation = "RiferimentoNISECI: {".to_string();
-        for s in &self.elenco_specie {
+        for s in self {
             string_representation = format!("{string_representation}\n  {{{s}}},");
         }
         string_representation = format!("{string_representation}\n}}");
@@ -100,11 +110,30 @@ impl fmt::Display for RiferimentoNISECI {
 
 impl RiferimentoNISECI {
     pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
+        #[allow(deprecated)]
         Self { elenco_specie }
     }
 }
 
-#[derive(Debug, Clone)]
+impl From<RiferimentoNISECI> for Vec<SpecieNISECI> {
+    fn from(val: RiferimentoNISECI) -> Self {
+        #[allow(deprecated)]
+        val.elenco_specie
+    }
+}
+
+impl<'a> IntoIterator for &'a RiferimentoNISECI {
+    type Item = &'a SpecieNISECI;
+    type IntoIter = std::slice::Iter<'a, SpecieNISECI>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        #[allow(deprecated)]
+        self.elenco_specie.iter()
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecordNISECI {
     pub specie: SpecieNISECI,
     pub passaggio_cattura: u8,
@@ -121,15 +150,20 @@ impl fmt::Display for RecordNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
+#[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, CampionamentoNISECI::new() to construct"
+    )]
     pub campionamento: Vec<RecordNISECI>,
 }
 
 impl fmt::Display for CampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_representation = "CampionaNISECI: {".to_string();
-        for r in &self.campionamento {
+        for r in self {
             string_representation = format!("{string_representation}\n  {{{r}}},");
         }
         string_representation = format!("{string_representation}\n}}");
@@ -141,14 +175,14 @@ impl CampionamentoNISECI {
     #[cfg(test)]
     pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
         let mut max_pass = 0;
-        for record in self.campionamento.iter() {
+        for record in self {
             if record.passaggio_cattura > max_pass {
                 max_pass = record.passaggio_cattura;
             }
         }
 
         let mut passaggi: Vec<i32> = vec![0; max_pass as usize];
-        for record in self.campionamento.iter() {
+        for record in self {
             passaggi[(record.passaggio_cattura - 1) as usize] += 1;
         }
 
@@ -165,6 +199,7 @@ impl CampionamentoNISECI {
     }
 
     pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
+        #[allow(deprecated)]
         Self { campionamento }
     }
 
@@ -174,7 +209,7 @@ impl CampionamentoNISECI {
             indigeni: 0,
         };
 
-        for pesce in &self.campionamento {
+        for pesce in self {
             if pesce.specie.tipo_alloctono > 0 && pesce.specie.tipo_alloctono <= 3 {
                 alieni_indigeni.alieni += 1;
             } else if pesce.specie.tipo_autoctono == 1 || pesce.specie.tipo_autoctono == 2 {
@@ -188,7 +223,7 @@ impl CampionamentoNISECI {
     pub fn get_tot_specie_autoctone_attese(&self) -> usize {
         let mut map: HashMap<String, bool> = HashMap::new();
 
-        for cattura in &self.campionamento {
+        for cattura in self {
             if cattura.specie.specie_attesa
                 && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
             {
@@ -205,12 +240,30 @@ impl CampionamentoNISECI {
     }
 }
 
+impl From<CampionamentoNISECI> for Vec<RecordNISECI> {
+    fn from(val: CampionamentoNISECI) -> Self {
+        #[allow(deprecated)]
+        val.campionamento
+    }
+}
+
+impl<'a> IntoIterator for &'a CampionamentoNISECI {
+    type Item = &'a RecordNISECI;
+    type IntoIter = std::slice::Iter<'a, RecordNISECI>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        #[allow(deprecated)]
+        self.campionamento.iter()
+    }
+}
+
 pub struct AlieniIndigeni {
     pub alieni: u32,
     pub indigeni: u32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum TipoComunitaNISECI {
     Redatta,
     Recuperata,
@@ -246,7 +299,8 @@ impl TryFrom<i32> for TipoComunitaNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ComunitaNISECI {
     pub tipo: TipoComunitaNISECI,
     pub fonte: Option<String>,
@@ -292,7 +346,8 @@ impl fmt::Display for ComunitaNISECI {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum AreaNISECI {
     Alpina,
     Mediterranea,
@@ -334,7 +389,9 @@ pub struct AnagraficaNISECIDraft {
     pub larghezza_media_stazione: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
+#[serde(deny_unknown_fields)]
 pub struct AnagraficaNISECI {
     pub comunita: ComunitaNISECI,
     pub codice_stazione: String,
@@ -344,28 +401,93 @@ pub struct AnagraficaNISECI {
     pub bacino_appartenenza: String,
     pub idro_eco_regione: IdroEcoRegioneNISECI,
     pub posizione: Location,
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaNISECI::new() to construct"
+    )]
+    #[serde(deserialize_with = "deserialize_positive_f32")]
     pub lunghezza_media_stazione: f32,
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaNISECI::new() to construct"
+    )]
+    #[serde(deserialize_with = "deserialize_positive_f32")]
     pub larghezza_media_stazione: f32,
 }
 
 impl AnagraficaNISECI {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        comunita: ComunitaNISECI,
+        codice_stazione: String,
+        date_string: String,
+        area: AreaNISECI,
+        corpo_idrico: String,
+        bacino_appartenenza: String,
+        idro_eco_regione: IdroEcoRegioneNISECI,
+        posizione: Location,
+        lunghezza_media_stazione: PositiveF32,
+        larghezza_media_stazione: PositiveF32,
+    ) -> Self {
+        Self {
+            comunita,
+            codice_stazione,
+            date_string,
+            area,
+            corpo_idrico,
+            bacino_appartenenza,
+            idro_eco_regione,
+            posizione,
+            #[allow(deprecated)]
+            lunghezza_media_stazione: *lunghezza_media_stazione,
+            #[allow(deprecated)]
+            larghezza_media_stazione: *larghezza_media_stazione,
+        }
+    }
     pub fn get_lunghezza_media(&self) -> f32 {
+        #[allow(deprecated)]
         self.lunghezza_media_stazione
     }
+    pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
+        if !val.is_finite() {
+            return Err(PositiveF32Error::NotFinite);
+        }
+        if val <= 0.0 {
+            return Err(PositiveF32Error::NotPositive);
+        }
+        #[allow(deprecated)]
+        {
+            self.lunghezza_media_stazione = val;
+        }
+        Ok(())
+    }
     pub fn get_larghezza_media(&self) -> f32 {
+        #[allow(deprecated)]
         self.larghezza_media_stazione
+    }
+    pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
+        if !val.is_finite() {
+            return Err(PositiveF32Error::NotFinite);
+        }
+        if val <= 0.0 {
+            return Err(PositiveF32Error::NotPositive);
+        }
+        #[allow(deprecated)]
+        {
+            self.larghezza_media_stazione = val;
+        }
+        Ok(())
     }
 }
 
 impl fmt::Display for AnagraficaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!("AnagraficaNISECI: {{ comunita: {{{}}}, codice_stazione {{{}}}, area: {{{}}}, corpo_idrico: {{{}}}, bacino_appartenenza: {{{}}}, idro_eco_regione: {{{}}}, posizione: {{{}}}, lunghezza_stazione: {{{}}}, larghezza_stazione: {{{}}} }}",
-        self.comunita, self.codice_stazione, self.area, self.corpo_idrico, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.lunghezza_media_stazione, self.larghezza_media_stazione);
+        self.comunita, self.codice_stazione, self.area, self.corpo_idrico, self.bacino_appartenenza, self.idro_eco_regione, self.posizione, self.get_lunghezza_media(), self.get_larghezza_media());
         write!(f, "{}", string_representation)
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum IdroEcoRegioneNISECI {
     AlpiOccidentali,
     PrealpiDolomiti,
@@ -482,7 +604,8 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
     }
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ValoriIntermediSpecieNISECI {
     pub densita_stimata: f32,
     pub quantita_stimata: u32,
@@ -515,7 +638,8 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
     }
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ValoriIntermediNISECI {
     pub x1: f32,
     pub x2: Option<f32>,
@@ -559,9 +683,79 @@ impl ValoriIntermediNISECI {
         //chopping on newlines from add_console_message()
         println!("Valori intermedi: {{{self}}}");
     }
+
+    pub fn to_csv(&self, comma_csv_delimiter: bool) -> String {
+        let mut string_representation = if comma_csv_delimiter {
+            "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2b, rapporto ad/juv, x2a_a, x2a_b".to_string()
+        } else {
+            "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
+        };
+        for (_k, v) in self.specie_specifici.iter() {
+            let rapporto_ad_juv_str = match v.rapporto_ad_juv {
+                Some(v) => {
+                    if comma_csv_delimiter {
+                        format!("{v}")
+                    } else {
+                        v.comma().to_string()
+                    }
+                }
+                None => "NC".to_string(),
+            };
+            let specie_attesa_str = if v.classi_eta.specie.specie_attesa {
+                "SI".to_string()
+            } else {
+                "NO".to_string()
+            };
+            string_representation = if comma_csv_delimiter {
+                format!(
+                    "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                    string_representation,
+                    v.classi_eta.specie.id,
+                    v.classi_eta.specie.nome,
+                    v.classi_eta.specie.tipo_autoctono,
+                    v.classi_eta.specie.tipo_alloctono,
+                    specie_attesa_str,
+                    v.classi_eta.cl1,
+                    v.classi_eta.cl2,
+                    v.classi_eta.cl3,
+                    v.classi_eta.cl4,
+                    v.classi_eta.cl5,
+                    v.densita_stimata,
+                    v.quantita_stimata,
+                    v.x2_b,
+                    rapporto_ad_juv_str,
+                    v.x2_a_a,
+                    v.x2_a_b
+                )
+            } else {
+                format!(
+                    "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+                    string_representation,
+                    v.classi_eta.specie.id,
+                    v.classi_eta.specie.nome,
+                    v.classi_eta.specie.tipo_autoctono,
+                    v.classi_eta.specie.tipo_alloctono,
+                    specie_attesa_str,
+                    v.classi_eta.cl1,
+                    v.classi_eta.cl2,
+                    v.classi_eta.cl3,
+                    v.classi_eta.cl4,
+                    v.classi_eta.cl5,
+                    v.densita_stimata.comma(),
+                    v.quantita_stimata,
+                    v.x2_b,
+                    rapporto_ad_juv_str,
+                    v.x2_a_a,
+                    v.x2_a_b
+                )
+            }
+        }
+        string_representation
+    }
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RisultatoNISECI {
     valore: Option<f32>,
     rqe: Option<f32>,
@@ -609,6 +803,100 @@ impl RisultatoNISECI {
     }
     pub fn get_x3(&self) -> f32 {
         self.valori_intermedi.x3
+    }
+    pub fn get_x3_a(&self) -> Option<f32> {
+        self.valori_intermedi.x3_a
+    }
+    pub fn get_x3_b(&self) -> Option<f32> {
+        self.valori_intermedi.x3_b
+    }
+
+    pub fn to_csv(&self, anagrafica: &AnagraficaNISECI, comma_csv_delimiter: bool) -> String {
+        let niseci = self.get_valore();
+        let niseci_str = match niseci {
+            Some(val) => {
+                if comma_csv_delimiter {
+                    format!("{val}")
+                } else {
+                    val.comma().to_string()
+                }
+            }
+            None => "NC".to_string(),
+        };
+
+        let rqe_niseci = self.get_rqe();
+        let rqe_niseci_str = match rqe_niseci {
+            Some(val) => {
+                if comma_csv_delimiter {
+                    format!("{val}")
+                } else {
+                    val.comma().to_string()
+                }
+            }
+            None => "NC".to_string(),
+        };
+        let stato_ecologico =
+            rqe_niseci.map(|val| StatoEcologicoNISECI::from((val, &anagrafica.area)));
+        let stato_ecologico_str = match stato_ecologico {
+            Some(val) => {
+                format!("{val}")
+            }
+            None => "NC".to_string(),
+        };
+        let string_representation = if comma_csv_delimiter {
+            format!("Codice stazione, Data, Regione, Idroecoregione, Area pertinenza, Bacino, NISECI, RQE NISECI, Stato ecologico, x1, x2, x3, x3_a, x3_b\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                anagrafica.codice_stazione,
+                anagrafica.date_string,
+                anagrafica.posizione.regione,
+                anagrafica.idro_eco_regione,
+                anagrafica.area,
+                anagrafica.corpo_idrico,
+                niseci_str,
+                rqe_niseci_str,
+                stato_ecologico_str,
+                self.get_x1(),
+                match self.get_x2() {
+                    Some(v) => format!("{v}"),
+                    None => "NC".to_string(),
+                },
+                self.get_x3(),
+                match self.get_x3_a() {
+                    Some(v) => format!("{v}"),
+                    None => "NC".to_string(),
+                },
+                match self.get_x3_b() {
+                    Some(v) => format!("{v}"),
+                    None => "NC".to_string(),
+                }
+            )
+        } else {
+            format!("Codice stazione; Data; Regione; Idroecoregione; Area pertinenza; Bacino; NISECI; RQE NISECI; Stato ecologico; x1; x2; x3; x3_a; x3_b\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+                anagrafica.codice_stazione,
+                anagrafica.date_string,
+                anagrafica.posizione.regione,
+                anagrafica.idro_eco_regione,
+                anagrafica.area,
+                anagrafica.corpo_idrico,
+                niseci_str,
+                rqe_niseci_str,
+                stato_ecologico_str,
+                self.get_x1().comma(),
+                match self.get_x2() {
+                    Some(v) => v.comma().to_string(),
+                    None => "NC".to_string(),
+                },
+                self.get_x3().comma(),
+                match self.get_x3_a() {
+                    Some(v) => v.comma().to_string(),
+                    None => "NC".to_string(),
+                },
+                match self.get_x3_b() {
+                    Some(v) => v.comma().to_string(),
+                    None => "NC".to_string(),
+                }
+            )
+        };
+        string_representation
     }
 }
 
@@ -660,7 +948,8 @@ impl MetricheX2A {
 /// le classi eta contengono il numero di esemplari trovati
 /// nel campionamento per ogni specie catturata
 /// suddivisi nelle loro classi di eta (in base alla lunghezza)
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ClassiEtaSpecieNISECI {
     pub specie: SpecieNISECI,
     pub cl1: u32,
@@ -677,6 +966,12 @@ impl fmt::Display for ClassiEtaSpecieNISECI {
             self.specie, self.cl1, self.cl2, self.cl3, self.cl4, self.cl5
         );
         write!(f, "{}", string_representation)
+    }
+}
+
+impl Default for ClassiEtaSpecieNISECI {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -856,6 +1151,12 @@ pub struct InfoPopolazioniNISECI {
     pub intermediates_map: HashMap<String, InfoIntermediePopolazioniNISECI>,
 }
 
+impl Default for InfoPopolazioniNISECI {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl InfoPopolazioniNISECI {
     pub fn new() -> InfoPopolazioniNISECI {
         InfoPopolazioniNISECI {
@@ -979,6 +1280,12 @@ pub struct ClassiEtaAlieniNISECI {
     pub tot_specie_autoctone: usize,
 }
 
+impl Default for ClassiEtaAlieniNISECI {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ClassiEtaAlieniNISECI {
     pub fn new() -> ClassiEtaAlieniNISECI {
         ClassiEtaAlieniNISECI {
@@ -1044,5 +1351,91 @@ impl fmt::Display for StatoEcologicoNISECI {
             StatoEcologicoNISECI::Cattivo => "Cattivo",
         };
         write!(f, "{}", string_representation)
+    }
+}
+
+const STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO: f32 = 0.8;
+const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA: f32 = 0.52;
+const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
+const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
+const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
+
+impl From<(f32, &AreaNISECI)> for StatoEcologicoNISECI {
+    fn from((val, area): (f32, &AreaNISECI)) -> Self {
+        if val >= STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO {
+            return StatoEcologicoNISECI::Elevato;
+        }
+        match area {
+            AreaNISECI::Alpina => {
+                if val >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA {
+                    return StatoEcologicoNISECI::Buono;
+                }
+            }
+            AreaNISECI::Mediterranea => {
+                if val >= STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA {
+                    return StatoEcologicoNISECI::Buono;
+                }
+            }
+        }
+        if val >= STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO {
+            return StatoEcologicoNISECI::Moderato;
+        }
+        if val >= STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE {
+            return StatoEcologicoNISECI::Scadente;
+        }
+        StatoEcologicoNISECI::Cattivo
+    }
+}
+
+#[cfg(test)]
+mod domain_niseci_private_tests {
+    use super::*;
+    #[cfg(test)]
+    impl AnagraficaNISECI {
+        /// Test helper to build unchecked instances
+        #[cfg(test)]
+        pub(crate) fn new_raw_unchecked(
+            comunita: ComunitaNISECI,
+            codice_stazione: String,
+            date_string: String,
+            area: AreaNISECI,
+            corpo_idrico: String,
+            bacino_appartenenza: String,
+            idro_eco_regione: IdroEcoRegioneNISECI,
+            posizione: Location,
+            lunghezza_media_stazione: f32,
+            larghezza_media_stazione: f32,
+        ) -> Self {
+            Self {
+                comunita,
+                codice_stazione,
+                date_string,
+                area,
+                corpo_idrico,
+                bacino_appartenenza,
+                idro_eco_regione,
+                posizione,
+                #[allow(deprecated)]
+                lunghezza_media_stazione,
+                #[allow(deprecated)]
+                larghezza_media_stazione,
+            }
+        }
+        /// Test helper to mutate lunghezza with no checks
+        #[cfg(test)]
+        pub(crate) fn set_lunghezza_unchecked(&mut self, val: f32) {
+            #[allow(deprecated)]
+            {
+                self.lunghezza_media_stazione = val;
+            }
+        }
+        /// Test helper to mutate larghezza with no checks
+        #[cfg(test)]
+        pub(crate) fn set_larghezza_unchecked(&mut self, val: f32) {
+            #[allow(deprecated)]
+            {
+                self.larghezza_media_stazione = val;
+            }
+        }
     }
 }

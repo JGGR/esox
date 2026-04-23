@@ -15,12 +15,17 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use once_cell::sync::Lazy;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use std::sync::LazyLock;
 
+use super::localize::CommaFormat;
+#[cfg(feature = "experimental")]
+use super::posf32::deserialize_positive_f32;
+use super::posf32::{PositiveF32, PositiveF32Error};
 use crate::domain::location::Location;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum GruppoEcoHFBI {
     MigratoriMarini,
     Diadromi,
@@ -44,7 +49,8 @@ impl fmt::Display for GruppoEcoHFBI {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct GruppoTrofHFBI {
     pub microbentivori: f32,
     pub macrobentivori: f32,
@@ -71,10 +77,11 @@ impl fmt::Display for GruppoTrofHFBI {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SpecieHFBI {
-    pub nome_comune: &'static str,
-    pub codice_specie: &'static str,
+    pub nome_comune: String,
+    pub codice_specie: String,
     pub autoctono: bool,
     pub gruppo_eco: GruppoEcoHFBI,
     pub gruppo_trofico: GruppoTrofHFBI,
@@ -98,477 +105,480 @@ impl fmt::Display for SpecieHFBI {
     }
 }
 
-pub const RIFERIMENTO_HFBI: [SpecieHFBI; 31] = [
-    SpecieHFBI {
-        nome_comune: "Cheppia",
-        codice_specie: "CH",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::Diadromi,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+pub static RIFERIMENTO_HFBI: LazyLock<Vec<SpecieHFBI>> = LazyLock::new(|| {
+    vec![
+        SpecieHFBI {
+            nome_comune: "Cheppia".to_string(),
+            codice_specie: "CH".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::Diadromi,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Anguilla",
-        codice_specie: "AN",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::Diadromi,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.2,
-            macrobentivori: 0.4,
-            iperbentivori: 0.4,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Anguilla".to_string(),
+            codice_specie: "AN".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::Diadromi,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.2,
+                macrobentivori: 0.4,
+                iperbentivori: 0.4,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Nono",
-        codice_specie: "NO",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.5,
-            macrobentivori: 0.0,
-            iperbentivori: 0.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.5,
+        SpecieHFBI {
+            nome_comune: "Nono".to_string(),
+            codice_specie: "NO".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.5,
+                macrobentivori: 0.0,
+                iperbentivori: 0.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.5,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Latterino di lago",
-        codice_specie: "LAT",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Latterino di lago".to_string(),
+            codice_specie: "LAT".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Aguglia",
-        codice_specie: "BBE",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Aguglia".to_string(),
+            codice_specie: "BBE".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Gallinella",
-        codice_specie: "CLU",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.4,
-            macrobentivori: 0.4,
-            iperbentivori: 0.2,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Gallinella".to_string(),
+            codice_specie: "CLU".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.4,
+                macrobentivori: 0.4,
+                iperbentivori: 0.2,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Muggine labbrone",
-        codice_specie: "CEL",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 0.5,
-            erbivori: 0.0,
-            detritivori: 0.5,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Muggine labbrone".to_string(),
+            codice_specie: "CEL".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 0.5,
+                erbivori: 0.0,
+                detritivori: 0.5,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Spigola branzino",
-        codice_specie: "DIC",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Spigola branzino".to_string(),
+            codice_specie: "DIC".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Alice (Acciuga Europea)",
-        codice_specie: "DIC",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 0.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 1.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Alice (Acciuga Europea)".to_string(),
+            codice_specie: "DIC".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 0.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 1.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Ghiozzo nero",
-        codice_specie: "GHN",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.4,
-            macrobentivori: 0.4,
-            iperbentivori: 0.2,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Ghiozzo nero".to_string(),
+            codice_specie: "GHN".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.4,
+                macrobentivori: 0.4,
+                iperbentivori: 0.2,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Cavalluccio marino",
-        codice_specie: "HGU",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.5,
-            macrobentivori: 0.0,
-            iperbentivori: 0.5,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Cavalluccio marino".to_string(),
+            codice_specie: "HGU".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.5,
+                macrobentivori: 0.0,
+                iperbentivori: 0.5,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Cavalluccio camuso",
-        codice_specie: "HHI",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.5,
-            macrobentivori: 0.0,
-            iperbentivori: 0.5,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Cavalluccio camuso".to_string(),
+            codice_specie: "HHI".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.5,
+                macrobentivori: 0.0,
+                iperbentivori: 0.5,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Ghiozzetto di laguna",
-        codice_specie: "GHL",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 2.0 / 3.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0 / 3.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Ghiozzetto di laguna".to_string(),
+            codice_specie: "GHL".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 2.0 / 3.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0 / 3.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Muggine dorato",
-        codice_specie: "CED",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 0.5,
-            erbivori: 0.0,
-            detritivori: 0.5,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Muggine dorato".to_string(),
+            codice_specie: "CED".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 0.5,
+                erbivori: 0.0,
+                detritivori: 0.5,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Muggine calamita",
-        codice_specie: "CEC",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::Diadromi,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 0.5,
-            erbivori: 0.0,
-            detritivori: 0.5,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Muggine calamita".to_string(),
+            codice_specie: "CEC".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::Diadromi,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 0.5,
+                erbivori: 0.0,
+                detritivori: 0.5,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Muggine musino",
-        codice_specie: "MUS",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 0.5,
-            erbivori: 0.0,
-            detritivori: 0.5,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Muggine musino".to_string(),
+            codice_specie: "MUS".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 0.5,
+                erbivori: 0.0,
+                detritivori: 0.5,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Cefalo",
-        codice_specie: "MUG",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::Diadromi,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 0.5,
-            erbivori: 0.0,
-            detritivori: 0.5,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Cefalo".to_string(),
+            codice_specie: "MUG".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::Diadromi,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 0.5,
+                erbivori: 0.0,
+                detritivori: 0.5,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Triglia di scoglio",
-        codice_specie: "MSU",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 2.0 / 3.0,
-            macrobentivori: 1.0 / 3.0,
-            iperbentivori: 0.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Triglia di scoglio".to_string(),
+            codice_specie: "MSU".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 2.0 / 3.0,
+                macrobentivori: 1.0 / 3.0,
+                iperbentivori: 0.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Pesce ago sottile",
-        codice_specie: "NOP",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 1.0,
-            macrobentivori: 0.0,
-            iperbentivori: 0.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Pesce ago sottile".to_string(),
+            codice_specie: "NOP".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 1.0,
+                macrobentivori: 0.0,
+                iperbentivori: 0.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Passera pianuzza",
-        codice_specie: "PFL",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.4,
-            macrobentivori: 0.4,
-            iperbentivori: 0.2,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Passera pianuzza".to_string(),
+            codice_specie: "PFL".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.4,
+                macrobentivori: 0.4,
+                iperbentivori: 0.2,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Ghiozzetto cenerino",
-        codice_specie: "GHC",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 2.0 / 3.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0 / 3.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Ghiozzetto cenerino".to_string(),
+            codice_specie: "GHC".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 2.0 / 3.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0 / 3.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Ghiozzetto marmorizzato",
-        codice_specie: "GHM",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 2.0 / 3.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0 / 3.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Ghiozzetto marmorizzato".to_string(),
+            codice_specie: "GHM".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 2.0 / 3.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0 / 3.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Ghiozzetto minuto",
-        codice_specie: "GHE",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 2.0 / 3.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0 / 3.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Ghiozzetto minuto".to_string(),
+            codice_specie: "GHE".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 2.0 / 3.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0 / 3.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Bavosa pavone",
-        codice_specie: "BAP",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.5,
-            macrobentivori: 0.0,
-            iperbentivori: 0.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.5,
+        SpecieHFBI {
+            nome_comune: "Bavosa pavone".to_string(),
+            codice_specie: "BAP".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.5,
+                macrobentivori: 0.0,
+                iperbentivori: 0.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.5,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Sardina",
-        codice_specie: "SPI",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 0.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 1.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Sardina".to_string(),
+            codice_specie: "SPI".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 0.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 1.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Sogliola comune",
-        codice_specie: "SSO",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 2.0 / 3.0,
-            macrobentivori: 1.0 / 3.0,
-            iperbentivori: 0.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Sogliola comune".to_string(),
+            codice_specie: "SSO".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 2.0 / 3.0,
+                macrobentivori: 1.0 / 3.0,
+                iperbentivori: 0.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Orata",
-        codice_specie: "SAU",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.4,
-            macrobentivori: 0.2,
-            iperbentivori: 0.4,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Orata".to_string(),
+            codice_specie: "SAU".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.4,
+                macrobentivori: 0.2,
+                iperbentivori: 0.4,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Pesce ago di rio",
-        codice_specie: "PAR",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 2.0 / 3.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0 / 3.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Pesce ago di rio".to_string(),
+            codice_specie: "PAR".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 2.0 / 3.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0 / 3.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Pesce ago adriatico",
-        codice_specie: "STA",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.0,
-            macrobentivori: 0.0,
-            iperbentivori: 1.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Pesce ago adriatico".to_string(),
+            codice_specie: "STA".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.0,
+                macrobentivori: 0.0,
+                iperbentivori: 1.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Pesce ago cavallino",
-        codice_specie: "STY",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 0.2,
-            macrobentivori: 0.0,
-            iperbentivori: 0.8,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Pesce ago cavallino".to_string(),
+            codice_specie: "STY".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 0.2,
+                macrobentivori: 0.0,
+                iperbentivori: 0.8,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-    SpecieHFBI {
-        nome_comune: "Ghiozzo gò",
-        codice_specie: "GHG",
-        autoctono: true,
-        gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
-        gruppo_trofico: GruppoTrofHFBI {
-            microbentivori: 1.0 / 3.0,
-            macrobentivori: 1.0 / 3.0,
-            iperbentivori: 1.0 / 3.0,
-            erbivori: 0.0,
-            detritivori: 0.0,
-            planctivori: 0.0,
-            onnivori: 0.0,
+        SpecieHFBI {
+            nome_comune: "Ghiozzo gò".to_string(),
+            codice_specie: "GHG".to_string(),
+            autoctono: true,
+            gruppo_eco: GruppoEcoHFBI::ResidentiDiEstuario,
+            gruppo_trofico: GruppoTrofHFBI {
+                microbentivori: 1.0 / 3.0,
+                macrobentivori: 1.0 / 3.0,
+                iperbentivori: 1.0 / 3.0,
+                erbivori: 0.0,
+                detritivori: 0.0,
+                planctivori: 0.0,
+                onnivori: 0.0,
+            },
         },
-    },
-];
+    ]
+});
 
 use std::{collections::HashMap, fmt};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecordHFBI {
     pub specie: SpecieHFBI,
     pub numero_individui: u32, // in millimetri
@@ -585,15 +595,24 @@ impl fmt::Display for RecordHFBI {
     }
 }
 
-#[derive(Clone)]
+/// Since calculations of HFBI rely on iteration order, this type must enforce
+/// the internal invariant that records are sorted by descending `peso`.
+/// v0.2 will change visibility of internals to avoid improper construction / mutation.
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
+#[serde(deny_unknown_fields)]
 pub struct CampionamentoHFBI {
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, CampionamentoHFBI::new() to construct"
+    )]
+    #[serde(deserialize_with = "deserialize_vec_record_hfbi_sorted")]
     pub campionamento: Vec<RecordHFBI>,
 }
 
 impl fmt::Display for CampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut string_representation = "CampionaHFBI: {".to_string();
-        for r in &self.campionamento {
+        for r in self {
             string_representation = format!("{string_representation}\n  {{{r}}},");
         }
         string_representation = format!("{string_representation}\n}}");
@@ -601,13 +620,85 @@ impl fmt::Display for CampionamentoHFBI {
     }
 }
 
-impl CampionamentoHFBI {
-    pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
-        Self { campionamento }
+/// Private helper trait to have the sorting directly on Vec
+trait SortedRecordsHFBI {
+    fn sort_by_peso_desc(&mut self);
+}
+
+/// Private helper impl to have the sorting directly on Vec
+impl SortedRecordsHFBI for Vec<RecordHFBI> {
+    fn sort_by_peso_desc(&mut self) {
+        self.sort_by(|a, b| b.peso.total_cmp(&a.peso));
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+/// Private helper impl to have the sorting directly on Vec
+impl SortedRecordsHFBI for Vec<&RecordHFBI> {
+    fn sort_by_peso_desc(&mut self) {
+        self.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+    }
+}
+
+impl CampionamentoHFBI {
+    pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
+        #[allow(deprecated)]
+        let mut sorted = Self { campionamento };
+        #[allow(deprecated)]
+        sorted.campionamento.sort_by_peso_desc();
+        sorted
+    }
+    pub fn sort_by_peso_desc(&mut self) {
+        #[allow(deprecated)]
+        self.campionamento.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+    }
+    pub fn sorted_by_peso_desc(&self) -> impl Iterator<Item = &RecordHFBI> {
+        #[allow(deprecated)]
+        let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
+
+        v.sort_by_peso_desc();
+
+        v.into_iter()
+    }
+}
+
+impl From<CampionamentoHFBI> for Vec<RecordHFBI> {
+    fn from(val: CampionamentoHFBI) -> Self {
+        #[allow(deprecated)]
+        let mut v = val.campionamento;
+
+        v.sort_by_peso_desc();
+
+        v
+    }
+}
+
+impl<'a> IntoIterator for &'a CampionamentoHFBI {
+    type Item = &'a RecordHFBI;
+    type IntoIter = std::vec::IntoIter<&'a RecordHFBI>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        #[allow(deprecated)]
+        let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
+
+        v.sort_by_peso_desc();
+
+        v.into_iter()
+    }
+}
+
+/// Custom field deserialize holding the order invariant for returned instances
+#[cfg(feature = "experimental")]
+fn deserialize_vec_record_hfbi_sorted<'de, D>(deserializer: D) -> Result<Vec<RecordHFBI>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let mut v = Vec::<RecordHFBI>::deserialize(deserializer)?;
+    v.sort_by_peso_desc();
+    Ok(v)
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum TipoLagunaCostieraHFBI {
     MAt1,
     MAt2,
@@ -638,7 +729,8 @@ impl TryFrom<i32> for TipoLagunaCostieraHFBI {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum StagioneHFBI {
     Primavera,
     Autunno,
@@ -666,7 +758,8 @@ impl TryFrom<i32> for StagioneHFBI {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum HabitatHFBI {
     Vegetato,
     NonVegetato,
@@ -707,7 +800,9 @@ pub struct AnagraficaHFBIDraft {
     pub larghezza_media_transetto: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
+#[serde(deny_unknown_fields)]
 pub struct AnagraficaHFBI {
     pub codice_stazione: String,
     pub corpo_idrico: String,
@@ -716,16 +811,80 @@ pub struct AnagraficaHFBI {
     pub tipo_laguna: TipoLagunaCostieraHFBI,
     pub stagione: StagioneHFBI,
     pub habitat_vegetato: HabitatHFBI,
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaHFBI::new() to construct"
+    )]
+    #[serde(deserialize_with = "deserialize_positive_f32")]
     pub lunghezza_media_transetto: f32,
+    #[deprecated(
+        note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaHFBI::new() to construct"
+    )]
+    #[serde(deserialize_with = "deserialize_positive_f32")]
     pub larghezza_media_transetto: f32,
 }
 
 impl AnagraficaHFBI {
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        codice_stazione: String,
+        corpo_idrico: String,
+        posizione: Location,
+        date_string: String,
+        tipo_laguna: TipoLagunaCostieraHFBI,
+        stagione: StagioneHFBI,
+        habitat_vegetato: HabitatHFBI,
+        lunghezza_media_transetto: PositiveF32,
+        larghezza_media_transetto: PositiveF32,
+    ) -> Self {
+        Self {
+            codice_stazione,
+            corpo_idrico,
+            posizione,
+            date_string,
+            tipo_laguna,
+            stagione,
+            habitat_vegetato,
+            #[allow(deprecated)]
+            lunghezza_media_transetto: *lunghezza_media_transetto,
+            #[allow(deprecated)]
+            larghezza_media_transetto: *larghezza_media_transetto,
+        }
+    }
     pub fn get_lunghezza_media(&self) -> f32 {
+        #[allow(deprecated)]
         self.lunghezza_media_transetto
     }
+
+    pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
+        if !val.is_finite() {
+            return Err(PositiveF32Error::NotFinite);
+        }
+        if val <= 0.0 {
+            return Err(PositiveF32Error::NotPositive);
+        }
+        #[allow(deprecated)]
+        {
+            self.lunghezza_media_transetto = val;
+        }
+        Ok(())
+    }
     pub fn get_larghezza_media(&self) -> f32 {
+        #[allow(deprecated)]
         self.larghezza_media_transetto
+    }
+
+    pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
+        if !val.is_finite() {
+            return Err(PositiveF32Error::NotFinite);
+        }
+        if val <= 0.0 {
+            return Err(PositiveF32Error::NotPositive);
+        }
+        #[allow(deprecated)]
+        {
+            self.larghezza_media_transetto = val;
+        }
+        Ok(())
     }
 
     pub fn get_cond_riferimento_key(&self) -> CondizioniRiferimentoKeyHFBI {
@@ -740,12 +899,13 @@ impl AnagraficaHFBI {
 impl fmt::Display for AnagraficaHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!("AnagraficaHFBI: {{ codice_stazione {{{}}}, corpo_idrico: {{{}}}, posizione: {{{}}}, data: {{{}}}, tipo_laguna: {{{}}}, stagione: {{{}}}, habitat: {{{}}}, lunghezza_transetto: {{{}}}, larghezza_transetto: {{{}}} }}",
-        self.codice_stazione, self.corpo_idrico, self.posizione, self.date_string, self.tipo_laguna, self.stagione, self.habitat_vegetato, self.lunghezza_media_transetto, self.larghezza_media_transetto);
+        self.codice_stazione, self.corpo_idrico, self.posizione, self.date_string, self.tipo_laguna, self.stagione, self.habitat_vegetato, self.get_lunghezza_media(), self.get_larghezza_media());
         write!(f, "{}", string_representation)
     }
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ValoriIntermediHFBI {
     pub bbent: f32,
     pub bn: f32,
@@ -774,9 +934,30 @@ impl ValoriIntermediHFBI {
         //chopping on newlines from add_console_message()
         println!("Valori intermedi: {{{self}}}");
     }
+
+    pub fn to_csv(&self, comma_csv_delimiter: bool) -> String {
+        let string_representation = if comma_csv_delimiter {
+            format!(
+                "bbent, bn, dbent, ddom, dhzp, dmig\n{}, {}, {}, {}, {}, {}",
+                self.bbent, self.bn, self.dbent, self.ddom, self.dhzp, self.dmig
+            )
+        } else {
+            format!(
+                "bbent; bn; dbent; ddom; dhzp; dmig\n{}; {}; {}; {}; {}; {}",
+                self.bbent.comma(),
+                self.bn.comma(),
+                self.dbent.comma(),
+                self.ddom.comma(),
+                self.dhzp.comma(),
+                self.dmig.comma()
+            )
+        };
+        string_representation
+    }
 }
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RisultatoHFBI {
     valore: Option<f32>,
     intermediates: ValoriIntermediHFBI,
@@ -809,6 +990,42 @@ impl RisultatoHFBI {
     pub fn get_intermediates(&self) -> ValoriIntermediHFBI {
         self.intermediates.clone()
     }
+    pub fn to_csv(&self, anagrafica: &AnagraficaHFBI, comma_csv_delimiter: bool) -> String {
+        let hfbi = match self.get_valore() {
+            Some(v) => v,
+            None => return "NC".to_string(),
+        };
+        let intermediates = self.get_intermediates();
+        let stato_ecologico = Some(StatoEcologicoHFBI::from(hfbi));
+        let stato_ecologico_str = match stato_ecologico {
+            Some(val) => {
+                format!("{val}")
+            }
+            None => "NC".to_string(),
+        };
+        let string_representation = if comma_csv_delimiter {
+            format!("Codice stazione, stagione, habitat vegetato, tipo laguna, MMI, HFBI, Stato ecologico\n{}, {}, {}, {}, {}, {}, {}",
+                    anagrafica.codice_stazione,
+                    anagrafica.stagione,
+                    anagrafica.habitat_vegetato,
+                    anagrafica.tipo_laguna,
+                    intermediates.mmi,
+                    hfbi,
+                    stato_ecologico_str
+            )
+        } else {
+            format!("Codice stazione; stagione; habitat vegetato; tipo laguna; MMI; HFBI; Stato ecologico\n{}; {}; {}; {}; {}; {}; {}",
+                    anagrafica.codice_stazione,
+                    anagrafica.stagione,
+                    anagrafica.habitat_vegetato,
+                    anagrafica.tipo_laguna,
+                    intermediates.mmi.comma(),
+                    hfbi.comma(),
+                    stato_ecologico_str
+            )
+        };
+        string_representation
+    }
 }
 
 #[derive(Hash, PartialEq, Eq)]
@@ -837,9 +1054,9 @@ impl CondizioniRiferimentoHFBI {
     }
 }
 
-static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: Lazy<
+static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: LazyLock<
     HashMap<CondizioniRiferimentoKeyHFBI, CondizioniRiferimentoHFBI>,
-> = Lazy::new(|| {
+> = LazyLock::new(|| {
     HashMap::from([
         // M-AT-1 data
         (
@@ -1047,5 +1264,227 @@ impl fmt::Display for StatoEcologicoHFBI {
             StatoEcologicoHFBI::Cattivo => "Cattivo",
         };
         write!(f, "{}", string_representation)
+    }
+}
+
+const STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE: f32 = 0.94;
+const STATO_ECOLOGICO_HFBI_SOGLIA_BUONO: f32 = 0.55;
+const STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE: f32 = 0.33;
+const STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO: f32 = 0.11;
+
+impl From<f32> for StatoEcologicoHFBI {
+    fn from(val: f32) -> Self {
+        if val >= STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE {
+            return StatoEcologicoHFBI::Eccellente;
+        }
+        if val >= STATO_ECOLOGICO_HFBI_SOGLIA_BUONO {
+            return StatoEcologicoHFBI::Buono;
+        }
+        if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE {
+            return StatoEcologicoHFBI::Sufficiente;
+        }
+        if val >= STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO {
+            return StatoEcologicoHFBI::Scarso;
+        }
+        StatoEcologicoHFBI::Cattivo
+    }
+}
+
+#[cfg(test)]
+mod domain_hfbi_private_tests {
+    use super::*;
+    fn create_specie_record(
+        codice_specie: &'static str,
+        gruppo_eco: GruppoEcoHFBI,
+        peso: f32,
+    ) -> RecordHFBI {
+        RecordHFBI {
+            specie: SpecieHFBI {
+                nome_comune: "Test Specie".to_string(),
+                codice_specie: codice_specie.to_string(),
+                autoctono: true,
+                gruppo_eco,
+                gruppo_trofico: GruppoTrofHFBI {
+                    microbentivori: 0.0,
+                    macrobentivori: 0.0,
+                    iperbentivori: 0.0,
+                    erbivori: 0.0,
+                    detritivori: 0.0,
+                    planctivori: 0.0,
+                    onnivori: 0.0,
+                },
+            },
+            numero_individui: 1,
+            peso,
+        }
+    }
+    #[cfg(test)]
+    impl CampionamentoHFBI {
+        /// Test helper to build unsorted instances
+        #[cfg(test)]
+        pub(crate) fn new_raw_unsorted(campionamento: Vec<RecordHFBI>) -> Self {
+            #[allow(deprecated)]
+            Self { campionamento }
+        }
+    }
+    #[cfg(test)]
+    impl AnagraficaHFBI {
+        /// Test helper to build unchecked instances
+        #[cfg(test)]
+        pub(crate) fn new_raw_unchecked(
+            codice_stazione: String,
+            corpo_idrico: String,
+            posizione: Location,
+            date_string: String,
+            tipo_laguna: TipoLagunaCostieraHFBI,
+            stagione: StagioneHFBI,
+            habitat_vegetato: HabitatHFBI,
+            lunghezza_media_transetto: f32,
+            larghezza_media_transetto: f32,
+        ) -> Self {
+            Self {
+                codice_stazione,
+                corpo_idrico,
+                posizione,
+                date_string,
+                tipo_laguna,
+                stagione,
+                habitat_vegetato,
+                #[allow(deprecated)]
+                lunghezza_media_transetto,
+                #[allow(deprecated)]
+                larghezza_media_transetto,
+            }
+        }
+
+        /// Test helper to mutate lunghezza with no checks
+        #[cfg(test)]
+        pub(crate) fn set_lunghezza_unchecked(&mut self, val: f32) {
+            #[allow(deprecated)]
+            {
+                self.lunghezza_media_transetto = val;
+            }
+        }
+        /// Test helper to mutate larghezza with no checks
+        #[cfg(test)]
+        pub(crate) fn set_larghezza_unchecked(&mut self, val: f32) {
+            #[allow(deprecated)]
+            {
+                self.larghezza_media_transetto = val;
+            }
+        }
+    }
+    #[test]
+    fn test_campionamentohfbi_new_order_invariant() {
+        let campione = CampionamentoHFBI::new(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+        ]);
+
+        #[allow(deprecated)]
+        let actual: Vec<(&str, f32)> = campione
+            .campionamento
+            .iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_campionamentohfbi_into_iter_order_invariant() {
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+        ]);
+
+        let actual: Vec<(&str, f32)> = campione
+            .into_iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_from_campionamentohfbi_to_vec_recordhfbi_order_invariant() {
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+        ]);
+
+        let into: Vec<RecordHFBI> = campione.into();
+
+        let actual: Vec<(&str, f32)> = into
+            .iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_campionamentohfbi_sort_by_peso_desc() {
+        let mut campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+        ]);
+
+        campione.sort_by_peso_desc();
+
+        #[allow(deprecated)]
+        let actual: Vec<(&str, f32)> = campione
+            .campionamento
+            .iter()
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_campionamentohfbi_sorted_by_peso_desc() {
+        let campione = CampionamentoHFBI::new_raw_unsorted(vec![
+            // Species 2: Migratory, contributes to most metrics
+            create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 200.0),
+            // Species 3: Resident, not dominant
+            create_specie_record("SP3", GruppoEcoHFBI::ResidentiDiEstuario, 100.0),
+            // Species 1: Migratory, dominant, contributes to all metrics
+            create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
+        ]);
+
+        let sorted = campione.sorted_by_peso_desc();
+
+        let actual: Vec<(&str, f32)> = sorted
+            .map(|r| (r.specie.codice_specie.as_str(), r.peso))
+            .collect();
+
+        let expected = vec![("SP1", 500.0), ("SP2", 200.0), ("SP3", 100.0)];
+
+        assert_eq!(actual, expected);
     }
 }

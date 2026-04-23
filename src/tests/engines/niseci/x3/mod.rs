@@ -69,7 +69,7 @@ fn calculate_x3_alieni_tipo_1_strutt() {
         lunghezza: 2,
         peso: 2.0,
     };
-    c.campionamento.push(ciaccio);
+    c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
 
@@ -88,7 +88,7 @@ fn calculate_x3_alieni_tipo_2_strutt() {
         lunghezza: 2,
         peso: 2.0,
     };
-    c.campionamento.push(ciaccio);
+    c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
 
@@ -107,7 +107,7 @@ fn calculate_x3_alieni_tipo_3_strutt() {
         lunghezza: 2,
         peso: 2.0,
     };
-    c.campionamento.push(ciaccio);
+    c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
 
@@ -126,7 +126,7 @@ fn calculate_x3_alieni_tipo_3_destrutt() {
         lunghezza: 2,
         peso: 2.0,
     };
-    c.campionamento.push(ciaccio);
+    c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
 
@@ -145,7 +145,7 @@ fn calculate_x3_alieni_tipo_3_mediam_strutt() {
         lunghezza: 2,
         peso: 2.0,
     };
-    c.campionamento.push(ciaccio);
+    c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
 

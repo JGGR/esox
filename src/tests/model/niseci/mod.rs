@@ -67,7 +67,7 @@ fn test_calcolo_pesci_per_passaggio() {
 
     c1.append(&mut c2);
     c1.append(&mut c3);
-    let campionamento = CampionamentoNISECI { campionamento: c1 };
+    let campionamento = CampionamentoNISECI::new(c1);
 
     let pesci_per_passaggio = campionamento.fishes_for_every_passage();
 
