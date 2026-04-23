@@ -406,15 +406,15 @@ pub fn parse_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
         };
         errors.push(err);
     }
-    if records.is_empty() {
+    let r = if let Some(r) = records.first() {
+        r
+    } else {
         let err = RecordAnagraficaNISECIError::ValoreInvalido {
             msg: "Nessun record trovato: atteso 1".to_string(),
         };
         errors.push(err);
         return Err(errors);
-    }
-
-    let r = records.first().unwrap();
+    };
 
     if r.codice_stazione().is_empty() {
         let err = RecordAnagraficaNISECIError::ValoreInvalido {

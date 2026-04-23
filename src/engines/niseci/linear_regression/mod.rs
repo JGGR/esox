@@ -32,6 +32,7 @@ impl<T> Point<T> {
 #[derive(Debug)]
 pub enum LinearRegressionError {
     SameValues,
+    EmptyInput,
 }
 
 fn gradient_descent(m_now: f32, b_now: f32, points: &[Point<f32>], step: f32) -> (f32, f32) {
@@ -74,7 +75,7 @@ pub fn gradient_descent_iterate(
         (m_norm, b_norm) = gradient_descent(m_norm, b_norm, &normalized_points, STEP);
     }
 
-    let (m_final, b_final) = denormalize_retta(m_norm, b_norm, points);
+    let (m_final, b_final) = denormalize_retta(m_norm, b_norm, points)?;
 
     Ok((m_final, b_final))
 }
@@ -86,6 +87,7 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
         Err(error) => {
             match error {
                 LinearRegressionError::SameValues => return Ok(get_sum(campionamenti)), // come da accordi ritorno la somma
+                LinearRegressionError::EmptyInput => return Err(format!("empty input")),
             }
         }
     };
@@ -111,25 +113,54 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
 /// La denormalizzazione riporta la retta normalizzata (rappresentata da m_norm e b_norm)
 /// che vive nel piano normalizzato {[0, 1], [0, 1]},
 /// nel suo spazio originale (piano cartesiano {R, R})
-fn denormalize_retta(m_norm: f32, b_norm: f32, points: &[Point<i32>]) -> (f32, f32) {
-    let max_x = points.iter().map(|p| p.x).max().unwrap() as f32;
-    let min_x = points.iter().map(|p| p.x).min().unwrap() as f32;
+fn denormalize_retta(
+    m_norm: f32,
+    b_norm: f32,
+    points: &[Point<i32>],
+) -> Result<(f32, f32), LinearRegressionError> {
+    let mut iter = points.iter();
 
-    let max_y = points.iter().map(|p| p.y).max().unwrap() as f32;
-    let min_y = points.iter().map(|p| p.y).min().unwrap() as f32;
+    let first = match iter.next() {
+        Some(p) => p,
+        None => return Err(LinearRegressionError::EmptyInput),
+    };
+
+    let (mut min_x, mut max_x) = (first.x, first.x);
+    let (mut min_y, mut max_y) = (first.y, first.y);
+
+    for p in iter {
+        min_x = min_x.min(p.x);
+        max_x = max_x.max(p.x);
+        min_y = min_y.min(p.y);
+        max_y = max_y.max(p.y);
+    }
+
+    let (min_x, max_x, min_y, max_y) = (min_x as f32, max_x as f32, min_y as f32, max_y as f32);
 
     let m = m_norm * (max_y - min_y) / (max_x - min_x);
     let b = b_norm * (max_y - min_y) + min_y - m * min_x;
-    (m, b)
+    Ok((m, b))
 }
 
 fn normalize_points(points: &[Point<i32>]) -> Result<Vec<Point<f32>>, LinearRegressionError> {
-    let max_x = points.iter().map(|p| p.x).max().unwrap() as f32;
-    let min_x = points.iter().map(|p| p.x).min().unwrap() as f32;
+    let mut iter = points.iter();
 
-    let max_y = points.iter().map(|p| p.y).max().unwrap() as f32;
-    let min_y = points.iter().map(|p| p.y).min().unwrap() as f32;
+    let first = match iter.next() {
+        Some(p) => p,
+        None => return Err(LinearRegressionError::EmptyInput),
+    };
 
+    let (mut min_x, mut max_x) = (first.x, first.x);
+    let (mut min_y, mut max_y) = (first.y, first.y);
+
+    for p in iter {
+        min_x = min_x.min(p.x);
+        max_x = max_x.max(p.x);
+        min_y = min_y.min(p.y);
+        max_y = max_y.max(p.y);
+    }
+
+    let (min_x, max_x, min_y, max_y) = (min_x as f32, max_x as f32, min_y as f32, max_y as f32);
     let epsilon: f32 = 1e-6;
     if (max_y - min_y).abs() < epsilon {
         return Err(LinearRegressionError::SameValues);

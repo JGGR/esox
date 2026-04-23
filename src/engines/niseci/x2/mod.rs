@@ -497,13 +497,24 @@ fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32, f32
 
 fn get_quantita_stimata(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
     if passaggi.len() == 1 {
-        return Ok(*passaggi.values().next().unwrap()); // sempre valorizzato
+        return passaggi
+            .values()
+            .next()
+            .copied()
+            .ok_or_else(|| "unexpected empty map".to_string());
     }
 
     // passaggi viene creata in calculate_sommatoria_x2_b()
-    if passaggi.len() == 2 && passaggi.contains_key(&1) && passaggi.contains_key(&2) {
-        let c1 = *passaggi.get(&1).unwrap();
-        let c2 = *passaggi.get(&2).unwrap();
+    if passaggi.len() == 2 {
+        let c1 = match passaggi.get(&1) {
+            Some(v) => *v,
+            None => return Err("missing key 1".to_string()),
+        };
+
+        let c2 = match passaggi.get(&2) {
+            Some(v) => *v,
+            None => return Err("missing key 2".to_string()),
+        };
 
         return calculate_passaggi_ripetuti(c1, c2);
     }
@@ -527,7 +538,10 @@ fn calculate_passaggi_ripetuti(c1: u32, c2: u32) -> Result<u32, String> {
 }
 
 fn calculate_q_stimata_regression(passaggi: &HashMap<u8, u32>) -> Result<u32, String> {
-    let ultimo_passaggio = *passaggi.keys().max().unwrap();
+    let ultimo_passaggio = match passaggi.keys().max() {
+        Some(&k) => k,
+        None => return Err("passaggi vuoto".to_string()),
+    };
 
     // dalla mappa non riesco a capire se ci siano o meno dei passaggi in cui non è stato trovato pesce
     // quindi mi creo un vettore che rappresenta i pesci trovati per ogni passaggio in ordine di passaggio
@@ -594,8 +608,7 @@ mod x2_private_tests {
 
         let q_stimata = calculate_q_stimata_regression(&passaggi);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(190, q_stimata.unwrap());
+        assert_eq!(Ok(190), q_stimata);
     }
 
     #[test]
@@ -607,8 +620,7 @@ mod x2_private_tests {
 
         let q_stimata = calculate_q_stimata_regression(&passaggi);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(225, q_stimata.unwrap());
+        assert_eq!(Ok(225), q_stimata);
     }
 
     #[test]
@@ -620,37 +632,32 @@ mod x2_private_tests {
 
         let q_stimata = calculate_q_stimata_regression(&passaggi);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(150, q_stimata.unwrap());
+        assert_eq!(Ok(150), q_stimata);
     }
 
     #[test]
     fn calcola_passaggi_ripetuti() {
         let q_stimata_1 = calculate_passaggi_ripetuti(30, 12);
 
-        assert!(q_stimata_1.is_ok());
-        assert_eq!(q_stimata_1.unwrap(), 50);
+        assert_eq!(Ok(50), q_stimata_1);
 
         let q_stimata_2 = calculate_passaggi_ripetuti(30, 15);
 
-        assert!(q_stimata_2.is_ok());
-        assert_eq!(q_stimata_2.unwrap(), 60);
+        assert_eq!(Ok(60), q_stimata_2);
     }
 
     #[test]
     fn calcola_passaggi_ripetuti_negative() {
         let q_stimata = calculate_passaggi_ripetuti(15, 30);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(q_stimata.unwrap(), 45);
+        assert_eq!(Ok(45), q_stimata);
     }
 
     #[test]
     fn calcola_passaggi_ripetuti_same_values() {
         let q_stimata = calculate_passaggi_ripetuti(30, 30);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(q_stimata.unwrap(), 60);
+        assert_eq!(Ok(60), q_stimata);
     }
 
     #[test]
@@ -663,8 +670,7 @@ mod x2_private_tests {
 
         let q_stimata = get_quantita_stimata(&passaggi);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(190, q_stimata.unwrap());
+        assert_eq!(Ok(190), q_stimata);
     }
 
     #[test]
@@ -675,8 +681,7 @@ mod x2_private_tests {
 
         let q_stimata = get_quantita_stimata(&passaggi);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(50, q_stimata.unwrap());
+        assert_eq!(Ok(50), q_stimata);
 
         let mut passaggi2: HashMap<u8, u32> = HashMap::new();
         passaggi2.insert(1, 30);
@@ -684,8 +689,7 @@ mod x2_private_tests {
 
         let q_stimata2 = get_quantita_stimata(&passaggi2);
 
-        assert!(q_stimata2.is_ok());
-        assert_eq!(60, q_stimata2.unwrap());
+        assert_eq!(Ok(60), q_stimata2);
     }
 
     #[test]
@@ -696,8 +700,7 @@ mod x2_private_tests {
 
         let q_stimata = get_quantita_stimata(&passaggi);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(q_stimata.unwrap(), 45);
+        assert_eq!(Ok(45), q_stimata);
     }
 
     #[test]
@@ -709,8 +712,7 @@ mod x2_private_tests {
 
         let q_stimata = get_quantita_stimata(&passaggi);
 
-        assert!(q_stimata.is_ok());
-        assert_eq!(q_stimata.unwrap(), 225);
+        assert_eq!(Ok(225), q_stimata);
     }
 
     #[test]
@@ -728,10 +730,7 @@ mod x2_private_tests {
 
         let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
 
-        assert!(x2_b.is_ok());
-
-        let (x2_b, _densita_stimata, _q_stimata) = x2_b.unwrap();
-        assert_eq!(x2_b, 1.0)
+        assert_eq!(Ok(1.0), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
@@ -751,10 +750,7 @@ mod x2_private_tests {
 
         let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
 
-        assert!(x2_b.is_ok());
-
-        let (x2_b, _densita_stimata, _q_stimata) = x2_b.unwrap();
-        assert_eq!(x2_b, 0.5)
+        assert_eq!(Ok(0.5), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
@@ -774,10 +770,7 @@ mod x2_private_tests {
 
         let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
 
-        assert!(x2_b.is_ok());
-
-        let (x2_b, _densita_stimata, _q_stimata) = x2_b.unwrap();
-        assert_eq!(x2_b, 0.0)
+        assert_eq!(Ok(0.0), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
@@ -793,10 +786,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.5, x2_a);
+        assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -812,9 +802,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.5, x2_a);
+        assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -830,9 +818,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(1.0, x2_a);
+        assert_eq!(Ok(1.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -848,9 +834,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(1.0, x2_a);
+        assert_eq!(Ok(1.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -866,9 +850,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(1.0, x2_a);
+        assert_eq!(Ok(1.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -884,9 +866,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.5, x2_a);
+        assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -902,9 +882,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.5, x2_a);
+        assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -920,9 +898,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.5, x2_a);
+        assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -938,9 +914,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.0, x2_a);
+        assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -956,9 +930,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.0, x2_a);
+        assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -974,9 +946,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.0, x2_a);
+        assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -992,9 +962,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.0, x2_a);
+        assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -1010,9 +978,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.0, x2_a);
+        assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -1028,9 +994,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.0, x2_a);
+        assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -1046,9 +1010,7 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.0, x2_a);
+        assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
@@ -1064,8 +1026,6 @@ mod x2_private_tests {
 
         let x2_a = calculate_x2_a(&classe);
 
-        assert!(x2_a.is_ok());
-        let (x2_a, _criteri_x2_a) = x2_a.unwrap();
-        assert_eq!(0.5, x2_a);
+        assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 }

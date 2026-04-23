@@ -163,16 +163,15 @@ pub fn parse_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
         };
         errors.push(err);
     }
-    if records.is_empty() {
+    let r = if let Some(r) = records.first() {
+        r
+    } else {
         let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: "Nessun record trovato: atteso 1".to_string(),
         };
         errors.push(err);
         return Err(errors);
-    }
-
-    let r = records.first().unwrap();
-
+    };
     if r.codice_stazione().is_empty() {
         let err = RecordAnagraficaHFBIError::ValoreInvalido {
             msg: format!("Codice stazione troppo corto: {}", r.codice_stazione()),

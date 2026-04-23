@@ -991,11 +991,10 @@ impl RisultatoHFBI {
         self.intermediates.clone()
     }
     pub fn to_csv(&self, anagrafica: &AnagraficaHFBI, comma_csv_delimiter: bool) -> String {
-        let hfbi_opt = self.get_valore();
-        if hfbi_opt.is_none() {
-            return "NC".to_string();
-        }
-        let hfbi = hfbi_opt.unwrap();
+        let hfbi = match self.get_valore() {
+            Some(v) => v,
+            None => return "NC".to_string(),
+        };
         let intermediates = self.get_intermediates();
         let stato_ecologico = Some(StatoEcologicoHFBI::from(hfbi));
         let stato_ecologico_str = match stato_ecologico {
