@@ -42,6 +42,15 @@ pub enum JsonDeserError {
     JsonArray(serde_json::Error),
 }
 
+impl From<JsonDispatchError> for JsonDeserError {
+    fn from(err: JsonDispatchError) -> Self {
+        match err {
+            JsonDispatchError::Io(e) => JsonDeserError::Io(e),
+            JsonDispatchError::JsonArray(errs) => JsonDeserError::JsonArray(errs),
+        }
+    }
+}
+
 use serde::de::DeserializeOwned;
 use serde_json::Deserializer;
 use std::io::{BufRead, BufReader, Read};

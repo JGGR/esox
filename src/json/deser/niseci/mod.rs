@@ -19,9 +19,7 @@ use crate::deser::{
     parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
     RecordCampionamentoNISECI, RecordRiferimentoNISECI,
 };
-use crate::json::deser::{
-    dispatch_json_input, JsonDeserError, JsonDispatchError, JsonPathCheckError,
-};
+use crate::json::deser::{dispatch_json_input, JsonDeserError, JsonPathCheckError};
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -33,18 +31,12 @@ where
 {
     dispatch_json_input(
         reader,
-        |res| match res {
-            Ok(v) => Ok(v),
-            Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
-        },
+        |res| res.map_err(Into::into),
         |deser| {
-            let iter = deser.into_iter::<T>();
-            let (records, errs) = parse_serialized_records(iter);
-            if !errs.is_empty() {
-                return Err(JsonDeserError::Json(errs));
-            }
-            Ok(records)
+            let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
+            errs.is_empty()
+                .then_some(records)
+                .ok_or(JsonDeserError::Json(errs))
         },
     )
 }
@@ -55,19 +47,12 @@ where
 {
     dispatch_json_input(
         reader,
-        |res| match res {
-            Ok(v) => Ok(v),
-            Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
-        },
+        |res| res.map_err(Into::into),
         |deser| {
-            let iter = deser.into_iter::<T>();
-            validate_serialized_records(iter, |errors| {
-                for error in errors {
-                    eprintln!("  {}", error);
-                }
+            validate_serialized_records(deser.into_iter::<T>(), |errs| {
+                errs.iter().for_each(|e| eprintln!("  {}", e));
             })
-            .map_err(|errs| JsonDeserError::Json(errs))
+            .map_err(JsonDeserError::Json)
         },
     )
 }
@@ -79,18 +64,12 @@ where
 {
     dispatch_json_input(
         reader,
-        |res| match res {
-            Ok(v) => Ok(v),
-            Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
-        },
+        |res| res.map_err(Into::into),
         |deser| {
-            let iter = deser.into_iter::<T>();
-            let (records, errs) = parse_serialized_records(iter);
-            if !errs.is_empty() {
-                return Err(JsonDeserError::Json(errs));
-            }
-            Ok(records)
+            let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
+            errs.is_empty()
+                .then_some(records)
+                .ok_or(JsonDeserError::Json(errs))
         },
     )
 }
@@ -101,19 +80,12 @@ where
 {
     dispatch_json_input(
         reader,
-        |res| match res {
-            Ok(v) => Ok(v),
-            Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
-        },
+        |res| res.map_err(Into::into),
         |deser| {
-            let iter = deser.into_iter::<T>();
-            validate_serialized_records(iter, |errors| {
-                for error in errors {
-                    eprintln!("  {}", error);
-                }
+            validate_serialized_records(deser.into_iter::<T>(), |errs| {
+                errs.iter().for_each(|e| eprintln!("  {}", e));
             })
-            .map_err(|errs| JsonDeserError::Json(errs))
+            .map_err(JsonDeserError::Json)
         },
     )
 }
@@ -125,18 +97,12 @@ where
 {
     dispatch_json_input(
         reader,
-        |res: Result<Vec<T>, _>| match res {
-            Ok(v) => Ok(v),
-            Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
-        },
+        |res| res.map_err(Into::into),
         |deser| {
-            let iter = deser.into_iter::<T>();
-            let (records, errs) = parse_serialized_records(iter);
-            if !errs.is_empty() {
-                return Err(JsonDeserError::Json(errs));
-            }
-            Ok(records)
+            let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
+            errs.is_empty()
+                .then_some(records)
+                .ok_or(JsonDeserError::Json(errs))
         },
     )
 }
@@ -147,19 +113,12 @@ where
 {
     dispatch_json_input(
         reader,
-        |res: Result<Vec<T>, _>| match res {
-            Ok(v) => Ok(v),
-            Err(JsonDispatchError::Io(e)) => Err(JsonDeserError::Io(e)),
-            Err(JsonDispatchError::JsonArray(errs)) => Err(JsonDeserError::JsonArray(errs)),
-        },
+        |res| res.map_err(Into::into),
         |deser| {
-            let iter = deser.into_iter::<T>();
-            validate_serialized_records(iter, |errors| {
-                for error in errors {
-                    eprintln!("  {}", error);
-                }
+            validate_serialized_records(deser.into_iter::<T>(), |errs| {
+                errs.iter().for_each(|e| eprintln!("  {}", e));
             })
-            .map_err(|errs| JsonDeserError::Json(errs))
+            .map_err(JsonDeserError::Json)
         },
     )
 }
