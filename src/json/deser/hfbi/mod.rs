@@ -64,11 +64,7 @@ where
     T: RecordCampionamentoHFBI,
 {
     let file = File::open(path)?;
-    check_campionamento_hfbi_reader(file).map_err(|e| match e {
-        JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
-        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
-        JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
-    })
+    check_campionamento_hfbi_reader(file).map_err(Into::into)
 }
 
 pub fn parse_json_anagrafica_hfbi<R, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
@@ -109,9 +105,5 @@ where
     T: RecordAnagraficaHFBI,
 {
     let file = File::open(path)?;
-    check_anagrafica_hfbi_reader(file).map_err(|e| match e {
-        JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
-        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
-        JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
-    })
+    check_anagrafica_hfbi_reader(file).map_err(Into::into)
 }

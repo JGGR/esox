@@ -130,11 +130,7 @@ where
     T: RecordRiferimentoNISECI,
 {
     let file = File::open(path)?;
-    check_riferimento_niseci_reader(file).map_err(|e| match e {
-        JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
-        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
-        JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
-    })
+    check_riferimento_niseci_reader(file).map_err(Into::into)
 }
 
 pub fn check_campionamento_niseci_path<T>(
@@ -144,11 +140,7 @@ where
     T: RecordCampionamentoNISECI,
 {
     let file = File::open(path)?;
-    check_campionamento_niseci_reader(file).map_err(|e| match e {
-        JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
-        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
-        JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
-    })
+    check_campionamento_niseci_reader(file).map_err(Into::into)
 }
 
 pub fn check_anagrafica_niseci_path<T>(path: impl AsRef<Path>) -> Result<Vec<T>, JsonPathCheckError>
@@ -156,9 +148,5 @@ where
     T: RecordAnagraficaNISECI,
 {
     let file = File::open(path)?;
-    check_anagrafica_niseci_reader(file).map_err(|e| match e {
-        JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
-        JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
-        JsonDeserError::Io(e) => JsonPathCheckError::Io(e),
-    })
+    check_anagrafica_niseci_reader(file).map_err(Into::into)
 }

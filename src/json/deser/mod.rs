@@ -18,18 +18,6 @@
 pub mod hfbi;
 pub mod niseci;
 
-pub enum JsonPathCheckError {
-    Io(std::io::Error),
-    Json(Vec<serde_json::Error>),
-    JsonArray(serde_json::Error),
-}
-
-impl From<std::io::Error> for JsonPathCheckError {
-    fn from(err: std::io::Error) -> Self {
-        JsonPathCheckError::Io(err)
-    }
-}
-
 pub enum JsonDispatchError {
     Io(std::io::Error),
     JsonArray(serde_json::Error),
@@ -47,6 +35,29 @@ impl From<JsonDispatchError> for JsonDeserError {
         match err {
             JsonDispatchError::Io(e) => JsonDeserError::Io(e),
             JsonDispatchError::JsonArray(errs) => JsonDeserError::JsonArray(errs),
+        }
+    }
+}
+
+pub enum JsonPathCheckError {
+    Io(std::io::Error),
+    DeserIo(std::io::Error),
+    Json(Vec<serde_json::Error>),
+    JsonArray(serde_json::Error),
+}
+
+impl From<std::io::Error> for JsonPathCheckError {
+    fn from(err: std::io::Error) -> Self {
+        JsonPathCheckError::Io(err)
+    }
+}
+
+impl From<JsonDeserError> for JsonPathCheckError {
+    fn from(err: JsonDeserError) -> Self {
+        match err {
+            JsonDeserError::Json(errs) => JsonPathCheckError::Json(errs),
+            JsonDeserError::JsonArray(err) => JsonPathCheckError::JsonArray(err),
+            JsonDeserError::Io(e) => JsonPathCheckError::DeserIo(e),
         }
     }
 }
