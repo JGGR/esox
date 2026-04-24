@@ -87,7 +87,7 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
         Err(error) => {
             match error {
                 LinearRegressionError::SameValues => return Ok(get_sum(campionamenti)), // come da accordi ritorno la somma
-                LinearRegressionError::EmptyInput => return Err(format!("empty input")),
+                LinearRegressionError::EmptyInput => return Err("empty input".to_string()),
             }
         }
     };
