@@ -16,11 +16,13 @@
 */
 use crate::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader, PlainRecordCsvAnagraficaHFBI,
-    PlainRecordCsvCampionamentoHFBI, VeryItalianRecordCsvAnagraficaHFBI,
-    VeryItalianRecordCsvCampionamentoHFBI,
+    PlainRecordCsvCampionamentoHFBI,
 };
 use crate::csv::deser::NormalizerReader;
 use crate::csv::load::InputFormat;
+use crate::csv::stanis::hfbi::{
+    VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
+};
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 use crate::parser::hfbi::{
@@ -97,7 +99,7 @@ where
         >(normalizing_reader, has_headers),
         InputFormat::Alternative => load_csv_campionamento_hfbi_from_reader::<
             NormalizerReader<R>,
-            VeryItalianRecordCsvCampionamentoHFBI,
+            VeryItalianRecordCampionamentoHFBI,
         >(normalizing_reader, has_headers),
     }
 }
@@ -178,7 +180,7 @@ where
         >(normalizing_reader, has_headers),
         InputFormat::Alternative => load_csv_anagrafica_hfbi_from_reader::<
             NormalizerReader<R>,
-            VeryItalianRecordCsvAnagraficaHFBI,
+            VeryItalianRecordAnagraficaHFBI,
         >(normalizing_reader, has_headers),
     }
 }

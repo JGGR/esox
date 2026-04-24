@@ -1,3 +1,9 @@
+## [0.1.4] - Unreleased
+
+### Changed
+
+- Deprecation warnings for visibility of `csv::deser::{niseci,hfbi}::VeryItalianRecordCsv*` structs
+
 ## [0.1.3] - 2026-04-24
 
 ### Added

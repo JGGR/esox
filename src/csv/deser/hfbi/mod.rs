@@ -15,9 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
-};
+use crate::csv::deser::{check_path_is_file_ends_with_csv, process_csv_errors, NormalizerReader};
 use crate::deser::{
     parse_serialized_records, validate_serialized_records, RecordAnagraficaHFBI,
     RecordCampionamentoHFBI, TipoRecord,
@@ -28,38 +26,11 @@ use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
 
-/// Currently allows unknown fields; will switch to
-/// `#[serde(deny_unknown_fields)]` in a future release.
-#[derive(Debug, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VeryItalianRecordCsvCampionamentoHFBI {
-    pub codice_specie: String,
-    pub numero_individui: u32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub peso: f32,
-}
-
-impl RecordCampionamentoHFBI for VeryItalianRecordCsvCampionamentoHFBI {
-    fn codice_specie(&self) -> String {
-        self.codice_specie.clone()
-    }
-    fn numero_individui(&self) -> u32 {
-        self.numero_individui
-    }
-    fn peso(&self) -> f32 {
-        self.peso
-    }
-}
-
-impl fmt::Display for VeryItalianRecordCsvCampionamentoHFBI {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = format!(
-            "RecordCampionamentoHFBI: {{ codice_specie: [{}], numero_individui: [{}], peso: [{}] }}",
-              self.codice_specie, self.numero_individui, self.peso
-        );
-        write!(f, "{}", string_representation)
-    }
-}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::csv::stanis::hfbi::VeryItalianRecordCampionamentoHFBI instead"
+)]
+pub use crate::csv::stanis::hfbi::VeryItalianRecordCampionamentoHFBI as VeryItalianRecordCsvCampionamentoHFBI;
+use crate::csv::stanis::hfbi::VeryItalianRecordCampionamentoHFBI;
 
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
@@ -115,7 +86,7 @@ where
 
     // Match on the TypeId to determine the actual type of T
     let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCsvCampionamentoHFBI>() => b';',
+        id if id == TypeId::of::<VeryItalianRecordCampionamentoHFBI>() => b';',
         _ => b',',
     };
 
@@ -158,79 +129,11 @@ where
     check_campionamento_hfbi_reader(file, has_headers)
 }
 
-/// Currently allows unknown fields; will switch to
-/// `#[serde(deny_unknown_fields)]` in a future release.
-#[derive(Debug, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VeryItalianRecordCsvAnagraficaHFBI {
-    pub codice_stazione: String,
-    pub corpo_idrico: String,
-    pub regione: String,
-    pub provincia: String,
-    pub data: String,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub lunghezza_stazione: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub larghezza_stazione: f32,
-    pub stagione: u32,
-    pub habitat: u32,
-    pub tipo_laguna: u32,
-}
-
-impl RecordAnagraficaHFBI for VeryItalianRecordCsvAnagraficaHFBI {
-    fn codice_stazione(&self) -> String {
-        self.codice_stazione.clone()
-    }
-    fn corpo_idrico(&self) -> String {
-        self.corpo_idrico.clone()
-    }
-    fn regione(&self) -> String {
-        self.regione.clone()
-    }
-    fn provincia(&self) -> String {
-        self.provincia.clone()
-    }
-    fn data(&self) -> String {
-        self.data.clone()
-    }
-    fn lunghezza_stazione(&self) -> f32 {
-        self.lunghezza_stazione
-    }
-    fn larghezza_stazione(&self) -> f32 {
-        self.larghezza_stazione
-    }
-    fn stagione(&self) -> u32 {
-        self.stagione
-    }
-    fn habitat(&self) -> u32 {
-        self.habitat
-    }
-    fn tipo_laguna(&self) -> u32 {
-        self.tipo_laguna
-    }
-}
-
-impl fmt::Display for VeryItalianRecordCsvAnagraficaHFBI {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = format!(
-            "RecordAnagraficaHFBI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
-            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
-            larghezza_stazione: [{}], stagione [{}], habitat [{}],\
-            tipo_laguna: [{}]}}",
-            self.codice_stazione,
-            self.corpo_idrico,
-            self.regione,
-            self.provincia,
-            self.data,
-            self.lunghezza_stazione,
-            self.larghezza_stazione,
-            self.stagione,
-            self.habitat,
-            self.tipo_laguna
-        );
-        write!(f, "{}", string_representation)
-    }
-}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::csv::stanis::hfbi::VeryItalianRecordAnagraficaHFBI instead"
+)]
+pub use crate::csv::stanis::hfbi::VeryItalianRecordAnagraficaHFBI as VeryItalianRecordCsvAnagraficaHFBI;
+use crate::csv::stanis::hfbi::VeryItalianRecordAnagraficaHFBI;
 
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
@@ -326,7 +229,7 @@ where
 
     // Match on the TypeId to determine the actual type of T
     let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCsvAnagraficaHFBI>() => b';',
+        id if id == TypeId::of::<VeryItalianRecordAnagraficaHFBI>() => b';',
         _ => b',',
     };
 

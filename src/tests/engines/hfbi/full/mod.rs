@@ -14,13 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::csv::deser::hfbi::{
-    check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader,
-    VeryItalianRecordCsvAnagraficaHFBI, VeryItalianRecordCsvCampionamentoHFBI,
-};
+use crate::csv::deser::hfbi::{check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader};
 use crate::csv::load::{
     hfbi::{load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader},
     InputFormat,
+};
+use crate::csv::stanis::hfbi::{
+    VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
 };
 use crate::domain::hfbi::ValoriIntermediHFBI;
 use crate::engines::hfbi::full::calculate_hfbi;
@@ -34,7 +34,7 @@ fn calculate_hfbi_template() {
 
     let campionamento_csv_check = check_campionamento_hfbi_reader::<
         _,
-        VeryItalianRecordCsvCampionamentoHFBI,
+        VeryItalianRecordCampionamentoHFBI,
     >(campionamento_reader, true);
 
     assert!(campionamento_csv_check.is_ok());
@@ -49,10 +49,8 @@ fn calculate_hfbi_template() {
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
 
-    let anagrafica_csv_check = check_anagrafica_hfbi_reader::<_, VeryItalianRecordCsvAnagraficaHFBI>(
-        anagrafica_reader,
-        true,
-    );
+    let anagrafica_csv_check =
+        check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(anagrafica_reader, true);
 
     assert!(anagrafica_csv_check.is_ok());
 

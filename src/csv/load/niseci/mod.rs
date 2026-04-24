@@ -19,11 +19,13 @@ use crate::csv::deser::niseci::{
     check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
     check_riferimento_niseci_reader, PlainRecordCsvAnagraficaNISECI,
     PlainRecordCsvCampionamentoNISECI, PlainRecordCsvRiferimentoNISECI,
-    VeryItalianRecordCsvAnagraficaNISECI, VeryItalianRecordCsvCampionamentoNISECI,
-    VeryItalianRecordCsvRiferimentoNISECI,
 };
 use crate::csv::deser::NormalizerReader;
 use crate::csv::load::InputFormat;
+use crate::csv::stanis::niseci::{
+    VeryItalianRecordAnagraficaNISECI, VeryItalianRecordCampionamentoNISECI,
+    VeryItalianRecordRiferimentoNISECI,
+};
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use crate::domain::niseci::{AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI};
 use crate::parser::niseci::{
@@ -101,7 +103,7 @@ where
         >(normalizing_reader, has_headers),
         InputFormat::Alternative => load_csv_riferimento_niseci_from_reader::<
             NormalizerReader<R>,
-            VeryItalianRecordCsvRiferimentoNISECI,
+            VeryItalianRecordRiferimentoNISECI,
         >(normalizing_reader, has_headers),
     }
 }
@@ -188,7 +190,7 @@ where
         >(normalizing_reader, has_headers, riferimento),
         InputFormat::Alternative => load_csv_campionamento_niseci_from_reader::<
             NormalizerReader<R>,
-            VeryItalianRecordCsvCampionamentoNISECI,
+            VeryItalianRecordCampionamentoNISECI,
         >(normalizing_reader, has_headers, riferimento),
     }
 }
@@ -271,7 +273,7 @@ where
         >(normalizing_reader, has_headers),
         InputFormat::Alternative => load_csv_anagrafica_niseci_from_reader::<
             NormalizerReader<R>,
-            VeryItalianRecordCsvAnagraficaNISECI,
+            VeryItalianRecordAnagraficaNISECI,
         >(normalizing_reader, has_headers),
     }
 }
