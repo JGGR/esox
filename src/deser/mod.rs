@@ -131,20 +131,6 @@ pub fn check_serialized_records<T, E>(
 }
 
 #[deprecated(
-    note = "v0.2 will drop visibility. Use `check_serialized_records` and handle errors explicitly instead.\nItalian formatting can be used from esox::csv::stanis::giorgio::format_csv_errors"
-)]
-pub fn validate_serialized_records<T, E, F>(
-    iter: impl IntoIterator<Item = Result<T, E>>,
-    on_error: F,
-) -> Result<Vec<T>, Vec<E>>
-where
-    F: Fn(&Vec<E>),
-{
-    #[expect(deprecated)]
-    debug_serialized_records::<T, E, F>(iter, on_error)
-}
-
-#[deprecated(
     note = "Use `check_serialized_records` and handle errors explicitly instead.\nItalian formatting can be used from esox::csv::stanis::giorgio::format_csv_errors"
 )]
 pub fn debug_serialized_records<T, E, F>(

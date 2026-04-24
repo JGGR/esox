@@ -15,15 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#[expect(deprecated)]
 use esox::csv::deser::hfbi::{check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader};
-#[expect(deprecated)]
-use esox::csv::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
 use esox::csv::stanis::hfbi::{
     VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
 };
-use esox::domain::hfbi::CampionamentoHFBI;
 use esox::engines::hfbi::full::calculate_hfbi;
+use esox::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
 use std::io::Cursor;
 
 const CAMPIONAMENTO_HFBI_TEMPLATE_DATA: &[u8] =
@@ -36,7 +33,6 @@ fn calculate_hfbi_template() {
     let has_headers = true;
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_HFBI_TEMPLATE_DATA);
 
-    #[expect(deprecated)]
     let campionamento_csv_check = check_campionamento_hfbi_reader::<
         _,
         VeryItalianRecordCampionamentoHFBI,
@@ -46,7 +42,6 @@ fn calculate_hfbi_template() {
 
     let campionamento_csv_records = campionamento_csv_check.expect("is_ok() was checked before");
 
-    #[expect(deprecated)]
     let campionamento_value_check = check_records_campionamento_hfbi(campionamento_csv_records);
 
     assert!(campionamento_value_check.is_ok());
@@ -55,7 +50,6 @@ fn calculate_hfbi_template() {
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
 
-    #[expect(deprecated)]
     let anagrafica_csv_check = check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(
         anagrafica_reader,
         has_headers,
@@ -65,14 +59,13 @@ fn calculate_hfbi_template() {
 
     let anagrafica_csv_records = anagrafica_csv_check.expect("is_ok() was checked before");
 
-    #[expect(deprecated)]
     let anagrafica_value_check = check_records_anagrafica_hfbi(anagrafica_csv_records);
 
     assert!(anagrafica_value_check.is_ok());
 
     let anagrafica = anagrafica_value_check.expect("is_ok() was checked before");
 
-    let calc_hfbi_res = calculate_hfbi(&CampionamentoHFBI::new(campionamento), &anagrafica);
+    let calc_hfbi_res = calculate_hfbi(&campionamento, &anagrafica);
 
     assert!(calc_hfbi_res.is_ok());
 

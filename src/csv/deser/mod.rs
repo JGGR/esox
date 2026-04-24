@@ -32,9 +32,6 @@
 
 pub mod utils;
 
-use crate::csv::stanis::field_name;
-use crate::csv::stanis::giorgio::translate_error_message as priv_translate;
-use crate::deser::TipoRecord;
 use std::io::{self, Read};
 use std::path::Path;
 
@@ -172,110 +169,6 @@ impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaNISECI {}
 impl DefaultRecordCsv for crate::deser::PlainRecordCampionamentoHFBI {}
 impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaHFBI {}
 
-fn parse_csv_pos(pos: Option<&csv::Position>) -> String {
-    let res;
-    match pos {
-        Some(p) => {
-            // These should be equal. We may show the value only once if they are
-            let line_offset = p.line();
-            let record_offset = p.record();
-
-            if line_offset == record_offset {
-                res = format!("Riga: {}", line_offset);
-            } else {
-                // TODO: How can we hit this branch?
-                res = format!("Riga: {} Record: {}", line_offset, record_offset);
-            }
-
-            // We ignore this since I don't think users may care?
-            // let byte_offset = p.byte();
-            // res = format!("Riga: {} Record: {} Char: {} ", line_offset, record_offset, byte_offset);
-        }
-        None => {
-            res = "none".to_string();
-        }
-    }
-    res
-}
-
-#[deprecated(
-    note = "v0.2 will change visibility.\nConsider using crate::csv::stanis::giorgio::format_csv_errors instead"
-)]
-pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec<String> {
-    let mut res = Vec::new();
-    for error in errors {
-        match error.kind() {
-            csv::ErrorKind::Deserialize { pos, err } => {
-                let field_str = match err.field().map(|f| f as usize) {
-                    Some(idx) => field_name(tipo_csv, idx),
-                    None => "none".to_string(),
-                };
-                let mut curr_err = format!(
-                    "  Errore di deserializzazione alla posizione: {}: campo {}",
-                    parse_csv_pos(pos.as_ref()),
-                    field_str,
-                );
-                match err.kind() {
-                    csv::DeserializeErrorKind::Message(msg) => {
-                        curr_err = format!("{curr_err}: {}", priv_translate(msg));
-                    }
-                    csv::DeserializeErrorKind::Unsupported(msg) => {
-                        curr_err = format!("{curr_err}: {}", priv_translate(msg));
-                    }
-                    csv::DeserializeErrorKind::UnexpectedEndOfRow => {
-                        curr_err = format!("{curr_err}: Fine riga inatteso");
-                    }
-                    csv::DeserializeErrorKind::InvalidUtf8(utf8err) => {
-                        curr_err = format!("{curr_err}: {}", priv_translate(&utf8err.to_string()));
-                    }
-                    csv::DeserializeErrorKind::ParseBool(boolerr) => {
-                        curr_err = format!("{curr_err}: {}", priv_translate(&boolerr.to_string()));
-                    }
-                    csv::DeserializeErrorKind::ParseInt(interr) => {
-                        curr_err = format!("{curr_err}: {}", priv_translate(&interr.to_string()));
-                    }
-                    csv::DeserializeErrorKind::ParseFloat(floaterr) => {
-                        curr_err = format!("{curr_err}: {}", priv_translate(&floaterr.to_string()));
-                    }
-                }
-                res.push(curr_err);
-            }
-            csv::ErrorKind::Io(io_error) => {
-                res.push(format!(
-                    "  Errore di I/O: {}",
-                    priv_translate(&io_error.to_string())
-                ));
-            }
-            csv::ErrorKind::Utf8 { pos, err } => {
-                res.push(format!(
-                    "  Errore UTF-8 alla posizione: {}: {}",
-                    parse_csv_pos(pos.as_ref()),
-                    priv_translate(&err.to_string())
-                ));
-            }
-            csv::ErrorKind::UnequalLengths {
-                pos,
-                expected_len,
-                len,
-            } => {
-                res.push(format!(
-                    "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
-                    parse_csv_pos(pos.as_ref()),
-                    expected_len,
-                    len // no priv_translate() anche se teoricamente lo supporta
-                ));
-            }
-            _ => {
-                res.push(format!(
-                    "  Errore sconosciuto: {}",
-                    priv_translate(&error.to_string())
-                ));
-            }
-        }
-    }
-    res
-}
-
 pub fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
     if !path.exists() {
         eprintln!("Error: Passed path does not exist");
@@ -301,11 +194,5 @@ pub fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
     }
 }
 
-#[deprecated(
-    note = "v0.2 will change visibility.\nConsider using crate::csv::stanis::giorgio::format_csv_error instead"
-)]
-pub fn translate_error_message(msg: &str) -> String {
-    priv_translate(msg)
-}
 pub mod hfbi;
 pub mod niseci;

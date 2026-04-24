@@ -260,7 +260,7 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
             dens_soglia1: r.dens_soglia1(),
             dens_soglia2: r.dens_soglia2(),
         };
-        interner.intern(&id, specie_rec);
+        interner.intern(specie_rec);
     }
 
     RiferimentoNISECIParseResult(RiferimentoNISECI::new_from_map(interner), errors)
@@ -653,10 +653,7 @@ pub fn parse_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     Ok(res)
 }
 
-/// v0.2 will have this method public
-/// Internal transitional API for migrating:
-///   - returning RiferimentoNISECI for success over Vec<SpecieNISECI>
-pub(crate) fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
+pub fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
 ) -> Result<RiferimentoNISECI, Vec<RecordRiferimentoNISECIError>> {
     let (rif, errors) = parse_records_riferimento_niseci(records).into_parts();
@@ -690,12 +687,7 @@ pub(crate) fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     }
 }
 
-/// v0.2 will have this method public
-/// Internal transitional API for migrating:
-///   - borrow over riferimento_specie
-///   - taking &RiferimentoNISECI over &Vec<SpecieNISECI>
-///   - returning CampionamentoNISECI for success over Vec<RecordNISECI>
-pub(crate) fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
+pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: &RiferimentoNISECI,
 ) -> Result<CampionamentoNISECI, Vec<RecordCampionamentoNISECIError>> {

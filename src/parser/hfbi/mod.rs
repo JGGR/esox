@@ -344,10 +344,7 @@ pub fn parse_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     Ok(res)
 }
 
-/// v0.2 will have this method public
-/// Internal transitional API for migrating:
-///   - returning CampionamentoHFBI for success over Vec<RecordHFBI>
-pub(crate) fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
+pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
 ) -> Result<CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>> {
     let (camp, errors) = parse_records_campionamento_hfbi(records).into_parts();

@@ -14,16 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-/// v0.2 will drop implicit logging, hence this method will not be needed anymore.
-/// Callsites will switch to crate::deser::check_serialized_records.
-/// Usercode will need to handle the format/printing of errors separately.
-#[expect(deprecated)]
-use crate::deser::validate_serialized_records;
-
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{
-    parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
-    RecordRiferimentoNISECI,
+    check_serialized_records, parse_serialized_records, RecordAnagraficaNISECI,
+    RecordCampionamentoNISECI, RecordRiferimentoNISECI,
 };
 use crate::json::deser::{dispatch_json_input, JsonDeserError, JsonPathCheckError};
 use std::fs::File;
@@ -66,11 +60,7 @@ where
                 limited_reader,
                 |res| res.map_err(Into::into),
                 |deser| {
-                    #[expect(deprecated)]
-                    validate_serialized_records(deser.into_iter::<T>(), |errs| {
-                        errs.iter().for_each(|e| eprintln!("  {}", e));
-                    })
-                    .map_err(JsonDeserError::Json)
+                    check_serialized_records(deser.into_iter::<T>()).map_err(JsonDeserError::Json)
                 },
             )
         },
@@ -114,11 +104,7 @@ where
                 limited_reader,
                 |res| res.map_err(Into::into),
                 |deser| {
-                    #[expect(deprecated)]
-                    validate_serialized_records(deser.into_iter::<T>(), |errs| {
-                        errs.iter().for_each(|e| eprintln!("  {}", e));
-                    })
-                    .map_err(JsonDeserError::Json)
+                    check_serialized_records(deser.into_iter::<T>()).map_err(JsonDeserError::Json)
                 },
             )
         },
@@ -162,11 +148,7 @@ where
                 limited_reader,
                 |res| res.map_err(Into::into),
                 |deser| {
-                    #[expect(deprecated)]
-                    validate_serialized_records(deser.into_iter::<T>(), |errs| {
-                        errs.iter().for_each(|e| eprintln!("  {}", e));
-                    })
-                    .map_err(JsonDeserError::Json)
+                    check_serialized_records(deser.into_iter::<T>()).map_err(JsonDeserError::Json)
                 },
             )
         },

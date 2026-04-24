@@ -1117,11 +1117,8 @@ impl fmt::Display for RecordHFBI {
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoHFBI {
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, CampionamentoHFBI::new() to construct"
-    )]
     #[serde(deserialize_with = "deserialize_vec_record_hfbi_sorted")]
-    pub campionamento: Vec<RecordHFBI>,
+    campionamento: Vec<RecordHFBI>,
 }
 
 impl fmt::Display for CampionamentoHFBI {
@@ -1156,18 +1153,14 @@ impl SortedRecordsHFBI for Vec<&RecordHFBI> {
 
 impl CampionamentoHFBI {
     pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
-        #[expect(deprecated)]
         let mut sorted = Self { campionamento };
-        #[expect(deprecated)]
         sorted.campionamento.sort_by_peso_desc();
         sorted
     }
     pub fn sort_by_peso_desc(&mut self) {
-        #[expect(deprecated)]
         self.campionamento.sort_by(|a, b| b.peso.total_cmp(&a.peso));
     }
     pub fn sorted_by_peso_desc(&self) -> impl Iterator<Item = &RecordHFBI> {
-        #[expect(deprecated)]
         let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
 
         v.sort_by_peso_desc();
@@ -1178,7 +1171,6 @@ impl CampionamentoHFBI {
 
 impl From<CampionamentoHFBI> for Vec<RecordHFBI> {
     fn from(val: CampionamentoHFBI) -> Self {
-        #[expect(deprecated)]
         let mut v = val.campionamento;
 
         v.sort_by_peso_desc();
@@ -1192,7 +1184,6 @@ impl<'a> IntoIterator for &'a CampionamentoHFBI {
     type IntoIter = std::vec::IntoIter<&'a RecordHFBI>;
 
     fn into_iter(self) -> Self::IntoIter {
-        #[expect(deprecated)]
         let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
 
         v.sort_by_peso_desc();
@@ -1326,16 +1317,10 @@ pub struct AnagraficaHFBI {
     pub tipo_laguna: TipoLagunaCostieraHFBI,
     pub stagione: StagioneHFBI,
     pub habitat_vegetato: HabitatHFBI,
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaHFBI::new() to construct"
-    )]
     #[serde(deserialize_with = "deserialize_positive_f32")]
-    pub lunghezza_media_transetto: f32,
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaHFBI::new() to construct"
-    )]
+    lunghezza_media_transetto: f32,
     #[serde(deserialize_with = "deserialize_positive_f32")]
-    pub larghezza_media_transetto: f32,
+    larghezza_media_transetto: f32,
 }
 
 impl AnagraficaHFBI {
@@ -1359,14 +1344,11 @@ impl AnagraficaHFBI {
             tipo_laguna,
             stagione,
             habitat_vegetato,
-            #[expect(deprecated)]
             lunghezza_media_transetto: *lunghezza_media_transetto,
-            #[expect(deprecated)]
             larghezza_media_transetto: *larghezza_media_transetto,
         }
     }
     pub fn get_lunghezza_media(&self) -> f32 {
-        #[expect(deprecated)]
         self.lunghezza_media_transetto
     }
 
@@ -1377,14 +1359,10 @@ impl AnagraficaHFBI {
         if val <= 0.0 {
             return Err(PositiveF32Error::NotPositive);
         }
-        #[expect(deprecated)]
-        {
-            self.lunghezza_media_transetto = val;
-        }
+        self.lunghezza_media_transetto = val;
         Ok(())
     }
     pub fn get_larghezza_media(&self) -> f32 {
-        #[expect(deprecated)]
         self.larghezza_media_transetto
     }
 
@@ -1395,10 +1373,7 @@ impl AnagraficaHFBI {
         if val <= 0.0 {
             return Err(PositiveF32Error::NotPositive);
         }
-        #[expect(deprecated)]
-        {
-            self.larghezza_media_transetto = val;
-        }
+        self.larghezza_media_transetto = val;
         Ok(())
     }
 
@@ -1838,7 +1813,6 @@ mod domain_hfbi_private_tests {
         /// Test helper to build unsorted instances
         #[cfg(test)]
         pub(crate) fn new_raw_unsorted(campionamento: Vec<RecordHFBI>) -> Self {
-            #[expect(deprecated)]
             Self { campionamento }
         }
     }
@@ -1865,9 +1839,7 @@ mod domain_hfbi_private_tests {
                 tipo_laguna,
                 stagione,
                 habitat_vegetato,
-                #[expect(deprecated)]
                 lunghezza_media_transetto,
-                #[expect(deprecated)]
                 larghezza_media_transetto,
             }
         }
@@ -1875,18 +1847,12 @@ mod domain_hfbi_private_tests {
         /// Test helper to mutate lunghezza with no checks
         #[cfg(test)]
         pub(crate) fn set_lunghezza_unchecked(&mut self, val: f32) {
-            #[expect(deprecated)]
-            {
-                self.lunghezza_media_transetto = val;
-            }
+            self.lunghezza_media_transetto = val;
         }
         /// Test helper to mutate larghezza with no checks
         #[cfg(test)]
         pub(crate) fn set_larghezza_unchecked(&mut self, val: f32) {
-            #[expect(deprecated)]
-            {
-                self.larghezza_media_transetto = val;
-            }
+            self.larghezza_media_transetto = val;
         }
     }
     #[test]
@@ -1900,7 +1866,6 @@ mod domain_hfbi_private_tests {
             create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 500.0),
         ]);
 
-        #[expect(deprecated)]
         let actual: Vec<(&str, f32)> = campione
             .campionamento
             .iter()
@@ -1969,7 +1934,6 @@ mod domain_hfbi_private_tests {
 
         campione.sort_by_peso_desc();
 
-        #[expect(deprecated)]
         let actual: Vec<(&str, f32)> = campione
             .campionamento
             .iter()

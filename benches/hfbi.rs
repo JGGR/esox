@@ -16,18 +16,14 @@
 */
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
-#[allow(deprecated)]
 use esox::csv::deser::hfbi::check_campionamento_hfbi_reader;
 use esox::csv::deser::hfbi::PlainRecordCsvCampionamentoHFBI;
-#[allow(deprecated)]
-use esox::csv::parser::hfbi::check_records_campionamento_hfbi;
 use esox::csv::CAMPIONAMENTO_HFBI_HEADER;
-use esox::domain::hfbi::{
-    AnagraficaHFBI, CampionamentoHFBI, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI,
-};
+use esox::domain::hfbi::{AnagraficaHFBI, HabitatHFBI, StagioneHFBI, TipoLagunaCostieraHFBI};
 use esox::domain::location::Location;
 use esox::domain::posf32::PositiveF32;
 use esox::engines::hfbi::full::calculate_hfbi;
+use esox::parser::hfbi::check_records_campionamento_hfbi;
 use std::hint::black_box;
 use std::io::Cursor;
 use std::time::Duration;
@@ -52,10 +48,7 @@ fn make_raw_input(n: usize) -> Vec<u8> {
 }
 
 fn bench_name(tag: &str) -> String {
-    #[cfg(feature = "lessclone")]
     const BACKEND: &'static str = "CSV v2-dev";
-    #[cfg(not(feature = "lessclone"))]
-    const BACKEND: &'static str = "CSV v1.6";
     format!("{}: {}", BACKEND, tag,)
 }
 
@@ -76,7 +69,6 @@ fn full_bench(c: &mut Criterion) {
             &raw_camp,
             |b, c| {
                 b.iter(|| {
-                #[allow(deprecated)]
                 let camp = check_campionamento_hfbi_reader::<_, PlainRecordCsvCampionamentoHFBI>(
                     Cursor::new(black_box(c)),
                     has_headers,
@@ -95,30 +87,24 @@ fn full_bench(c: &mut Criterion) {
             &raw_camp,
             |b, c| {
                 b.iter(|| {
-                    #[allow(deprecated)]
                     let camp_d = check_campionamento_hfbi_reader::<
                         _,
                         PlainRecordCsvCampionamentoHFBI,
                     >(Cursor::new(black_box(c)), has_headers)
                     .expect("Input should be valid");
-                    #[allow(deprecated)]
                     let camp = check_records_campionamento_hfbi(black_box(camp_d));
                     black_box(camp)
                 })
             },
         );
 
-        #[allow(deprecated)]
         let camp_d_2 = check_campionamento_hfbi_reader::<_, PlainRecordCsvCampionamentoHFBI>(
             Cursor::new(&raw_camp),
             has_headers,
         )
         .expect("Input should be valid");
 
-        let camp = CampionamentoHFBI::new(
-            #[allow(deprecated)]
-            check_records_campionamento_hfbi(camp_d_2).expect("Input should be valid"),
-        );
+        let camp = check_records_campionamento_hfbi(camp_d_2).expect("Input should be valid");
 
         // -------------------------
         // COMPUTE PHASE

@@ -16,33 +16,21 @@
 */
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
-#[allow(deprecated)]
 use esox::csv::deser::niseci::{
     check_campionamento_niseci_reader, check_riferimento_niseci_reader,
 };
 use esox::csv::deser::niseci::{
     PlainRecordCsvCampionamentoNISECI, PlainRecordCsvRiferimentoNISECI,
 };
-#[allow(deprecated)]
-use esox::csv::parser::niseci::{
-    check_records_campionamento_niseci, check_records_riferimento_niseci,
-};
 use esox::csv::{CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER};
 use esox::domain::location::Location;
 use esox::domain::niseci::{
-    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, RiferimentoNISECI,
-    TipoComunitaNISECI,
+    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, TipoComunitaNISECI,
 };
 use esox::domain::posf32::PositiveF32;
+use esox::parser::niseci::{check_records_campionamento_niseci, check_records_riferimento_niseci};
 
-#[cfg(feature = "lessclone")]
-use esox::domain::niseci::lessclone::CampionamentoNISECI;
-#[cfg(not(feature = "lessclone"))]
-use esox::domain::niseci::CampionamentoNISECI;
-#[cfg(not(feature = "lessclone"))]
 use esox::engines::niseci::full::calculate_niseci;
-#[cfg(feature = "lessclone")]
-use esox::engines::niseci::full::lessclone::calculate_niseci;
 
 use rand::rng;
 use rand::seq::SliceRandom;
@@ -156,7 +144,6 @@ fn run_bench(c: &mut Criterion, name: &str, build_input: fn(usize) -> (Vec<u8>, 
             &raw_rif,
             |b, r| {
                 b.iter(|| {
-                    #[allow(deprecated)]
                     let rif = check_riferimento_niseci_reader::<_, PlainRecordCsvRiferimentoNISECI>(
                         Cursor::new(black_box(r)),
                         has_headers,
@@ -171,7 +158,6 @@ fn run_bench(c: &mut Criterion, name: &str, build_input: fn(usize) -> (Vec<u8>, 
             &raw_camp,
             |b, c| {
                 b.iter(|| {
-                    #[allow(deprecated)]
                     let camp = check_campionamento_niseci_reader::<
                         _,
                         PlainRecordCsvCampionamentoNISECI,
@@ -190,14 +176,12 @@ fn run_bench(c: &mut Criterion, name: &str, build_input: fn(usize) -> (Vec<u8>, 
             &raw_rif,
             |b, r| {
                 b.iter(|| {
-                    #[allow(deprecated)]
                     let rif_d =
                         check_riferimento_niseci_reader::<_, PlainRecordCsvRiferimentoNISECI>(
                             Cursor::new(black_box(r)),
                             has_headers,
                         )
                         .expect("Input should be valid");
-                    #[allow(deprecated)]
                     let rif = check_records_riferimento_niseci(black_box(rif_d))
                         .expect("Input should be valid");
                     black_box(rif)
@@ -205,13 +189,11 @@ fn run_bench(c: &mut Criterion, name: &str, build_input: fn(usize) -> (Vec<u8>, 
             },
         );
 
-        #[allow(deprecated)]
         let rif_d = check_riferimento_niseci_reader::<_, PlainRecordCsvRiferimentoNISECI>(
             Cursor::new(&raw_rif),
             has_headers,
         )
         .expect("Input should be valid");
-        #[allow(deprecated)]
         let rif = check_records_riferimento_niseci(rif_d).expect("Input should be valid");
 
         group.bench_with_input(
@@ -219,45 +201,35 @@ fn run_bench(c: &mut Criterion, name: &str, build_input: fn(usize) -> (Vec<u8>, 
             &raw_camp,
             |b, c| {
                 b.iter(|| {
-                    #[allow(deprecated)]
                     let camp_d = check_campionamento_niseci_reader::<
                         _,
                         PlainRecordCsvCampionamentoNISECI,
                     >(Cursor::new(black_box(c)), has_headers)
                     .expect("Input should be valid");
-                    #[allow(deprecated)]
-                    let camp = check_records_campionamento_niseci(
-                        black_box(camp_d),
-                        black_box(rif.clone()),
-                    );
+                    let camp =
+                        check_records_campionamento_niseci(black_box(camp_d), black_box(&rif));
 
                     black_box(camp)
                 })
             },
         );
 
-        #[allow(deprecated)]
         let rif_d_2 = check_riferimento_niseci_reader::<_, PlainRecordCsvRiferimentoNISECI>(
             Cursor::new(&raw_rif),
             has_headers,
         )
         .expect("Input should be valid");
-        #[allow(deprecated)]
         let camp_d_2 = check_campionamento_niseci_reader::<_, PlainRecordCsvCampionamentoNISECI>(
             Cursor::new(&raw_camp),
             has_headers,
         )
         .expect("Input should be valid");
 
-        #[allow(deprecated)]
         let elenco_specie =
             check_records_riferimento_niseci(rif_d_2).expect("Input should be valid");
-        let rif = RiferimentoNISECI::new(elenco_specie.clone());
-        let camp = CampionamentoNISECI::new(
-            #[allow(deprecated)]
-            check_records_campionamento_niseci(camp_d_2, elenco_specie)
-                .expect("Input should be valid"),
-        );
+        let rif = elenco_specie.clone();
+        let camp = check_records_campionamento_niseci(camp_d_2, &elenco_specie)
+            .expect("Input should be valid");
 
         // -------------------------
         // COMPUTE PHASE
@@ -303,10 +275,7 @@ fn run_bench(c: &mut Criterion, name: &str, build_input: fn(usize) -> (Vec<u8>, 
 const PREFIX_LEN: usize = 16;
 
 fn bench_name(tag: &str) -> String {
-    #[cfg(feature = "lessclone")]
     const BACKEND: &'static str = "CSV v2-dev";
-    #[cfg(not(feature = "lessclone"))]
-    const BACKEND: &'static str = "CSV v1.6";
     format!("{}: {tag}, prefix: {PREFIX_LEN}", BACKEND)
 }
 

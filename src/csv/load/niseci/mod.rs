@@ -20,7 +20,7 @@ use crate::csv::deser::niseci::{
     check_riferimento_niseci_reader_conf, PlainRecordCsvAnagraficaNISECI,
     PlainRecordCsvCampionamentoNISECI, PlainRecordCsvRiferimentoNISECI,
 };
-use crate::csv::deser::{CsvConfig, NormalizerReader};
+use crate::csv::deser::{CsvConfig, Delimiter, NormalizerReader, RecordCsv};
 use crate::csv::load::InputFormat;
 use crate::csv::stanis::niseci::{
     VeryItalianRecordAnagraficaNISECI, VeryItalianRecordCampionamentoNISECI,
@@ -37,7 +37,6 @@ use crate::parser::niseci::{
     check_records_riferimento_niseci, RecordAnagraficaNISECIError, RecordCampionamentoNISECIError,
     RecordRiferimentoNISECIError,
 };
-use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
@@ -64,28 +63,18 @@ impl fmt::Display for RiferimentoNISECIError {
 
 impl std::error::Error for RiferimentoNISECIError {}
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_riferimento_niseci_from_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_riferimento_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
 where
     R: Read,
-    T: RecordRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordRiferimentoNISECI>() => b';',
-        _ => b',',
-    };
     load_csv_riferimento_niseci_from_reader_conf::<R, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -105,27 +94,17 @@ where
     check_records_riferimento_niseci(csv_records).map_err(RiferimentoNISECIError::Value)
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_riferimento_niseci_from_path_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_riferimento_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
 ) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
 where
-    T: RecordRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordRiferimentoNISECI>() => b';',
-        _ => b',',
-    };
     load_csv_riferimento_niseci_from_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -204,9 +183,6 @@ impl fmt::Display for CampionamentoNISECIError {
 
 impl std::error::Error for CampionamentoNISECIError {}
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_campionamento_niseci_from_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_campionamento_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -214,19 +190,12 @@ pub fn load_csv_campionamento_niseci_from_reader<R, T>(
 ) -> Result<CampionamentoNISECI, CampionamentoNISECIError>
 where
     R: Read,
-    T: RecordCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCampionamentoNISECI>() => b';',
-        _ => b',',
-    };
     load_csv_campionamento_niseci_from_reader_conf::<R, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
         riferimento,
     )
@@ -252,28 +221,18 @@ where
         .map_err(CampionamentoNISECIError::Value)
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_campionamento_niseci_from_path_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_campionamento_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
     riferimento: &RiferimentoNISECI,
 ) -> Result<CampionamentoNISECI, CampionamentoNISECIError>
 where
-    T: RecordCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCampionamentoNISECI>() => b';',
-        _ => b',',
-    };
     load_csv_campionamento_niseci_from_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
         riferimento,
     )
@@ -357,28 +316,18 @@ impl fmt::Display for AnagraficaNISECIError {
 
 impl std::error::Error for AnagraficaNISECIError {}
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_anagrafica_niseci_from_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_anagrafica_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
 where
     R: Read,
-    T: RecordAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordAnagraficaNISECI>() => b';',
-        _ => b',',
-    };
     load_csv_anagrafica_niseci_from_reader_conf::<R, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -399,27 +348,17 @@ where
     check_records_anagrafica_niseci(csv_records).map_err(AnagraficaNISECIError::Value)
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_anagrafica_niseci_from_path_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_anagrafica_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
 ) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
 where
-    T: RecordAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordAnagraficaNISECI>() => b';',
-        _ => b',',
-    };
     load_csv_anagrafica_niseci_from_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
     )
 }

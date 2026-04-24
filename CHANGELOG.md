@@ -1,3 +1,21 @@
+## [0.2.0] - Unreleased
+
+### Changed
+
+- BREAKING:
+  - Visibility changes:
+    - `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
+    - `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
+    - `csv::parser` module
+    - `csv::deser::{niseci,hfbi}::VeryItalianRecordCsv*` structs
+    - `csv::RecordCsv*` traits, `csv::TipoRecordCsv`
+    - `parser::validate_serialized_records`
+    - `csv::deser::{process_csv_errors, translate_error_message}`
+
+- Drop implicit logging on check functions
+  - Usercode can use `csv::stanis::giorgio::format_csv_errors` explicitly instead
+- Drop internal transitional methods
+
 ## [0.1.7] - 2026-07-17
 
 ### Changed

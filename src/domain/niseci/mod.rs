@@ -325,15 +325,15 @@ impl InternerSpecieNISECI {
     /// Holds invariant: the underlying map is holding the set of present entries.
     /// Do not modify if you don't want to break stuff.
     #[inline(always)]
-    pub(crate) fn intern(&mut self, s: &str, val: SpecieNISECI) -> IdSpecieNISECI {
-        match self.map.raw_entry_mut().from_key(s) {
+    pub(crate) fn intern(&mut self, val: SpecieNISECI) -> IdSpecieNISECI {
+        match self.map.raw_entry_mut().from_key(val.id()) {
             HBRawEntryMut::Occupied(entry) => *entry.get(),
 
             HBRawEntryMut::Vacant(entry) => {
                 let id = self.next_id;
                 self.next_id += 1;
 
-                entry.insert(s.to_owned(), id);
+                entry.insert(val.id().to_owned(), id);
                 self.store.insert(id, val);
 
                 id
@@ -346,7 +346,7 @@ impl From<Vec<SpecieNISECI>> for InternerSpecieNISECI {
     fn from(val: Vec<SpecieNISECI>) -> Self {
         let mut res = Self::new();
         for v in val {
-            res.intern(&v.id().to_string(), v);
+            res.intern(v);
         }
         res
     }
@@ -356,13 +356,6 @@ impl From<Vec<SpecieNISECI>> for InternerSpecieNISECI {
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct RiferimentoNISECI {
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, RiferimentoNISECI::new() to construct"
-    )]
-    pub elenco_specie: Vec<SpecieNISECI>,
-    // TODO: in v0.2, we can:
-    // - drop the elenco_specie field
-    // - avoiding cloning all SpecieNISECI on new(), the map will move them in
     map_ids: InternerSpecieNISECI,
 }
 
@@ -380,31 +373,13 @@ impl fmt::Display for RiferimentoNISECI {
 impl RiferimentoNISECI {
     pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
         let mut interner = InternerSpecieNISECI::new();
-        for rec in &elenco_specie {
-            // TODO: in v0.2, we can:
-            // - drop the elenco_specie field
-            // - avoiding cloning all SpecieNISECI on new()
-            interner.intern(rec.id(), rec.clone());
+        for rec in elenco_specie {
+            interner.intern(rec);
         }
-        #[expect(deprecated)]
-        Self {
-            elenco_specie,
-            map_ids: interner,
-        }
+        Self { map_ids: interner }
     }
     pub(crate) fn new_from_map(map_ids: InternerSpecieNISECI) -> Self {
-        // TODO: in v0.2, we can:
-        // - drop the elenco_specie field
-        // - avoiding cloning all SpecieNISECI on new()
-        let mut elenco_specie = Vec::new();
-        for s in map_ids.store.values.iter() {
-            elenco_specie.push(s.clone());
-        }
-        #[expect(deprecated)]
-        Self {
-            elenco_specie,
-            map_ids,
-        }
+        Self { map_ids }
     }
     #[inline(always)]
     pub fn contains_id(&self, id: &str) -> bool {
@@ -556,10 +531,7 @@ impl RecordNISECI {
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, CampionamentoNISECI::new() to construct"
-    )]
-    pub campionamento: Vec<RecordNISECI>,
+    campionamento: Vec<RecordNISECI>,
 }
 
 impl fmt::Display for CampionamentoNISECI {
@@ -601,7 +573,6 @@ impl CampionamentoNISECI {
     }
 
     pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
-        #[expect(deprecated)]
         Self { campionamento }
     }
 
@@ -652,7 +623,6 @@ impl CampionamentoNISECI {
 
 impl From<CampionamentoNISECI> for Vec<RecordNISECI> {
     fn from(val: CampionamentoNISECI) -> Self {
-        #[expect(deprecated)]
         val.campionamento
     }
 }
@@ -662,7 +632,6 @@ impl<'a> IntoIterator for &'a CampionamentoNISECI {
     type IntoIter = std::slice::Iter<'a, RecordNISECI>;
 
     fn into_iter(self) -> Self::IntoIter {
-        #[expect(deprecated)]
         self.campionamento.iter()
     }
 }
@@ -863,16 +832,10 @@ pub struct AnagraficaNISECI {
     pub bacino_appartenenza: String,
     pub idro_eco_regione: IdroEcoRegioneNISECI,
     pub posizione: Location,
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaNISECI::new() to construct"
-    )]
     #[serde(deserialize_with = "deserialize_positive_f32")]
-    pub lunghezza_media_stazione: f32,
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaNISECI::new() to construct"
-    )]
+    lunghezza_media_stazione: f32,
     #[serde(deserialize_with = "deserialize_positive_f32")]
-    pub larghezza_media_stazione: f32,
+    larghezza_media_stazione: f32,
 }
 
 impl AnagraficaNISECI {
@@ -898,14 +861,11 @@ impl AnagraficaNISECI {
             bacino_appartenenza,
             idro_eco_regione,
             posizione,
-            #[expect(deprecated)]
             lunghezza_media_stazione: *lunghezza_media_stazione,
-            #[expect(deprecated)]
             larghezza_media_stazione: *larghezza_media_stazione,
         }
     }
     pub fn get_lunghezza_media(&self) -> f32 {
-        #[expect(deprecated)]
         self.lunghezza_media_stazione
     }
     pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
@@ -915,14 +875,10 @@ impl AnagraficaNISECI {
         if val <= 0.0 {
             return Err(PositiveF32Error::NotPositive);
         }
-        #[expect(deprecated)]
-        {
-            self.lunghezza_media_stazione = val;
-        }
+        self.lunghezza_media_stazione = val;
         Ok(())
     }
     pub fn get_larghezza_media(&self) -> f32 {
-        #[expect(deprecated)]
         self.larghezza_media_stazione
     }
     pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
@@ -932,10 +888,7 @@ impl AnagraficaNISECI {
         if val <= 0.0 {
             return Err(PositiveF32Error::NotPositive);
         }
-        #[expect(deprecated)]
-        {
-            self.larghezza_media_stazione = val;
-        }
+        self.larghezza_media_stazione = val;
         Ok(())
     }
 }
@@ -2370,7 +2323,7 @@ mod domain_niseci_private_tests {
                     value.id(),
                     value.nome()
                 );
-                self.map_ids.intern(value.id(), value.clone())
+                self.map_ids.intern(value)
             } else {
                 let inner_id = self
                     .get_inner_id(value.id())
@@ -2391,13 +2344,11 @@ mod domain_niseci_private_tests {
         #[cfg(not(feature = "lessclone"))]
         #[cfg(test)]
         pub(crate) fn push(&mut self, value: RecordNISECI) {
-            #[expect(deprecated)]
             self.campionamento.push(value);
         }
         #[cfg(not(feature = "lessclone"))]
         #[cfg(test)]
         pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
-            #[expect(deprecated)]
             &mut self.campionamento
         }
     }
@@ -2461,27 +2412,19 @@ mod domain_niseci_private_tests {
                 bacino_appartenenza,
                 idro_eco_regione,
                 posizione,
-                #[expect(deprecated)]
                 lunghezza_media_stazione,
-                #[expect(deprecated)]
                 larghezza_media_stazione,
             }
         }
         /// Test helper to mutate lunghezza with no checks
         #[cfg(test)]
         pub(crate) fn set_lunghezza_unchecked(&mut self, val: f32) {
-            #[expect(deprecated)]
-            {
-                self.lunghezza_media_stazione = val;
-            }
+            self.lunghezza_media_stazione = val;
         }
         /// Test helper to mutate larghezza with no checks
         #[cfg(test)]
         pub(crate) fn set_larghezza_unchecked(&mut self, val: f32) {
-            #[expect(deprecated)]
-            {
-                self.larghezza_media_stazione = val;
-            }
+            self.larghezza_media_stazione = val;
         }
     }
 }

@@ -15,33 +15,19 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader,
+    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, Delimiter, NormalizerReader,
+    RecordCsv,
 };
-
-/// Used as the closure argument for
-/// validate_serialized_records(), to print italian error messages.
-use crate::csv::stanis::giorgio::csv_error_handler;
-/// v0.2 will drop implicit logging, hence this method will not be needed anymore.
-/// Callsites will switch to crate::deser::check_serialized_records.
-/// Usercode will need to handle the format/printing of errors separately.
-#[expect(deprecated)]
-use crate::deser::validate_serialized_records;
 
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{
-    parse_serialized_records, RecordAnagraficaHFBI, RecordCampionamentoHFBI, TipoRecord,
+    check_serialized_records, parse_serialized_records, RecordAnagraficaHFBI,
+    RecordCampionamentoHFBI,
 };
-use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
-
-#[deprecated(
-    note = "v0.2 will drop this reexport.\nConsider using crate::csv::stanis::hfbi::VeryItalianRecordCampionamentoHFBI instead"
-)]
-pub use crate::csv::stanis::hfbi::VeryItalianRecordCampionamentoHFBI as VeryItalianRecordCsvCampionamentoHFBI;
-use crate::csv::stanis::hfbi::VeryItalianRecordCampionamentoHFBI;
 
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
@@ -89,28 +75,17 @@ where
     parse_serialized_records(iter)
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn check_campionamento_hfbi_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCampionamentoHFBI>() => b';',
-        _ => b',',
-    };
-
     private_check_campionamento_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -142,37 +117,23 @@ where
                 .has_headers(config.has_headers())
                 .from_reader(limited_reader);
             let iter = rdr.deserialize();
-            #[expect(deprecated)]
-            validate_serialized_records(iter, |errors| {
-                csv_error_handler(TipoRecord::CampionamentoHFBI)(errors);
-            })
+            check_serialized_records(iter)
         },
         |limit_error| vec![csv::Error::from(limit_error)],
     )
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_path_conf() if you need runtime delimiter selection instead"
-)]
 pub fn check_campionamento_hfbi_path<T>(
     path: PathBuf,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCampionamentoHFBI>() => b';',
-        _ => b',',
-    };
-
     check_campionamento_hfbi_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -195,12 +156,6 @@ where
     let file = File::open(path).expect("Unable to open file");
     private_check_campionamento_hfbi_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }
-
-#[deprecated(
-    note = "v0.2 will drop this reexport.\nConsider using crate::csv::stanis::hfbi::VeryItalianRecordAnagraficaHFBI instead"
-)]
-pub use crate::csv::stanis::hfbi::VeryItalianRecordAnagraficaHFBI as VeryItalianRecordCsvAnagraficaHFBI;
-use crate::csv::stanis::hfbi::VeryItalianRecordAnagraficaHFBI;
 
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
@@ -288,28 +243,17 @@ where
     parse_serialized_records(iter)
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordAnagraficaHFBI>() => b';',
-        _ => b',',
-    };
-
     private_check_anagrafica_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -341,37 +285,23 @@ where
                 .has_headers(config.has_headers())
                 .from_reader(limited_reader);
             let iter = rdr.deserialize();
-            #[expect(deprecated)]
-            validate_serialized_records(iter, |errors| {
-                csv_error_handler(TipoRecord::AnagraficaHFBI)(errors);
-            })
+            check_serialized_records(iter)
         },
         |limit_error| vec![csv::Error::from(limit_error)],
     )
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_path_conf() if you need runtime delimiter selection instead"
-)]
 pub fn check_anagrafica_hfbi_path<T>(
     path: PathBuf,
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + RecordCsv + 'static,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordAnagraficaHFBI>() => b';',
-        _ => b',',
-    };
-
     check_anagrafica_hfbi_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::D::DELIMITER)
             .with_headers(has_headers),
     )
 }
