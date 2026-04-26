@@ -14,7 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::csv::deser::hfbi::{check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader};
+use crate::csv::deser::hfbi::{
+    check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf,
+};
+use crate::csv::deser::CsvConfig;
 use crate::csv::load::{
     hfbi::{load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader},
     InputFormat,
@@ -30,12 +33,13 @@ use std::io::Cursor;
 
 #[test]
 fn calculate_hfbi_template() {
+    let config = CsvConfig::default().with_delimiter(b';');
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_HFBI_TEMPLATE_DATA);
 
-    let campionamento_csv_check = check_campionamento_hfbi_reader::<
+    let campionamento_csv_check = check_campionamento_hfbi_reader_conf::<
         _,
         VeryItalianRecordCampionamentoHFBI,
-    >(campionamento_reader, true);
+    >(campionamento_reader, config);
 
     assert!(campionamento_csv_check.is_ok());
 
@@ -49,8 +53,10 @@ fn calculate_hfbi_template() {
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_HFBI_TEMPLATE_DATA);
 
-    let anagrafica_csv_check =
-        check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(anagrafica_reader, true);
+    let anagrafica_csv_check = check_anagrafica_hfbi_reader_conf::<
+        _,
+        VeryItalianRecordAnagraficaHFBI,
+    >(anagrafica_reader, config);
 
     assert!(anagrafica_csv_check.is_ok());
 

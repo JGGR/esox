@@ -15,7 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::{check_path_is_file_ends_with_csv, process_csv_errors, NormalizerReader};
+use crate::csv::deser::{
+    check_path_is_file_ends_with_csv, process_csv_errors, CsvConfig, NormalizerReader,
+};
 use crate::deser::{
     parse_serialized_records, validate_serialized_records, RecordAnagraficaHFBI,
     RecordCampionamentoHFBI, TipoRecord,
@@ -73,6 +75,9 @@ where
     parse_serialized_records(iter)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() instead"
+)]
 pub fn check_campionamento_hfbi_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -80,8 +85,6 @@ pub fn check_campionamento_hfbi_reader<R: Read, T>(
 where
     T: RecordCampionamentoHFBI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
-
     let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
 
     // Match on the TypeId to determine the actual type of T
@@ -90,9 +93,26 @@ where
         _ => b',',
     };
 
+    check_campionamento_hfbi_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_campionamento_hfbi_reader_conf<R: Read, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCampionamentoHFBI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(delimiter)
-        .has_headers(has_headers)
+        .delimiter(config.delimiter())
+        .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
     validate_serialized_records(iter, |errors| {
@@ -110,9 +130,35 @@ where
     })
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_campionamento_hfbi_path_conf() instead"
+)]
 pub fn check_campionamento_hfbi_path<T>(
     path: PathBuf,
     has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCampionamentoHFBI + 'static,
+{
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCampionamentoHFBI>() => b';',
+        _ => b',',
+    };
+
+    check_campionamento_hfbi_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_campionamento_hfbi_path_conf<T>(
+    path: PathBuf,
+    config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCampionamentoHFBI + 'static,
@@ -126,7 +172,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_campionamento_hfbi_reader(file, has_headers)
+    check_campionamento_hfbi_reader_conf(file, config)
 }
 
 #[deprecated(
@@ -216,6 +262,9 @@ where
     parse_serialized_records(iter)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() instead"
+)]
 pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -223,8 +272,6 @@ pub fn check_anagrafica_hfbi_reader<R: Read, T>(
 where
     T: RecordAnagraficaHFBI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
-
     let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
 
     // Match on the TypeId to determine the actual type of T
@@ -233,9 +280,26 @@ where
         _ => b',',
     };
 
+    check_anagrafica_hfbi_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_anagrafica_hfbi_reader_conf<R: Read, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordAnagraficaHFBI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(delimiter)
-        .has_headers(has_headers)
+        .delimiter(config.delimiter())
+        .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
     validate_serialized_records(iter, |errors| {
@@ -253,9 +317,35 @@ where
     })
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_anagrafica_hfbi_path_conf() instead"
+)]
 pub fn check_anagrafica_hfbi_path<T>(
     path: PathBuf,
     has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordAnagraficaHFBI + 'static,
+{
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordAnagraficaHFBI>() => b';',
+        _ => b',',
+    };
+
+    check_anagrafica_hfbi_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_anagrafica_hfbi_path_conf<T>(
+    path: PathBuf,
+    config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordAnagraficaHFBI + 'static,
@@ -269,5 +359,5 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_anagrafica_hfbi_reader(file, has_headers)
+    check_anagrafica_hfbi_reader_conf(file, config)
 }

@@ -16,7 +16,7 @@
 */
 
 use crate::csv::deser::{
-    hfbi::{check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader},
+    hfbi::{check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf},
     niseci::{
         check_anagrafica_niseci_reader_conf, check_campionamento_niseci_reader_conf,
         check_riferimento_niseci_reader_conf,
@@ -628,8 +628,10 @@ fn test_load_anagrafica_niseci() {
 fn test_csv_campionamento_hfbi_found_string_expect_int() {
     let csv_data = format!("{}\nAN;foo;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCampionamentoHFBI>(reader, true);
+    let result = check_campionamento_hfbi_reader_conf::<_, VeryItalianRecordCampionamentoHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -642,8 +644,10 @@ fn test_csv_campionamento_hfbi_found_string_expect_int() {
 fn test_csv_campionamento_hfbi_found_empty_string_expect_int() {
     let csv_data = format!("{}\nAN;;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCampionamentoHFBI>(reader, true);
+    let result = check_campionamento_hfbi_reader_conf::<_, VeryItalianRecordCampionamentoHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -656,8 +660,10 @@ fn test_csv_campionamento_hfbi_found_empty_string_expect_int() {
 fn test_csv_campionamento_hfbi_found_float_expect_int() {
     let csv_data = format!("{}\nAN;2.75;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCampionamentoHFBI>(reader, true);
+    let result = check_campionamento_hfbi_reader_conf::<_, VeryItalianRecordCampionamentoHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -670,8 +676,10 @@ fn test_csv_campionamento_hfbi_found_float_expect_int() {
 fn test_csv_campionamento_hfbi_lessfields() {
     let csv_data = format!("{}\nAN;2.75", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCampionamentoHFBI>(reader, true);
+    let result = check_campionamento_hfbi_reader_conf::<_, VeryItalianRecordCampionamentoHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -685,8 +693,10 @@ fn test_csv_campionamento_hfbi_lessfields() {
 fn test_valid_csv_campionamento_hfbi() {
     let csv_data = format!("{}\nAN;25;240", CAMPIONAMENTO_HFBI_HEADER);
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCampionamentoHFBI>(reader, true);
+    let result = check_campionamento_hfbi_reader_conf::<_, VeryItalianRecordCampionamentoHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(!result.is_err());
 }
@@ -695,8 +705,10 @@ fn test_valid_csv_campionamento_hfbi() {
 fn test_empty_csv_campionamento_hfbi() {
     let csv_data = CAMPIONAMENTO_HFBI_HEADER.to_string(); // Only header, no data
     let reader = Cursor::new(csv_data);
-    let result =
-        check_campionamento_hfbi_reader::<_, VeryItalianRecordCampionamentoHFBI>(reader, true);
+    let result = check_campionamento_hfbi_reader_conf::<_, VeryItalianRecordCampionamentoHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_ok());
     let records = result.unwrap();
@@ -734,7 +746,10 @@ fn test_csv_anagrafica_hfbi_found_string_expect_int() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(reader, true);
+    let result = check_anagrafica_hfbi_reader_conf::<_, VeryItalianRecordAnagraficaHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -750,7 +765,10 @@ fn test_csv_anagrafica_hfbi_found_empty_string_expect_int() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(reader, true);
+    let result = check_anagrafica_hfbi_reader_conf::<_, VeryItalianRecordAnagraficaHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -766,7 +784,10 @@ fn test_csv_anagrafica_hfbi_found_float_expect_int() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(reader, true);
+    let result = check_anagrafica_hfbi_reader_conf::<_, VeryItalianRecordAnagraficaHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -782,7 +803,10 @@ fn test_csv_anagrafica_hfbi_lessfields() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(reader, true);
+    let result = check_anagrafica_hfbi_reader_conf::<_, VeryItalianRecordAnagraficaHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_err());
     let errors = result.err().unwrap();
@@ -799,7 +823,10 @@ fn test_valid_csv_anagrafica_hfbi() {
         ANAGRAFICA_HFBI_HEADER
     );
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(reader, true);
+    let result = check_anagrafica_hfbi_reader_conf::<_, VeryItalianRecordAnagraficaHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(!result.is_err());
 }
@@ -808,7 +835,10 @@ fn test_valid_csv_anagrafica_hfbi() {
 fn test_empty_csv_anagrafica_hfbi() {
     let csv_data = ANAGRAFICA_HFBI_HEADER.to_string(); // Only header, no data
     let reader = Cursor::new(csv_data);
-    let result = check_anagrafica_hfbi_reader::<_, VeryItalianRecordAnagraficaHFBI>(reader, true);
+    let result = check_anagrafica_hfbi_reader_conf::<_, VeryItalianRecordAnagraficaHFBI>(
+        reader,
+        CsvConfig::default().with_delimiter(b';'),
+    );
 
     assert!(result.is_ok());
     let records = result.unwrap();

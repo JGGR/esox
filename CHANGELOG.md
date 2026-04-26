@@ -7,7 +7,7 @@
 ### Changed
 
 - Deprecation warnings for visibility of `csv::deser::{niseci,hfbi}::VeryItalianRecordCsv*` structs
-- Deprecation warnings for check functions in `csv::{deser,load}::niseci`, next version will change public API:
+- Deprecation warnings for check functions in `csv::{deser,load}::{niseci,hfbi}`, next version will change public API:
   - In: will expect `delimiter` as new required argument
 
 ## [0.1.3] - 2026-04-24
