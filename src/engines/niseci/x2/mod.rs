@@ -21,6 +21,7 @@ use crate::domain::niseci::{
     AnagraficaNISECI, CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura, MetricheX2A,
     MetricheX2aB, RecordNISECI,
 };
+use crate::domain::posf32::PositiveF32;
 
 use super::linear_regression::{calculate_quantita_with_regression, Point};
 
@@ -302,8 +303,11 @@ fn calculate_sommatoria_x2_b(
     anagrafica: &AnagraficaNISECI,
     require_specie_attesa: bool,
 ) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
-    let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
-
+    let width = anagrafica.get_larghezza_media();
+    let length = anagrafica.get_lunghezza_media();
+    let width_checked = PositiveF32::new(width).map_err(|e| vec![e.to_string()])?;
+    let length_checked = PositiveF32::new(length).map_err(|e| vec![e.to_string()])?;
+    let superficie: f32 = *width_checked * *length_checked;
     let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
         HashMap::with_capacity(10);
 
@@ -359,8 +363,21 @@ fn calculate_sommatoria_x2_b_per_alloctone(
     c: &CampionamentoNISECI,
     anagrafica: &AnagraficaNISECI,
 ) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
-    let superficie = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
-
+    let width = anagrafica.get_larghezza_media();
+    let length = anagrafica.get_lunghezza_media();
+    if width <= 0.0 {
+        return Err(vec!["Width too small".to_string()]);
+    }
+    if !width.is_finite() {
+        return Err(vec!["Width not finite".to_string()]);
+    }
+    if length <= 0.0 {
+        return Err(vec!["Length too small".to_string()]);
+    }
+    if !length.is_finite() {
+        return Err(vec!["Length not finite".to_string()]);
+    }
+    let superficie = width * length;
     let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
         HashMap::with_capacity(10);
 

@@ -30,12 +30,12 @@ pub fn calculate_mmi(
         None => return Err(String::from("Errore condizioni di riferimento non trovate")),
     };
 
-    let bbent: f32 = calc_bbent(campionamento, anagrafica);
+    let bbent: f32 = calc_bbent(campionamento, anagrafica)?;
     let bn: f32 = calc_bn(campionamento);
-    let dbent: f32 = calc_dbent(campionamento, anagrafica);
-    let ddom: f32 = calc_ddom(campionamento, anagrafica);
-    let dhzp: f32 = calc_dhzp(campionamento, anagrafica);
-    let dmig: f32 = calc_dmig(campionamento, anagrafica);
+    let dbent: f32 = calc_dbent(campionamento, anagrafica)?;
+    let ddom: f32 = calc_ddom(campionamento, anagrafica)?;
+    let dhzp: f32 = calc_dhzp(campionamento, anagrafica)?;
+    let dmig: f32 = calc_dmig(campionamento, anagrafica)?;
     let rqe_bbent = bbent / condizioni_riferimento.bbent;
     let rqe_bn = bn / condizioni_riferimento.bn;
     let rqe_dbent = dbent / condizioni_riferimento.dbent;

@@ -15,18 +15,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use crate::csv::deser::hfbi::{
-    check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader, PlainRecordCsvAnagraficaHFBI,
-    PlainRecordCsvCampionamentoHFBI, VeryItalianRecordCsvAnagraficaHFBI,
-    VeryItalianRecordCsvCampionamentoHFBI,
+    check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf,
+    PlainRecordCsvAnagraficaHFBI, PlainRecordCsvCampionamentoHFBI,
 };
-use crate::csv::deser::NormalizerReader;
+use crate::csv::deser::{CsvConfig, NormalizerReader};
 use crate::csv::load::InputFormat;
+use crate::csv::stanis::hfbi::{
+    VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
+};
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 use crate::parser::hfbi::{
     check_records_anagrafica_hfbi, check_records_campionamento_hfbi, RecordAnagraficaHFBIError,
     RecordCampionamentoHFBIError,
 };
+use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
@@ -53,6 +56,9 @@ impl fmt::Display for CampionamentoHFBIError {
 
 impl std::error::Error for CampionamentoHFBIError {}
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::hfbi::load_csv_campionamento_hfbi_from_reader_conf() instead"
+)]
 pub fn load_csv_campionamento_hfbi_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -61,13 +67,40 @@ where
     R: Read,
     T: RecordCampionamentoHFBI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCampionamentoHFBI>() => b';',
+        _ => b',',
+    };
+
+    load_csv_campionamento_hfbi_from_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn load_csv_campionamento_hfbi_from_reader_conf<R, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
+where
+    R: Read,
+    T: RecordCampionamentoHFBI + 'static,
+{
     let normalizing_reader = NormalizerReader::new(reader);
     let csv_records =
-        check_campionamento_hfbi_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
+        check_campionamento_hfbi_reader_conf::<NormalizerReader<R>, T>(normalizing_reader, config)
             .map_err(CampionamentoHFBIError::Csv)?;
     check_records_campionamento_hfbi(csv_records).map_err(CampionamentoHFBIError::Value)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::hfbi::load_csv_campionamento_hfbi_from_path_conf() instead"
+)]
 pub fn load_csv_campionamento_hfbi_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -75,10 +108,33 @@ pub fn load_csv_campionamento_hfbi_from_path<T>(
 where
     T: RecordCampionamentoHFBI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCampionamentoHFBI>() => b';',
+        _ => b',',
+    };
+
+    load_csv_campionamento_hfbi_from_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn load_csv_campionamento_hfbi_from_path_conf<T>(
+    path: impl AsRef<Path>,
+    config: CsvConfig,
+) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
+where
+    T: RecordCampionamentoHFBI + 'static,
+{
     let file =
         File::open(path).map_err(|e| CampionamentoHFBIError::Csv(vec![csv::Error::from(e)]))?;
 
-    load_csv_campionamento_hfbi_from_reader::<_, T>(file, has_headers)
+    load_csv_campionamento_hfbi_from_reader_conf::<_, T>(file, config)
 }
 
 pub fn load_campionamento_hfbi_from_reader<R>(
@@ -91,14 +147,22 @@ where
 {
     let normalizing_reader = NormalizerReader::new(reader);
     match format {
-        InputFormat::Standard => load_csv_campionamento_hfbi_from_reader::<
+        InputFormat::Standard => load_csv_campionamento_hfbi_from_reader_conf::<
             NormalizerReader<R>,
             PlainRecordCsvCampionamentoHFBI,
-        >(normalizing_reader, has_headers),
-        InputFormat::Alternative => load_csv_campionamento_hfbi_from_reader::<
+        >(
+            normalizing_reader,
+            CsvConfig::default().with_headers(has_headers),
+        ),
+        InputFormat::Alternative => load_csv_campionamento_hfbi_from_reader_conf::<
             NormalizerReader<R>,
-            VeryItalianRecordCsvCampionamentoHFBI,
-        >(normalizing_reader, has_headers),
+            VeryItalianRecordCampionamentoHFBI,
+        >(
+            normalizing_reader,
+            CsvConfig::default()
+                .with_delimiter(b';')
+                .with_headers(has_headers),
+        ),
     }
 }
 
@@ -134,6 +198,9 @@ impl fmt::Display for AnagraficaHFBIError {
 
 impl std::error::Error for AnagraficaHFBIError {}
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::hfbi::load_csv_anagrafica_hfbi_from_reader_conf() instead"
+)]
 pub fn load_csv_anagrafica_hfbi_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -142,14 +209,41 @@ where
     R: Read,
     T: RecordAnagraficaHFBI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordAnagraficaHFBI>() => b';',
+        _ => b',',
+    };
+
+    load_csv_anagrafica_hfbi_from_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn load_csv_anagrafica_hfbi_from_reader_conf<R, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
+where
+    R: Read,
+    T: RecordAnagraficaHFBI + 'static,
+{
     let normalizing_reader = NormalizerReader::new(reader);
 
     let csv_records =
-        check_anagrafica_hfbi_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
+        check_anagrafica_hfbi_reader_conf::<NormalizerReader<R>, T>(normalizing_reader, config)
             .map_err(AnagraficaHFBIError::Csv)?;
     check_records_anagrafica_hfbi(csv_records).map_err(AnagraficaHFBIError::Value)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::hfbi::load_csv_anagrafica_hfbi_from_path_conf() instead"
+)]
 pub fn load_csv_anagrafica_hfbi_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -157,9 +251,32 @@ pub fn load_csv_anagrafica_hfbi_from_path<T>(
 where
     T: RecordAnagraficaHFBI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordAnagraficaHFBI>() => b';',
+        _ => b',',
+    };
+
+    load_csv_anagrafica_hfbi_from_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn load_csv_anagrafica_hfbi_from_path_conf<T>(
+    path: impl AsRef<Path>,
+    config: CsvConfig,
+) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
+where
+    T: RecordAnagraficaHFBI + 'static,
+{
     let file = File::open(path).map_err(|e| AnagraficaHFBIError::Csv(vec![csv::Error::from(e)]))?;
 
-    load_csv_anagrafica_hfbi_from_reader::<_, T>(file, has_headers)
+    load_csv_anagrafica_hfbi_from_reader_conf::<_, T>(file, config)
 }
 
 pub fn load_anagrafica_hfbi_from_reader<R>(
@@ -172,14 +289,22 @@ where
 {
     let normalizing_reader = NormalizerReader::new(reader);
     match format {
-        InputFormat::Standard => load_csv_anagrafica_hfbi_from_reader::<
+        InputFormat::Standard => load_csv_anagrafica_hfbi_from_reader_conf::<
             NormalizerReader<R>,
             PlainRecordCsvAnagraficaHFBI,
-        >(normalizing_reader, has_headers),
-        InputFormat::Alternative => load_csv_anagrafica_hfbi_from_reader::<
+        >(
+            normalizing_reader,
+            CsvConfig::default().with_headers(has_headers),
+        ),
+        InputFormat::Alternative => load_csv_anagrafica_hfbi_from_reader_conf::<
             NormalizerReader<R>,
-            VeryItalianRecordCsvAnagraficaHFBI,
-        >(normalizing_reader, has_headers),
+            VeryItalianRecordAnagraficaHFBI,
+        >(
+            normalizing_reader,
+            CsvConfig::default()
+                .with_delimiter(b';')
+                .with_headers(has_headers),
+        ),
     }
 }
 

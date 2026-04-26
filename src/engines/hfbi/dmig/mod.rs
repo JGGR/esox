@@ -18,9 +18,10 @@
 use std::collections::HashMap;
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, SpecieHFBI};
+use crate::domain::posf32::PositiveF32;
 
-pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
-    let bmig = calc_bmig(campione, anagrafica);
+pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
+    let bmig = calc_bmig(campione, anagrafica)?;
 
     let mut specie_map: HashMap<String, SpecieHFBI> = HashMap::with_capacity(10);
     // trovo il numero di specie trovate
@@ -39,18 +40,23 @@ pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f
     let smig = specie_map.len();
 
     if smig == 0 {
-        return 0.0;
+        return Ok(0.0);
     }
 
     if smig == 1 {
-        return 0.01;
+        return Ok(0.01);
     }
 
     let dmig = (((smig as f32 - 1.0) / bmig.ln()) + 1.0).ln();
-    (1000.0 * dmig).round() / 1000.0
+    Ok((1000.0 * dmig).round() / 1000.0)
 }
 
-fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
+    let width = anagrafica.get_larghezza_media();
+    let length = anagrafica.get_lunghezza_media();
+    let width_checked = PositiveF32::new(width).map_err(|e| e.to_string())?;
+    let length_checked = PositiveF32::new(length).map_err(|e| e.to_string())?;
+    let area: f32 = *width_checked * *length_checked;
     let mut biomig = 0.0;
     for specie in campione {
         match specie.specie.gruppo_eco {
@@ -59,9 +65,7 @@ fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
         }
     }
 
-    let area = anagrafica.get_lunghezza_media() * anagrafica.get_larghezza_media();
-
-    (biomig / area) * 100.0
+    Ok((biomig / area) * 100.0)
 }
 
 #[cfg(test)]
@@ -127,7 +131,9 @@ mod dmig_private_tests {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI::new(vec![]);
         // biomig = 0 -> ln(1) = 0
-        assert!((calc_bmig(&campione, &anagrafica) - 0.0).abs() < EPSILON);
+        let res = calc_bmig(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
+        assert!((res - 0.0).abs() < EPSILON);
     }
 
     #[test]
@@ -139,7 +145,8 @@ mod dmig_private_tests {
             100.0,
         )]);
         // biomig > 0, area = 0 -> division by zero -> infinity
-        assert!(calc_bmig(&campione, &anagrafica).is_infinite());
+        let res = calc_bmig(&campione, &anagrafica);
+        assert!(res.is_err());
     }
 
     #[test]
@@ -153,7 +160,8 @@ mod dmig_private_tests {
         // biomig = 150 + 50 = 200
         // expected = ln((200 / 100) * 100 + 1) = ln(201)
         let expected = 200.0_f32;
-        let result = calc_bmig(&campione, &anagrafica);
+        let result = calc_bmig(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         assert!((result - expected).abs() < EPSILON);
     }
 
@@ -168,7 +176,9 @@ mod dmig_private_tests {
             100.0,
         )]);
         // No migratory species, so smig = 0. Should return 0.0
-        assert!((calc_dmig(&campione, &anagrafica) - 0.0).abs() < EPSILON);
+        let result = calc_dmig(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
+        assert!((result - 0.0).abs() < EPSILON);
     }
 
     #[test]
@@ -179,7 +189,9 @@ mod dmig_private_tests {
             create_specie_record("SP1", GruppoEcoHFBI::Diadromi, 50.0), // Same species
         ]);
         // Only one unique migratory species, so smig = 1. Should return 0.01
-        assert!((calc_dmig(&campione, &anagrafica) - 0.01).abs() < EPSILON);
+        let result = calc_dmig(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
+        assert!((result - 0.01).abs() < EPSILON);
     }
 
     #[test]
@@ -190,7 +202,8 @@ mod dmig_private_tests {
             create_specie_record("SP2", GruppoEcoHFBI::MigratoriMarini, 50.0),
         ]);
         // bmig is infinity. Formula is ln(((smig-1)/inf)+1) = ln(1) = 0
-        assert!((calc_dmig(&campione, &anagrafica) - 0.0).abs() < EPSILON);
+        let result = calc_dmig(&campione, &anagrafica);
+        assert!(result.is_err());
     }
 
     #[test]
@@ -213,7 +226,8 @@ mod dmig_private_tests {
         let smig = 2.0_f32;
 
         let expected = (1000.0 * (((smig - 1.0) / bmig) + 1.0).ln()).round() / 1000.0;
-        let result = calc_dmig(&campione, &anagrafica);
+        let result = calc_dmig(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
 
         assert!((result - expected).abs() < EPSILON);
     }

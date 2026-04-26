@@ -16,16 +16,20 @@
 */
 
 use crate::csv::deser::niseci::{
-    check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
-    check_riferimento_niseci_reader, VeryItalianRecordCsvAnagraficaNISECI,
-    VeryItalianRecordCsvCampionamentoNISECI, VeryItalianRecordCsvRiferimentoNISECI,
+    check_anagrafica_niseci_reader_conf, check_campionamento_niseci_reader_conf,
+    check_riferimento_niseci_reader_conf,
 };
+use crate::csv::deser::CsvConfig;
 use crate::csv::load::{
     niseci::{
         load_anagrafica_niseci_from_reader, load_campionamento_niseci_from_reader,
         load_riferimento_niseci_from_reader,
     },
     InputFormat,
+};
+use crate::csv::stanis::niseci::{
+    VeryItalianRecordAnagraficaNISECI, VeryItalianRecordCampionamentoNISECI,
+    VeryItalianRecordRiferimentoNISECI,
 };
 use crate::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
@@ -70,11 +74,12 @@ fn calculate_dummy_niseci_campionamento_chopped() {
 
 #[test]
 fn calculate_niseci_template() {
+    let config = CsvConfig::default().with_delimiter(b';');
     let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
-    let riferimento_csv_check = check_riferimento_niseci_reader::<
+    let riferimento_csv_check = check_riferimento_niseci_reader_conf::<
         _,
-        VeryItalianRecordCsvRiferimentoNISECI,
-    >(riferimento_reader, true);
+        VeryItalianRecordRiferimentoNISECI,
+    >(riferimento_reader, config);
 
     assert!(riferimento_csv_check.is_ok());
 
@@ -88,10 +93,10 @@ fn calculate_niseci_template() {
 
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_NISECI_TEMPLATE_DATA);
 
-    let campionamento_csv_check = check_campionamento_niseci_reader::<
+    let campionamento_csv_check = check_campionamento_niseci_reader_conf::<
         _,
-        VeryItalianRecordCsvCampionamentoNISECI,
-    >(campionamento_reader, true);
+        VeryItalianRecordCampionamentoNISECI,
+    >(campionamento_reader, config);
 
     assert!(campionamento_csv_check.is_ok());
 
@@ -106,10 +111,10 @@ fn calculate_niseci_template() {
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_NISECI_TEMPLATE_DATA);
 
-    let anagrafica_csv_check = check_anagrafica_niseci_reader::<
+    let anagrafica_csv_check = check_anagrafica_niseci_reader_conf::<
         _,
-        VeryItalianRecordCsvAnagraficaNISECI,
-    >(anagrafica_reader, true);
+        VeryItalianRecordAnagraficaNISECI,
+    >(anagrafica_reader, config);
 
     assert!(anagrafica_csv_check.is_ok());
 
@@ -138,7 +143,7 @@ fn calc_templates_with_area(
     format: InputFormat,
     x: f32,
     y: f32,
-) -> (Option<f32>, ValoriIntermediNISECI) {
+) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
     let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
     let riferimento = load_riferimento_niseci_from_reader(riferimento_reader, has_headers, format)
         .expect("Failed loading template RiferimentoNISECI");
@@ -156,60 +161,43 @@ fn calc_templates_with_area(
     anagrafica.set_lunghezza_unchecked(x);
     anagrafica.set_larghezza_unchecked(y);
 
-    let calc_niseci_res = calculate_niseci(&campionamento, &riferimento, &anagrafica);
-
-    assert!(calc_niseci_res.is_ok());
-    let (niseci, intermediates) = calc_niseci_res.expect("is_ok() was checked before");
-    (niseci, intermediates)
+    calculate_niseci(&campionamento, &riferimento, &anagrafica)
 }
 
 #[test]
 fn calculate_niseci_template_zero_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
-    let (niseci, intermediates) = calc_templates_with_area(has_headers, format, 0.0, 0.0);
+    let calc_niseci_res = calc_templates_with_area(has_headers, format, 0.0, 0.0);
 
-    assert_eq!(niseci, Some(0.266));
-    assert_eq!(intermediates.x1, 0.429);
-    assert_eq!(intermediates.x2, Some(0.4));
-    assert_eq!(intermediates.x3, 1.0);
+    assert!(calc_niseci_res.is_err());
 }
 
 #[test]
 fn calculate_niseci_template_subzero_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
-    let (niseci, intermediates) = calc_templates_with_area(has_headers, format, -1.0, 100.0);
+    let calc_niseci_res = calc_templates_with_area(has_headers, format, -1.0, 100.0);
 
-    assert_eq!(niseci, Some(0.065));
-    assert_eq!(intermediates.x1, 0.429);
-    assert_eq!(intermediates.x2, Some(0.0));
-    assert_eq!(intermediates.x3, 1.0);
+    assert!(calc_niseci_res.is_err());
 }
 
 #[test]
 fn calculate_niseci_template_infinite_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
-    let (niseci, intermediates) = calc_templates_with_area(has_headers, format, f32::INFINITY, 1.0);
+    let calc_niseci_res = calc_templates_with_area(has_headers, format, f32::INFINITY, 1.0);
 
-    assert_eq!(niseci, Some(0.065));
-    assert_eq!(intermediates.x1, 0.429);
-    assert_eq!(intermediates.x2, Some(0.0));
-    assert_eq!(intermediates.x3, 1.0);
+    assert!(calc_niseci_res.is_err());
 }
 
 #[test]
 fn calculate_niseci_template_subzero_infinite_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
-    let (niseci, intermediates) =
-        calc_templates_with_area(has_headers, format, f32::NEG_INFINITY, 1.0);
+    let calc_niseci_res = calc_templates_with_area(has_headers, format, f32::NEG_INFINITY, 1.0);
 
-    assert_eq!(niseci, Some(0.065));
-    assert_eq!(intermediates.x1, 0.429);
-    assert_eq!(intermediates.x2, Some(0.0));
-    assert_eq!(intermediates.x3, 1.0);
+    assert!(calc_niseci_res.is_err());
 }
 
 #[test]
@@ -221,10 +209,7 @@ fn calculate_niseci_template_quietnan_area() {
     // the Rust assumptions that the quiet/signaling bit being set to 1
     // indicates a quiet NaN)
     let quiet_nan = f32::NAN;
-    let (niseci, intermediates) = calc_templates_with_area(has_headers, format, quiet_nan, 1.0);
+    let calc_niseci_res = calc_templates_with_area(has_headers, format, quiet_nan, 1.0);
 
-    assert_eq!(niseci, Some(0.065));
-    assert_eq!(intermediates.x1, 0.429);
-    assert_eq!(intermediates.x2, Some(0.0));
-    assert_eq!(intermediates.x3, 1.0);
+    assert!(calc_niseci_res.is_err());
 }

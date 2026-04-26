@@ -18,6 +18,7 @@
 pub mod deser;
 pub mod load;
 pub mod parser;
+pub mod stanis;
 
 // This must be kept aligned with RecordCsvRiferimentoNISECI definition.
 // TODO: get this stuff with some macro?

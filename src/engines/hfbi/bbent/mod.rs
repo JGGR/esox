@@ -16,8 +16,17 @@
 */
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
+use crate::domain::posf32::PositiveF32;
 
-pub fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+pub fn calc_bbent(
+    campione: &CampionamentoHFBI,
+    anagrafica: &AnagraficaHFBI,
+) -> Result<f32, String> {
+    let width = anagrafica.get_larghezza_media();
+    let length = anagrafica.get_lunghezza_media();
+    let width_checked = PositiveF32::new(width).map_err(|e| e.to_string())?;
+    let length_checked = PositiveF32::new(length).map_err(|e| e.to_string())?;
+    let area: f32 = *width_checked * *length_checked;
     let mut biobent = 0.0;
     for specie in campione {
         match specie.specie.gruppo_eco {
@@ -33,14 +42,12 @@ pub fn calc_bbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> 
 
     let epsilon: f32 = 1e-6;
     if biobent.abs() < epsilon {
-        return 0.0;
+        return Ok(0.0);
     }
-
-    let area = anagrafica.get_lunghezza_media() * anagrafica.get_larghezza_media();
 
     let bbent = ((biobent / area) * 100.0 + 1.0).ln();
 
-    (1000.0 * bbent).round() / 1000.0
+    Ok((1000.0 * bbent).round() / 1000.0)
 }
 
 #[cfg(test)]
@@ -106,7 +113,8 @@ mod bbent_private_tests {
     fn test_calc_bbent_empty_campionamento() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI::new(vec![]);
-        let result = calc_bbent(&campione, &anagrafica);
+        let result = calc_bbent(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         let expected = 0.0;
         assert!(
             (result - expected).abs() < EPSILON,
@@ -125,7 +133,8 @@ mod bbent_private_tests {
             0.5,
             100.0,
         )]);
-        let result = calc_bbent(&campione, &anagrafica);
+        let result = calc_bbent(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         let expected = 0.0;
         assert!(
             (result - expected).abs() < EPSILON,
@@ -144,7 +153,8 @@ mod bbent_private_tests {
             0.6,
             200.0,
         )]);
-        let result = calc_bbent(&campione, &anagrafica);
+        let result = calc_bbent(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         let expected = (1000.0 * 41.0_f32.ln()).round() / 1000.0;
         assert!(
             (result - expected).abs() < EPSILON,
@@ -163,7 +173,8 @@ mod bbent_private_tests {
             create_specie_record(GruppoEcoHFBI::OccasionaliDiAcqueDolci, 1.0, 0.0, 500.0),
             create_specie_record(GruppoEcoHFBI::Diadromi, 0.8, 0.2, 200.0),
         ]);
-        let result = calc_bbent(&campione, &anagrafica);
+        let result = calc_bbent(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         let expected = (1000.0 * 101.0_f32.ln()).round() / 1000.0;
         assert!(
             (result - expected).abs() < EPSILON,
@@ -183,10 +194,7 @@ mod bbent_private_tests {
             100.0,
         )]);
         let result = calc_bbent(&campione, &anagrafica);
-        assert!(
-            result.is_infinite(),
-            "Result should be infinity for zero area with positive biobent"
-        );
+        assert!(result.is_err());
     }
 
     #[test]
@@ -194,12 +202,6 @@ mod bbent_private_tests {
         let anagrafica = create_test_anagrafica(0.0, 10.0);
         let campione = CampionamentoHFBI::new(vec![]);
         let result = calc_bbent(&campione, &anagrafica);
-        let expected = 0.0;
-        assert!(
-            (result - expected).abs() < EPSILON,
-            "Failed zero area and zero biobent test. Expected: {}, Got: {}",
-            expected,
-            result
-        );
+        assert!(result.is_err());
     }
 }

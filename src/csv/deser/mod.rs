@@ -21,7 +21,6 @@ use super::{
     RIFERIMENTO_NISECI_HEADER_FIELDS,
 };
 use crate::deser::TipoRecord;
-use serde::{de, Deserialize, Deserializer};
 use std::io::{self, Read};
 use std::path::Path;
 
@@ -55,13 +54,39 @@ impl<R: Read> Read for NormalizerReader<R> {
     }
 }
 
-fn deserialize_comma_f32<'de, D>(deserializer: D) -> Result<f32, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let s: &str = Deserialize::deserialize(deserializer)?;
-    let s = s.replace(',', "."); // Replace comma with dot
-    s.parse::<f32>().map_err(de::Error::custom)
+#[derive(Debug, Clone, Copy)]
+pub struct CsvConfig {
+    delimiter: u8,
+    has_headers: bool,
+}
+
+impl Default for CsvConfig {
+    fn default() -> Self {
+        Self {
+            delimiter: b';',
+            has_headers: true,
+        }
+    }
+}
+
+impl CsvConfig {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn delimiter(&self) -> u8 {
+        self.delimiter
+    }
+    pub fn has_headers(&self) -> bool {
+        self.has_headers
+    }
+    pub fn with_delimiter(mut self, delimiter: u8) -> Self {
+        self.delimiter = delimiter;
+        self
+    }
+    pub fn with_headers(mut self, has_headers: bool) -> Self {
+        self.has_headers = has_headers;
+        self
+    }
 }
 
 fn parse_csv_pos(pos: &Option<csv::Position>) -> String {

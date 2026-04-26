@@ -16,7 +16,7 @@
 */
 
 use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, deserialize_comma_f32, process_csv_errors, NormalizerReader,
+    check_path_is_file_ends_with_csv, process_csv_errors, CsvConfig, NormalizerReader,
 };
 use crate::deser::{
     parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
@@ -28,103 +28,11 @@ use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
 
-/// Currently allows unknown fields; will switch to
-/// `#[serde(deny_unknown_fields)]` in a future release.
-#[derive(Debug, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VeryItalianRecordCsvRiferimentoNISECI {
-    pub nome_comune: String,
-    pub nome_latino: String,
-    pub codice_specie: String,
-    pub origine: String,
-    pub tipo_autoctono: u32,
-    pub allo_nocivita: u32,
-    pub specie_attesa: u32,
-    pub cl_soglia1: u32, // in mm
-    pub cl_soglia2: u32, // in mm
-    pub cl_soglia3: u32, // in mm
-    pub cl_soglia4: u32, // in mm
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia1: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia2: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia3: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub ad_juv_soglia4: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub dens_soglia1: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub dens_soglia2: f32,
-}
-
-impl RecordRiferimentoNISECI for VeryItalianRecordCsvRiferimentoNISECI {
-    fn nome_comune(&self) -> String {
-        self.nome_comune.clone()
-    }
-    fn nome_latino(&self) -> String {
-        self.nome_latino.clone()
-    }
-    fn codice_specie(&self) -> String {
-        self.codice_specie.clone()
-    }
-    fn origine(&self) -> String {
-        self.origine.clone()
-    }
-    fn tipo_autoctono(&self) -> u32 {
-        self.tipo_autoctono
-    }
-    fn allo_nocivita(&self) -> u32 {
-        self.allo_nocivita
-    }
-    fn specie_attesa(&self) -> u32 {
-        self.specie_attesa
-    }
-    fn cl_soglia1(&self) -> u32 {
-        self.cl_soglia1
-    }
-    fn cl_soglia2(&self) -> u32 {
-        self.cl_soglia2
-    }
-    fn cl_soglia3(&self) -> u32 {
-        self.cl_soglia3
-    }
-    fn cl_soglia4(&self) -> u32 {
-        self.cl_soglia4
-    }
-    fn ad_juv_soglia1(&self) -> f32 {
-        self.ad_juv_soglia1
-    }
-    fn ad_juv_soglia2(&self) -> f32 {
-        self.ad_juv_soglia2
-    }
-    fn ad_juv_soglia3(&self) -> f32 {
-        self.ad_juv_soglia3
-    }
-    fn ad_juv_soglia4(&self) -> f32 {
-        self.ad_juv_soglia4
-    }
-    fn dens_soglia1(&self) -> f32 {
-        self.dens_soglia1
-    }
-    fn dens_soglia2(&self) -> f32 {
-        self.dens_soglia2
-    }
-}
-
-impl fmt::Display for VeryItalianRecordCsvRiferimentoNISECI {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = format!(
-            "RecordRiferimentoNISECI: {{ nome_comune: [{}], nome_latino: [{}], codice_specie: [{}], origine: [{}], tipo_autoctono: [{}], allo_nocivita: [{}], specie_attesa: [{}], cl_soglia1: [{}], cl_soglia2: [{}], cl_soglia3: [{}], cl_soglia4: [{}], ad_juv_soglia1: [{}], ad_juv_soglia2: [{}], ad_juv_soglia3: [{}], ad_juv_soglia4: [{}], dens_soglia1: [{}], dens_soglia2: [{}] }}",
-              self.nome_comune, self.nome_latino, self.codice_specie, self.origine,
-              self.tipo_autoctono, self.allo_nocivita, self.specie_attesa,
-              self.cl_soglia1, self.cl_soglia2, self.cl_soglia3, self.cl_soglia4,
-              self.ad_juv_soglia1, self.ad_juv_soglia2, self.ad_juv_soglia3, self.ad_juv_soglia4,
-              self.dens_soglia1, self.dens_soglia2
-        );
-        write!(f, "{}", string_representation)
-    }
-}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::csv::stanis::niseci::VeryItalianRecordRiferimentoNISECI instead"
+)]
+pub use crate::csv::stanis::niseci::VeryItalianRecordRiferimentoNISECI as VeryItalianRecordCsvRiferimentoNISECI;
+use crate::csv::stanis::niseci::VeryItalianRecordRiferimentoNISECI;
 
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
@@ -227,6 +135,9 @@ where
     parse_serialized_records(iter)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_riferimento_niseci_reader_conf() instead"
+)]
 pub fn check_riferimento_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -234,19 +145,32 @@ pub fn check_riferimento_niseci_reader<R: Read, T>(
 where
     T: RecordRiferimentoNISECI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
-
     let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
 
     // Match on the TypeId to determine the actual type of T
     let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCsvRiferimentoNISECI>() => b';',
+        id if id == TypeId::of::<VeryItalianRecordRiferimentoNISECI>() => b';',
         _ => b',',
     };
 
+    let config = CsvConfig::default()
+        .with_delimiter(delimiter)
+        .with_headers(has_headers);
+    check_riferimento_niseci_reader_conf::<R, T>(reader, config)
+}
+
+pub fn check_riferimento_niseci_reader_conf<R: Read, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordRiferimentoNISECI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(delimiter)
-        .has_headers(has_headers)
+        .delimiter(config.delimiter())
+        .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
     validate_serialized_records(iter, |errors| {
@@ -264,9 +188,35 @@ where
     })
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_riferimento_niseci_path_conf() instead"
+)]
 pub fn check_riferimento_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordRiferimentoNISECI + 'static,
+{
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordRiferimentoNISECI>() => b';',
+        _ => b',',
+    };
+
+    check_riferimento_niseci_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_riferimento_niseci_path_conf<T>(
+    path: PathBuf,
+    config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordRiferimentoNISECI + 'static,
@@ -280,54 +230,14 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_riferimento_niseci_reader(file, has_headers)
+    check_riferimento_niseci_reader_conf(file, config)
 }
 
-/// Currently allows unknown fields; will switch to
-/// `#[serde(deny_unknown_fields)]` in a future release.
-#[derive(Debug, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VeryItalianRecordCsvCampionamentoNISECI {
-    pub data: String,
-    pub stazione: String,
-    pub num_passaggio: u32,
-    pub codice_specie: String,
-    pub lunghezza: u32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub peso: f32,
-}
-
-impl RecordCampionamentoNISECI for VeryItalianRecordCsvCampionamentoNISECI {
-    fn data(&self) -> String {
-        self.data.clone()
-    }
-    fn stazione(&self) -> String {
-        self.stazione.clone()
-    }
-    fn num_passaggio(&self) -> u32 {
-        self.num_passaggio
-    }
-    fn codice_specie(&self) -> String {
-        self.codice_specie.clone()
-    }
-    fn lunghezza(&self) -> u32 {
-        self.lunghezza
-    }
-    fn peso(&self) -> f32 {
-        self.peso
-    }
-}
-
-impl fmt::Display for VeryItalianRecordCsvCampionamentoNISECI {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = format!(
-            "RecordCampionamentoNISECI: {{ data: [{}], stazione: [{}], num_passaggio: [{}], codice_specie: [{}], lunghezza: [{}], peso: [{}] }}",
-              self.data, self.stazione, self.num_passaggio,
-              self.codice_specie, self.lunghezza, self.peso
-        );
-        write!(f, "{}", string_representation)
-    }
-}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::csv::stanis::niseci::VeryItalianRecordCampionamentoNISECI instead"
+)]
+pub use crate::csv::stanis::niseci::VeryItalianRecordCampionamentoNISECI as VeryItalianRecordCsvCampionamentoNISECI;
+use crate::csv::stanis::niseci::VeryItalianRecordCampionamentoNISECI;
 
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
@@ -383,6 +293,9 @@ where
     parse_serialized_records(iter)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_campionamento_niseci_reader_conf() instead"
+)]
 pub fn check_campionamento_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -390,19 +303,34 @@ pub fn check_campionamento_niseci_reader<R: Read, T>(
 where
     T: RecordCampionamentoNISECI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
-
     let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
 
     // Match on the TypeId to determine the actual type of T
     let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCsvCampionamentoNISECI>() => b';',
+        id if id == TypeId::of::<VeryItalianRecordCampionamentoNISECI>() => b';',
         _ => b',',
     };
 
+    check_campionamento_niseci_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_campionamento_niseci_reader_conf<R: Read, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCampionamentoNISECI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(delimiter)
-        .has_headers(has_headers)
+        .delimiter(config.delimiter())
+        .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
     validate_serialized_records(iter, |errors| {
@@ -420,9 +348,35 @@ where
     })
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_campionamento_niseci_path_conf() instead"
+)]
 pub fn check_campionamento_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCampionamentoNISECI + 'static,
+{
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCampionamentoNISECI>() => b';',
+        _ => b',',
+    };
+
+    check_campionamento_niseci_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_campionamento_niseci_path_conf<T>(
+    path: PathBuf,
+    config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordCampionamentoNISECI + 'static,
@@ -436,98 +390,14 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_campionamento_niseci_reader(file, has_headers)
+    check_campionamento_niseci_reader_conf(file, config)
 }
 
-/// Currently allows unknown fields; will switch to
-/// `#[serde(deny_unknown_fields)]` in a future release.
-#[derive(Debug, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct VeryItalianRecordCsvAnagraficaNISECI {
-    pub codice_stazione: String,
-    pub corpo_idrico: String,
-    pub regione: String,
-    pub provincia: String,
-    pub data: String,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub lunghezza_stazione: f32,
-    #[serde(deserialize_with = "deserialize_comma_f32")]
-    pub larghezza_stazione: f32,
-    pub tipo_comunita: u32,
-    pub fonte: String,
-    pub numero_protocollo: String,
-    pub idro_eco_regione: u32,
-    pub area_alpina: u32,
-    pub nome_bacino: String,
-}
-
-impl RecordAnagraficaNISECI for VeryItalianRecordCsvAnagraficaNISECI {
-    fn codice_stazione(&self) -> String {
-        self.codice_stazione.clone()
-    }
-    fn corpo_idrico(&self) -> String {
-        self.corpo_idrico.clone()
-    }
-    fn regione(&self) -> String {
-        self.regione.clone()
-    }
-    fn provincia(&self) -> String {
-        self.provincia.clone()
-    }
-    fn data(&self) -> String {
-        self.data.clone()
-    }
-    fn lunghezza_stazione(&self) -> f32 {
-        self.lunghezza_stazione
-    }
-    fn larghezza_stazione(&self) -> f32 {
-        self.larghezza_stazione
-    }
-    fn tipo_comunita(&self) -> u32 {
-        self.tipo_comunita
-    }
-    fn fonte(&self) -> String {
-        self.fonte.clone()
-    }
-    fn numero_protocollo(&self) -> String {
-        self.numero_protocollo.clone()
-    }
-    fn idro_eco_regione(&self) -> u32 {
-        self.idro_eco_regione
-    }
-    fn area_alpina(&self) -> u32 {
-        self.area_alpina
-    }
-    fn nome_bacino(&self) -> String {
-        self.nome_bacino.clone()
-    }
-}
-
-impl fmt::Display for VeryItalianRecordCsvAnagraficaNISECI {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = format!(
-            "RecordAnagraficaNISECI: {{ codice_stazione: [{}], corpo_idrico: [{}],\
-            regione: [{}], provincia: [{}], data: [{}], lunghezza_stazione: [{}],\
-            larghezza_stazione: [{}], tipo_comunita [{}], fonte [{}],\
-            numero_protocollo: [{}], idro_eco_regione: [{}],\
-            area_alpina: [{}], nome_bacino: [{}]}}",
-            self.codice_stazione,
-            self.corpo_idrico,
-            self.regione,
-            self.provincia,
-            self.data,
-            self.lunghezza_stazione,
-            self.larghezza_stazione,
-            self.tipo_comunita,
-            self.fonte,
-            self.numero_protocollo,
-            self.idro_eco_regione,
-            self.area_alpina,
-            self.nome_bacino
-        );
-        write!(f, "{}", string_representation)
-    }
-}
+#[deprecated(
+    note = "v0.2 will drop this reexport.\nConsider using crate::csv::stanis::niseci::VeryItalianRecordAnagraficaNISECI instead"
+)]
+pub use crate::csv::stanis::niseci::VeryItalianRecordAnagraficaNISECI as VeryItalianRecordCsvAnagraficaNISECI;
+use crate::csv::stanis::niseci::VeryItalianRecordAnagraficaNISECI;
 
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
@@ -626,6 +496,9 @@ where
     parse_serialized_records(iter)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_anagrafica_niseci_reader_conf() instead"
+)]
 pub fn check_anagrafica_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -633,19 +506,34 @@ pub fn check_anagrafica_niseci_reader<R: Read, T>(
 where
     T: RecordAnagraficaNISECI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
-
     let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
 
     // Match on the TypeId to determine the actual type of T
     let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCsvAnagraficaNISECI>() => b';',
+        id if id == TypeId::of::<VeryItalianRecordAnagraficaNISECI>() => b';',
         _ => b',',
     };
 
+    check_anagrafica_niseci_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_anagrafica_niseci_reader_conf<R: Read, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordAnagraficaNISECI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+
     let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(delimiter)
-        .has_headers(has_headers)
+        .delimiter(config.delimiter())
+        .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
     validate_serialized_records(iter, |errors| {
@@ -663,9 +551,34 @@ where
     })
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_anagrafica_niseci_path_conf() instead"
+)]
 pub fn check_anagrafica_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordAnagraficaNISECI + 'static,
+{
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordAnagraficaNISECI>() => b';',
+        _ => b',',
+    };
+    check_anagrafica_niseci_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn check_anagrafica_niseci_path_conf<T>(
+    path: PathBuf,
+    config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
     T: RecordAnagraficaNISECI + 'static,
@@ -679,5 +592,5 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_anagrafica_niseci_reader(file, has_headers)
+    check_anagrafica_niseci_reader_conf(file, config)
 }
