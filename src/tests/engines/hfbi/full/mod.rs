@@ -89,7 +89,7 @@ fn calc_templates_with_area(
     format: InputFormat,
     x: f32,
     y: f32,
-) -> (f32, ValoriIntermediHFBI) {
+) -> Result<(f32, ValoriIntermediHFBI), String> {
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_HFBI_TEMPLATE_DATA);
     let campionamento =
         load_campionamento_hfbi_from_reader(campionamento_reader, has_headers, format)
@@ -100,12 +100,7 @@ fn calc_templates_with_area(
     anagrafica.set_lunghezza_unchecked(x);
     anagrafica.set_larghezza_unchecked(y);
 
-    let calc_hfbi_res = calculate_hfbi(&campionamento, &anagrafica);
-
-    assert!(calc_hfbi_res.is_ok());
-
-    let (hfbi, intermediates) = calc_hfbi_res.expect("is_ok() was checked before");
-    (hfbi, intermediates)
+    calculate_hfbi(&campionamento, &anagrafica)
 }
 
 #[test]
@@ -113,16 +108,9 @@ fn calculate_hfbi_template_zero_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
 
-    let (hfbi, intermediates) = calc_templates_with_area(has_headers, format, 0.0, 0.0);
+    let calc_hfbi_res = calc_templates_with_area(has_headers, format, 0.0, 0.0);
 
-    assert!(hfbi.is_nan());
-    assert!(intermediates.mmi.is_nan());
-    assert_eq!(intermediates.bbent, f32::INFINITY);
-    assert_eq!(intermediates.bn, 1.587);
-    assert!(intermediates.dbent.is_nan());
-    assert_eq!(intermediates.ddom, 0.0);
-    assert_eq!(intermediates.dhzp, 0.0);
-    assert_eq!(intermediates.dmig, 0.0);
+    assert!(calc_hfbi_res.is_err());
 }
 
 #[test]
@@ -130,16 +118,9 @@ fn calculate_hfbi_template_subzero_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
 
-    let (hfbi, intermediates) = calc_templates_with_area(has_headers, format, -1.0, 100.0);
+    let calc_hfbi_res = calc_templates_with_area(has_headers, format, -1.0, 100.0);
 
-    assert!(hfbi.is_nan());
-    assert!(intermediates.mmi.is_nan());
-    assert!(intermediates.bbent.is_nan());
-    assert_eq!(intermediates.bn, 1.587);
-    assert!(intermediates.dbent.is_nan());
-    assert!(intermediates.ddom.is_nan());
-    assert!(intermediates.dhzp.is_nan());
-    assert!(intermediates.dmig.is_nan());
+    assert!(calc_hfbi_res.is_err());
 }
 
 #[test]
@@ -147,16 +128,9 @@ fn calculate_hfbi_template_infinite_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
 
-    let (hfbi, intermediates) = calc_templates_with_area(has_headers, format, f32::INFINITY, 1.0);
+    let calc_hfbi_res = calc_templates_with_area(has_headers, format, f32::INFINITY, 1.0);
 
-    assert_eq!(hfbi, f32::INFINITY);
-    assert_eq!(intermediates.mmi, f32::INFINITY);
-    assert_eq!(intermediates.bbent, 0.0);
-    assert_eq!(intermediates.bn, 1.587);
-    assert_eq!(intermediates.dbent, 0.0);
-    assert_eq!(intermediates.ddom, f32::INFINITY);
-    assert_eq!(intermediates.dhzp, 0.0);
-    assert_eq!(intermediates.dmig, 0.0);
+    assert!(calc_hfbi_res.is_err());
 }
 
 #[test]
@@ -164,17 +138,9 @@ fn calculate_hfbi_template_subzero_infinite_area() {
     let has_headers = true;
     let format = InputFormat::Alternative;
 
-    let (hfbi, intermediates) =
-        calc_templates_with_area(has_headers, format, f32::NEG_INFINITY, 1.0);
+    let calc_hfbi_res = calc_templates_with_area(has_headers, format, f32::NEG_INFINITY, 1.0);
 
-    assert_eq!(hfbi, f32::INFINITY);
-    assert_eq!(intermediates.mmi, f32::INFINITY);
-    assert_eq!(intermediates.bbent, 0.0);
-    assert_eq!(intermediates.bn, 1.587);
-    assert_eq!(intermediates.dbent, 0.0);
-    assert_eq!(intermediates.ddom, f32::INFINITY);
-    assert_eq!(intermediates.dhzp, 0.0);
-    assert_eq!(intermediates.dmig, 0.0);
+    assert!(calc_hfbi_res.is_err());
 }
 
 #[test]
@@ -187,14 +153,7 @@ fn calculate_hfbi_template_quietnan_area() {
     // the Rust assumptions that the quiet/signaling bit being set to 1
     // indicates a quiet NaN)
     let quiet_nan = f32::NAN;
-    let (hfbi, intermediates) = calc_templates_with_area(has_headers, format, quiet_nan, 1.0);
+    let calc_hfbi_res = calc_templates_with_area(has_headers, format, quiet_nan, 1.0);
 
-    assert!(hfbi.is_nan());
-    assert!(intermediates.mmi.is_nan());
-    assert!(intermediates.bbent.is_nan());
-    assert_eq!(intermediates.bn, 1.587);
-    assert!(intermediates.dbent.is_nan());
-    assert!(intermediates.ddom.is_nan());
-    assert!(intermediates.dhzp.is_nan());
-    assert!(intermediates.dmig.is_nan());
+    assert!(calc_hfbi_res.is_err());
 }

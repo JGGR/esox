@@ -10,6 +10,7 @@
 - Deprecation warnings for check functions in `csv::{deser,load}::{niseci,hfbi}`, next version will change public API:
   - In: will expect `delimiter` as new required argument
 - Catch negative or not finite area values in `engines::niseci::x2::{calculate_sommatoria_x2_b, calculate_sommatoria_x2_b_per_alloctone}`
+- Catch negative or not finite area values in `engines::hfbi::bbent::calc_bbent`
 
 ## [0.1.3] - 2026-04-24
 
