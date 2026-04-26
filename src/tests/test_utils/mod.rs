@@ -51,8 +51,8 @@ pub fn create_dummy_anagrafica() -> AnagraficaNISECI {
             regione: "foo".to_string(),
             provincia: "foo".to_string(),
         },
-        0.0,
-        0.0,
+        1.0,
+        1.0,
     );
 }
 
