@@ -19,16 +19,37 @@ use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 
 /// This calculation is order-dependent due to calc_s90_b90() being order-dependent.
 /// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
-pub fn calc_ddom(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
-    let (s90, b90): (u32, f32) = calc_s90_b90(campionamento, anagrafica);
+pub fn calc_ddom(
+    campionamento: &CampionamentoHFBI,
+    anagrafica: &AnagraficaHFBI,
+) -> Result<f32, String> {
+    let (s90, b90): (u32, f32) = calc_s90_b90(campionamento, anagrafica)?;
 
     let ddom = (((s90 as f32 - 1.0) / b90) + 1.0).ln();
-    (1000.0 * ddom).round() / 1000.0
+    Ok((1000.0 * ddom).round() / 1000.0)
 }
 
 /// This calculation is order-dependent.
 /// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
-fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> (u32, f32) {
+fn calc_s90_b90(
+    campionamento: &CampionamentoHFBI,
+    anagrafica: &AnagraficaHFBI,
+) -> Result<(u32, f32), String> {
+    let width = anagrafica.get_larghezza_media();
+    let length = anagrafica.get_lunghezza_media();
+    if width <= 0.0 {
+        return Err("Width too small".to_string());
+    }
+    if !width.is_finite() {
+        return Err("Width not finite".to_string());
+    }
+    if length <= 0.0 {
+        return Err("Length too small".to_string());
+    }
+    if !length.is_finite() {
+        return Err("Length not finite".to_string());
+    }
+    let area = width * length;
     let mut biomassa_tot = 0.0;
     for cattura in campionamento {
         biomassa_tot += cattura.peso;
@@ -46,10 +67,9 @@ fn calc_s90_b90(campionamento: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) 
         }
     }
 
-    let area: f32 = anagrafica.get_lunghezza_media() * anagrafica.get_larghezza_media();
     let b90: f32 = ((biomassa_90 / area) * 100.0 + 1.0).ln();
 
-    (n_specie_90, b90)
+    Ok((n_specie_90, b90))
 }
 
 #[cfg(test)]
@@ -119,8 +139,10 @@ mod ddom_private_tests {
             create_dummy_record(1.0),
             create_dummy_record(1.0),
         ]);
-        let (n_specie_90, b90) = calc_s90_b90(&campione, &anagrafica);
-        let (n_specie_90_sorted, b90_sorted) = calc_s90_b90(&sorted, &anagrafica);
+        let (n_specie_90, b90) = calc_s90_b90(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
+        let (n_specie_90_sorted, b90_sorted) = calc_s90_b90(&sorted, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         assert!((b90 - b90_sorted).abs() < EPSILON);
         assert!(n_specie_90 == n_specie_90_sorted);
     }
@@ -138,8 +160,10 @@ mod ddom_private_tests {
             create_dummy_record(1.0),
             create_dummy_record(1.0),
         ]);
-        let ddom = calc_ddom(&campione, &anagrafica);
-        let ddom_sorted = calc_ddom(&sorted, &anagrafica);
+        let ddom = calc_ddom(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
+        let ddom_sorted = calc_ddom(&sorted, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         assert!((ddom - ddom_sorted).abs() < EPSILON);
     }
 
@@ -147,7 +171,8 @@ mod ddom_private_tests {
     fn test_s90_b90_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI::new(vec![]);
-        let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
+        let (s90, b90) = calc_s90_b90(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
 
         assert_eq!(s90, 0);
         // b90 = ln((0 / 500) * 100 + 1) = ln(1) = 0
@@ -158,7 +183,8 @@ mod ddom_private_tests {
     fn test_s90_b90_single_species() {
         let anagrafica = create_test_anagrafica(10.0, 10.0); // area = 100
         let campione = CampionamentoHFBI::new(vec![create_dummy_record(200.0)]);
-        let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
+        let (s90, b90) = calc_s90_b90(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
 
         // n_specie_90 is 1 because the loop runs once and breaks.
         assert_eq!(s90, 1);
@@ -172,11 +198,9 @@ mod ddom_private_tests {
     fn test_s90_b90_zero_area() {
         let anagrafica = create_test_anagrafica(10.0, 0.0); // area = 0
         let campione = CampionamentoHFBI::new(vec![create_dummy_record(100.0)]);
-        let (s90, b90) = calc_s90_b90(&campione, &anagrafica);
+        let res = calc_s90_b90(&campione, &anagrafica);
 
-        assert_eq!(s90, 1);
-        // Division by zero area results in infinity
-        assert!(b90.is_infinite());
+        assert!(res.is_err());
     }
 
     // --- Tests for the public function: calc_ddom ---
@@ -185,7 +209,8 @@ mod ddom_private_tests {
     fn test_ddom_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI::new(vec![]);
-        let result = calc_ddom(&campione, &anagrafica);
+        let result = calc_ddom(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         // s90=0, b90=0. Formula is ln(((0-1)/0)+1) = ln(-inf) = NaN
         assert!(result.is_nan());
     }
@@ -194,7 +219,8 @@ mod ddom_private_tests {
     fn test_ddom_single_species() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI::new(vec![create_dummy_record(100.0)]);
-        let result = calc_ddom(&campione, &anagrafica);
+        let result = calc_ddom(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         // s90=1. Formula is ln(((1-1)/b90)+1) = ln(1) = 0
         assert!((result - 0.0).abs() < EPSILON);
     }
@@ -205,8 +231,7 @@ mod ddom_private_tests {
         let campione =
             CampionamentoHFBI::new(vec![create_dummy_record(100.0), create_dummy_record(50.0)]);
         let result = calc_ddom(&campione, &anagrafica);
-        // b90 is infinity. Formula is ln(((s90-1)/inf)+1) = ln(0+1) = ln(1) = 0
-        assert!((result - 0.0).abs() < EPSILON);
+        assert!(result.is_err());
     }
 
     #[test]
@@ -227,7 +252,8 @@ mod ddom_private_tests {
         let b90 = 181.0_f32.ln();
 
         let expected_result = (1000.0 * (((s90 - 1.0) / b90) + 1.0).ln()).round() / 1000.0;
-        let actual_result = calc_ddom(&campione, &anagrafica);
+        let actual_result = calc_ddom(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
 
         assert!((actual_result - expected_result).abs() < EPSILON);
     }

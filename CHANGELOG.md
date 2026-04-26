@@ -13,6 +13,7 @@
   - `engines::niseci::x2::{calculate_sommatoria_x2_b, calculate_sommatoria_x2_b_per_alloctone}`
   - `engines::hfbi::bbent::calc_bbent`
   - `engines::hfbi::dbent::calc_dbent`
+  - `engines::hfbi::ddom::calc_ddom`
 
 ## [0.1.3] - 2026-04-24
 
