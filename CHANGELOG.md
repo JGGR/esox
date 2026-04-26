@@ -1,8 +1,9 @@
-## [0.1.4] - Unreleased
+## [0.1.4] - 2026-04-26
 
 ### Added
 
 - Add `csv::deser::CsvConfig` to support explicit delimiter settings
+- Add `csv::stanis` module
 
 ### Changed
 
@@ -16,6 +17,7 @@
   - `engines::hfbi::ddom::calc_ddom`
   - `engines::hfbi::dhzp::calc_dhzp`
   - `engines::hfbi::dmig::calc_dmig`
+  - Listed methods now return `Result`
 
 ## [0.1.3] - 2026-04-24
 
