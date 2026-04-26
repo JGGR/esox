@@ -54,6 +54,41 @@ impl<R: Read> Read for NormalizerReader<R> {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct CsvConfig {
+    delimiter: u8,
+    has_headers: bool,
+}
+
+impl Default for CsvConfig {
+    fn default() -> Self {
+        Self {
+            delimiter: b';',
+            has_headers: true,
+        }
+    }
+}
+
+impl CsvConfig {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn delimiter(&self) -> u8 {
+        self.delimiter
+    }
+    pub fn has_headers(&self) -> bool {
+        self.has_headers
+    }
+    pub fn with_delimiter(mut self, delimiter: u8) -> Self {
+        self.delimiter = delimiter;
+        self
+    }
+    pub fn with_headers(mut self, has_headers: bool) -> Self {
+        self.has_headers = has_headers;
+        self
+    }
+}
+
 fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     let res;
     match pos {

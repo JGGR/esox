@@ -16,11 +16,11 @@
 */
 
 use crate::csv::deser::niseci::{
-    check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
-    check_riferimento_niseci_reader, PlainRecordCsvAnagraficaNISECI,
+    check_anagrafica_niseci_reader_conf, check_campionamento_niseci_reader_conf,
+    check_riferimento_niseci_reader_conf, PlainRecordCsvAnagraficaNISECI,
     PlainRecordCsvCampionamentoNISECI, PlainRecordCsvRiferimentoNISECI,
 };
-use crate::csv::deser::NormalizerReader;
+use crate::csv::deser::{CsvConfig, NormalizerReader};
 use crate::csv::load::InputFormat;
 use crate::csv::stanis::niseci::{
     VeryItalianRecordAnagraficaNISECI, VeryItalianRecordCampionamentoNISECI,
@@ -33,6 +33,7 @@ use crate::parser::niseci::{
     check_records_riferimento_niseci, RecordAnagraficaNISECIError, RecordCampionamentoNISECIError,
     RecordRiferimentoNISECIError,
 };
+use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
@@ -59,6 +60,9 @@ impl fmt::Display for RiferimentoNISECIError {
 
 impl std::error::Error for RiferimentoNISECIError {}
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_riferimento_niseci_from_reader_conf() instead"
+)]
 pub fn load_csv_riferimento_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -67,13 +71,39 @@ where
     R: Read,
     T: RecordRiferimentoNISECI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordRiferimentoNISECI>() => b';',
+        _ => b',',
+    };
+    load_csv_riferimento_niseci_from_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn load_csv_riferimento_niseci_from_reader_conf<R, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
+where
+    R: Read,
+    T: RecordRiferimentoNISECI + 'static,
+{
     let normalizing_reader = NormalizerReader::new(reader);
     let csv_records =
-        check_riferimento_niseci_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
+        check_riferimento_niseci_reader_conf::<NormalizerReader<R>, T>(normalizing_reader, config)
             .map_err(RiferimentoNISECIError::Csv)?;
     check_records_riferimento_niseci(csv_records).map_err(RiferimentoNISECIError::Value)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_riferimento_niseci_from_path_conf() instead"
+)]
 pub fn load_csv_riferimento_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -81,10 +111,32 @@ pub fn load_csv_riferimento_niseci_from_path<T>(
 where
     T: RecordRiferimentoNISECI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordRiferimentoNISECI>() => b';',
+        _ => b',',
+    };
+    load_csv_riferimento_niseci_from_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn load_csv_riferimento_niseci_from_path_conf<T>(
+    path: impl AsRef<Path>,
+    config: CsvConfig,
+) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
+where
+    T: RecordRiferimentoNISECI + 'static,
+{
     let file =
         File::open(path).map_err(|e| RiferimentoNISECIError::Csv(vec![csv::Error::from(e)]))?;
 
-    load_csv_riferimento_niseci_from_reader::<_, T>(file, has_headers)
+    load_csv_riferimento_niseci_from_reader_conf::<_, T>(file, config)
 }
 
 pub fn load_riferimento_niseci_from_reader<R>(
@@ -97,14 +149,22 @@ where
 {
     let normalizing_reader = NormalizerReader::new(reader);
     match format {
-        InputFormat::Standard => load_csv_riferimento_niseci_from_reader::<
+        InputFormat::Standard => load_csv_riferimento_niseci_from_reader_conf::<
             NormalizerReader<R>,
             PlainRecordCsvRiferimentoNISECI,
-        >(normalizing_reader, has_headers),
-        InputFormat::Alternative => load_csv_riferimento_niseci_from_reader::<
+        >(
+            normalizing_reader,
+            CsvConfig::default().with_headers(has_headers),
+        ),
+        InputFormat::Alternative => load_csv_riferimento_niseci_from_reader_conf::<
             NormalizerReader<R>,
             VeryItalianRecordRiferimentoNISECI,
-        >(normalizing_reader, has_headers),
+        >(
+            normalizing_reader,
+            CsvConfig::default()
+                .with_delimiter(b';')
+                .with_headers(has_headers),
+        ),
     }
 }
 
@@ -140,6 +200,9 @@ impl fmt::Display for CampionamentoNISECIError {
 
 impl std::error::Error for CampionamentoNISECIError {}
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_campionamento_niseci_from_reader_conf() instead"
+)]
 pub fn load_csv_campionamento_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -149,10 +212,35 @@ where
     R: Read,
     T: RecordCampionamentoNISECI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCampionamentoNISECI>() => b';',
+        _ => b',',
+    };
+    load_csv_campionamento_niseci_from_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+        riferimento,
+    )
+}
+
+pub fn load_csv_campionamento_niseci_from_reader_conf<R, T>(
+    reader: R,
+    config: CsvConfig,
+    riferimento: &RiferimentoNISECI,
+) -> Result<CampionamentoNISECI, CampionamentoNISECIError>
+where
+    R: Read,
+    T: RecordCampionamentoNISECI + 'static,
+{
     let normalizing_reader = NormalizerReader::new(reader);
-    let csv_records = check_campionamento_niseci_reader::<NormalizerReader<R>, T>(
+    let csv_records = check_campionamento_niseci_reader_conf::<NormalizerReader<R>, T>(
         normalizing_reader,
-        has_headers,
+        config,
     )
     .map_err(CampionamentoNISECIError::Csv)?;
 
@@ -160,6 +248,9 @@ where
         .map_err(CampionamentoNISECIError::Value)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_campionamento_niseci_from_path_conf() instead"
+)]
 pub fn load_csv_campionamento_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -168,9 +259,33 @@ pub fn load_csv_campionamento_niseci_from_path<T>(
 where
     T: RecordCampionamentoNISECI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordCampionamentoNISECI>() => b';',
+        _ => b',',
+    };
+    load_csv_campionamento_niseci_from_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+        riferimento,
+    )
+}
+
+pub fn load_csv_campionamento_niseci_from_path_conf<T>(
+    path: impl AsRef<Path>,
+    config: CsvConfig,
+    riferimento: &RiferimentoNISECI,
+) -> Result<CampionamentoNISECI, CampionamentoNISECIError>
+where
+    T: RecordCampionamentoNISECI + 'static,
+{
     let file =
         File::open(path).map_err(|e| CampionamentoNISECIError::Csv(vec![csv::Error::from(e)]))?;
-    load_csv_campionamento_niseci_from_reader::<_, T>(file, has_headers, riferimento)
+    load_csv_campionamento_niseci_from_reader_conf::<_, T>(file, config, riferimento)
 }
 
 pub fn load_campionamento_niseci_from_reader<R>(
@@ -184,14 +299,24 @@ where
 {
     let normalizing_reader = NormalizerReader::new(reader);
     match format {
-        InputFormat::Standard => load_csv_campionamento_niseci_from_reader::<
+        InputFormat::Standard => load_csv_campionamento_niseci_from_reader_conf::<
             NormalizerReader<R>,
             PlainRecordCsvCampionamentoNISECI,
-        >(normalizing_reader, has_headers, riferimento),
-        InputFormat::Alternative => load_csv_campionamento_niseci_from_reader::<
+        >(
+            normalizing_reader,
+            CsvConfig::default().with_headers(has_headers),
+            riferimento,
+        ),
+        InputFormat::Alternative => load_csv_campionamento_niseci_from_reader_conf::<
             NormalizerReader<R>,
             VeryItalianRecordCampionamentoNISECI,
-        >(normalizing_reader, has_headers, riferimento),
+        >(
+            normalizing_reader,
+            CsvConfig::default()
+                .with_delimiter(b';')
+                .with_headers(has_headers),
+            riferimento,
+        ),
     }
 }
 
@@ -228,6 +353,9 @@ impl fmt::Display for AnagraficaNISECIError {
 
 impl std::error::Error for AnagraficaNISECIError {}
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_anagrafica_niseci_from_reader_conf() instead"
+)]
 pub fn load_csv_anagrafica_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -236,14 +364,40 @@ where
     R: Read,
     T: RecordAnagraficaNISECI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordAnagraficaNISECI>() => b';',
+        _ => b',',
+    };
+    load_csv_anagrafica_niseci_from_reader_conf::<R, T>(
+        reader,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn load_csv_anagrafica_niseci_from_reader_conf<R, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
+where
+    R: Read,
+    T: RecordAnagraficaNISECI + 'static,
+{
     let normalizing_reader = NormalizerReader::new(reader);
 
     let csv_records =
-        check_anagrafica_niseci_reader::<NormalizerReader<R>, T>(normalizing_reader, has_headers)
+        check_anagrafica_niseci_reader_conf::<NormalizerReader<R>, T>(normalizing_reader, config)
             .map_err(AnagraficaNISECIError::Csv)?;
     check_records_anagrafica_niseci(csv_records).map_err(AnagraficaNISECIError::Value)
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_anagrafica_niseci_from_path_conf() instead"
+)]
 pub fn load_csv_anagrafica_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -251,10 +405,32 @@ pub fn load_csv_anagrafica_niseci_from_path<T>(
 where
     T: RecordAnagraficaNISECI + 'static,
 {
+    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
+
+    // Match on the TypeId to determine the actual type of T
+    let delimiter = match type_id {
+        id if id == TypeId::of::<VeryItalianRecordAnagraficaNISECI>() => b';',
+        _ => b',',
+    };
+    load_csv_anagrafica_niseci_from_path_conf::<T>(
+        path,
+        CsvConfig::default()
+            .with_delimiter(delimiter)
+            .with_headers(has_headers),
+    )
+}
+
+pub fn load_csv_anagrafica_niseci_from_path_conf<T>(
+    path: impl AsRef<Path>,
+    config: CsvConfig,
+) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
+where
+    T: RecordAnagraficaNISECI + 'static,
+{
     let file =
         File::open(path).map_err(|e| AnagraficaNISECIError::Csv(vec![csv::Error::from(e)]))?;
 
-    load_csv_anagrafica_niseci_from_reader::<_, T>(file, has_headers)
+    load_csv_anagrafica_niseci_from_reader_conf::<_, T>(file, config)
 }
 
 pub fn load_anagrafica_niseci_from_reader<R>(
@@ -267,14 +443,22 @@ where
 {
     let normalizing_reader = NormalizerReader::new(reader);
     match format {
-        InputFormat::Standard => load_csv_anagrafica_niseci_from_reader::<
+        InputFormat::Standard => load_csv_anagrafica_niseci_from_reader_conf::<
             NormalizerReader<R>,
             PlainRecordCsvAnagraficaNISECI,
-        >(normalizing_reader, has_headers),
-        InputFormat::Alternative => load_csv_anagrafica_niseci_from_reader::<
+        >(
+            normalizing_reader,
+            CsvConfig::default().with_headers(has_headers),
+        ),
+        InputFormat::Alternative => load_csv_anagrafica_niseci_from_reader_conf::<
             NormalizerReader<R>,
             VeryItalianRecordAnagraficaNISECI,
-        >(normalizing_reader, has_headers),
+        >(
+            normalizing_reader,
+            CsvConfig::default()
+                .with_delimiter(b';')
+                .with_headers(has_headers),
+        ),
     }
 }
 

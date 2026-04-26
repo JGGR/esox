@@ -16,9 +16,10 @@
 */
 
 use crate::csv::deser::niseci::{
-    check_anagrafica_niseci_reader, check_campionamento_niseci_reader,
-    check_riferimento_niseci_reader,
+    check_anagrafica_niseci_reader_conf, check_campionamento_niseci_reader_conf,
+    check_riferimento_niseci_reader_conf,
 };
+use crate::csv::deser::CsvConfig;
 use crate::csv::load::{
     niseci::{
         load_anagrafica_niseci_from_reader, load_campionamento_niseci_from_reader,
@@ -73,11 +74,12 @@ fn calculate_dummy_niseci_campionamento_chopped() {
 
 #[test]
 fn calculate_niseci_template() {
+    let config = CsvConfig::default().with_delimiter(b';');
     let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
-    let riferimento_csv_check = check_riferimento_niseci_reader::<
+    let riferimento_csv_check = check_riferimento_niseci_reader_conf::<
         _,
         VeryItalianRecordRiferimentoNISECI,
-    >(riferimento_reader, true);
+    >(riferimento_reader, config);
 
     assert!(riferimento_csv_check.is_ok());
 
@@ -91,10 +93,10 @@ fn calculate_niseci_template() {
 
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_NISECI_TEMPLATE_DATA);
 
-    let campionamento_csv_check = check_campionamento_niseci_reader::<
+    let campionamento_csv_check = check_campionamento_niseci_reader_conf::<
         _,
         VeryItalianRecordCampionamentoNISECI,
-    >(campionamento_reader, true);
+    >(campionamento_reader, config);
 
     assert!(campionamento_csv_check.is_ok());
 
@@ -109,10 +111,10 @@ fn calculate_niseci_template() {
 
     let anagrafica_reader = Cursor::new(ANAGRAFICA_NISECI_TEMPLATE_DATA);
 
-    let anagrafica_csv_check = check_anagrafica_niseci_reader::<_, VeryItalianRecordAnagraficaNISECI>(
-        anagrafica_reader,
-        true,
-    );
+    let anagrafica_csv_check = check_anagrafica_niseci_reader_conf::<
+        _,
+        VeryItalianRecordAnagraficaNISECI,
+    >(anagrafica_reader, config);
 
     assert!(anagrafica_csv_check.is_ok());
 
