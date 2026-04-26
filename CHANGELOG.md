@@ -14,6 +14,7 @@
   - `engines::hfbi::bbent::calc_bbent`
   - `engines::hfbi::dbent::calc_dbent`
   - `engines::hfbi::ddom::calc_ddom`
+  - `engines::hfbi::dhzp::calc_dhzp`
 
 ## [0.1.3] - 2026-04-24
 

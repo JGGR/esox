@@ -17,9 +17,9 @@
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
-pub fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+pub fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
     let mut shzp = 0.0;
-    let bhzp = calc_bhzp(campione, anagrafica);
+    let bhzp = calc_bhzp(campione, anagrafica)?;
     for specie in campione {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
@@ -33,18 +33,33 @@ pub fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f
 
     let epsilon: f32 = 1e-6;
     if shzp.abs() < epsilon {
-        return 0.0;
+        return Ok(0.0);
     }
 
     if (shzp - 0.2).abs() < epsilon {
-        return 0.01;
+        return Ok(0.01);
     }
 
     let dhzp = (((shzp - 0.2) / bhzp.ln()) + 1.0).ln();
-    (1000.0 * dhzp).round() / 1000.0
+    Ok((1000.0 * dhzp).round() / 1000.0)
 }
 
-fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
+    let width = anagrafica.get_larghezza_media();
+    let length = anagrafica.get_lunghezza_media();
+    if width <= 0.0 {
+        return Err("Width too small".to_string());
+    }
+    if !width.is_finite() {
+        return Err("Width not finite".to_string());
+    }
+    if length <= 0.0 {
+        return Err("Length too small".to_string());
+    }
+    if !length.is_finite() {
+        return Err("Length not finite".to_string());
+    }
+    let area = width * length;
     let mut biohzp = 0.0;
     for specie in campione {
         match specie.specie.gruppo_eco {
@@ -57,9 +72,7 @@ fn calc_bhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
         }
     }
 
-    let area = anagrafica.get_lunghezza_media() * anagrafica.get_larghezza_media();
-
-    (biohzp / area) * 100.0
+    Ok((biohzp / area) * 100.0)
 }
 
 #[cfg(test)]
@@ -125,7 +138,9 @@ mod dhzp_private_tests {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI::new(vec![]);
         // biohzp = 0 -> ln(1) = 0
-        assert!((calc_bhzp(&campione, &anagrafica) - 0.0).abs() < EPSILON);
+        let res = calc_bhzp(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
+        assert!((res - 0.0).abs() < EPSILON);
     }
 
     #[test]
@@ -136,8 +151,8 @@ mod dhzp_private_tests {
             100.0,
             1.0,
         )]);
-        // biohzp > 0, area = 0 -> division by zero -> infinity
-        assert!(calc_bhzp(&campione, &anagrafica).is_infinite());
+        let res = calc_bhzp(&campione, &anagrafica);
+        assert!(res.is_err());
     }
 
     #[test]
@@ -151,7 +166,8 @@ mod dhzp_private_tests {
         // biohzp = 25 + 75 = 100
         // expected = ln((100 / 100) * 100 + 1) = ln(101)
         let expected = 100.0_f32;
-        let result = calc_bhzp(&campione, &anagrafica);
+        let result = calc_bhzp(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         assert!((result - expected).abs() < EPSILON);
     }
 
@@ -168,8 +184,10 @@ mod dhzp_private_tests {
                 0.0,
             )],
         );
+        let res = calc_dhzp(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         // The special case for shzp near zero should trigger
-        assert!((calc_dhzp(&campione, &anagrafica) - 0.0).abs() < EPSILON);
+        assert!((res - 0.0).abs() < EPSILON);
     }
 
     #[test]
@@ -180,7 +198,9 @@ mod dhzp_private_tests {
             create_specie_record(GruppoEcoHFBI::MigratoriMarini, 50.0, 0.1),
         ]);
         // shzp = 0.1 + 0.1 = 0.2. The special case should trigger.
-        assert!((calc_dhzp(&campione, &anagrafica) - 0.01).abs() < EPSILON);
+        let res = calc_dhzp(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
+        assert!((res - 0.01).abs() < EPSILON);
     }
 
     #[test]
@@ -192,7 +212,8 @@ mod dhzp_private_tests {
             0.5,
         )]);
         // bhzp is infinity. Formula is ln(((shzp-0.2)/inf)+1) = ln(1) = 0
-        assert!((calc_dhzp(&campione, &anagrafica) - 0.0).abs() < EPSILON);
+        let res = calc_dhzp(&campione, &anagrafica);
+        assert!(res.is_err());
     }
 
     #[test]
@@ -213,7 +234,8 @@ mod dhzp_private_tests {
         let shzp = 1.5_f32;
 
         let expected = (1000.0 * (((shzp - 0.2) / bhzp) + 1.0).ln()).round() / 1000.0;
-        let result = calc_dhzp(&campione, &anagrafica);
+        let result = calc_dhzp(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
 
         assert!((result - expected).abs() < EPSILON);
     }
