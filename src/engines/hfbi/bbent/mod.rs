@@ -16,6 +16,7 @@
 */
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
+use crate::domain::posf32::PositiveF32;
 
 pub fn calc_bbent(
     campione: &CampionamentoHFBI,
@@ -23,19 +24,9 @@ pub fn calc_bbent(
 ) -> Result<f32, String> {
     let width = anagrafica.get_larghezza_media();
     let length = anagrafica.get_lunghezza_media();
-    if width <= 0.0 {
-        return Err("Width too small".to_string());
-    }
-    if !width.is_finite() {
-        return Err("Width not finite".to_string());
-    }
-    if length <= 0.0 {
-        return Err("Length too small".to_string());
-    }
-    if !length.is_finite() {
-        return Err("Length not finite".to_string());
-    }
-    let area = width * length;
+    let width_checked = PositiveF32::new(width).map_err(|e| e.to_string())?;
+    let length_checked = PositiveF32::new(length).map_err(|e| e.to_string())?;
+    let area: f32 = *width_checked * *length_checked;
     let mut biobent = 0.0;
     for specie in campione {
         match specie.specie.gruppo_eco {

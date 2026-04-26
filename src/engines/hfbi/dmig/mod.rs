@@ -18,6 +18,7 @@
 use std::collections::HashMap;
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, SpecieHFBI};
+use crate::domain::posf32::PositiveF32;
 
 pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
     let bmig = calc_bmig(campione, anagrafica)?;
@@ -53,19 +54,9 @@ pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> R
 fn calc_bmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
     let width = anagrafica.get_larghezza_media();
     let length = anagrafica.get_lunghezza_media();
-    if width <= 0.0 {
-        return Err("Width too small".to_string());
-    }
-    if !width.is_finite() {
-        return Err("Width not finite".to_string());
-    }
-    if length <= 0.0 {
-        return Err("Length too small".to_string());
-    }
-    if !length.is_finite() {
-        return Err("Length not finite".to_string());
-    }
-    let area = width * length;
+    let width_checked = PositiveF32::new(width).map_err(|e| e.to_string())?;
+    let length_checked = PositiveF32::new(length).map_err(|e| e.to_string())?;
+    let area: f32 = *width_checked * *length_checked;
     let mut biomig = 0.0;
     for specie in campione {
         match specie.specie.gruppo_eco {
