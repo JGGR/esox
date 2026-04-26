@@ -32,7 +32,7 @@ pub fn calculate_mmi(
 
     let bbent: f32 = calc_bbent(campionamento, anagrafica)?;
     let bn: f32 = calc_bn(campionamento);
-    let dbent: f32 = calc_dbent(campionamento, anagrafica);
+    let dbent: f32 = calc_dbent(campionamento, anagrafica)?;
     let ddom: f32 = calc_ddom(campionamento, anagrafica);
     let dhzp: f32 = calc_dhzp(campionamento, anagrafica);
     let dmig: f32 = calc_dmig(campionamento, anagrafica);

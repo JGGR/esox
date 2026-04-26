@@ -17,12 +17,29 @@
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 
-pub fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> f32 {
+pub fn calc_dbent(
+    campione: &CampionamentoHFBI,
+    anagrafica: &AnagraficaHFBI,
+) -> Result<f32, String> {
+    let width = anagrafica.get_larghezza_media();
+    let length = anagrafica.get_lunghezza_media();
+    if width <= 0.0 {
+        return Err("Width too small".to_string());
+    }
+    if !width.is_finite() {
+        return Err("Width not finite".to_string());
+    }
+    if length <= 0.0 {
+        return Err("Length too small".to_string());
+    }
+    if !length.is_finite() {
+        return Err("Length not finite".to_string());
+    }
+    let area = width * length;
     let mut sbent = 0.0;
     let mut densita_biomassa;
     let mut specie_sbent;
     let mut bbent = 0.0;
-    let area = anagrafica.get_larghezza_media() * anagrafica.get_lunghezza_media();
     for specie in campione {
         match specie.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi
@@ -40,15 +57,15 @@ pub fn calc_dbent(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> 
 
     let epsilon: f32 = 1e-6;
     if sbent.abs() < epsilon {
-        return 0.0;
+        return Ok(0.0);
     }
 
     if (sbent - 0.2).abs() < epsilon {
-        return 0.01;
+        return Ok(0.01);
     }
 
     let dbent = (((sbent - 1.0) / bbent.ln()) + 1.0).ln();
-    (1000.0 * dbent).round() / 1000.0
+    Ok((1000.0 * dbent).round() / 1000.0)
 }
 
 #[cfg(test)]
@@ -113,7 +130,8 @@ mod dbent_private_tests {
     fn test_dbent_empty_input() {
         let anagrafica = create_test_anagrafica(100.0, 5.0);
         let campione = CampionamentoHFBI::new(vec![]);
-        let result = calc_dbent(&campione, &anagrafica);
+        let result = calc_dbent(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         assert!(
             (result - 0.0).abs() < EPSILON,
             "Expected 0.0 for empty input, got {}",
@@ -130,7 +148,8 @@ mod dbent_private_tests {
             0.0,
             100.0,
         )]);
-        let result = calc_dbent(&campione, &anagrafica);
+        let result = calc_dbent(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         assert!(
             (result - 0.0).abs() < EPSILON,
             "Expected 0.0 for sbent near zero, got {}",
@@ -145,7 +164,8 @@ mod dbent_private_tests {
             create_specie_record(GruppoEcoHFBI::Diadromi, 0.15, 0.05, 100.0),
             create_specie_record(GruppoEcoHFBI::MigratoriMarini, 0.0, 0.0, 50.0),
         ]);
-        let result = calc_dbent(&campione, &anagrafica);
+        let result = calc_dbent(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
         assert!(
             (result - 0.01).abs() < EPSILON,
             "Expected 0.01 for sbent near 0.2, got {}",
@@ -165,7 +185,8 @@ mod dbent_private_tests {
         let sbent = 2.0;
         let bbent = 75.0_f32.ln();
         let expected = (1000.0 * (((sbent - 1.0) / bbent) + 1.0).ln()).round() / 1000.0;
-        let result = calc_dbent(&campione, &anagrafica);
+        let result = calc_dbent(&campione, &anagrafica)
+            .expect("Area fields of anagrafica should be positive and finite");
 
         assert!(
             (result - expected).abs() < EPSILON,
