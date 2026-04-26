@@ -5,9 +5,10 @@ edition = "2021"
 description = "Library for NISECI and HFBI calc"
 license = "GPL-3.0-only"
 repository = "https://github.com/JGGR/esox"
-exclude = [
-    ".github/**",
-    "templates",
+documentation = "https://docs.rs/esox/"
+include = [
+    "src/*",
+    "LICENSE",
 ]
 
 [features]
