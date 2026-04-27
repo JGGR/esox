@@ -179,12 +179,15 @@ where
             eprintln!("  {}", error);
         }
         */
+        /*
         let processed_errors = process_csv_errors(errors, TipoRecord::RiferimentoNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv del riferimento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
+        */
+        crate::csv::deser::error::duccio::csv_error_handler(TipoRecord::RiferimentoNISECI)(errors);
     })
 }
 

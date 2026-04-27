@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use crate::csv::deser::error::duccio::format_csv_error;
 use crate::csv::deser::{
     hfbi::{check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf},
     niseci::{
@@ -42,6 +43,7 @@ use crate::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,
     CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER,
 };
+use crate::deser::TipoRecord;
 use crate::domain::niseci::{RiferimentoNISECI, SpecieNISECI};
 use crate::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
 use crate::parser::niseci::{
@@ -70,7 +72,7 @@ fn test_csv_riferimento_niseci_found_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI); //translate_error_message(&errors[0].to_string());
     assert!(translated_error.contains("tipo non valido"));
 }
 
