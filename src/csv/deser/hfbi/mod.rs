@@ -15,9 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, process_csv_errors, CsvConfig, NormalizerReader,
-};
+use crate::csv::deser::error::duccio::csv_error_handler;
+use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
 use crate::deser::{
     parse_serialized_records, validate_serialized_records, RecordAnagraficaHFBI,
     RecordCampionamentoHFBI, TipoRecord,
@@ -120,13 +119,14 @@ where
         for error in &errors {
             eprintln!("  {}", error);
         }
-        */
         let processed_errors = process_csv_errors(errors, TipoRecord::CampionamentoHFBI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento HFBI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
+        */
+        csv_error_handler(TipoRecord::CampionamentoHFBI)(errors);
     })
 }
 
@@ -307,13 +307,14 @@ where
         for error in &errors {
             eprintln!("  {}", error);
         }
-        */
         let processed_errors = process_csv_errors(errors, TipoRecord::AnagraficaHFBI);
         eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica HFBI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
+        */
+        csv_error_handler(TipoRecord::AnagraficaHFBI)(errors);
     })
 }
 

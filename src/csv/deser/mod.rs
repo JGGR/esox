@@ -119,6 +119,9 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     res
 }
 
+#[deprecated(
+    note = "v0.2 will change visibility.\nConsider using crate::csv::deser::error::duccio::format_csv_errors instead"
+)]
 pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec<String> {
     let mut res = Vec::new();
     for error in errors {

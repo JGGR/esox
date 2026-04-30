@@ -15,9 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, process_csv_errors, CsvConfig, NormalizerReader,
-};
+use crate::csv::deser::error::duccio::csv_error_handler;
+use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
 use crate::deser::{
     parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
     RecordCampionamentoNISECI, RecordRiferimentoNISECI, TipoRecord,
@@ -187,7 +186,7 @@ where
         }
         eprintln!("}}");
         */
-        crate::csv::deser::error::duccio::csv_error_handler(TipoRecord::RiferimentoNISECI)(errors);
+        csv_error_handler(TipoRecord::RiferimentoNISECI)(errors);
     })
 }
 
@@ -341,13 +340,14 @@ where
         for error in &errors {
             eprintln!("  {}", error);
         }
-        */
         let processed_errors = process_csv_errors(errors, TipoRecord::CampionamentoNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv del campionamento NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
+        */
+        csv_error_handler(TipoRecord::CampionamentoNISECI)(errors);
     })
 }
 
@@ -544,13 +544,14 @@ where
         for error in &errors {
             eprintln!("  {}", error);
         }
-        */
         let processed_errors = process_csv_errors(errors, TipoRecord::AnagraficaNISECI);
         eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica NISECI: {{");
         for e in processed_errors {
             eprintln!("{e}");
         }
         eprintln!("}}");
+        */
+        csv_error_handler(TipoRecord::AnagraficaNISECI)(errors);
     })
 }
 
