@@ -17,12 +17,8 @@
 
 pub mod utils;
 
-use super::{
-    ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS,
-    CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS,
-    RIFERIMENTO_NISECI_HEADER_FIELDS,
-};
 use crate::csv::deser::utils::diagnostic::duccio::translate_error_message as priv_translate;
+use crate::csv::stanis::field_name;
 use crate::deser::TipoRecord;
 use std::io::{self, Read};
 use std::path::Path;
@@ -126,69 +122,10 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
     for error in errors {
         match error.kind() {
             csv::ErrorKind::Deserialize { pos, err } => {
-                let field_str;
-                match err.field() {
-                    Some(f) => {
-                        // Deduce name for field from index in the header
-                        // f is u64 starting from 0
-                        let field_idx = f as usize;
-                        match tipo_csv {
-                            TipoRecord::RiferimentoNISECI => {
-                                if field_idx < RIFERIMENTO_NISECI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, RIFERIMENTO_NISECI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                            TipoRecord::CampionamentoNISECI => {
-                                if field_idx < CAMPIONAMENTO_NISECI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, CAMPIONAMENTO_NISECI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                            TipoRecord::AnagraficaNISECI => {
-                                if field_idx < ANAGRAFICA_NISECI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, ANAGRAFICA_NISECI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                            TipoRecord::CampionamentoHFBI => {
-                                if field_idx < CAMPIONAMENTO_HFBI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, CAMPIONAMENTO_HFBI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                            TipoRecord::AnagraficaHFBI => {
-                                if field_idx < ANAGRAFICA_HFBI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, ANAGRAFICA_HFBI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                        }
-                    }
-                    None => {
-                        field_str = "none".to_string();
-                    }
-                }
+                let field_str = match err.field().map(|f| f as usize) {
+                    Some(idx) => field_name(tipo_csv, idx),
+                    None => "none".to_string(),
+                };
                 let mut curr_err = format!(
                     "  Errore di deserializzazione alla posizione: {}: campo {}",
                     parse_csv_pos(pos),

@@ -19,11 +19,7 @@ use crate::csv::deser::utils::diagnostic::{
     format_csv_error as generic_format_csv_error, CsvDiagnosticFormatter, CsvDiagnosticLayout,
     CsvDiagnosticLocalization, CsvFieldResolver, CsvPositionFormatter,
 };
-use crate::csv::deser::{
-    ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS,
-    CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS,
-    RIFERIMENTO_NISECI_HEADER_FIELDS,
-};
+use crate::csv::stanis::field_name;
 use crate::deser::TipoRecord;
 
 pub struct ItalianCsvDiagnostic;
@@ -95,32 +91,7 @@ pub struct ItalianCsvFieldResolver;
 
 impl CsvFieldResolver for ItalianCsvFieldResolver {
     fn resolve(&self, record: TipoRecord, idx: usize) -> String {
-        match record {
-            TipoRecord::RiferimentoNISECI => RIFERIMENTO_NISECI_HEADER_FIELDS
-                .get(idx)
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| "???".to_string()),
-
-            TipoRecord::CampionamentoNISECI => CAMPIONAMENTO_NISECI_HEADER_FIELDS
-                .get(idx)
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| "???".to_string()),
-
-            TipoRecord::AnagraficaNISECI => ANAGRAFICA_NISECI_HEADER_FIELDS
-                .get(idx)
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| "???".to_string()),
-
-            TipoRecord::CampionamentoHFBI => CAMPIONAMENTO_HFBI_HEADER_FIELDS
-                .get(idx)
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| "???".to_string()),
-
-            TipoRecord::AnagraficaHFBI => ANAGRAFICA_HFBI_HEADER_FIELDS
-                .get(idx)
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| "???".to_string()),
-        }
+        field_name(record, idx)
     }
 }
 
