@@ -32,7 +32,7 @@
 //! - Converts raw CSV into typed intermediate structs
 //! - Validates CSV structure and field types (e.g. integer fields must be valid numbers)
 //!
-//! 2. CSV parsing and validation: ([`csv::parser`]) (from next version: [`parser`])
+//! 2. Intermediate structs parsing and validation (`parser`)
 //!
 //! - Converts the intermediate CSV structs into [`domain`] models
 //! - Enforces domain rules (e.g. value ranges, invariants)
@@ -44,7 +44,7 @@
 //! ### Convenience API
 //!
 //! `csv::load` provides a single-step interface that combines
-//! deserialization and parsing ([`csv::deser`] + [`csv::parser`]),
+//! deserialization and parsing ([`csv::deser`] + [`parser`]),
 //! returning validated domain models directly from raw CSV input.
 //!
 //! ### Input format
