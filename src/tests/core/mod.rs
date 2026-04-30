@@ -15,7 +15,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::utils::diagnostic::duccio::format_csv_error;
 use crate::csv::deser::{
     hfbi::{check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf},
     niseci::{
@@ -32,6 +31,7 @@ use crate::csv::load::niseci::{
     load_riferimento_niseci_from_reader,
 };
 use crate::csv::load::InputFormat;
+use crate::csv::stanis::duccio::format_csv_error;
 use crate::csv::stanis::hfbi::{
     VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
 };
