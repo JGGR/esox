@@ -18,6 +18,9 @@
 //!
 //! This module provides support for italian formatting of csv diagnostics.
 
+#[cfg(test)]
+mod tests;
+
 use crate::csv::deser::utils::diagnostic::{
     csv_error_handler as generic_csv_error_handler, format_csv_error as generic_format_csv_error,
     CsvDiagnosticFormatter, CsvDiagnosticLayout, CsvDiagnosticLocalization, CsvFieldResolver,

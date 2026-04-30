@@ -16,6 +16,7 @@
   - May result in minor differences in output
   - Next version will drop the implicit logging
     - Usercode can use the `giorgio` format function explicitly instead
+- Moved tests checking italian diagnostic messages to `stanis::giorgio::tests`
 - Deprecation warning for visibility of `csv::deser::translate_error_message`
 - Deprecation warning for visibility of `csv::deser::process_csv_errors`
 - Deprecation warning for visibility of `deser::validate_serialized_records`
