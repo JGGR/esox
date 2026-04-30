@@ -14,13 +14,19 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
 
-use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, process_csv_errors, CsvConfig, NormalizerReader,
-};
+/// Used as the closure argument for
+/// validate_serialized_records(), to print italian error messages.
+use crate::csv::stanis::giorgio::csv_error_handler;
+/// v0.2 will drop implicit logging, hence this method will not be needed anymore.
+/// Callsites will switch to crate::deser::check_serialized_records.
+/// Usercode will need to handle the format/printing of errors separately.
+#[allow(deprecated)]
+use crate::deser::validate_serialized_records;
+
 use crate::deser::{
-    parse_serialized_records, validate_serialized_records, RecordAnagraficaHFBI,
-    RecordCampionamentoHFBI, TipoRecord,
+    parse_serialized_records, RecordAnagraficaHFBI, RecordCampionamentoHFBI, TipoRecord,
 };
 use std::any::TypeId;
 use std::fmt;
@@ -115,18 +121,9 @@ where
         .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
+    #[allow(deprecated)]
     validate_serialized_records(iter, |errors| {
-        /*
-        for error in &errors {
-            eprintln!("  {}", error);
-        }
-        */
-        let processed_errors = process_csv_errors(errors, TipoRecord::CampionamentoHFBI);
-        eprintln!("Errori incontrati durante l'elaborazione csv del campionamento HFBI: {{");
-        for e in processed_errors {
-            eprintln!("{e}");
-        }
-        eprintln!("}}");
+        csv_error_handler(TipoRecord::CampionamentoHFBI)(errors);
     })
 }
 
@@ -302,18 +299,9 @@ where
         .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
+    #[allow(deprecated)]
     validate_serialized_records(iter, |errors| {
-        /*
-        for error in &errors {
-            eprintln!("  {}", error);
-        }
-        */
-        let processed_errors = process_csv_errors(errors, TipoRecord::AnagraficaHFBI);
-        eprintln!("Errori incontrati durante l'elaborazione csv dell' anagrafica HFBI: {{");
-        for e in processed_errors {
-            eprintln!("{e}");
-        }
-        eprintln!("}}");
+        csv_error_handler(TipoRecord::AnagraficaHFBI)(errors);
     })
 }
 

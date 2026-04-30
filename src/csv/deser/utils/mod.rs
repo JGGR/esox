@@ -15,14 +15,4 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#[deprecated(note = "v0.2 will drop this reexport.\nConsider using from esox::parser instead")]
-pub use crate::parser::parse_date;
-
-#[deprecated(
-    note = "v0.2 will remove this module.\nConsider using symbols from esox::parser::hfbi"
-)]
-pub mod hfbi;
-#[deprecated(
-    note = "v0.2 will remove this module.\nConsider using symbols from esox::parser::niseci"
-)]
-pub mod niseci;
+pub mod diagnostic;

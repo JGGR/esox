@@ -17,6 +17,7 @@
 
 pub mod deser;
 pub mod load;
+#[deprecated(note = "v0.2 will remove this module.\nConsider using symbols from esox::parser")]
 pub mod parser;
 pub mod stanis;
 

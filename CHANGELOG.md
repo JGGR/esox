@@ -1,3 +1,27 @@
+## [0.1.5] - 2026-04-30
+
+### Added
+
+- Add `csv::deser::utils::diagnostic` module
+  - Provides generic formatting of errors
+  - `utils::diagnostic::ww` module
+    - Provides english formatting of errors
+
+- Add `csv::stanis::giorgio` module
+    - Provides italian formatting of errors
+
+### Changed
+
+- Implicit error logging now uses `stanis::giorgio::format_csv_errors`
+  - May result in minor differences in output
+  - Next version will drop the implicit logging
+    - Usercode can use the `giorgio` format function explicitly instead
+- Moved tests checking italian diagnostic messages to `stanis::giorgio::tests`
+- Deprecation warning for visibility of `csv::deser::translate_error_message`
+- Deprecation warning for visibility of `csv::deser::process_csv_errors`
+- Deprecation warning for visibility of `deser::validate_serialized_records`
+- Deprecation warnings for `csv::parser` module
+
 ## [0.1.4] - 2026-04-26
 
 ### Added

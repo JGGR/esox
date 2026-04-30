@@ -15,11 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use super::{
-    ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS,
-    CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS,
-    RIFERIMENTO_NISECI_HEADER_FIELDS,
-};
+pub mod utils;
+
+use crate::csv::stanis::field_name;
+use crate::csv::stanis::giorgio::translate_error_message as priv_translate;
 use crate::deser::TipoRecord;
 use std::io::{self, Read};
 use std::path::Path;
@@ -115,74 +114,18 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     res
 }
 
+#[deprecated(
+    note = "v0.2 will change visibility.\nConsider using crate::csv::stanis::giorgio::format_csv_errors instead"
+)]
 pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec<String> {
     let mut res = Vec::new();
     for error in errors {
         match error.kind() {
             csv::ErrorKind::Deserialize { pos, err } => {
-                let field_str;
-                match err.field() {
-                    Some(f) => {
-                        // Deduce name for field from index in the header
-                        // f is u64 starting from 0
-                        let field_idx = f as usize;
-                        match tipo_csv {
-                            TipoRecord::RiferimentoNISECI => {
-                                if field_idx < RIFERIMENTO_NISECI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, RIFERIMENTO_NISECI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                            TipoRecord::CampionamentoNISECI => {
-                                if field_idx < CAMPIONAMENTO_NISECI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, CAMPIONAMENTO_NISECI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                            TipoRecord::AnagraficaNISECI => {
-                                if field_idx < ANAGRAFICA_NISECI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, ANAGRAFICA_NISECI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                            TipoRecord::CampionamentoHFBI => {
-                                if field_idx < CAMPIONAMENTO_HFBI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, CAMPIONAMENTO_HFBI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                            TipoRecord::AnagraficaHFBI => {
-                                if field_idx < ANAGRAFICA_HFBI_HEADER_FIELDS.len() {
-                                    field_str = format!(
-                                        "{} ({})",
-                                        field_idx, ANAGRAFICA_HFBI_HEADER_FIELDS[field_idx]
-                                    );
-                                } else {
-                                    field_str = "???".to_string();
-                                }
-                            }
-                        }
-                    }
-                    None => {
-                        field_str = "none".to_string();
-                    }
-                }
+                let field_str = match err.field().map(|f| f as usize) {
+                    Some(idx) => field_name(tipo_csv, idx),
+                    None => "none".to_string(),
+                };
                 let mut curr_err = format!(
                     "  Errore di deserializzazione alla posizione: {}: campo {}",
                     parse_csv_pos(pos),
@@ -190,37 +133,25 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
                 );
                 match err.kind() {
                     csv::DeserializeErrorKind::Message(msg) => {
-                        curr_err = format!("{curr_err}: {}", translate_error_message(msg));
+                        curr_err = format!("{curr_err}: {}", priv_translate(msg));
                     }
                     csv::DeserializeErrorKind::Unsupported(msg) => {
-                        curr_err = format!("{curr_err}: {}", translate_error_message(msg));
+                        curr_err = format!("{curr_err}: {}", priv_translate(msg));
                     }
                     csv::DeserializeErrorKind::UnexpectedEndOfRow => {
                         curr_err = format!("{curr_err}: Fine riga inatteso");
                     }
                     csv::DeserializeErrorKind::InvalidUtf8(utf8err) => {
-                        curr_err = format!(
-                            "{curr_err}: {}",
-                            translate_error_message(&utf8err.to_string())
-                        );
+                        curr_err = format!("{curr_err}: {}", priv_translate(&utf8err.to_string()));
                     }
                     csv::DeserializeErrorKind::ParseBool(boolerr) => {
-                        curr_err = format!(
-                            "{curr_err}: {}",
-                            translate_error_message(&boolerr.to_string())
-                        );
+                        curr_err = format!("{curr_err}: {}", priv_translate(&boolerr.to_string()));
                     }
                     csv::DeserializeErrorKind::ParseInt(interr) => {
-                        curr_err = format!(
-                            "{curr_err}: {}",
-                            translate_error_message(&interr.to_string())
-                        );
+                        curr_err = format!("{curr_err}: {}", priv_translate(&interr.to_string()));
                     }
                     csv::DeserializeErrorKind::ParseFloat(floaterr) => {
-                        curr_err = format!(
-                            "{curr_err}: {}",
-                            translate_error_message(&floaterr.to_string())
-                        );
+                        curr_err = format!("{curr_err}: {}", priv_translate(&floaterr.to_string()));
                     }
                 }
                 res.push(curr_err);
@@ -228,14 +159,14 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
             csv::ErrorKind::Io(io_error) => {
                 res.push(format!(
                     "  Errore di I/O: {}",
-                    translate_error_message(&io_error.to_string())
+                    priv_translate(&io_error.to_string())
                 ));
             }
             csv::ErrorKind::Utf8 { pos, err } => {
                 res.push(format!(
                     "  Errore UTF-8 alla posizione: {}: {}",
                     parse_csv_pos(pos),
-                    translate_error_message(&err.to_string())
+                    priv_translate(&err.to_string())
                 ));
             }
             csv::ErrorKind::UnequalLengths {
@@ -247,13 +178,13 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
                     "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
                     parse_csv_pos(pos),
                     expected_len,
-                    len // no translate_error_message() anche se teoricamente lo supporta
+                    len // no priv_translate() anche se teoricamente lo supporta
                 ));
             }
             _ => {
                 res.push(format!(
                     "  Errore sconosciuto: {}",
-                    translate_error_message(&error.to_string())
+                    priv_translate(&error.to_string())
                 ));
             }
         }
@@ -286,43 +217,11 @@ pub fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change visibility.\nConsider using crate::csv::stanis::giorgio::format_csv_error instead"
+)]
 pub fn translate_error_message(msg: &str) -> String {
-    if msg.starts_with("missing field") {
-        msg.replace("missing field", "campo mancante")
-    } else if msg.starts_with("invalid type") {
-        msg.replace("invalid type", "tipo non valido")
-    } else if msg.starts_with("unexpected end of input") {
-        msg.replace("unexpected end of input", "fine inaspettata dell'input")
-    } else if msg.contains("invalid UTF-8 sequence") {
-        msg.replace("invalid UTF-8 sequence", "sequenza UTF-8 non valida")
-    } else if msg.contains("file not found") {
-        msg.replace("file not found", "file non trovato")
-    } else if msg.contains("invalid digit found in string") {
-        msg.replace(
-            "invalid digit found in string",
-            "tipo non valido: numero, attesa stringa",
-        )
-        .replace("field", "campo")
-    } else if msg.contains("invalid float literal") {
-        msg.replace("invalid float literal", "tipo non valido: atteso decimale")
-            .replace("field", "campo")
-    } else if msg.contains("cannot parse") && msg.contains("from empty string") {
-        // NOTE: there's a leading space in " from empty string", it enables us to attach the ","
-        // to the previous part
-        msg.replace("cannot parse", "campo vuoto: atteso")
-            .replace("field", "campo")
-            .replace("float", "decimale")
-            .replace("integer", "intero")
-            .replace(" from empty string", ", trovato: stringa vuota")
-    } else if msg.contains("fields, but the previous record has") {
-        msg.replace("found record with", "numero campi: trovato record con")
-            .replace("but the previous record has", "ma il record precedente ha")
-            .replace("fields", "campi")
-    } else {
-        eprintln!("Unmatched translation for {msg}");
-        msg.to_string() // Default to original message if no match
-    }
+    priv_translate(msg)
 }
-
 pub mod hfbi;
 pub mod niseci;
