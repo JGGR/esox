@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#[allow(deprecated)]
 use crate::deser::{
     parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
     RecordCampionamentoNISECI, RecordRiferimentoNISECI,
@@ -49,6 +50,7 @@ where
         reader,
         |res| res.map_err(Into::into),
         |deser| {
+            #[allow(deprecated)]
             validate_serialized_records(deser.into_iter::<T>(), |errs| {
                 errs.iter().for_each(|e| eprintln!("  {}", e));
             })
@@ -82,6 +84,7 @@ where
         reader,
         |res| res.map_err(Into::into),
         |deser| {
+            #[allow(deprecated)]
             validate_serialized_records(deser.into_iter::<T>(), |errs| {
                 errs.iter().for_each(|e| eprintln!("  {}", e));
             })
@@ -115,6 +118,7 @@ where
         reader,
         |res| res.map_err(Into::into),
         |deser| {
+            #[allow(deprecated)]
             validate_serialized_records(deser.into_iter::<T>(), |errs| {
                 errs.iter().for_each(|e| eprintln!("  {}", e));
             })

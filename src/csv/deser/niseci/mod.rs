@@ -17,6 +17,7 @@
 
 use crate::csv::deser::error::duccio::csv_error_handler;
 use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
+#[allow(deprecated)]
 use crate::deser::{
     parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
     RecordCampionamentoNISECI, RecordRiferimentoNISECI, TipoRecord,
@@ -172,6 +173,7 @@ where
         .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
+    #[allow(deprecated)]
     validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
@@ -335,6 +337,7 @@ where
         .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
+    #[allow(deprecated)]
     validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
@@ -539,6 +542,7 @@ where
         .has_headers(config.has_headers())
         .from_reader(normalizing_reader);
     let iter = rdr.deserialize();
+    #[allow(deprecated)]
     validate_serialized_records(iter, |errors| {
         /*
         for error in &errors {
