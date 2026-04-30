@@ -19,6 +19,7 @@
 - Deprecation warning for visibility of `csv::deser::translate_error_message`
 - Deprecation warning for visibility of `csv::deser::process_csv_errors`
 - Deprecation warning for visibility of `deser::validate_serialized_records`
+- Deprecation warnings for `csv::parser` module
 
 ## [0.1.4] - 2026-04-26
 

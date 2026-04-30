@@ -29,7 +29,7 @@ use crate::parser::niseci::{
 pub use crate::parser::niseci::RecordRiferimentoNISECIError as RecordCsvRiferimentoNISECIError;
 
 #[deprecated(
-    note = "v0.2 will change signature to return RiferimentoNISECIParseResult\nConsider using RiferimentoNISECI::parse_records(records).into_parts()"
+    note = "v0.2 will drop visibility.\nConsider using RiferimentoNISECI::parse_records(records).into_parts()"
 )]
 pub fn parse_recordcsv_riferimento_niseci<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
@@ -44,7 +44,7 @@ pub fn parse_recordcsv_riferimento_niseci<T: RecordRiferimentoNISECI>(
 pub use crate::parser::niseci::RecordCampionamentoNISECIError as RecordCsvCampionamentoNISECIError;
 
 #[deprecated(
-    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECIParseResult\n  Consider using CampionamentoNISECI::parse_records(records, riferimento).into_parts()"
+    note = "v0.2 will drop visibility.\n  Consider using CampionamentoNISECI::parse_records(records, riferimento).into_parts()"
 )]
 pub fn parse_recordcsv_campionamento_niseci<T: RecordCampionamentoNISECI>(
     records: Vec<T>,
@@ -63,6 +63,9 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCampionamentoNISECI>(
 )]
 pub use crate::parser::niseci::RecordAnagraficaNISECIError as RecordCsvAnagraficaNISECIError;
 
+#[deprecated(
+    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::parse_records(records).into_parts()"
+)]
 pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     records: Vec<T>,
 ) -> Result<AnagraficaNISECI, Vec<RecordAnagraficaNISECIError>> {
@@ -70,7 +73,7 @@ pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to return RiferimentoNISECI on success\nConsider using RiferimentoNISECI::check_records(records)"
+    note = "v0.2 will drop visibility.\nConsider using RiferimentoNISECI::check_records(records)"
 )]
 pub fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
@@ -79,7 +82,7 @@ pub fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to:\n  - expect riferimento_specie as &RiferimentoNISECI\n  - return CampionamentoNISECI on success\nConsider using CampionamentoNISECI::check_records(records, &riferimento)"
+    note = "v0.2 will drop visibility.\nConsider using CampionamentoNISECI::check_records(records, &riferimento)"
 )]
 pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
     records: Vec<T>,
@@ -92,6 +95,9 @@ pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
     .map(|v| v.into())
 }
 
+#[deprecated(
+    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::check_records(records).into_parts()"
+)]
 pub fn check_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     records: Vec<T>,
 ) -> Result<AnagraficaNISECI, Vec<RecordAnagraficaNISECIError>> {
