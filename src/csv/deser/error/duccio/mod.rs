@@ -206,6 +206,9 @@ impl ItalianFormatter {
     }
 }
 
+/// Transitional private helper, used in csv::deser::{niseci,hfbi} as the closure argument for
+/// validate_serialized_records(), to print italian error messages.
+/// v0.2 will drop this implicit logging, hence this method will not be needed anymore.
 pub(crate) fn csv_error_handler(record: TipoRecord) -> impl Fn(&Vec<csv::Error>) {
     super::csv_error_handler(
         ItalianFormatter::new(),
