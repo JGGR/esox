@@ -22,6 +22,8 @@
 //! By default, Excel exports CSV files with:
 //! - Semicolon `;` as csv field delimiter
 //! - Comma `,` as float decimal delimiter
+//!
+//! [References](https://it.wikipedia.org/wiki/Personaggi_di_Boris#Stanis)
 
 pub mod giorgio;
 pub mod hfbi;
