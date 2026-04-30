@@ -18,7 +18,7 @@ use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerR
 
 /// Used as the closure argument for
 /// validate_serialized_records(), to print italian error messages.
-use crate::csv::stanis::duccio::csv_error_handler;
+use crate::csv::stanis::giorgio::csv_error_handler;
 /// v0.2 will drop implicit logging, hence this method will not be needed anymore.
 /// Callsites will switch to crate::deser::check_serialized_records.
 /// Usercode will need to handle the format/printing of errors separately.

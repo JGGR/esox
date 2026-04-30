@@ -31,7 +31,7 @@ use crate::csv::load::niseci::{
     load_riferimento_niseci_from_reader,
 };
 use crate::csv::load::InputFormat;
-use crate::csv::stanis::duccio::format_csv_error;
+use crate::csv::stanis::giorgio::format_csv_error;
 use crate::csv::stanis::hfbi::{
     VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
 };

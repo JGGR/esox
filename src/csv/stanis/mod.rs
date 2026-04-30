@@ -23,7 +23,7 @@
 //! - Semicolon `;` as csv field delimiter
 //! - Comma `,` as float decimal delimiter
 
-pub mod duccio;
+pub mod giorgio;
 pub mod hfbi;
 pub mod niseci;
 use crate::csv::{

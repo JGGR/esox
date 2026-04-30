@@ -7,15 +7,15 @@
   - `utils::diagnostic::ww` module
     - Provides english formatting of errors
 
-- Add `csv::stanis::duccio` module
+- Add `csv::stanis::giorgio` module
     - Provides italian formatting of errors
 
 ### Changed
 
-- Implicit error logging now uses `stanis::duccio::format_csv_errors`
+- Implicit error logging now uses `stanis::giorgio::format_csv_errors`
   - May result in minor differences in output
   - Next version will drop the implicit logging
-    - Usercode can use the `duccio` format function explicitly instead
+    - Usercode can use the `giorgio` format function explicitly instead
 - Deprecation warning for visibility of `csv::deser::translate_error_message`
 - Deprecation warning for visibility of `csv::deser::process_csv_errors`
 - Deprecation warning for visibility of `deser::validate_serialized_records`
