@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub(crate) mod duccio;
+pub mod duccio;
 
 use crate::deser::TipoRecord;
 use csv::Position;
@@ -153,6 +153,9 @@ pub fn normalize_one(error: &csv::Error) -> CsvDiagnostic {
                         }
                         IntErrorKind::PosOverflow => {
                             ParseIntDiagnosticKind::PosOverflow(e.to_string())
+                        }
+                        IntErrorKind::NegOverflow => {
+                            ParseIntDiagnosticKind::NegOverflow(e.to_string())
                         }
                         IntErrorKind::Zero => ParseIntDiagnosticKind::Zero(e.to_string()),
                         _ => ParseIntDiagnosticKind::Unknown(e.to_string()),
@@ -365,7 +368,7 @@ where
     }
 }
 
-pub(crate) fn format_csv_error<L, P, Fld, Lay>(
+pub fn format_csv_error<L, P, Fld, Lay>(
     formatter: CsvDiagnosticFormatter<L, P, Fld, Lay>,
     error: &csv::Error,
     record: TipoRecord,
@@ -380,7 +383,7 @@ where
     formatter.format(&d, record)
 }
 
-pub(crate) fn format_csv_errors<L, P, Fld, Lay>(
+pub fn format_csv_errors<L, P, Fld, Lay>(
     formatter: CsvDiagnosticFormatter<L, P, Fld, Lay>,
     errors: &[csv::Error],
     record: TipoRecord,

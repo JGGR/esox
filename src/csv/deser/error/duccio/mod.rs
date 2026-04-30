@@ -16,7 +16,8 @@
 */
 
 use crate::csv::deser::error::{
-    CsvDiagnosticFormatter, CsvLayout, CsvLocalization, CsvPositionFormatter, FieldResolver,
+    format_csv_error as generic_format_csv_error, CsvDiagnosticFormatter, CsvLayout,
+    CsvLocalization, CsvPositionFormatter, FieldResolver,
 };
 use crate::csv::deser::{
     ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS,
@@ -214,7 +215,7 @@ pub(crate) fn csv_error_handler(record: TipoRecord) -> impl Fn(&Vec<csv::Error>)
 }
 
 pub fn format_csv_error(error: &csv::Error, record: TipoRecord) -> String {
-    super::format_csv_error(ItalianFormatter::new(), error, record)
+    generic_format_csv_error(ItalianFormatter::new(), error, record)
 }
 
 pub fn format_csv_errors(errors: &[csv::Error], record: TipoRecord) -> Vec<String> {
