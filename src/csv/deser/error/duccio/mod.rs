@@ -19,7 +19,7 @@ use crate::csv::deser::error::{
     CsvDiagnosticFormatter, CsvLayout, CsvLocalization, CsvPositionFormatter, FieldResolver,
 };
 use crate::csv::deser::{
-    translate_error_message, ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS,
+    ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS,
     CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS,
     RIFERIMENTO_NISECI_HEADER_FIELDS,
 };
@@ -120,6 +120,44 @@ impl FieldResolver for ItalianFieldResolver {
                 .map(|s| s.to_string())
                 .unwrap_or_else(|| "???".to_string()),
         }
+    }
+}
+
+pub(crate) fn translate_error_message(msg: &str) -> String {
+    if msg.starts_with("missing field") {
+        msg.replace("missing field", "campo mancante")
+    } else if msg.starts_with("invalid type") {
+        msg.replace("invalid type", "tipo non valido")
+    } else if msg.starts_with("unexpected end of input") {
+        msg.replace("unexpected end of input", "fine inaspettata dell'input")
+    } else if msg.contains("invalid UTF-8 sequence") {
+        msg.replace("invalid UTF-8 sequence", "sequenza UTF-8 non valida")
+    } else if msg.contains("file not found") {
+        msg.replace("file not found", "file non trovato")
+    } else if msg.contains("invalid digit found in string") {
+        msg.replace(
+            "invalid digit found in string",
+            "tipo non valido: numero, attesa stringa",
+        )
+        .replace("field", "campo")
+    } else if msg.contains("invalid float literal") {
+        msg.replace("invalid float literal", "tipo non valido: atteso decimale")
+            .replace("field", "campo")
+    } else if msg.contains("cannot parse") && msg.contains("from empty string") {
+        // NOTE: there's a leading space in " from empty string", it enables us to attach the ","
+        // to the previous part
+        msg.replace("cannot parse", "campo vuoto: atteso")
+            .replace("field", "campo")
+            .replace("float", "decimale")
+            .replace("integer", "intero")
+            .replace(" from empty string", ", trovato: stringa vuota")
+    } else if msg.contains("fields, but the previous record has") {
+        msg.replace("found record with", "numero campi: trovato record con")
+            .replace("but the previous record has", "ma il record precedente ha")
+            .replace("fields", "campi")
+    } else {
+        eprintln!("Unmatched translation for {msg}");
+        msg.to_string() // Default to original message if no match
     }
 }
 
