@@ -14,6 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! Dedicated diagnostic formatting module for semicolon delimited CSV.
+//!
+//! This module provides support for italian formatting of csv diagnostics.
 
 use crate::csv::deser::utils::diagnostic::{
     csv_error_handler as generic_csv_error_handler, format_csv_error as generic_format_csv_error,
