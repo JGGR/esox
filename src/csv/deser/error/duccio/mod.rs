@@ -172,7 +172,10 @@ impl CsvLayout for ItalianLayout {
     }
 
     fn unequal_lengths(&self, pos: &str, expected: u64, found: u64) -> String {
-        format!("({pos}) attesi {} trovati {}", expected, found)
+        format!(
+            "Errore numero campi alla posizione ({pos}) attesi {} trovati {}",
+            expected, found
+        )
     }
 
     fn io(&self, base: &str, pos: &str, detail: &str) -> String {

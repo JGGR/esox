@@ -22,7 +22,7 @@ use crate::csv::deser::{
         check_anagrafica_niseci_reader_conf, check_campionamento_niseci_reader_conf,
         check_riferimento_niseci_reader_conf,
     },
-    translate_error_message, CsvConfig,
+    CsvConfig,
 };
 use crate::csv::load::hfbi::{
     load_anagrafica_hfbi_from_reader, load_campionamento_hfbi_from_reader,
@@ -72,7 +72,7 @@ fn test_csv_riferimento_niseci_found_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI); //translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -91,7 +91,7 @@ fn test_csv_riferimento_niseci_found_string_expect_float() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -110,7 +110,7 @@ fn test_csv_riferimento_niseci_found_empty_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI);
     assert!(translated_error.contains("campo vuoto"));
 }
 
@@ -129,7 +129,7 @@ fn test_csv_riferimento_niseci_found_empty_string_expect_float() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI);
     assert!(translated_error.contains("campo vuoto"));
 }
 
@@ -148,7 +148,7 @@ fn test_csv_riferimento_niseci_found_float_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -169,7 +169,7 @@ fn test_csv_riferimento_niseci_err_found_cl_negative() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -189,7 +189,7 @@ fn test_csv_riferimento_niseci_lessfields() {
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
 
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::RiferimentoNISECI);
     assert!(translated_error.contains("numero campi"));
 }
 
@@ -337,7 +337,7 @@ fn test_csv_campionamento_niseci_found_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::CampionamentoNISECI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -356,7 +356,7 @@ fn test_csv_campionamento_niseci_found_empty_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::CampionamentoNISECI);
     assert!(translated_error.contains("campo vuoto"));
 }
 
@@ -375,7 +375,7 @@ fn test_csv_campionamento_niseci_found_float_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::CampionamentoNISECI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -395,7 +395,7 @@ fn test_csv_campionamento_niseci_lessfields() {
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
 
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::CampionamentoNISECI);
     assert!(translated_error.contains("numero campi"));
 }
 
@@ -504,7 +504,7 @@ fn test_csv_anagrafica_niseci_found_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::AnagraficaNISECI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -523,7 +523,7 @@ fn test_csv_anagrafica_niseci_found_empty_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::AnagraficaNISECI);
     assert!(translated_error.contains("campo vuoto"));
 }
 
@@ -542,7 +542,7 @@ fn test_csv_anagrafica_niseci_found_float_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::AnagraficaNISECI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -562,7 +562,7 @@ fn test_csv_anagrafica_niseci_lessfields() {
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
 
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::AnagraficaNISECI);
     assert!(translated_error.contains("numero campi"));
 }
 
@@ -638,7 +638,7 @@ fn test_csv_campionamento_hfbi_found_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::CampionamentoHFBI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -654,7 +654,7 @@ fn test_csv_campionamento_hfbi_found_empty_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::CampionamentoHFBI);
     assert!(translated_error.contains("campo vuoto"));
 }
 
@@ -670,7 +670,7 @@ fn test_csv_campionamento_hfbi_found_float_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::CampionamentoHFBI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -687,7 +687,7 @@ fn test_csv_campionamento_hfbi_lessfields() {
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
 
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::CampionamentoHFBI);
     assert!(translated_error.contains("numero campi"));
 }
 
@@ -756,7 +756,7 @@ fn test_csv_anagrafica_hfbi_found_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::AnagraficaHFBI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -775,7 +775,7 @@ fn test_csv_anagrafica_hfbi_found_empty_string_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::AnagraficaHFBI);
     assert!(translated_error.contains("campo vuoto"));
 }
 
@@ -794,7 +794,7 @@ fn test_csv_anagrafica_hfbi_found_float_expect_int() {
     assert!(result.is_err());
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::AnagraficaHFBI);
     assert!(translated_error.contains("tipo non valido"));
 }
 
@@ -814,7 +814,7 @@ fn test_csv_anagrafica_hfbi_lessfields() {
     let errors = result.err().unwrap();
     assert_eq!(errors.len(), 1); // One invalid record
 
-    let translated_error = translate_error_message(&errors[0].to_string());
+    let translated_error = format_csv_error(&errors[0], TipoRecord::AnagraficaHFBI);
     assert!(translated_error.contains("numero campi"));
 }
 
