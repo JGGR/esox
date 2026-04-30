@@ -16,8 +16,8 @@
 */
 
 use crate::csv::deser::error::{
-    format_csv_error as generic_format_csv_error, CsvDiagnosticFormatter, CsvLayout,
-    CsvLocalization, CsvPositionFormatter, FieldResolver,
+    format_csv_error as generic_format_csv_error, CsvDiagnosticFormatter, CsvDiagnosticLayout,
+    CsvDiagnosticLocalization, CsvFieldResolver, CsvPositionFormatter,
 };
 use crate::csv::deser::{
     ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS,
@@ -26,9 +26,9 @@ use crate::csv::deser::{
 };
 use crate::deser::TipoRecord;
 
-pub struct CsvItalian;
+pub struct CsvDiagnosticItalian;
 
-impl CsvLocalization for CsvItalian {
+impl CsvDiagnosticLocalization for CsvDiagnosticItalian {
     fn io_error(&self) -> &'static str {
         "Errore I/O"
     }
@@ -61,9 +61,9 @@ impl CsvLocalization for CsvItalian {
     }
 }
 
-pub struct ItalianPosition;
+pub struct ItalianCsvPosition;
 
-impl CsvPositionFormatter for ItalianPosition {
+impl CsvPositionFormatter for ItalianCsvPosition {
     fn format(&self, pos: &Option<csv::Position>) -> String {
         let res;
         match pos {
@@ -91,9 +91,9 @@ impl CsvPositionFormatter for ItalianPosition {
     }
 }
 
-pub struct ItalianFieldResolver;
+pub struct ItalianCsvFieldResolver;
 
-impl FieldResolver for ItalianFieldResolver {
+impl CsvFieldResolver for ItalianCsvFieldResolver {
     fn resolve(&self, record: TipoRecord, idx: usize) -> String {
         match record {
             TipoRecord::RiferimentoNISECI => RIFERIMENTO_NISECI_HEADER_FIELDS
@@ -162,9 +162,9 @@ pub(crate) fn translate_error_message(msg: &str) -> String {
     }
 }
 
-pub struct ItalianLayout;
+pub struct ItalianCsvDiagnosticLayout;
 
-impl CsvLayout for ItalianLayout {
+impl CsvDiagnosticLayout for ItalianCsvDiagnosticLayout {
     fn deserialize(&self, base: &str, pos: &str, field: &str, detail: &str) -> String {
         format!(
             "{base} ({pos}, campo {field}) {}",
@@ -192,16 +192,20 @@ impl CsvLayout for ItalianLayout {
     }
 }
 
-pub(crate) type ItalianFormatter =
-    CsvDiagnosticFormatter<CsvItalian, ItalianPosition, ItalianFieldResolver, ItalianLayout>;
+pub(crate) type ItalianDiagnosticFormatter = CsvDiagnosticFormatter<
+    CsvDiagnosticItalian,
+    ItalianCsvPosition,
+    ItalianCsvFieldResolver,
+    ItalianCsvDiagnosticLayout,
+>;
 
-impl ItalianFormatter {
+impl ItalianDiagnosticFormatter {
     pub(crate) fn new() -> Self {
         Self {
-            loc: CsvItalian,
-            pos: ItalianPosition,
-            field: ItalianFieldResolver,
-            layout: ItalianLayout,
+            loc: CsvDiagnosticItalian,
+            pos: ItalianCsvPosition,
+            field: ItalianCsvFieldResolver,
+            layout: ItalianCsvDiagnosticLayout,
         }
     }
 }
@@ -211,14 +215,14 @@ impl ItalianFormatter {
 /// v0.2 will drop this implicit logging, hence this method will not be needed anymore.
 pub(crate) fn csv_error_handler(record: TipoRecord) -> impl Fn(&Vec<csv::Error>) {
     super::csv_error_handler(
-        ItalianFormatter::new(),
+        ItalianDiagnosticFormatter::new(),
         "Errori incontrati durante l'elaborazione csv".to_string(),
         record,
     )
 }
 
 pub fn format_csv_error(error: &csv::Error, record: TipoRecord) -> String {
-    generic_format_csv_error(ItalianFormatter::new(), error, record)
+    generic_format_csv_error(ItalianDiagnosticFormatter::new(), error, record)
 }
 
 pub fn format_csv_errors(errors: &[csv::Error], record: TipoRecord) -> Vec<String> {

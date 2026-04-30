@@ -207,7 +207,7 @@ pub fn normalize_one(error: &csv::Error) -> CsvDiagnostic {
     }
 }
 
-pub trait CsvLocalization {
+pub trait CsvDiagnosticLocalization {
     fn io_error(&self) -> &'static str;
     fn utf8_error(&self) -> &'static str;
     fn unexpected_eof(&self) -> &'static str;
@@ -242,11 +242,11 @@ impl CsvPositionFormatter for SimplePosition {
 }
 */
 
-pub trait FieldResolver {
+pub trait CsvFieldResolver {
     fn resolve(&self, record: TipoRecord, idx: usize) -> String;
 }
 
-pub trait CsvLayout {
+pub trait CsvDiagnosticLayout {
     fn deserialize(&self, base: &str, pos: &str, field: &str, detail: &str) -> String;
 
     fn unequal_lengths(&self, pos: &str, expected: u64, found: u64) -> String;
@@ -267,10 +267,10 @@ pub struct CsvDiagnosticFormatter<L, P, F, T> {
 
 impl<L, P, F, T> CsvDiagnosticFormatter<L, P, F, T>
 where
-    L: CsvLocalization,
+    L: CsvDiagnosticLocalization,
     P: CsvPositionFormatter,
-    F: FieldResolver,
-    T: CsvLayout,
+    F: CsvFieldResolver,
+    T: CsvDiagnosticLayout,
 {
     pub fn format(&self, err: &CsvDiagnostic, record: TipoRecord) -> String {
         let pos = self.pos.format(match err {
@@ -353,10 +353,10 @@ fn csv_error_handler<L, P, Fld, Lay>(
     record: TipoRecord,
 ) -> impl Fn(&Vec<csv::Error>)
 where
-    L: CsvLocalization,
+    L: CsvDiagnosticLocalization,
     P: CsvPositionFormatter,
-    Fld: FieldResolver,
-    Lay: CsvLayout,
+    Fld: CsvFieldResolver,
+    Lay: CsvDiagnosticLayout,
 {
     move |errors: &Vec<csv::Error>| {
         let diagnostics = normalize(errors);
@@ -377,10 +377,10 @@ pub fn format_csv_error<L, P, Fld, Lay>(
     record: TipoRecord,
 ) -> String
 where
-    L: CsvLocalization,
+    L: CsvDiagnosticLocalization,
     P: CsvPositionFormatter,
-    Fld: FieldResolver,
-    Lay: CsvLayout,
+    Fld: CsvFieldResolver,
+    Lay: CsvDiagnosticLayout,
 {
     let d = normalize_one(error);
     formatter.format(&d, record)
@@ -392,10 +392,10 @@ pub fn format_csv_errors<L, P, Fld, Lay>(
     record: TipoRecord,
 ) -> Vec<String>
 where
-    L: CsvLocalization,
+    L: CsvDiagnosticLocalization,
     P: CsvPositionFormatter,
-    Fld: FieldResolver,
-    Lay: CsvLayout,
+    Fld: CsvFieldResolver,
+    Lay: CsvDiagnosticLayout,
 {
     errors
         .iter()
