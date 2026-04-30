@@ -16,6 +16,7 @@
 */
 
 pub mod duccio;
+pub mod ww;
 
 use crate::deser::TipoRecord;
 use csv::Position;
@@ -223,24 +224,6 @@ pub trait CsvDiagnosticLocalization {
 pub trait CsvPositionFormatter {
     fn format(&self, pos: &Option<csv::Position>) -> String;
 }
-
-/*
-pub struct SimplePosition;
-
-impl CsvPositionFormatter for SimplePosition {
-    fn format(&self, pos: &Option<csv::Position>) -> String {
-        match pos {
-            Some(p) => format!(
-                "line={}, record={}, byte={}",
-                p.line(),
-                p.record(),
-                p.byte()
-            ),
-            None => "unknown".to_string(),
-        }
-    }
-}
-*/
 
 pub trait CsvFieldResolver {
     fn resolve(&self, record: TipoRecord, idx: usize) -> String;

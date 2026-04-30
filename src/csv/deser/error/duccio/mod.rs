@@ -26,9 +26,9 @@ use crate::csv::deser::{
 };
 use crate::deser::TipoRecord;
 
-pub struct CsvDiagnosticItalian;
+pub struct ItalianCsvDiagnostic;
 
-impl CsvDiagnosticLocalization for CsvDiagnosticItalian {
+impl CsvDiagnosticLocalization for ItalianCsvDiagnostic {
     fn io_error(&self) -> &'static str {
         "Errore I/O"
     }
@@ -193,7 +193,7 @@ impl CsvDiagnosticLayout for ItalianCsvDiagnosticLayout {
 }
 
 pub(crate) type ItalianDiagnosticFormatter = CsvDiagnosticFormatter<
-    CsvDiagnosticItalian,
+    ItalianCsvDiagnostic,
     ItalianCsvPosition,
     ItalianCsvFieldResolver,
     ItalianCsvDiagnosticLayout,
@@ -202,7 +202,7 @@ pub(crate) type ItalianDiagnosticFormatter = CsvDiagnosticFormatter<
 impl ItalianDiagnosticFormatter {
     pub(crate) fn new() -> Self {
         Self {
-            loc: CsvDiagnosticItalian,
+            loc: ItalianCsvDiagnostic,
             pos: ItalianCsvPosition,
             field: ItalianCsvFieldResolver,
             layout: ItalianCsvDiagnosticLayout,
