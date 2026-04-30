@@ -14,11 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
+/// v0.2 will drop implicit logging, hence this method will not be needed anymore.
+/// Callsites will switch to crate::deser::check_serialized_records.
+/// Usercode will need to handle the format/printing of errors separately.
 #[allow(deprecated)]
+use crate::deser::validate_serialized_records;
+
 use crate::deser::{
-    parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
-    RecordCampionamentoNISECI, RecordRiferimentoNISECI,
+    parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
+    RecordRiferimentoNISECI,
 };
 use crate::json::deser::{dispatch_json_input, JsonDeserError, JsonPathCheckError};
 use std::fs::File;

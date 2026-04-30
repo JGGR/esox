@@ -15,12 +15,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::error::duccio::csv_error_handler;
 use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
+
+/// Used as the closure argument for
+/// validate_serialized_records(), to print italian error messages.
+use crate::csv::deser::error::duccio::csv_error_handler;
+/// v0.2 will drop implicit logging, hence this method will not be needed anymore.
+/// Callsites will switch to crate::deser::check_serialized_records.
+/// Usercode will need to handle the format/printing of errors separately.
 #[allow(deprecated)]
+use crate::deser::validate_serialized_records;
+
 use crate::deser::{
-    parse_serialized_records, validate_serialized_records, RecordAnagraficaNISECI,
-    RecordCampionamentoNISECI, RecordRiferimentoNISECI, TipoRecord,
+    parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
+    RecordRiferimentoNISECI, TipoRecord,
 };
 use std::any::TypeId;
 use std::fmt;
