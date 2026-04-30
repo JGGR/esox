@@ -15,14 +15,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub mod error;
+pub mod utils;
 
 use super::{
     ANAGRAFICA_HFBI_HEADER_FIELDS, ANAGRAFICA_NISECI_HEADER_FIELDS,
     CAMPIONAMENTO_HFBI_HEADER_FIELDS, CAMPIONAMENTO_NISECI_HEADER_FIELDS,
     RIFERIMENTO_NISECI_HEADER_FIELDS,
 };
-use crate::csv::deser::error::duccio::translate_error_message as priv_translate;
+use crate::csv::deser::utils::diagnostic::duccio::translate_error_message as priv_translate;
 use crate::deser::TipoRecord;
 use std::io::{self, Read};
 use std::path::Path;
@@ -119,7 +119,7 @@ fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
 }
 
 #[deprecated(
-    note = "v0.2 will change visibility.\nConsider using crate::csv::deser::error::duccio::format_csv_errors instead"
+    note = "v0.2 will change visibility.\nConsider using crate::csv::deser::utils::diagnostic::duccio::format_csv_errors instead"
 )]
 pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec<String> {
     let mut res = Vec::new();
@@ -281,7 +281,7 @@ pub fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
 }
 
 #[deprecated(
-    note = "v0.2 will change visibility.\nConsider using crate::csv::deser::error::duccio::format_csv_error instead"
+    note = "v0.2 will change visibility.\nConsider using crate::csv::deser::utils::diagnostic::duccio::format_csv_error instead"
 )]
 pub fn translate_error_message(msg: &str) -> String {
     priv_translate(msg)

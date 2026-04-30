@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::error::duccio::format_csv_error;
+use crate::csv::deser::utils::diagnostic::duccio::format_csv_error;
 use crate::csv::deser::{
     hfbi::{check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf},
     niseci::{
