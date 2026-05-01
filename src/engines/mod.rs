@@ -16,7 +16,21 @@
 */
 //! Computation module.
 //!
-//! Routines and types for computing the index from `crate::domain` structs.
+//! Routines and types for computing the index from [`crate::domain`] structs.
+//!
+//! The main methods are:
+//!
+//! - In [`niseci`]
+//!
+//!   - [`niseci::full::calculate_niseci`]
+//!   - [`niseci::full::calculate_rqe_niseci`]
+//!   - [`niseci::full::calculate_stato_ecologico_niseci`]
+//!
+//! - In [`hfbi`]
+//!
+//!   - [`hfbi::full::calculate_hfbi`]
+//!   - [`hfbi::full::calculate_mmi`]
+//!   - [`hfbi::full::calculate_stato_ecologico_hfbi`]
 
 pub mod hfbi;
 pub mod niseci;

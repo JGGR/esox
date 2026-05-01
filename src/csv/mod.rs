@@ -25,7 +25,7 @@
 //!   - [`parser`]
 //! - Semicolon input format and italian diagnostic formatting for [`csv::Error`]
 //!   - [`stanis`]
-//! - Single-step load (deser + parse)
+//! - Single-step load ([`deser`] + [`parse`])
 //!   - [`load`]
 
 pub mod deser;

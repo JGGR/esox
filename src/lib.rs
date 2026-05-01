@@ -28,14 +28,17 @@
 //! The processing pipeline is:
 //!
 //! 1. CSV deserialization: ([`csv::deser`])
+//!
 //! - Converts raw CSV into typed intermediate structs
 //! - Validates CSV structure and field types (e.g. integer fields must be valid numbers)
 //!
 //! 2. CSV parsing and validation: ([`csv::parser`]) (from next version: [`parser`])
+//!
 //! - Converts the intermediate CSV structs into [`domain`] models
 //! - Enforces domain rules (e.g. value ranges, invariants)
 //!
 //! 3. Index computation: ([`engines`])
+//!
 //! - Computes NISECI and HFBI from validated domain data
 //!
 //! ### Convenience API

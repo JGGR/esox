@@ -19,11 +19,11 @@
 //! This module provides support for:
 //!
 //! - Validation of the intermediate structs
-//! - Enforcement of `crate::domain` invariants
+//! - Enforcement of [`crate::domain`] invariants
 //!
 //! Next version will:
 //!
-//! - Drop the `crate::csv::parser` module
+//! - Drop the [`crate::csv::parser`] module
 //! - Expose more methods here to provide the same functionality
 //!
 //! In the meantime, consider using:
@@ -31,7 +31,7 @@
 //! - `parse_records`
 //! - `check_records`
 //!
-//! from `crate::domain` structs.
+//! from [`crate::domain`] structs.
 
 use chrono::NaiveDate;
 
