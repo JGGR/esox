@@ -28,7 +28,7 @@ use crate::parser::hfbi::{
 pub use crate::parser::hfbi::RecordCampionamentoHFBIError as RecordCsvCampionamentoHFBIError;
 
 #[deprecated(
-    note = "v0.2 will change signature to return CampionamentoHFBIParseResult\nConsider using CampionamentoHFBI::parse_records(records).into_parts()"
+    note = "v0.2 will drop visibility.\nConsider using CampionamentoHFBI::parse_records(records).into_parts()"
 )]
 pub fn parse_recordcsv_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
@@ -42,6 +42,9 @@ pub fn parse_recordcsv_campionamento_hfbi<T: RecordCampionamentoHFBI>(
 )]
 pub use crate::parser::hfbi::RecordAnagraficaHFBIError as RecordCsvAnagraficaHFBIError;
 
+#[deprecated(
+    note = "v0.2 will drop visibility.\nConsider using AnagraficaHFBI::parse_records(records)"
+)]
 pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     records: Vec<T>,
 ) -> Result<AnagraficaHFBI, Vec<RecordAnagraficaHFBIError>> {
@@ -49,7 +52,7 @@ pub fn parse_recordcsv_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to return CampionamentoHFBI on success\nConsider using CampionamentoHFBI::check_records(records)"
+    note = "v0.2 will drop visibility.\nConsider using CampionamentoHFBI::check_records(records)"
 )]
 pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
@@ -57,6 +60,9 @@ pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     crate::parser::hfbi::check_records_campionamento_hfbi::<T>(records).map(|v| v.into())
 }
 
+#[deprecated(
+    note = "v0.2 will drop visibility.\nConsider using AnagraficaHFBI::check_records(records)"
+)]
 pub fn check_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     records: Vec<T>,
 ) -> Result<AnagraficaHFBI, Vec<RecordAnagraficaHFBIError>> {

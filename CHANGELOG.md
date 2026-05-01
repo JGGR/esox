@@ -7,6 +7,11 @@
     - `deser::Record{Riferimento,Campionamento,Anagrafica}NISECI`
     - `deser::Record{Campionamento,Anagrafica}HFBI`
 
+### Changed
+
+- Corrected deprecation message for `csv::parser::niseci::{parse,check}_anagrafica_niseci`
+- Deprecation warning for visibility of `csv::parser::hfbi::{parse,check}_anagrafica_hfbi`
+
 ## [0.1.5] - 2026-04-30
 
 ### Added

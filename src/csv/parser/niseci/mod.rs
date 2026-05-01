@@ -64,7 +64,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCampionamentoNISECI>(
 pub use crate::parser::niseci::RecordAnagraficaNISECIError as RecordCsvAnagraficaNISECIError;
 
 #[deprecated(
-    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::parse_records(records).into_parts()"
+    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::parse_records(records)"
 )]
 pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     records: Vec<T>,
@@ -96,7 +96,7 @@ pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
 }
 
 #[deprecated(
-    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::check_records(records).into_parts()"
+    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::check_records(records)"
 )]
 pub fn check_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     records: Vec<T>,
