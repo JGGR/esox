@@ -88,11 +88,30 @@ impl CsvConfig {
     }
 }
 
-/// Preset for Delimiter: b','
+/// Preset [`Delimiter`] for comma (`b','`).
+///
+/// # Example
+/// ```
+/// use esox::csv::deser::{Delimiter, CommaDelimiter};
+///
+/// assert_eq!(CommaDelimiter::delimiter(), b',');
+/// ```
 pub struct CommaDelimiter;
-/// Preset for Delimiter: b';'
+
+/// Preset [`Delimiter`] for semicolon (`b';'`).
+///
+/// # Example
+/// ```
+/// use esox::csv::deser::{Delimiter, SemicolonDelimiter};
+///
+/// assert_eq!(SemicolonDelimiter::delimiter(), b';');
+/// ```
 pub struct SemicolonDelimiter;
 
+/// A type-level delimiter.
+///
+/// Implemented by zero-sized marker types like [`CommaDelimiter`]
+/// and [`SemicolonDelimiter`].
 pub trait Delimiter {
     fn delimiter() -> u8;
 }
@@ -108,6 +127,23 @@ impl Delimiter for SemicolonDelimiter {
     }
 }
 
+/// A CSV record configuration.
+///
+/// This trait associates a [`Delimiter`] with a record type.
+/// Available presets:
+/// - [`CommaDelimiter`]
+/// - [`SemicolonDelimiter`].
+///
+/// # Example
+/// ```
+/// use esox::csv::deser::{RecordCsv, CommaDelimiter};
+///
+/// struct MyRecord;
+///
+/// impl RecordCsv for MyRecord {
+///     type D = CommaDelimiter;
+/// }
+/// ```
 pub trait RecordCsv {
     type D: Delimiter;
 }
