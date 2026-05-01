@@ -6,6 +6,8 @@
   - Will allow compile-type definition of csv delimiter for impls of:
     - `deser::Record{Riferimento,Campionamento,Anagrafica}NISECI`
     - `deser::Record{Campionamento,Anagrafica}HFBI`
+- Add `tests` folder for integration tests
+  - `{niseci,hfbi}::italian::template` tests full pipeline with italian templates, using deprecated methods
 
 ### Changed
 
