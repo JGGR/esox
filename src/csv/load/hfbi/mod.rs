@@ -57,7 +57,7 @@ impl fmt::Display for CampionamentoHFBIError {
 impl std::error::Error for CampionamentoHFBIError {}
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::hfbi::load_csv_campionamento_hfbi_from_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::hfbi::load_csv_campionamento_hfbi_from_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_campionamento_hfbi_from_reader<R, T>(
     reader: R,
@@ -99,7 +99,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::hfbi::load_csv_campionamento_hfbi_from_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::hfbi::load_csv_campionamento_hfbi_from_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_campionamento_hfbi_from_path<T>(
     path: impl AsRef<Path>,
@@ -199,7 +199,7 @@ impl fmt::Display for AnagraficaHFBIError {
 impl std::error::Error for AnagraficaHFBIError {}
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::hfbi::load_csv_anagrafica_hfbi_from_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::hfbi::load_csv_anagrafica_hfbi_from_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_anagrafica_hfbi_from_reader<R, T>(
     reader: R,
@@ -242,7 +242,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::hfbi::load_csv_anagrafica_hfbi_from_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::hfbi::load_csv_anagrafica_hfbi_from_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_anagrafica_hfbi_from_path<T>(
     path: impl AsRef<Path>,

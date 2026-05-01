@@ -61,7 +61,7 @@ impl fmt::Display for RiferimentoNISECIError {
 impl std::error::Error for RiferimentoNISECIError {}
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_riferimento_niseci_from_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_riferimento_niseci_from_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_riferimento_niseci_from_reader<R, T>(
     reader: R,
@@ -102,7 +102,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_riferimento_niseci_from_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_riferimento_niseci_from_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_riferimento_niseci_from_path<T>(
     path: impl AsRef<Path>,
@@ -201,7 +201,7 @@ impl fmt::Display for CampionamentoNISECIError {
 impl std::error::Error for CampionamentoNISECIError {}
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_campionamento_niseci_from_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_campionamento_niseci_from_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_campionamento_niseci_from_reader<R, T>(
     reader: R,
@@ -249,7 +249,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_campionamento_niseci_from_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_campionamento_niseci_from_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_campionamento_niseci_from_path<T>(
     path: impl AsRef<Path>,
@@ -354,7 +354,7 @@ impl fmt::Display for AnagraficaNISECIError {
 impl std::error::Error for AnagraficaNISECIError {}
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_anagrafica_niseci_from_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_anagrafica_niseci_from_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_anagrafica_niseci_from_reader<R, T>(
     reader: R,
@@ -396,7 +396,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::load::niseci::load_csv_anagrafica_niseci_from_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::niseci::load_csv_anagrafica_niseci_from_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn load_csv_anagrafica_niseci_from_path<T>(
     path: impl AsRef<Path>,

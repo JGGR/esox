@@ -125,6 +125,9 @@ impl RecordRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
 impl RecordCsv for PlainRecordCsvRiferimentoNISECI {
     type D = CommaDelimiter;
 }
+impl RecordCsv for crate::deser::PlainRecordRiferimentoNISECI {
+    type D = CommaDelimiter;
+}
 
 impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -140,6 +143,9 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_riferimento_niseci_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -150,7 +156,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_riferimento_niseci_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_riferimento_niseci_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_riferimento_niseci_reader<R: Read, T>(
     reader: R,
@@ -194,7 +200,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_riferimento_niseci_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_riferimento_niseci_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_riferimento_niseci_path<T>(
     path: PathBuf,
@@ -281,6 +287,9 @@ impl RecordCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
 impl RecordCsv for PlainRecordCsvCampionamentoNISECI {
     type D = CommaDelimiter;
 }
+impl RecordCsv for crate::deser::PlainRecordCampionamentoNISECI {
+    type D = CommaDelimiter;
+}
 
 impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -293,6 +302,9 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_campionamento_niseci_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -303,7 +315,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_campionamento_niseci_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_campionamento_niseci_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_campionamento_niseci_reader<R: Read, T>(
     reader: R,
@@ -349,7 +361,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_campionamento_niseci_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_campionamento_niseci_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_campionamento_niseci_path<T>(
     path: PathBuf,
@@ -464,6 +476,9 @@ impl RecordAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
 impl RecordCsv for PlainRecordCsvAnagraficaNISECI {
     type D = CommaDelimiter;
 }
+impl RecordCsv for crate::deser::PlainRecordAnagraficaNISECI {
+    type D = CommaDelimiter;
+}
 
 impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -491,6 +506,9 @@ impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_anagrafica_niseci_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -501,7 +519,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_anagrafica_niseci_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_anagrafica_niseci_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_anagrafica_niseci_reader<R: Read, T>(
     reader: R,
@@ -547,7 +565,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_anagrafica_niseci_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_anagrafica_niseci_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_anagrafica_niseci_path<T>(
     path: PathBuf,

@@ -10,6 +10,14 @@
 ### Changed
 
 - Corrected deprecation message for `csv::parser::niseci::{parse,check}_anagrafica_niseci`
+- Corrected deprecation message for `csv::{deser,load}::{niseci,hfbi}` generic methods
+  - Next version will add a `RecordCsv` bound on `T`
+  - New bound will NOT apply to `*_conf` methods, allowing runtime delimiter selection
+  - Consider adding `impl RecordCsv` on your custom types if needed
+  - Provided types are already compliant:
+    - `csv::deser::{niseci,hfbi}::PlainRecord*` structs
+    - `csv::stanis::{niseci,hfbi}::VeryItalianRecord*` structs
+    - `deser::PlainRecord*` structs
 - Deprecation warning for visibility of `csv::parser::hfbi::{parse,check}_anagrafica_hfbi`
 
 ## [0.1.5] - 2026-04-30

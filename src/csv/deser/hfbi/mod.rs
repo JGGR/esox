@@ -67,6 +67,9 @@ impl RecordCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
 impl RecordCsv for PlainRecordCsvCampionamentoHFBI {
     type D = CommaDelimiter;
 }
+impl RecordCsv for crate::deser::PlainRecordCampionamentoHFBI {
+    type D = CommaDelimiter;
+}
 
 impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -78,6 +81,9 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -88,7 +94,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_campionamento_hfbi_reader<R: Read, T>(
     reader: R,
@@ -134,7 +140,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_campionamento_hfbi_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_campionamento_hfbi_path<T>(
     path: PathBuf,
@@ -237,6 +243,9 @@ impl RecordAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
 impl RecordCsv for PlainRecordCsvAnagraficaHFBI {
     type D = CommaDelimiter;
 }
+impl RecordCsv for crate::deser::PlainRecordAnagraficaHFBI {
+    type D = CommaDelimiter;
+}
 
 impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -260,6 +269,9 @@ impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -270,7 +282,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     reader: R,
@@ -316,7 +328,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_anagrafica_hfbi_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_anagrafica_hfbi_path<T>(
     path: PathBuf,
