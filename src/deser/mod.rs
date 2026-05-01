@@ -14,6 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! Deserialization module for intermediate structs.
+//!
+//! This module provides generic support for:
+//! - Converting raw data into typed intermediate structs
+//! - Validating raw data structure and field types
+//!   - Eg. Integer fields must not be `"foo"`)
+//!
+//! To validate intermediate structs into [`crate::domain`] structs, see:
+//! - [`crate::parser`]
 use std::fmt;
 
 #[derive(Copy, Clone)]

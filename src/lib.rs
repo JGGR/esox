@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-//! # esox: NISECI / HFBI computation crate
+//! # Esox: NISECI / HFBI computation crate
 //!
 //! Esox parses a custom CSV format and computes two derived indices:
 //! NISECI and HFBI.
@@ -27,21 +27,21 @@
 //!
 //! The processing pipeline is:
 //!
-//! 1. CSV deserialization (`csv::deser`)
-//!    - converts raw CSV into typed intermediate structs
-//!    - validates CSV structure and field types (e.g. integer fields must be valid numbers)
+//! 1. CSV deserialization: ([`csv::deser`])
+//! - Converts raw CSV into typed intermediate structs
+//! - Validates CSV structure and field types (e.g. integer fields must be valid numbers)
 //!
-//! 2. CSV parsing and validation (`csv::parser`)
-//!    - converts the intermediate CSV structs into domain models
-//!    - enforces domain rules (e.g. value ranges, invariants)
+//! 2. CSV parsing and validation: ([`csv::parser`]) (from next version: [`parser`])
+//! - Converts the intermediate CSV structs into [`domain`] models
+//! - Enforces domain rules (e.g. value ranges, invariants)
 //!
-//! 3. Index computation (`engines`)
-//!    - computes NISECI and HFBI from validated domain data
+//! 3. Index computation: ([`engines`])
+//! - Computes NISECI and HFBI from validated domain data
 //!
 //! ### Convenience API
 //!
 //! `csv::load` provides a single-step interface that combines
-//! deserialization and parsing (`csv::deser` + `csv::parser`),
+//! deserialization and parsing ([`csv::deser`] + [`csv::parser`]),
 //! returning validated domain models directly from raw CSV input.
 //!
 //! ### Input format

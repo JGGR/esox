@@ -431,11 +431,18 @@ impl CampionamentoHFBI {
     {
         CampionamentoHFBIParseResult::parse::<T>(vec)
     }
-    pub fn check_record<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
+    pub fn check_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
     where
         T: RecordCampionamentoHFBI,
     {
         check_records_campionamento_hfbi::<T>(vec)
+    }
+    #[deprecated(note = "v0.2 will drop visibility.\nConsider using check_records instead")]
+    pub fn check_record<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
+    where
+        T: RecordCampionamentoHFBI,
+    {
+        Self::check_records::<T>(vec)
     }
 }
 

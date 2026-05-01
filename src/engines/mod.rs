@@ -14,6 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! Computation module.
+//!
+//! Routines and types for computing the index from `crate::domain` structs.
 
 pub mod hfbi;
 pub mod niseci;

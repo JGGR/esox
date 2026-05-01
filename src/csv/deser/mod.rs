@@ -14,6 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! Deserialization module for CSV to intermediate structs.
+//!
+//! Provides support for:
+//!
+//! - Converting raw CSV data into typed intermediate structs
+//! - Validating raw CSV data structure and field types
+//!   - Eg. Integer fields must not be `"foo"`)
+//!
+//! To validate intermediate structs into [`crate::domain`] structs, see:
+//!
+//! - [`crate::parser`]
+//!
+//! To do deser and parse steps at once (go from raw CSV to domain structs) see:
+//!
+//! - [`crate::csv::load`]
 
 pub mod utils;
 
@@ -94,7 +109,7 @@ impl CsvConfig {
 /// ```
 /// use esox::csv::deser::{Delimiter, CommaDelimiter};
 ///
-/// assert_eq!(CommaDelimiter::delimiter(), b',');
+/// assert_eq!(CommaDelimiter::DELIMITER, b',');
 /// ```
 pub struct CommaDelimiter;
 
@@ -104,27 +119,23 @@ pub struct CommaDelimiter;
 /// ```
 /// use esox::csv::deser::{Delimiter, SemicolonDelimiter};
 ///
-/// assert_eq!(SemicolonDelimiter::delimiter(), b';');
+/// assert_eq!(SemicolonDelimiter::DELIMITER, b';');
 /// ```
 pub struct SemicolonDelimiter;
 
 /// A type-level delimiter.
 ///
-/// Implemented by zero-sized marker types like [`CommaDelimiter`]
+/// Implemented by marker types like [`CommaDelimiter`]
 /// and [`SemicolonDelimiter`].
 pub trait Delimiter {
-    fn delimiter() -> u8;
+    const DELIMITER: u8;
 }
 
 impl Delimiter for CommaDelimiter {
-    fn delimiter() -> u8 {
-        b','
-    }
+    const DELIMITER: u8 = b',';
 }
 impl Delimiter for SemicolonDelimiter {
-    fn delimiter() -> u8 {
-        b';'
-    }
+    const DELIMITER: u8 = b';';
 }
 
 /// A CSV record configuration.
