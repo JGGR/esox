@@ -88,6 +88,28 @@ impl CsvConfig {
     }
 }
 
+pub struct CommaDelimiter;
+pub struct SemicolonDelimiter;
+
+pub trait Delimiter {
+    fn delimiter() -> u8;
+}
+
+impl Delimiter for CommaDelimiter {
+    fn delimiter() -> u8 {
+        b','
+    }
+}
+impl Delimiter for SemicolonDelimiter {
+    fn delimiter() -> u8 {
+        b';'
+    }
+}
+
+pub trait RecordCsv {
+    type D: Delimiter;
+}
+
 fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     let res;
     match pos {

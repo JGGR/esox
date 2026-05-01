@@ -14,7 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
+use crate::csv::deser::{
+    check_path_is_file_ends_with_csv, CommaDelimiter, CsvConfig, NormalizerReader, RecordCsv,
+};
 
 /// Used as the closure argument for
 /// validate_serialized_records(), to print italian error messages.
@@ -60,6 +62,10 @@ impl RecordCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
     fn peso(&self) -> f32 {
         self.peso
     }
+}
+
+impl RecordCsv for PlainRecordCsvCampionamentoHFBI {
+    type D = CommaDelimiter;
 }
 
 impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
@@ -226,6 +232,10 @@ impl RecordAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
     fn tipo_laguna(&self) -> u32 {
         self.tipo_laguna
     }
+}
+
+impl RecordCsv for PlainRecordCsvAnagraficaHFBI {
+    type D = CommaDelimiter;
 }
 
 impl fmt::Display for PlainRecordCsvAnagraficaHFBI {

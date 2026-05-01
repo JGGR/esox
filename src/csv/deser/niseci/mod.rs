@@ -15,7 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
+use crate::csv::deser::{
+    check_path_is_file_ends_with_csv, CommaDelimiter, CsvConfig, NormalizerReader, RecordCsv,
+};
 
 /// Used as the closure argument for
 /// validate_serialized_records(), to print italian error messages.
@@ -118,6 +120,10 @@ impl RecordRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
     fn dens_soglia2(&self) -> f32 {
         self.dens_soglia2
     }
+}
+
+impl RecordCsv for PlainRecordCsvRiferimentoNISECI {
+    type D = CommaDelimiter;
 }
 
 impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
@@ -270,6 +276,10 @@ impl RecordCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
     fn peso(&self) -> f32 {
         self.peso
     }
+}
+
+impl RecordCsv for PlainRecordCsvCampionamentoNISECI {
+    type D = CommaDelimiter;
 }
 
 impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
@@ -449,6 +459,10 @@ impl RecordAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
     fn nome_bacino(&self) -> String {
         self.nome_bacino.clone()
     }
+}
+
+impl RecordCsv for PlainRecordCsvAnagraficaNISECI {
+    type D = CommaDelimiter;
 }
 
 impl fmt::Display for PlainRecordCsvAnagraficaNISECI {

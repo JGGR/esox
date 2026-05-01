@@ -1,3 +1,12 @@
+## [0.1.6] - Unreleased
+
+### Added
+
+- Add `csv::deser::{RecordCsv, CommaDelimiter, SemicolonDelimiter}`
+  - Will allow compile-type definition of csv delimiter for impls of:
+    - `deser::Record{Riferimento,Campionamento,Anagrafica}NISECI`
+    - `deser::Record{Campionamento,Anagrafica}HFBI`
+
 ## [0.1.5] - 2026-04-30
 
 ### Added

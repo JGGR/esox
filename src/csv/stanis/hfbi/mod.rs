@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+use crate::csv::deser::{RecordCsv, SemicolonDelimiter};
 use crate::csv::stanis::deserialize_comma_f32;
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use std::fmt;
@@ -39,6 +40,10 @@ impl RecordCampionamentoHFBI for VeryItalianRecordCampionamentoHFBI {
     fn peso(&self) -> f32 {
         self.peso
     }
+}
+
+impl RecordCsv for VeryItalianRecordCampionamentoHFBI {
+    type D = SemicolonDelimiter;
 }
 
 impl fmt::Display for VeryItalianRecordCampionamentoHFBI {
@@ -101,6 +106,10 @@ impl RecordAnagraficaHFBI for VeryItalianRecordAnagraficaHFBI {
     fn tipo_laguna(&self) -> u32 {
         self.tipo_laguna
     }
+}
+
+impl RecordCsv for VeryItalianRecordAnagraficaHFBI {
+    type D = SemicolonDelimiter;
 }
 
 impl fmt::Display for VeryItalianRecordAnagraficaHFBI {
