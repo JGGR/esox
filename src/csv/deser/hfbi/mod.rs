@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, CommaDelimiter, CsvConfig, NormalizerReader, RecordCsv,
+    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader,
 };
 
 /// Used as the closure argument for
@@ -64,12 +64,7 @@ impl RecordCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
     }
 }
 
-impl RecordCsv for PlainRecordCsvCampionamentoHFBI {
-    type D = CommaDelimiter;
-}
-impl RecordCsv for crate::deser::PlainRecordCampionamentoHFBI {
-    type D = CommaDelimiter;
-}
+impl DefaultRecordCsv for PlainRecordCsvCampionamentoHFBI {}
 
 impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -240,12 +235,7 @@ impl RecordAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
     }
 }
 
-impl RecordCsv for PlainRecordCsvAnagraficaHFBI {
-    type D = CommaDelimiter;
-}
-impl RecordCsv for crate::deser::PlainRecordAnagraficaHFBI {
-    type D = CommaDelimiter;
-}
+impl DefaultRecordCsv for PlainRecordCsvAnagraficaHFBI {}
 
 impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

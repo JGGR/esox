@@ -88,7 +88,9 @@ impl CsvConfig {
     }
 }
 
+/// Preset for Delimiter: b','
 pub struct CommaDelimiter;
+/// Preset for Delimiter: b';'
 pub struct SemicolonDelimiter;
 
 pub trait Delimiter {
@@ -109,6 +111,19 @@ impl Delimiter for SemicolonDelimiter {
 pub trait RecordCsv {
     type D: Delimiter;
 }
+
+/// Internal helper used by PlainRecord structs to autoimpl RecordCsv
+trait DefaultRecordCsv: RecordCsv {}
+
+impl<T: DefaultRecordCsv> RecordCsv for T {
+    type D = CommaDelimiter;
+}
+
+impl DefaultRecordCsv for crate::deser::PlainRecordRiferimentoNISECI {}
+impl DefaultRecordCsv for crate::deser::PlainRecordCampionamentoNISECI {}
+impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaNISECI {}
+impl DefaultRecordCsv for crate::deser::PlainRecordCampionamentoHFBI {}
+impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaHFBI {}
 
 fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
     let res;

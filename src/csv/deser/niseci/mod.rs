@@ -16,7 +16,7 @@
 */
 
 use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, CommaDelimiter, CsvConfig, NormalizerReader, RecordCsv,
+    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader,
 };
 
 /// Used as the closure argument for
@@ -122,12 +122,7 @@ impl RecordRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
-impl RecordCsv for PlainRecordCsvRiferimentoNISECI {
-    type D = CommaDelimiter;
-}
-impl RecordCsv for crate::deser::PlainRecordRiferimentoNISECI {
-    type D = CommaDelimiter;
-}
+impl DefaultRecordCsv for PlainRecordCsvRiferimentoNISECI {}
 
 impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -284,12 +279,7 @@ impl RecordCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
-impl RecordCsv for PlainRecordCsvCampionamentoNISECI {
-    type D = CommaDelimiter;
-}
-impl RecordCsv for crate::deser::PlainRecordCampionamentoNISECI {
-    type D = CommaDelimiter;
-}
+impl DefaultRecordCsv for PlainRecordCsvCampionamentoNISECI {}
 
 impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -473,12 +463,7 @@ impl RecordAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
     }
 }
 
-impl RecordCsv for PlainRecordCsvAnagraficaNISECI {
-    type D = CommaDelimiter;
-}
-impl RecordCsv for crate::deser::PlainRecordAnagraficaNISECI {
-    type D = CommaDelimiter;
-}
+impl DefaultRecordCsv for PlainRecordCsvAnagraficaNISECI {}
 
 impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
