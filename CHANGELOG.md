@@ -8,6 +8,7 @@
     - `deser::Record{Campionamento,Anagrafica}HFBI`
 - Add `tests` folder for integration tests
   - `{niseci,hfbi}::italian::template` tests full pipeline with italian templates, using deprecated methods
+- Add `benches` folder for benchmarks
 
 ### Changed
 
