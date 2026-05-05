@@ -52,7 +52,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCampionamentoNISECI>(
 ) -> (Vec<RecordNISECI>, Vec<RecordCampionamentoNISECIError>) {
     let (camp, errs) = parse_records_campionamento_niseci::<T>(
         records,
-        &RiferimentoNISECI::new(riferimento_specie),
+        &RiferimentoNISECI::new_from_map(riferimento_specie.into()),
     )
     .into_parts();
     (camp.into(), errs)
@@ -90,7 +90,7 @@ pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
 ) -> Result<Vec<RecordNISECI>, Vec<RecordCampionamentoNISECIError>> {
     crate::parser::niseci::check_records_campionamento_niseci::<T>(
         records,
-        &RiferimentoNISECI::new(riferimento_specie),
+        &RiferimentoNISECI::new_from_map(riferimento_specie.into()),
     )
     .map(|v| v.into())
 }

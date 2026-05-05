@@ -87,6 +87,95 @@ impl SpecieNISECI {
     }
 }
 
+type IdSpecieNISECI = u32;
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct StoreSpecieNISECI {
+    values: Vec<EntryStateSpecieNISECI>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+enum EntryStateSpecieNISECI {
+    Missing,
+    Present(SpecieNISECI),
+}
+
+impl StoreSpecieNISECI {
+    fn new() -> Self {
+        Self { values: Vec::new() }
+    }
+
+    #[inline(always)]
+    fn ensure_len(&mut self, id: IdSpecieNISECI) {
+        let idx = id as usize;
+        if idx >= self.values.len() {
+            self.values
+                .resize_with(idx + 1, || EntryStateSpecieNISECI::Missing);
+        }
+    }
+
+    #[inline(always)]
+    fn insert(&mut self, id: IdSpecieNISECI, value: SpecieNISECI) {
+        self.ensure_len(id);
+        self.values[id as usize] = EntryStateSpecieNISECI::Present(value);
+    }
+
+    #[inline(always)]
+    fn get(&self, id: IdSpecieNISECI) -> Option<&SpecieNISECI> {
+        match self.values.get(id as usize)? {
+            EntryStateSpecieNISECI::Present(v) => Some(v),
+            EntryStateSpecieNISECI::Missing => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct InternerSpecieNISECI {
+    map: HashMap<String, IdSpecieNISECI>,
+    store: StoreSpecieNISECI,
+    next_id: IdSpecieNISECI,
+}
+
+impl InternerSpecieNISECI {
+    pub(crate) fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+            next_id: 0,
+            store: StoreSpecieNISECI::new(),
+        }
+    }
+    #[inline(always)]
+    pub(crate) fn contains_id(&self, s: &str) -> bool {
+        self.map.contains_key(s)
+    }
+    #[inline(always)]
+    pub(crate) fn get(&self, s: &str) -> Option<&SpecieNISECI> {
+        self.map.get(s).and_then(|k| self.store.get(*k))
+    }
+    #[inline(always)]
+    pub(crate) fn intern(&mut self, s: &str, val: SpecieNISECI) -> IdSpecieNISECI {
+        if let Some(&id) = self.map.get(s) {
+            id
+        } else {
+            let id = self.next_id;
+            self.next_id += 1;
+            self.map.insert(s.to_string(), id);
+            self.store.insert(id, val);
+            id
+        }
+    }
+}
+
+impl From<Vec<SpecieNISECI>> for InternerSpecieNISECI {
+    fn from(val: Vec<SpecieNISECI>) -> Self {
+        let mut res = Self::new();
+        for v in val {
+            res.intern(&v.id.clone(), v);
+        }
+        res
+    }
+}
+
 #[derive(Clone, Serialize)]
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
@@ -95,6 +184,10 @@ pub struct RiferimentoNISECI {
         note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, RiferimentoNISECI::new() to construct"
     )]
     pub elenco_specie: Vec<SpecieNISECI>,
+    // TODO: in v0.2, we can:
+    // - drop the elenco_specie field
+    // - avoiding cloning all SpecieNISECI on new()
+    map_ids: InternerSpecieNISECI,
 }
 
 impl fmt::Display for RiferimentoNISECI {
@@ -110,8 +203,42 @@ impl fmt::Display for RiferimentoNISECI {
 
 impl RiferimentoNISECI {
     pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
+        let mut interner = InternerSpecieNISECI::new();
+        for rec in &elenco_specie {
+            // TODO: in v0.2, we can:
+            // - drop the elenco_specie field
+            // - avoiding cloning all SpecieNISECI on new()
+            interner.intern(&rec.id, rec.clone());
+        }
         #[allow(deprecated)]
-        Self { elenco_specie }
+        Self {
+            elenco_specie,
+            map_ids: interner,
+        }
+    }
+    pub(crate) fn new_from_map(map_ids: InternerSpecieNISECI) -> Self {
+        // TODO: in v0.2, we can:
+        // - drop the elenco_specie field
+        // - avoiding cloning all SpecieNISECI on new()
+        let mut elenco_specie = Vec::new();
+        for v in map_ids.store.values.iter() {
+            if let EntryStateSpecieNISECI::Present(s) = v {
+                elenco_specie.push(s.clone());
+            }
+        }
+        #[allow(deprecated)]
+        Self {
+            elenco_specie,
+            map_ids,
+        }
+    }
+    #[inline(always)]
+    pub fn contains_id(&self, id: &str) -> bool {
+        self.map_ids.contains_id(id)
+    }
+    #[inline(always)]
+    pub fn get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI> {
+        self.map_ids.get(id)
     }
 }
 

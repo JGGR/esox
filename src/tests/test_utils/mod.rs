@@ -222,7 +222,7 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     elenco_specie.push(inatteso_1);
     elenco_specie.push(inatteso_2);
 
-    RiferimentoNISECI::new(elenco_specie)
+    RiferimentoNISECI::new_from_map(elenco_specie.into())
 }
 
 /// campionamento che ha dentro tutte le specie autoctone attese

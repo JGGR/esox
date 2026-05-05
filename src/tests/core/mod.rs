@@ -248,7 +248,7 @@ fn test_valid_recordcsv_campionamento_niseci() {
     let recordcsv_data = vec![record_1];
     let result = check_records_campionamento_niseci(
         recordcsv_data,
-        &RiferimentoNISECI::new(riferimento_specie),
+        &RiferimentoNISECI::new_from_map(riferimento_specie.into()),
     );
 
     assert!(!result.is_err());

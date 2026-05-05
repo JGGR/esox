@@ -17,6 +17,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
+use std::{collections::HashMap, fmt};
 
 use super::localize::CommaFormat;
 #[cfg(feature = "experimental")]
@@ -105,6 +106,7 @@ impl fmt::Display for SpecieHFBI {
     }
 }
 
+#[deprecated(note = "v0.2 will change type to HashMap<String, SpecieHFBI>")]
 pub static RIFERIMENTO_HFBI: LazyLock<Vec<SpecieHFBI>> = LazyLock::new(|| {
     vec![
         SpecieHFBI {
@@ -575,7 +577,16 @@ pub static RIFERIMENTO_HFBI: LazyLock<Vec<SpecieHFBI>> = LazyLock::new(|| {
     ]
 });
 
-use std::{collections::HashMap, fmt};
+/// v0.2 will have this public as RIFERIMENTO_HFBI,
+/// avoiding the cloning.
+pub(crate) static RIFERIMENTO_HFBI_MAP: LazyLock<HashMap<String, SpecieHFBI>> =
+    LazyLock::new(|| {
+        #[expect(deprecated)]
+        RIFERIMENTO_HFBI
+            .iter()
+            .map(|s| (s.codice_specie.clone(), s.clone()))
+            .collect()
+    });
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

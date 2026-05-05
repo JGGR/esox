@@ -9,9 +9,15 @@
 - Add `tests` folder for integration tests
   - `{niseci,hfbi}::italian::template` tests full pipeline with italian templates, using deprecated methods
 - Add `benches` folder for benchmarks
+- Add new APIs to `domain::niseci::RiferimentoNISECI`:
+  - `contains_id(&self, id: &str) -> bool`
+  - `get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI>`
+- Add internal `domain::hfbi::RIFERIMENTO_HFBI_MAP`:
+  - Next version will make it public as `domain::hfbi::RIFERIMENTO_HFBI`
 
 ### Changed
 
+- Improved worst cases parsing performance
 - Corrected deprecation message for `csv::{deser,load}::{niseci,hfbi}` generic methods
   - Next version will add a `RecordCsv` bound on `T`
   - New bound will NOT apply to `*_conf` methods, allowing runtime delimiter selection
@@ -27,6 +33,7 @@
   - `csv::parser::niseci::{parse,check}_anagrafica_niseci`
 - Deprecation warning for visibility of `csv::parser::hfbi::{parse,check}_anagrafica_hfbi`
 - Deprecation warning for visibility of `CampionamentoHFBI::check_record` (typo, use `_records`)
+- Deprecation warning for definition of `domain::hfbi::RIFERIMENTO_HFBI`
 
 ## [0.1.5] - 2026-04-30
 

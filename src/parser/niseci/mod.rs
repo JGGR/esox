@@ -19,7 +19,7 @@ use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRife
 use crate::domain::location::Location;
 use crate::domain::niseci::{
     AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
-    RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
+    InternerSpecieNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
 };
 use crate::domain::posf32::PositiveF32;
 use crate::parser::parse_date;
@@ -96,12 +96,28 @@ fn check_soglie_ad_juv<T: RecordRiferimentoNISECI>(r: &T) -> bool {
 pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
 ) -> RiferimentoNISECIParseResult {
-    let mut specie = Vec::new();
     let mut errors = Vec::new();
     let mut idx = 0;
-    let mut used_id_specie = Vec::new(); // Stores already-parsed ids to detect doubles
+    let mut interner = InternerSpecieNISECI::new();
     for r in records {
         idx += 1;
+        if r.codice_specie().is_empty() {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
+                msg: format!("Record {idx}: codice_specie non valido (lunghezza < 1)"),
+            };
+            errors.push(err);
+            continue;
+        }
+
+        let id = r.codice_specie();
+
+        if interner.contains_id(&id) {
+            let err = RecordRiferimentoNISECIError::ValoreInvalido {
+                msg: format!("Record {idx}: codice_specie non valido (ridefinizione)"),
+            };
+            errors.push(err);
+            continue;
+        }
         let mut origine_autoctono = true;
         match r.origine().as_str() {
             "ALL" => {
@@ -157,24 +173,6 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
                     continue;
                 }
             }
-        }
-
-        if r.codice_specie().is_empty() {
-            let err = RecordRiferimentoNISECIError::ValoreInvalido {
-                msg: format!("Record {idx}: codice_specie non valido (lunghezza < 1)"),
-            };
-            errors.push(err);
-            continue;
-        }
-
-        let id = r.codice_specie();
-
-        if used_id_specie.contains(&id) {
-            let err = RecordRiferimentoNISECIError::ValoreInvalido {
-                msg: format!("Record {idx}: codice_specie non valido (ridefinizione)"),
-            };
-            errors.push(err);
-            continue;
         }
 
         let nome = r.nome_latino(); //TODO: controllare se dovrebbe essere nome_comune
@@ -256,11 +254,10 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
             dens_soglia1: r.dens_soglia1(),
             dens_soglia2: r.dens_soglia2(),
         };
-        specie.push(specie_rec);
-        used_id_specie.push(id);
+        interner.intern(&id, specie_rec);
     }
 
-    RiferimentoNISECIParseResult(RiferimentoNISECI::new(specie), errors)
+    RiferimentoNISECIParseResult(RiferimentoNISECI::new_from_map(interner), errors)
 }
 
 #[derive(Debug)]
@@ -324,15 +321,7 @@ pub(crate) fn parse_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
             continue;
         }
         let codice_specie = r.codice_specie();
-        let mut opt_matched_specie = None;
-        for s in riferimento_specie {
-            // FIXME: this is O(n^2).
-            if s.id == codice_specie {
-                opt_matched_specie = Some(s);
-                break; // TODO: mmmh
-            }
-        }
-
+        let opt_matched_specie = riferimento_specie.get_ref_by_id(&codice_specie);
         let matched_specie;
         if let Some(specie) = opt_matched_specie {
             matched_specie = specie;
