@@ -85,6 +85,19 @@ impl SpecieNISECI {
             dens_soglia2: 0.9,
         }
     }
+
+    pub(crate) fn nome(&self) -> &str {
+        &self.nome
+    }
+    pub(crate) fn specie_attesa(&self) -> bool {
+        self.specie_attesa
+    }
+    pub(crate) fn tipo_autoctono(&self) -> u8 {
+        self.tipo_autoctono
+    }
+    pub(crate) fn tipo_alloctono(&self) -> u8 {
+        self.tipo_alloctono
+    }
 }
 
 type IdSpecieNISECI = u32;
@@ -805,12 +818,14 @@ impl fmt::Display for ValoriIntermediNISECI {
 }
 
 impl ValoriIntermediNISECI {
+    #[deprecated(note = "v0.2 will drop visibility")]
     pub fn log(&self) {
         //TODO: a proper format? we count on the embedded newlines to leverage the
         //chopping on newlines from add_console_message()
         println!("Valori intermedi: {{{self}}}");
     }
 
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.to_csv_joined() instead")]
     pub fn to_csv(&self, comma_csv_delimiter: bool) -> String {
         let mut string_representation = if comma_csv_delimiter {
             "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2b, rapporto ad/juv, x2a_a, x2a_b".to_string()
@@ -829,9 +844,9 @@ impl ValoriIntermediNISECI {
                 None => "NC".to_string(),
             };
             let specie_attesa_str = if v.classi_eta.specie_attesa() {
-                "SI".to_string()
+                "SI"
             } else {
-                "NO".to_string()
+                "NO"
             };
             string_representation = if comma_csv_delimiter {
                 format!(
@@ -862,6 +877,88 @@ impl ValoriIntermediNISECI {
                     v.classi_eta.nome(),
                     v.classi_eta.tipo_autoctono(),
                     v.classi_eta.tipo_alloctono(),
+                    specie_attesa_str,
+                    v.classi_eta.cl1,
+                    v.classi_eta.cl2,
+                    v.classi_eta.cl3,
+                    v.classi_eta.cl4,
+                    v.classi_eta.cl5,
+                    v.densita_stimata.comma(),
+                    v.quantita_stimata,
+                    v.x2_b,
+                    rapporto_ad_juv_str,
+                    v.x2_a_a,
+                    v.x2_a_b
+                )
+            }
+        }
+        string_representation
+    }
+    pub fn to_csv_joined(
+        &self,
+        riferimento: &RiferimentoNISECI,
+        comma_csv_delimiter: bool,
+    ) -> String {
+        let mut string_representation = if comma_csv_delimiter {
+            "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2b, rapporto ad/juv, x2a_a, x2a_b".to_string()
+        } else {
+            "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
+        };
+        for (key_id, v) in self.specie_specifici.iter() {
+            let specie_ref = match riferimento.get_ref_by_id(key_id) {
+                Some(s) => s,
+                None => {
+                    string_representation = format!(
+                        "{}\n?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
+                        string_representation
+                    );
+                    return string_representation;
+                }
+            };
+            let rapporto_ad_juv_str = match v.rapporto_ad_juv {
+                Some(v) => {
+                    if comma_csv_delimiter {
+                        format!("{v}")
+                    } else {
+                        v.comma().to_string()
+                    }
+                }
+                None => "NC".to_string(),
+            };
+            let specie_attesa_str = if specie_ref.specie_attesa() {
+                "SI"
+            } else {
+                "NO"
+            };
+            string_representation = if comma_csv_delimiter {
+                format!(
+                    "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                    string_representation,
+                    key_id,
+                    specie_ref.nome(),
+                    specie_ref.tipo_autoctono(),
+                    specie_ref.tipo_alloctono(),
+                    specie_attesa_str,
+                    v.classi_eta.cl1,
+                    v.classi_eta.cl2,
+                    v.classi_eta.cl3,
+                    v.classi_eta.cl4,
+                    v.classi_eta.cl5,
+                    v.densita_stimata,
+                    v.quantita_stimata,
+                    v.x2_b,
+                    rapporto_ad_juv_str,
+                    v.x2_a_a,
+                    v.x2_a_b
+                )
+            } else {
+                format!(
+                    "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+                    string_representation,
+                    key_id,
+                    specie_ref.nome(),
+                    specie_ref.tipo_autoctono(),
+                    specie_ref.tipo_alloctono(),
                     specie_attesa_str,
                     v.classi_eta.cl1,
                     v.classi_eta.cl2,

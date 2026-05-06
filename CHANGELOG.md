@@ -14,6 +14,7 @@
   - `get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI>`
 - Add internal `domain::hfbi::RIFERIMENTO_HFBI_MAP`:
   - Next version will make it public as `domain::hfbi::RIFERIMENTO_HFBI`
+- Add internal `domain::niseci::ValoriIntermediNISECI::to_csv_joined()`
 
 ### Changed
 
@@ -36,6 +37,7 @@
 - Deprecation warning for visibility of `CampionamentoHFBI::check_record` (typo, use `_records`)
 - Deprecation warning for visibility of `ClassiEtaSpecieNISECI::{specie, new}`
 - Deprecation warning for definition of `domain::hfbi::RIFERIMENTO_HFBI`
+- Deprecation warning for visibility of `domain::niseci::ValoriIntermediNISECI::{log, to_csv}`
 
 ## [0.1.5] - 2026-04-30
 
