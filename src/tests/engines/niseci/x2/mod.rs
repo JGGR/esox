@@ -32,6 +32,7 @@ use crate::{
 #[test]
 fn calculate_x2_a_criterio_a_5_classi_valorizzate() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 1,
         cl2: 1,
@@ -47,6 +48,7 @@ fn calculate_x2_a_criterio_a_5_classi_valorizzate() {
 #[test]
 fn calculate_x2_a_criterio_a_3_classi_valorizzate() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 0,
         cl2: 0,
@@ -62,6 +64,7 @@ fn calculate_x2_a_criterio_a_3_classi_valorizzate() {
 #[test]
 fn calculate_x2_a_criterio_a_2_classi_valorizzate() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 0,
         cl2: 0,
@@ -77,6 +80,7 @@ fn calculate_x2_a_criterio_a_2_classi_valorizzate() {
 #[test]
 fn calculate_x2_a_criterio_b_zero_giovani() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 0,
         cl2: 0,
@@ -92,6 +96,7 @@ fn calculate_x2_a_criterio_b_zero_giovani() {
 #[test]
 fn calculate_x2_a_criterio_b_1_bilanciato() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 0,
         cl2: 1,
@@ -107,6 +112,7 @@ fn calculate_x2_a_criterio_b_1_bilanciato() {
 #[test]
 fn calculate_x2_a_criterio_b_2_medio_sbilanciato_adulti() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 0,
         cl2: 1,
@@ -122,6 +128,7 @@ fn calculate_x2_a_criterio_b_2_medio_sbilanciato_adulti() {
 #[test]
 fn calculate_x2_a_criterio_b_2_medio_sbilanciato_giovani() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 0,
         cl2: 2,
@@ -137,6 +144,7 @@ fn calculate_x2_a_criterio_b_2_medio_sbilanciato_giovani() {
 #[test]
 fn calculate_x2_a_criterio_b_3_molto_sbilanciato_adulti() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 0,
         cl2: 1,
@@ -152,6 +160,7 @@ fn calculate_x2_a_criterio_b_3_molto_sbilanciato_adulti() {
 #[test]
 fn calculate_x2_a_criterio_b_3_molto_sbilanciato_giovani() {
     let classe = ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
         specie: get_ciaccio(),
         cl1: 0,
         cl2: 3,

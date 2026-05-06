@@ -34,6 +34,7 @@
   - `csv::parser::niseci::{parse,check}_anagrafica_niseci`
 - Deprecation warning for visibility of `csv::parser::hfbi::{parse,check}_anagrafica_hfbi`
 - Deprecation warning for visibility of `CampionamentoHFBI::check_record` (typo, use `_records`)
+- Deprecation warning for visibility of `ClassiEtaSpecieNISECI::{specie, new}`
 - Deprecation warning for definition of `domain::hfbi::RIFERIMENTO_HFBI`
 
 ## [0.1.5] - 2026-04-30

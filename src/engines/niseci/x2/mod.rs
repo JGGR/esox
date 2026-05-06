@@ -420,7 +420,7 @@ fn calculate_sommatoria_x2_a_absolute(
                 let ad_juv = criteri_x2_a.get_rapporto_ad_juv();
                 sommatoria_x2_a += x2_a;
                 criteri_vec.push(RecordSubmetricheX2A::new(
-                    classe.specie.id.clone(),
+                    classe.id().to_string(),
                     MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv)),
                     classe.clone(),
                 ));
@@ -793,6 +793,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_giovani() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 3,
@@ -809,6 +810,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_adulti() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 1,
@@ -825,6 +827,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_1_cb_2_adulti() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 1,
@@ -841,6 +844,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_1_cb_2_giovani() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 2,
@@ -857,6 +861,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_1_cb_1() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 1,
@@ -873,6 +878,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_2_cb_1() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -889,6 +895,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_2_cb_2_adulti() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -905,6 +912,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_2_cb_2_giovani() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 2,
@@ -921,6 +929,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_2_cb_3_adulti() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -937,6 +946,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_2_cb_3_giovani() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -953,6 +963,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_3_cb_3_adulti() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -969,6 +980,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_3_cb_3_giovani() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -985,6 +997,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_3_cb_1() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -1001,6 +1014,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_3_cb_2_giovani() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -1017,6 +1031,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_3_cb_2_adulti() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 0,
             cl2: 0,
@@ -1033,6 +1048,7 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_adulti_cl1_valorizzato() {
         let classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: get_ciaccio(),
             cl1: 5,
             cl2: 0,

@@ -134,6 +134,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
                 vacant_entry.insert(
                     //We fill classi_eta later
                     SubmetricheX3::new(
+                        #[expect(deprecated)]
                         ClassiEtaSpecieNISECI::new(),
                         val.get_rapporto_ad_juv(),
                         val.get_criterio_a(),
@@ -170,6 +171,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
                 vacant_entry.insert(
                     //We fill classi_eta later
                     SubmetricheX3::new(
+                        #[expect(deprecated)]
                         ClassiEtaSpecieNISECI::new(),
                         val.get_rapporto_ad_juv(),
                         val.get_criterio_a(),
@@ -206,6 +208,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
                 vacant_entry.insert(
                     //We fill classi_eta later
                     SubmetricheX3::new(
+                        #[expect(deprecated)]
                         ClassiEtaSpecieNISECI::new(),
                         val.get_rapporto_ad_juv(),
                         val.get_criterio_a(),

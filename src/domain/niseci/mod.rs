@@ -817,7 +817,7 @@ impl ValoriIntermediNISECI {
         } else {
             "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
         };
-        for (_k, v) in self.specie_specifici.iter() {
+        for (key_id, v) in self.specie_specifici.iter() {
             let rapporto_ad_juv_str = match v.rapporto_ad_juv {
                 Some(v) => {
                     if comma_csv_delimiter {
@@ -828,7 +828,7 @@ impl ValoriIntermediNISECI {
                 }
                 None => "NC".to_string(),
             };
-            let specie_attesa_str = if v.classi_eta.specie.specie_attesa {
+            let specie_attesa_str = if v.classi_eta.specie_attesa() {
                 "SI".to_string()
             } else {
                 "NO".to_string()
@@ -837,10 +837,10 @@ impl ValoriIntermediNISECI {
                 format!(
                     "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                     string_representation,
-                    v.classi_eta.specie.id,
-                    v.classi_eta.specie.nome,
-                    v.classi_eta.specie.tipo_autoctono,
-                    v.classi_eta.specie.tipo_alloctono,
+                    key_id,
+                    v.classi_eta.nome(),
+                    v.classi_eta.tipo_autoctono(),
+                    v.classi_eta.tipo_alloctono(),
                     specie_attesa_str,
                     v.classi_eta.cl1,
                     v.classi_eta.cl2,
@@ -858,10 +858,10 @@ impl ValoriIntermediNISECI {
                 format!(
                     "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
                     string_representation,
-                    v.classi_eta.specie.id,
-                    v.classi_eta.specie.nome,
-                    v.classi_eta.specie.tipo_autoctono,
-                    v.classi_eta.specie.tipo_alloctono,
+                    key_id,
+                    v.classi_eta.nome(),
+                    v.classi_eta.tipo_autoctono(),
+                    v.classi_eta.tipo_alloctono(),
                     specie_attesa_str,
                     v.classi_eta.cl1,
                     v.classi_eta.cl2,
@@ -1078,6 +1078,9 @@ impl MetricheX2A {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ClassiEtaSpecieNISECI {
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.id(), self.nome(), self.ad_juv_soglia_N() instead"
+    )]
     pub specie: SpecieNISECI,
     pub cl1: u32,
     pub cl2: u32,
@@ -1088,9 +1091,22 @@ pub struct ClassiEtaSpecieNISECI {
 
 impl fmt::Display for ClassiEtaSpecieNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let specie_attesa_str = match self.specie_attesa() {
+            true => "SI".to_string(),
+            false => "NO".to_string(),
+        };
         let string_representation = format!(
-            "{}; {}; {}; {}; {}; {}",
-            self.specie, self.cl1, self.cl2, self.cl3, self.cl4, self.cl5
+            "{}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+            self.id(),
+            self.nome(),
+            self.tipo_autoctono(),
+            self.tipo_alloctono(),
+            specie_attesa_str,
+            self.cl1,
+            self.cl2,
+            self.cl3,
+            self.cl4,
+            self.cl5
         );
         write!(f, "{}", string_representation)
     }
@@ -1098,13 +1114,16 @@ impl fmt::Display for ClassiEtaSpecieNISECI {
 
 impl Default for ClassiEtaSpecieNISECI {
     fn default() -> Self {
+        #[expect(deprecated)]
         Self::new()
     }
 }
 
 impl ClassiEtaSpecieNISECI {
+    #[deprecated(note = "v0.2 will drop visibility. Consider using new_cl_prevalorizzata instead")]
     pub fn new() -> ClassiEtaSpecieNISECI {
         ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
             specie: SpecieNISECI::new_dummy_specie(),
             cl1: 0,
             cl2: 0,
@@ -1115,9 +1134,16 @@ impl ClassiEtaSpecieNISECI {
     }
 
     pub fn new_cl_prevalorizzata(record: &RecordNISECI) -> ClassiEtaSpecieNISECI {
-        let mut classe = ClassiEtaSpecieNISECI::new();
+        let mut classe = ClassiEtaSpecieNISECI {
+            #[expect(deprecated)]
+            specie: record.specie.clone(),
+            cl1: 0,
+            cl2: 0,
+            cl3: 0,
+            cl4: 0,
+            cl5: 0,
+        };
         classe.update_classi_eta(record);
-        classe.specie = record.specie.clone();
         classe
     }
 
@@ -1129,6 +1155,51 @@ impl ClassiEtaSpecieNISECI {
             ClassiEta::CL4 => self.cl4 += 1,
             ClassiEta::CL5 => self.cl5 += 1,
         }
+    }
+
+    pub fn id(&self) -> &str {
+        #[expect(deprecated)]
+        &self.specie.id
+    }
+
+    pub fn nome(&self) -> &str {
+        #[expect(deprecated)]
+        &self.specie.nome
+    }
+
+    pub fn specie_attesa(&self) -> bool {
+        #[expect(deprecated)]
+        self.specie.specie_attesa
+    }
+
+    pub(crate) fn tipo_autoctono(&self) -> u8 {
+        #[expect(deprecated)]
+        self.specie.tipo_autoctono
+    }
+
+    pub(crate) fn tipo_alloctono(&self) -> u8 {
+        #[expect(deprecated)]
+        self.specie.tipo_alloctono
+    }
+
+    pub fn ad_juv_soglia_1(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.ad_juv_soglia1
+    }
+
+    pub fn ad_juv_soglia_2(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.ad_juv_soglia2
+    }
+
+    pub fn ad_juv_soglia_3(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.ad_juv_soglia3
+    }
+
+    pub fn ad_juv_soglia_4(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.ad_juv_soglia4
     }
 
     fn get_how_many_classes(&self) -> usize {
@@ -1155,16 +1226,16 @@ impl ClassiEtaSpecieNISECI {
         }
 
         let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
-        if ad_juv < self.specie.ad_juv_soglia1 {
+        if ad_juv < self.ad_juv_soglia_1() {
             return (3, Some(ad_juv));
         }
-        if ad_juv <= self.specie.ad_juv_soglia2 {
+        if ad_juv <= self.ad_juv_soglia_2() {
             return (2, Some(ad_juv));
         }
-        if ad_juv <= self.specie.ad_juv_soglia3 {
+        if ad_juv <= self.ad_juv_soglia_3() {
             return (1, Some(ad_juv));
         }
-        if ad_juv <= self.specie.ad_juv_soglia4 {
+        if ad_juv <= self.ad_juv_soglia_4() {
             return (2, Some(ad_juv));
         }
         (3, Some(ad_juv))
@@ -1324,7 +1395,7 @@ impl InfoPopolazioniNISECI {
                     let rapporto_ad_juv = criteri_x2_a.get_rapporto_ad_juv();
 
                     info_pop.intermediates_map.insert(
-                        classe.specie.id.clone(),
+                        classe.id().to_string(),
                         InfoIntermediePopolazioniNISECI::new(
                             criterio_a,
                             criterio_b,
