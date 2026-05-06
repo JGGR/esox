@@ -31,15 +31,7 @@ use crate::{
 
 #[test]
 fn calculate_x2_a_criterio_a_5_classi_valorizzate() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 1,
-        cl2: 1,
-        cl3: 1,
-        cl4: 1,
-        cl5: 1,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 1, 1, 1, 1, 1);
 
     let x2_a_criterio_a = classe.get_x2_a_criterio_a();
     assert_eq!(1, x2_a_criterio_a)
@@ -47,15 +39,7 @@ fn calculate_x2_a_criterio_a_5_classi_valorizzate() {
 
 #[test]
 fn calculate_x2_a_criterio_a_3_classi_valorizzate() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 0,
-        cl2: 0,
-        cl3: 1,
-        cl4: 1,
-        cl5: 1,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 1, 1, 1);
 
     let x2_a_criterio_a = classe.get_x2_a_criterio_a();
     assert_eq!(2, x2_a_criterio_a)
@@ -63,15 +47,7 @@ fn calculate_x2_a_criterio_a_3_classi_valorizzate() {
 
 #[test]
 fn calculate_x2_a_criterio_a_2_classi_valorizzate() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 0,
-        cl2: 0,
-        cl3: 0,
-        cl4: 1,
-        cl5: 1,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 0, 1, 1);
 
     let x2_a_criterio_a = classe.get_x2_a_criterio_a();
     assert_eq!(3, x2_a_criterio_a)
@@ -79,15 +55,7 @@ fn calculate_x2_a_criterio_a_2_classi_valorizzate() {
 
 #[test]
 fn calculate_x2_a_criterio_b_zero_giovani() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 0,
-        cl2: 0,
-        cl3: 0,
-        cl4: 1,
-        cl5: 1,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 0, 1, 1);
 
     let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
     assert_eq!(3, x2_a_criterio_b)
@@ -95,15 +63,7 @@ fn calculate_x2_a_criterio_b_zero_giovani() {
 
 #[test]
 fn calculate_x2_a_criterio_b_1_bilanciato() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 0,
-        cl2: 1,
-        cl3: 1,
-        cl4: 1,
-        cl5: 1,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 1, 1);
 
     let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
     assert_eq!(1, x2_a_criterio_b)
@@ -111,15 +71,7 @@ fn calculate_x2_a_criterio_b_1_bilanciato() {
 
 #[test]
 fn calculate_x2_a_criterio_b_2_medio_sbilanciato_adulti() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 0,
-        cl2: 1,
-        cl3: 1,
-        cl4: 2,
-        cl5: 2,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 2, 2);
 
     let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
     assert_eq!(2, x2_a_criterio_b)
@@ -127,15 +79,7 @@ fn calculate_x2_a_criterio_b_2_medio_sbilanciato_adulti() {
 
 #[test]
 fn calculate_x2_a_criterio_b_2_medio_sbilanciato_giovani() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 0,
-        cl2: 2,
-        cl3: 2,
-        cl4: 1,
-        cl5: 1,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 2, 2, 1, 1);
 
     let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
     assert_eq!(2, x2_a_criterio_b)
@@ -143,15 +87,7 @@ fn calculate_x2_a_criterio_b_2_medio_sbilanciato_giovani() {
 
 #[test]
 fn calculate_x2_a_criterio_b_3_molto_sbilanciato_adulti() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 0,
-        cl2: 1,
-        cl3: 1,
-        cl4: 3,
-        cl5: 3,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 3, 3);
 
     let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
     assert_eq!(3, x2_a_criterio_b)
@@ -159,15 +95,7 @@ fn calculate_x2_a_criterio_b_3_molto_sbilanciato_adulti() {
 
 #[test]
 fn calculate_x2_a_criterio_b_3_molto_sbilanciato_giovani() {
-    let classe = ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
-        specie: get_ciaccio(),
-        cl1: 0,
-        cl2: 3,
-        cl3: 3,
-        cl4: 1,
-        cl5: 1,
-    };
+    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 3, 3, 1, 1);
 
     let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
     assert_eq!(3, x2_a_criterio_b)

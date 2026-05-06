@@ -197,6 +197,26 @@ impl SpecieNISECI {
         self.cl_soglia4
     }
     #[inline(always)]
+    pub(crate) fn ad_juv_soglia_1(&self) -> f32 {
+        #[expect(deprecated)]
+        self.ad_juv_soglia1
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_2(&self) -> f32 {
+        #[expect(deprecated)]
+        self.ad_juv_soglia2
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_3(&self) -> f32 {
+        #[expect(deprecated)]
+        self.ad_juv_soglia3
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_4(&self) -> f32 {
+        #[expect(deprecated)]
+        self.ad_juv_soglia4
+    }
+    #[inline(always)]
     pub(crate) fn dens_soglia_1(&self) -> f32 {
         #[expect(deprecated)]
         self.dens_soglia1
@@ -497,6 +517,26 @@ impl RecordNISECI {
     pub(crate) fn cl_soglia_4(&self) -> u32 {
         #[expect(deprecated)]
         self.specie.cl_soglia_4()
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_1(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.ad_juv_soglia_1()
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_2(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.ad_juv_soglia_2()
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_3(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.ad_juv_soglia_3()
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_4(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.ad_juv_soglia_4()
     }
     #[inline(always)]
     #[expect(dead_code)]
@@ -1401,6 +1441,13 @@ pub struct ClassiEtaSpecieNISECI {
         note = "v0.2 will drop visibility. Consider using self.id(), self.nome(), self.ad_juv_soglia_N() instead"
     )]
     pub specie: SpecieNISECI,
+    tipo_autoctono: u8,
+    tipo_alloctono: u8,
+    specie_attesa: bool,
+    ad_juv_soglia_1: f32,
+    ad_juv_soglia_2: f32,
+    ad_juv_soglia_3: f32,
+    ad_juv_soglia_4: f32,
     pub cl1: u32,
     pub cl2: u32,
     pub cl3: u32,
@@ -1444,6 +1491,13 @@ impl ClassiEtaSpecieNISECI {
         ClassiEtaSpecieNISECI {
             #[expect(deprecated)]
             specie: SpecieNISECI::new_dummy_specie(),
+            tipo_autoctono: 0,
+            tipo_alloctono: 0,
+            specie_attesa: true,
+            ad_juv_soglia_1: 0.1,
+            ad_juv_soglia_2: 0.2,
+            ad_juv_soglia_3: 0.3,
+            ad_juv_soglia_4: 0.4,
             cl1: 0,
             cl2: 0,
             cl3: 0,
@@ -1456,6 +1510,13 @@ impl ClassiEtaSpecieNISECI {
         let mut classe = ClassiEtaSpecieNISECI {
             #[expect(deprecated)]
             specie: record.specie.clone(),
+            specie_attesa: record.specie_attesa(),
+            tipo_autoctono: record.tipo_autoctono(),
+            tipo_alloctono: record.tipo_alloctono(),
+            ad_juv_soglia_1: record.ad_juv_soglia_1(),
+            ad_juv_soglia_2: record.ad_juv_soglia_2(),
+            ad_juv_soglia_3: record.ad_juv_soglia_3(),
+            ad_juv_soglia_4: record.ad_juv_soglia_4(),
             cl1: 0,
             cl2: 0,
             cl3: 0,
@@ -1489,44 +1550,37 @@ impl ClassiEtaSpecieNISECI {
 
     #[inline(always)]
     pub fn specie_attesa(&self) -> bool {
-        #[expect(deprecated)]
-        self.specie.specie_attesa
+        self.specie_attesa
     }
 
     #[inline(always)]
     pub(crate) fn tipo_autoctono(&self) -> u8 {
-        #[expect(deprecated)]
-        self.specie.tipo_autoctono
+        self.tipo_autoctono
     }
 
     #[inline(always)]
     pub(crate) fn tipo_alloctono(&self) -> u8 {
-        #[expect(deprecated)]
-        self.specie.tipo_alloctono
+        self.tipo_alloctono
     }
 
     #[inline(always)]
     pub fn ad_juv_soglia_1(&self) -> f32 {
-        #[expect(deprecated)]
-        self.specie.ad_juv_soglia1
+        self.ad_juv_soglia_1
     }
 
     #[inline(always)]
     pub fn ad_juv_soglia_2(&self) -> f32 {
-        #[expect(deprecated)]
-        self.specie.ad_juv_soglia2
+        self.ad_juv_soglia_2
     }
 
     #[inline(always)]
     pub fn ad_juv_soglia_3(&self) -> f32 {
-        #[expect(deprecated)]
-        self.specie.ad_juv_soglia3
+        self.ad_juv_soglia_3
     }
 
     #[inline(always)]
     pub fn ad_juv_soglia_4(&self) -> f32 {
-        #[expect(deprecated)]
-        self.specie.ad_juv_soglia4
+        self.ad_juv_soglia_4
     }
 
     fn get_how_many_classes(&self) -> usize {
@@ -1947,6 +2001,36 @@ impl From<(f32, &AreaNISECI)> for StatoEcologicoNISECI {
 #[cfg(test)]
 mod domain_niseci_private_tests {
     use super::*;
+
+    #[cfg(test)]
+    impl ClassiEtaSpecieNISECI {
+        #[cfg(test)]
+        pub(crate) fn new_custom(
+            specie: &SpecieNISECI,
+            cl1: u32,
+            cl2: u32,
+            cl3: u32,
+            cl4: u32,
+            cl5: u32,
+        ) -> Self {
+            Self {
+                #[expect(deprecated)]
+                specie: specie.clone(),
+                tipo_autoctono: specie.tipo_autoctono(),
+                tipo_alloctono: specie.tipo_alloctono(),
+                specie_attesa: specie.specie_attesa(),
+                ad_juv_soglia_1: specie.ad_juv_soglia_1(),
+                ad_juv_soglia_2: specie.ad_juv_soglia_2(),
+                ad_juv_soglia_3: specie.ad_juv_soglia_3(),
+                ad_juv_soglia_4: specie.ad_juv_soglia_4(),
+                cl1,
+                cl2,
+                cl3,
+                cl4,
+                cl5,
+            }
+        }
+    }
     #[cfg(test)]
     impl AnagraficaNISECI {
         /// Test helper to build unchecked instances

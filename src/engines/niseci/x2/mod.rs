@@ -775,15 +775,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 3,
-            cl3: 3,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 3, 3, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -792,15 +784,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 1,
-            cl3: 1,
-            cl4: 3,
-            cl5: 3,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 3, 3);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -809,15 +793,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 1,
-            cl3: 1,
-            cl4: 2,
-            cl5: 2,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 2, 2);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -826,15 +802,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 2,
-            cl3: 2,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 2, 2, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -843,15 +811,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_1() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 1,
-            cl3: 1,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -860,15 +820,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_1() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 2,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 2, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -877,15 +829,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 2,
-            cl4: 2,
-            cl5: 2,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 2, 2, 2);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -894,15 +838,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 2,
-            cl3: 2,
-            cl4: 2,
-            cl5: 0,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 2, 2, 2, 0);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -911,15 +847,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 2,
-            cl4: 3,
-            cl5: 3,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 2, 3, 3);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -928,15 +856,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 6,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 6, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -945,15 +865,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 1,
-            cl4: 0,
-            cl5: 6,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 1, 0, 6);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -962,15 +874,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 6,
-            cl4: 0,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 6, 0, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -979,15 +883,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_1() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 1,
-            cl4: 0,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 1, 0, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -996,15 +892,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 2,
-            cl4: 0,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 2, 0, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -1013,15 +901,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 1,
-            cl4: 0,
-            cl5: 2,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 1, 0, 2);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -1030,15 +910,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_adulti_cl1_valorizzato() {
-        let classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: get_ciaccio(),
-            cl1: 5,
-            cl2: 0,
-            cl3: 10,
-            cl4: 20,
-            cl5: 10,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 5, 0, 10, 20, 10);
 
         let x2_a = calculate_x2_a(&classe);
 
