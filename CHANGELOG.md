@@ -18,6 +18,7 @@
 ### Changed
 
 - Improved worst cases parsing performance
+- Refactor internal `engines::niseci::x2` methods to avoid some cloning
 - Corrected deprecation message for `csv::{deser,load}::{niseci,hfbi}` generic methods
   - Next version will add a `RecordCsv` bound on `T`
   - New bound will NOT apply to `*_conf` methods, allowing runtime delimiter selection
