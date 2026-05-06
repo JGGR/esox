@@ -86,6 +86,9 @@ impl SpecieNISECI {
         }
     }
 
+    pub(crate) fn id(&self) -> &str {
+        &self.id
+    }
     pub(crate) fn nome(&self) -> &str {
         &self.nome
     }
@@ -97,6 +100,12 @@ impl SpecieNISECI {
     }
     pub(crate) fn tipo_alloctono(&self) -> u8 {
         self.tipo_alloctono
+    }
+    pub(crate) fn dens_soglia_1(&self) -> f32 {
+        self.dens_soglia1
+    }
+    pub(crate) fn dens_soglia_2(&self) -> f32 {
+        self.dens_soglia2
     }
 }
 
@@ -1254,7 +1263,7 @@ impl ClassiEtaSpecieNISECI {
         }
     }
 
-    pub fn id(&self) -> &str {
+    pub(crate) fn id(&self) -> &str {
         #[expect(deprecated)]
         &self.specie.id
     }
@@ -1598,22 +1607,51 @@ impl ClassiEtaAlieniNISECI {
 /// il numero di esemplari trovati
 /// suddivisi in base al numero di passaggio
 pub struct EsemplariPerCattura {
+    #[deprecated(note = "v0.2 will drop visibility")]
     pub specie: SpecieNISECI,
+    #[deprecated(note = "v0.2 will drop visibility")]
     pub mappa: HashMap<u8, u32>, // la key è il numero del passaggio
 }
 
 impl EsemplariPerCattura {
+    pub(crate) fn id(&self) -> &str {
+        #[expect(deprecated)]
+        self.specie.id()
+    }
+    pub(crate) fn dens_soglia_1(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.dens_soglia_1()
+    }
+    pub(crate) fn dens_soglia_2(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.dens_soglia_2()
+    }
+
+    pub(crate) fn new(specie: &SpecieNISECI) -> Self {
+        EsemplariPerCattura {
+            #[expect(deprecated)]
+            specie: specie.clone(),
+            #[expect(deprecated)]
+            mappa: HashMap::new(),
+        }
+    }
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using EsemplariPerCattura::new().fill_passaggio() instead"
+    )]
     pub fn new_prevalorized(numero_passaggio: u8, specie: &SpecieNISECI) -> EsemplariPerCattura {
         let mut mappa: HashMap<u8, u32> = HashMap::new();
         mappa.insert(numero_passaggio, 1);
 
         EsemplariPerCattura {
+            #[expect(deprecated)]
             specie: specie.clone(),
+            #[expect(deprecated)]
             mappa,
         }
     }
 
     pub fn fill_passaggio(&mut self, numero_passaggio: u8) {
+        #[expect(deprecated)]
         match self.mappa.entry(numero_passaggio) {
             Entry::Occupied(occupied) => {
                 let numero_esemplari = occupied.get() + 1;

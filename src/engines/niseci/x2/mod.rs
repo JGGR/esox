@@ -322,10 +322,9 @@ fn calculate_sommatoria_x2_b(
                         .fill_passaggio(cattura.passaggio_cattura);
                 }
                 Entry::Vacant(vacant_entry) => {
-                    vacant_entry.insert(EsemplariPerCattura::new_prevalorized(
-                        cattura.passaggio_cattura,
-                        &cattura.specie,
-                    ));
+                    let mut epc = EsemplariPerCattura::new(&cattura.specie);
+                    epc.fill_passaggio(cattura.passaggio_cattura);
+                    vacant_entry.insert(epc);
                 }
             }
         }
@@ -390,10 +389,9 @@ fn calculate_sommatoria_x2_b_per_alloctone(
                         .fill_passaggio(cattura.passaggio_cattura);
                 }
                 Entry::Vacant(vacant_entry) => {
-                    vacant_entry.insert(EsemplariPerCattura::new_prevalorized(
-                        cattura.passaggio_cattura,
-                        &cattura.specie,
-                    ));
+                    let mut epc = EsemplariPerCattura::new(&cattura.specie);
+                    epc.fill_passaggio(cattura.passaggio_cattura);
+                    vacant_entry.insert(epc);
                 }
             }
         }
@@ -453,7 +451,7 @@ fn calculate_sommatoria_x2_b_absolute(
             Ok((x2_b, densita_stimata, quantita_stimata)) => {
                 sommatoria_x2_b += x2_b;
                 densita_vec.push(MetricheX2B::new(
-                    catture.specie.id.clone(),
+                    catture.id().to_string(),
                     densita_stimata,
                     quantita_stimata,
                     x2_b,
@@ -494,16 +492,17 @@ fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<(f32, MetricheX2A), 
 }
 
 fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32, f32, u32), String> {
+    #[expect(deprecated)]
     match get_quantita_stimata(&e.mappa) {
         Ok(q_stimata) => {
             // calcolo densita stimata
             let densita_stimata = q_stimata as f32 / superficie;
 
             // trovo ora x2_b
-            if densita_stimata > e.specie.dens_soglia2 {
+            if densita_stimata > e.dens_soglia_2() {
                 return Ok((1.0, densita_stimata, q_stimata));
             }
-            if densita_stimata > e.specie.dens_soglia1 {
+            if densita_stimata > e.dens_soglia_1() {
                 return Ok((0.5, densita_stimata, q_stimata));
             }
             Ok((0.0, densita_stimata, q_stimata))
@@ -734,58 +733,42 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_b_buona() {
-        let mut passaggi: HashMap<u8, u32> = HashMap::new();
-        passaggi.insert(1, 30);
-        passaggi.insert(2, 15);
-
         let specie = get_ciaccio();
+        let mut epc = EsemplariPerCattura::new(&specie);
+        (0..30).for_each(|_| epc.fill_passaggio(1));
+        (0..15).for_each(|_| epc.fill_passaggio(2));
 
-        let esemplari_per_cattura = EsemplariPerCattura {
-            specie: specie,
-            mappa: passaggi,
-        };
-
-        let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
+        let x2_b = calculate_x2_b(&epc, &2.0);
 
         assert_eq!(Ok(1.0), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
     fn calculate_x2_b_test_intermedia() {
-        let mut passaggi: HashMap<u8, u32> = HashMap::new();
-        passaggi.insert(1, 30);
-        passaggi.insert(2, 15);
-
         let mut specie = get_ciaccio();
         specie.dens_soglia1 = 20.0;
         specie.dens_soglia2 = 30.0;
 
-        let esemplari_per_cattura = EsemplariPerCattura {
-            specie: specie,
-            mappa: passaggi,
-        };
+        let mut epc = EsemplariPerCattura::new(&specie);
+        (0..30).for_each(|_| epc.fill_passaggio(1));
+        (0..15).for_each(|_| epc.fill_passaggio(2));
 
-        let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
+        let x2_b = calculate_x2_b(&epc, &2.0);
 
         assert_eq!(Ok(0.5), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
     fn calculate_x2_b_test_scarsa() {
-        let mut passaggi: HashMap<u8, u32> = HashMap::new();
-        passaggi.insert(1, 30);
-        passaggi.insert(2, 15);
-
         let mut specie = get_ciaccio();
         specie.dens_soglia1 = 30.0;
         specie.dens_soglia2 = 40.0;
 
-        let esemplari_per_cattura = EsemplariPerCattura {
-            specie: specie,
-            mappa: passaggi,
-        };
+        let mut epc = EsemplariPerCattura::new(&specie);
+        (0..30).for_each(|_| epc.fill_passaggio(1));
+        (0..15).for_each(|_| epc.fill_passaggio(2));
 
-        let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
+        let x2_b = calculate_x2_b(&epc, &2.0);
 
         assert_eq!(Ok(0.0), x2_b.map(|(x2_b, _, _)| x2_b));
     }
