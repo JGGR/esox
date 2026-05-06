@@ -251,8 +251,8 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
 
     // riempo l'hashmap con solo le specie alloctone campionate
     for cattura in c {
-        if cattura.specie.tipo_alloctono() == 1 {
-            match classi_eta.map_tipo_1.entry(cattura.specie.id().to_string()) {
+        if cattura.tipo_alloctono() == 1 {
+            match classi_eta.map_tipo_1.entry(cattura.id().to_string()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
                 }
@@ -260,8 +260,8 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
                     entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
                 }
             };
-        } else if cattura.specie.tipo_alloctono() == 2 {
-            match classi_eta.map_tipo_2.entry(cattura.specie.id().to_string()) {
+        } else if cattura.tipo_alloctono() == 2 {
+            match classi_eta.map_tipo_2.entry(cattura.id().to_string()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
                 }
@@ -269,8 +269,8 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
                     entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
                 }
             };
-        } else if cattura.specie.tipo_alloctono() == 3 {
-            match classi_eta.map_tipo_3.entry(cattura.specie.id().to_string()) {
+        } else if cattura.tipo_alloctono() == 3 {
+            match classi_eta.map_tipo_3.entry(cattura.id().to_string()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
                 }

@@ -260,60 +260,15 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
 /// che servono in @test_calculate_x1
 pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     let ds = create_dummy_specie_niseci_set();
-    let record_1 = RecordNISECI {
-        specie: ds.importante_1,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
-    let record_2 = RecordNISECI {
-        specie: ds.importante_2,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
-    let record_3 = RecordNISECI {
-        specie: ds.importante_3,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
-    let record_4 = RecordNISECI {
-        specie: ds.normale_2,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
-    let record_5 = RecordNISECI {
-        specie: ds.normale_1,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
-    let record_6 = RecordNISECI {
-        specie: ds.inatteso_1,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
-    let record_7 = RecordNISECI {
-        specie: ds.inatteso_2,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
-    let record_8 = RecordNISECI {
-        specie: ds.alloctono_1,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
-    let record_9 = RecordNISECI {
-        specie: ds.alloctono_2,
-        lunghezza: 5,
-        peso: 5.0,
-        passaggio_cattura: 1,
-    };
+    let record_1 = RecordNISECI::new(&ds.importante_1, 5, 1, 5.0);
+    let record_2 = RecordNISECI::new(&ds.importante_2, 5, 1, 5.0);
+    let record_3 = RecordNISECI::new(&ds.importante_3, 5, 1, 5.0);
+    let record_4 = RecordNISECI::new(&ds.normale_2, 5, 1, 5.0);
+    let record_5 = RecordNISECI::new(&ds.normale_1, 5, 1, 5.0);
+    let record_6 = RecordNISECI::new(&ds.inatteso_1, 5, 1, 5.0);
+    let record_7 = RecordNISECI::new(&ds.inatteso_2, 5, 1, 5.0);
+    let record_8 = RecordNISECI::new(&ds.alloctono_1, 5, 1, 5.0);
+    let record_9 = RecordNISECI::new(&ds.alloctono_2, 5, 1, 5.0);
 
     let mut campionamento = Vec::with_capacity(9);
     campionamento.push(record_1);
@@ -367,12 +322,7 @@ pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
     let mut c = create_massive_campionamento_ciacci_solo_autoctoni_1();
 
     // pesce alloctono in C2
-    let trocchio = RecordNISECI {
-        specie: get_trocchio(),
-        passaggio_cattura: 2,
-        lunghezza: 2,
-        peso: 2.0,
-    };
+    let trocchio = RecordNISECI::new(&get_trocchio(), 2, 2, 2.0);
     c.push(trocchio);
 
     c
@@ -392,12 +342,7 @@ pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
     let mut c = create_massive_campionamento_ciacci_solo_autoctoni_2();
 
     // pesce alloctono in C2
-    let trocchio = RecordNISECI {
-        specie: get_trocchio(),
-        passaggio_cattura: 2,
-        lunghezza: 2,
-        peso: 2.0,
-    };
+    let trocchio = RecordNISECI::new(&get_trocchio(), 2, 2, 2.0);
     c.push(trocchio);
 
     c
@@ -420,56 +365,31 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
     // 10 ciacci cl5 in c1
-    let ciaccio_cl5_c1 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 13,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let ciaccio_cl5_c1 = RecordNISECI::new(&ciaccio, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl5_c1.clone());
     }
 
     // 10 ciacci cl4 in c1
-    let ciaccio_cl4_c1 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 10,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let ciaccio_cl4_c1 = RecordNISECI::new(&ciaccio, 1, 10, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c1.clone());
     }
 
     // 10 ciacci cl3 in c1
-    let ciaccio_cl3_c1 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 7,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let ciaccio_cl3_c1 = RecordNISECI::new(&ciaccio, 1, 7, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl3_c1.clone());
     }
 
     // 10 ciacci cl4 in c2
-    let ciaccio_cl4_c2 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 10,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let ciaccio_cl4_c2 = RecordNISECI::new(&ciaccio, 2, 10, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c2.clone());
     }
 
     // 5 ciacci cl1 in c2
-    let ciaccio_cl1_c2 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 2,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let ciaccio_cl1_c2 = RecordNISECI::new(&ciaccio, 2, 2, 10.0);
     for _ in 0..5 {
         campionamento.push(ciaccio_cl1_c2.clone());
     }
@@ -494,56 +414,31 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
     // 10 ciacci cl5 in c1
-    let ciaccio_cl5_c1 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 13,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let ciaccio_cl5_c1 = RecordNISECI::new(&ciaccio, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl5_c1.clone());
     }
 
     // 10 ciacci cl4 in c1
-    let ciaccio_cl4_c1 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 10,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let ciaccio_cl4_c1 = RecordNISECI::new(&ciaccio, 1, 10, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c1.clone());
     }
 
     // 10 ciacci cl3 in c1
-    let ciaccio_cl3_c1 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 7,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let ciaccio_cl3_c1 = RecordNISECI::new(&ciaccio, 1, 7, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl3_c1.clone());
     }
 
     // 10 ciacci cl2 in c2
-    let ciaccio_cl2_c2 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 4,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let ciaccio_cl2_c2 = RecordNISECI::new(&ciaccio, 2, 4, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl2_c2.clone());
     }
 
     // 5 ciacci cl1 in c2
-    let ciaccio_cl1_c2 = RecordNISECI {
-        specie: ciaccio.clone(),
-        lunghezza: 4,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let ciaccio_cl1_c2 = RecordNISECI::new(&ciaccio, 2, 4, 10.0);
     for _ in 0..5 {
         campionamento.push(ciaccio_cl1_c2.clone());
     }
@@ -747,56 +642,31 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
     // 10 esemplari cl5 in c1
-    let cl5_c1 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 13,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let cl5_c1 = RecordNISECI::new(&specie, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
     }
 
     // 10 esemplari cl4 in c1
-    let cl4_c1 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 10,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let cl4_c1 = RecordNISECI::new(&specie, 1, 10, 10.0);
     for _ in 0..10 {
         campionamento.push(cl4_c1.clone());
     }
 
     // 10 esemplari cl3 in c1
-    let cl3_c1 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 7,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let cl3_c1 = RecordNISECI::new(&specie, 1, 7, 10.0);
     for _ in 0..10 {
         campionamento.push(cl3_c1.clone());
     }
 
     // 10 esemplari cl2 in c2
-    let cl2_c2 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 4,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let cl2_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
     }
 
     // 5 esemplari cl1 in c2
-    let cl1_c2 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 4,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let cl1_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
     for _ in 0..5 {
         campionamento.push(cl1_c2.clone());
     }
@@ -814,34 +684,19 @@ fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> C
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
     // 10 esemplari cl5 in c1
-    let cl5_c1 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 13,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let cl5_c1 = RecordNISECI::new(&specie, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
     }
 
-    // 10 esemplari cl4 in c1
-    let cl4_c1 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 10,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    // 20 esemplari cl4 in c1
+    let cl4_c1 = RecordNISECI::new(&specie, 1, 10, 10.0);
     for _ in 0..20 {
         campionamento.push(cl4_c1.clone());
     }
 
     // 10 esemplari cl2 in c2
-    let cl2_c2 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 4,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let cl2_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
     }
@@ -862,45 +717,25 @@ fn create_campionamento_mediam_strutturato_data_una_specie(
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
     // 10 esemplari cl5 in c1
-    let cl5_c1 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 13,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    let cl5_c1 = RecordNISECI::new(&specie, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
     }
 
-    // 10 esemplari cl4 in c1
-    let cl4_c1 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 10,
-        passaggio_cattura: 1,
-        peso: 10.0,
-    };
+    // 20 esemplari cl4 in c1
+    let cl4_c1 = RecordNISECI::new(&specie, 1, 10, 10.0);
     for _ in 0..20 {
         campionamento.push(cl4_c1.clone());
     }
 
     // 10 esemplari cl2 in c2
-    let cl2_c2 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 4,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let cl2_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
     }
 
     // 5 esemplari cl1 in c2
-    let cl1_c2 = RecordNISECI {
-        specie: specie.clone(),
-        lunghezza: 4,
-        passaggio_cattura: 2,
-        peso: 10.0,
-    };
+    let cl1_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
     for _ in 0..5 {
         campionamento.push(cl1_c2.clone());
     }

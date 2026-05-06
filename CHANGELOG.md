@@ -16,6 +16,7 @@
   - Next version will make it public as `domain::hfbi::RIFERIMENTO_HFBI`
 - Add `domain::niseci::ValoriIntermediNISECI::to_csv_joined()`
 - Add `domain::niseci::RiferimentoNISECI::to_csv_intermediates_joined()`
+- Add `domain::niseci::RecordNISECI` getters
 
 ### Changed
 

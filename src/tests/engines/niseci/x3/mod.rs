@@ -63,12 +63,7 @@ fn calculate_x3_alieni_magg_uguale_autoctoni() {
 fn calculate_x3_alieni_tipo_1_strutt() {
     let mut c = create_massive_campionamento_ciacci_con_trocchi_strutt();
 
-    let ciaccio = RecordNISECI {
-        specie: get_ciaccio(),
-        passaggio_cattura: 2,
-        lunghezza: 2,
-        peso: 2.0,
-    };
+    let ciaccio = RecordNISECI::new(&get_ciaccio(), 2, 2, 2.0);
     c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
@@ -82,12 +77,7 @@ fn calculate_x3_alieni_tipo_1_strutt() {
 fn calculate_x3_alieni_tipo_2_strutt() {
     let mut c = create_massive_campionamento_ciacci_con_bronzi_strutt();
 
-    let ciaccio = RecordNISECI {
-        specie: get_ciaccio(),
-        passaggio_cattura: 2,
-        lunghezza: 2,
-        peso: 2.0,
-    };
+    let ciaccio = RecordNISECI::new(&get_ciaccio(), 2, 2, 2.0);
     c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
@@ -101,12 +91,7 @@ fn calculate_x3_alieni_tipo_2_strutt() {
 fn calculate_x3_alieni_tipo_3_strutt() {
     let mut c = create_massive_campionamento_ciacci_con_tappi_strutt();
 
-    let ciaccio = RecordNISECI {
-        specie: get_ciaccio(),
-        passaggio_cattura: 2,
-        lunghezza: 2,
-        peso: 2.0,
-    };
+    let ciaccio = RecordNISECI::new(&get_ciaccio(), 2, 2, 2.0);
     c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
@@ -120,12 +105,7 @@ fn calculate_x3_alieni_tipo_3_strutt() {
 fn calculate_x3_alieni_tipo_3_destrutt() {
     let mut c = create_massive_campionamento_ciacci_con_tappi_destrutt();
 
-    let ciaccio = RecordNISECI {
-        specie: get_ciaccio(),
-        passaggio_cattura: 2,
-        lunghezza: 2,
-        peso: 2.0,
-    };
+    let ciaccio = RecordNISECI::new(&get_ciaccio(), 2, 2, 2.0);
     c.push(ciaccio);
 
     let x3 = calculate_x3(&c);
@@ -139,12 +119,7 @@ fn calculate_x3_alieni_tipo_3_destrutt() {
 fn calculate_x3_alieni_tipo_3_mediam_strutt() {
     let mut c = create_massive_campionamento_ciacci_con_tappi_mediam_strutt();
 
-    let ciaccio = RecordNISECI {
-        specie: get_ciaccio(),
-        passaggio_cattura: 2,
-        lunghezza: 2,
-        peso: 2.0,
-    };
+    let ciaccio = RecordNISECI::new(&get_ciaccio(), 2, 2, 2.0);
     c.push(ciaccio);
 
     let x3 = calculate_x3(&c);

@@ -31,9 +31,7 @@ pub enum GruppoEcoHFBI {
     MigratoriMarini,
     Diadromi,
     ResidentiDiEstuario,
-    #[allow(dead_code)]
     OccasionaliMarini,
-    #[allow(dead_code)]
     OccasionaliDiAcqueDolci,
 }
 

@@ -28,20 +28,18 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
     // creo un set delle specie campionate
     let mut specie_campionate_map: HashMap<&str, &RecordNISECI> = HashMap::new();
     for camp in campionamento {
-        if camp.specie.specie_attesa() {
-            specie_campionate_map
-                .entry(camp.specie.id())
-                .or_insert(camp);
+        if camp.specie_attesa() {
+            specie_campionate_map.entry(camp.id()).or_insert(camp);
         }
     }
     let set_specie_campionate: Vec<&RecordNISECI> = specie_campionate_map.into_values().collect();
     let mut n_i: f32 = 0.0;
     let mut n_a: f32 = 0.0;
     for spec in set_specie_campionate {
-        if spec.specie.tipo_autoctono() == 1 {
+        if spec.tipo_autoctono() == 1 {
             // tipo_autoctono == 1 allora specie importante
             n_i += 1.0;
-        } else if spec.specie.tipo_autoctono() == 2 {
+        } else if spec.tipo_autoctono() == 2 {
             n_a += 1.0;
         }
     }

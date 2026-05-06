@@ -357,12 +357,12 @@ pub(crate) fn parse_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
             continue;
         }
 
-        let niseci_rec = RecordNISECI {
-            specie: matched_specie.clone(),
-            passaggio_cattura: passaggio_cattura as u8,
-            lunghezza: r.lunghezza(),
-            peso: r.peso(),
-        };
+        let niseci_rec = RecordNISECI::new(
+            matched_specie,
+            passaggio_cattura as u8,
+            r.lunghezza(),
+            r.peso(),
+        );
         campioni.push(niseci_rec);
     }
     CampionamentoNISECIParseResult(CampionamentoNISECI::new(campioni), errors)

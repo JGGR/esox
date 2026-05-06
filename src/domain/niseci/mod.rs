@@ -93,7 +93,7 @@ impl fmt::Display for SpecieNISECI {
 }
 
 impl SpecieNISECI {
-    #[allow(dead_code)]
+    #[cfg(test)]
     pub(crate) fn new(
         id: &str,
         nome: &str,
@@ -405,6 +405,9 @@ impl<'a> IntoIterator for &'a RiferimentoNISECI {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RecordNISECI {
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.id(), self.specie_attesa() and other getters instead"
+    )]
     pub specie: SpecieNISECI,
     pub passaggio_cattura: u8,
     pub lunghezza: u32,
@@ -415,8 +418,97 @@ pub struct RecordNISECI {
 impl fmt::Display for RecordNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!("RecordNISECI: {{ specie: {{{}}}, passaggio_cattura {{{}}}, lunghezza: {{{}}}, peso: {{{}}}",
-                self.specie, self.passaggio_cattura, self.lunghezza, self.peso);
+                self.specie(), self.passaggio_cattura, self.lunghezza, self.peso);
         write!(f, "{}", string_representation)
+    }
+}
+
+impl RecordNISECI {
+    pub(crate) fn new(
+        specie: &SpecieNISECI,
+        passaggio_cattura: u8,
+        lunghezza: u32,
+        peso: f32,
+    ) -> Self {
+        Self {
+            #[expect(deprecated)]
+            specie: specie.clone(),
+            passaggio_cattura,
+            lunghezza,
+            peso,
+        }
+    }
+    #[inline(always)]
+    #[expect(dead_code)]
+    pub(crate) fn passaggio_cattura(&self) -> u8 {
+        self.passaggio_cattura
+    }
+    #[inline(always)]
+    #[expect(dead_code)]
+    pub(crate) fn lunghezza(&self) -> u32 {
+        self.lunghezza
+    }
+    #[inline(always)]
+    #[expect(dead_code)]
+    pub(crate) fn peso(&self) -> f32 {
+        self.peso
+    }
+    #[inline(always)]
+    pub(crate) fn specie(&self) -> &SpecieNISECI {
+        #[expect(deprecated)]
+        &self.specie
+    }
+    #[inline(always)]
+    pub(crate) fn id(&self) -> &str {
+        #[expect(deprecated)]
+        self.specie.id()
+    }
+    #[inline(always)]
+    pub(crate) fn tipo_autoctono(&self) -> u8 {
+        #[expect(deprecated)]
+        self.specie.tipo_autoctono()
+    }
+    #[inline(always)]
+    pub(crate) fn tipo_alloctono(&self) -> u8 {
+        #[expect(deprecated)]
+        self.specie.tipo_alloctono()
+    }
+    #[inline(always)]
+    pub(crate) fn specie_attesa(&self) -> bool {
+        #[expect(deprecated)]
+        self.specie.specie_attesa()
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_1(&self) -> u32 {
+        #[expect(deprecated)]
+        self.specie.cl_soglia_1()
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_2(&self) -> u32 {
+        #[expect(deprecated)]
+        self.specie.cl_soglia_2()
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_3(&self) -> u32 {
+        #[expect(deprecated)]
+        self.specie.cl_soglia_3()
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_4(&self) -> u32 {
+        #[expect(deprecated)]
+        self.specie.cl_soglia_4()
+    }
+    #[inline(always)]
+    #[expect(dead_code)]
+    pub(crate) fn dens_soglia_1(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.dens_soglia_1()
+    }
+    #[inline(always)]
+    #[expect(dead_code)]
+    pub(crate) fn dens_soglia_2(&self) -> f32 {
+        #[expect(deprecated)]
+        self.specie.dens_soglia_2()
     }
 }
 
@@ -480,9 +572,9 @@ impl CampionamentoNISECI {
         };
 
         for pesce in self {
-            if pesce.specie.tipo_alloctono() > 0 && pesce.specie.tipo_alloctono() <= 3 {
+            if pesce.tipo_alloctono() > 0 && pesce.tipo_alloctono() <= 3 {
                 alieni_indigeni.alieni += 1;
-            } else if pesce.specie.tipo_autoctono() == 1 || pesce.specie.tipo_autoctono() == 2 {
+            } else if pesce.tipo_autoctono() == 1 || pesce.tipo_autoctono() == 2 {
                 alieni_indigeni.indigeni += 1;
             }
         }
@@ -494,10 +586,10 @@ impl CampionamentoNISECI {
         let mut map: HashMap<String, bool> = HashMap::new();
 
         for cattura in self {
-            if cattura.specie.specie_attesa()
-                && (cattura.specie.tipo_autoctono() == 1 || cattura.specie.tipo_autoctono() == 2)
+            if cattura.specie_attesa()
+                && (cattura.tipo_autoctono() == 1 || cattura.tipo_autoctono() == 2)
             {
-                match map.entry(cattura.specie.id().to_string()) {
+                match map.entry(cattura.id().to_string()) {
                     Entry::Occupied(_) => {}
                     Entry::Vacant(entry) => {
                         entry.insert(true);
@@ -1531,13 +1623,13 @@ pub enum ClassiEta {
 
 impl ClassiEta {
     pub fn find_classe_eta(record: &RecordNISECI) -> ClassiEta {
-        if record.lunghezza < record.specie.cl_soglia_1() {
+        if record.lunghezza < record.cl_soglia_1() {
             ClassiEta::CL1
-        } else if record.lunghezza < record.specie.cl_soglia_2() {
+        } else if record.lunghezza < record.cl_soglia_2() {
             ClassiEta::CL2
-        } else if record.lunghezza < record.specie.cl_soglia_3() {
+        } else if record.lunghezza < record.cl_soglia_3() {
             ClassiEta::CL3
-        } else if record.lunghezza < record.specie.cl_soglia_4() {
+        } else if record.lunghezza < record.cl_soglia_4() {
             ClassiEta::CL4
         } else {
             ClassiEta::CL5

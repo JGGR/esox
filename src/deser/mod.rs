@@ -35,7 +35,6 @@ pub enum TipoRecord {
 }
 
 pub trait RecordRiferimentoNISECI: serde::de::DeserializeOwned {
-    #[allow(dead_code)]
     fn nome_comune(&self) -> String;
     fn nome_latino(&self) -> String;
     fn codice_specie(&self) -> String;
@@ -56,9 +55,7 @@ pub trait RecordRiferimentoNISECI: serde::de::DeserializeOwned {
 }
 
 pub trait RecordCampionamentoNISECI: serde::de::DeserializeOwned {
-    #[allow(dead_code)]
     fn data(&self) -> String;
-    #[allow(dead_code)]
     fn stazione(&self) -> String;
     fn num_passaggio(&self) -> u32;
     fn codice_specie(&self) -> String;
