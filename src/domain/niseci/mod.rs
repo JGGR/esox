@@ -1886,6 +1886,8 @@ pub struct EsemplariPerCattura {
     pub specie: SpecieNISECI,
     #[deprecated(note = "v0.2 will drop visibility")]
     pub mappa: HashMap<u8, u32>, // la key è il numero del passaggio
+    dens_soglia_1: f32,
+    dens_soglia_2: f32,
 }
 
 impl EsemplariPerCattura {
@@ -1896,13 +1898,11 @@ impl EsemplariPerCattura {
     }
     #[inline(always)]
     pub(crate) fn dens_soglia_1(&self) -> f32 {
-        #[expect(deprecated)]
-        self.specie.dens_soglia_1()
+        self.dens_soglia_1
     }
     #[inline(always)]
     pub(crate) fn dens_soglia_2(&self) -> f32 {
-        #[expect(deprecated)]
-        self.specie.dens_soglia_2()
+        self.dens_soglia_2
     }
 
     pub(crate) fn new(specie: &SpecieNISECI) -> Self {
@@ -1911,6 +1911,8 @@ impl EsemplariPerCattura {
             specie: specie.clone(),
             #[expect(deprecated)]
             mappa: HashMap::new(),
+            dens_soglia_1: specie.dens_soglia_1(),
+            dens_soglia_2: specie.dens_soglia_2(),
         }
     }
     #[deprecated(
@@ -1925,6 +1927,8 @@ impl EsemplariPerCattura {
             specie: specie.clone(),
             #[expect(deprecated)]
             mappa,
+            dens_soglia_1: specie.dens_soglia_1(),
+            dens_soglia_2: specie.dens_soglia_2(),
         }
     }
 
