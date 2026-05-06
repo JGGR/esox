@@ -34,39 +34,105 @@ use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_ev
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpecieNISECI {
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.id() instead")]
     pub id: String,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.nome() instead")]
     pub nome: String,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_autoctono() instead")]
     pub tipo_autoctono: u8,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_alloctono() instead")]
     pub tipo_alloctono: u8,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.specie_attesa() instead")]
     pub specie_attesa: bool,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_1() instead")]
     pub cl_soglia1: u32, // in mm
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_2() instead")]
     pub cl_soglia2: u32, // in mm
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_3() instead")]
     pub cl_soglia3: u32, // in mm
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_4() instead")]
     pub cl_soglia4: u32, // in mm
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_1() instead"
+    )]
     pub ad_juv_soglia1: f32,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_2() instead"
+    )]
     pub ad_juv_soglia2: f32,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_3() instead"
+    )]
     pub ad_juv_soglia3: f32,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_4() instead"
+    )]
     pub ad_juv_soglia4: f32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.dens_soglia_1() instead")]
     pub dens_soglia1: f32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.dens_soglia_2() instead")]
     pub dens_soglia2: f32,
 }
 
 impl fmt::Display for SpecieNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let specie_attesa_str = match self.specie_attesa {
-            true => "SI".to_string(),
-            false => "NO".to_string(),
+        let specie_attesa_str = match self.specie_attesa() {
+            true => "SI",
+            false => "NO",
         };
         let string_representation = format!(
             "{}; {}; {}; {}; {}",
-            self.id, self.nome, self.tipo_autoctono, self.tipo_alloctono, specie_attesa_str
+            self.id(),
+            self.nome(),
+            self.tipo_autoctono(),
+            self.tipo_alloctono(),
+            specie_attesa_str
         );
         write!(f, "{}", string_representation)
     }
 }
 
 impl SpecieNISECI {
+    #[allow(dead_code)]
+    pub(crate) fn new(
+        id: &str,
+        nome: &str,
+        tipo_autoctono: u8,
+        tipo_alloctono: u8,
+        specie_attesa: bool,
+        cl_soglia_1: u32,
+        cl_soglia_2: u32,
+        cl_soglia_3: u32,
+        cl_soglia_4: u32,
+        ad_juv_soglia_1: f32,
+        ad_juv_soglia_2: f32,
+        ad_juv_soglia_3: f32,
+        ad_juv_soglia_4: f32,
+        dens_soglia_1: f32,
+        dens_soglia_2: f32,
+    ) -> Self {
+        #[expect(deprecated)]
+        SpecieNISECI {
+            id: id.to_string(),
+            nome: nome.to_string(),
+            tipo_autoctono,
+            tipo_alloctono,
+            specie_attesa,
+            cl_soglia1: cl_soglia_1,
+            cl_soglia2: cl_soglia_2,
+            cl_soglia3: cl_soglia_3,
+            cl_soglia4: cl_soglia_4,
+            ad_juv_soglia1: ad_juv_soglia_1,
+            ad_juv_soglia2: ad_juv_soglia_2,
+            ad_juv_soglia3: ad_juv_soglia_3,
+            ad_juv_soglia4: ad_juv_soglia_4,
+            dens_soglia1: dens_soglia_1,
+            dens_soglia2: dens_soglia_2,
+        }
+    }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using SpecieNISECI::new() instead")]
     pub fn new_dummy_specie() -> SpecieNISECI {
+        #[expect(deprecated)]
         SpecieNISECI {
             id: "0".to_string(),
             nome: "dummy".to_string(),
@@ -87,25 +153,62 @@ impl SpecieNISECI {
     }
 
     pub(crate) fn id(&self) -> &str {
+        #[expect(deprecated)]
         &self.id
     }
     pub(crate) fn nome(&self) -> &str {
+        #[expect(deprecated)]
         &self.nome
     }
     pub(crate) fn specie_attesa(&self) -> bool {
+        #[expect(deprecated)]
         self.specie_attesa
     }
     pub(crate) fn tipo_autoctono(&self) -> u8 {
+        #[expect(deprecated)]
         self.tipo_autoctono
     }
     pub(crate) fn tipo_alloctono(&self) -> u8 {
+        #[expect(deprecated)]
         self.tipo_alloctono
     }
+    pub(crate) fn cl_soglia_1(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl_soglia1
+    }
+    pub(crate) fn cl_soglia_2(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl_soglia2
+    }
+    pub(crate) fn cl_soglia_3(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl_soglia3
+    }
+    pub(crate) fn cl_soglia_4(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl_soglia4
+    }
     pub(crate) fn dens_soglia_1(&self) -> f32 {
+        #[expect(deprecated)]
         self.dens_soglia1
     }
+    #[cfg(test)]
+    pub(crate) fn set_dens_soglia_1(&mut self, val: f32) {
+        #[expect(deprecated)]
+        {
+            self.dens_soglia1 = val;
+        }
+    }
     pub(crate) fn dens_soglia_2(&self) -> f32 {
+        #[expect(deprecated)]
         self.dens_soglia2
+    }
+    #[cfg(test)]
+    pub(crate) fn set_dens_soglia_2(&mut self, val: f32) {
+        #[expect(deprecated)]
+        {
+            self.dens_soglia2 = val;
+        }
     }
 }
 
@@ -192,7 +295,7 @@ impl From<Vec<SpecieNISECI>> for InternerSpecieNISECI {
     fn from(val: Vec<SpecieNISECI>) -> Self {
         let mut res = Self::new();
         for v in val {
-            res.intern(&v.id.clone(), v);
+            res.intern(&v.id().to_string(), v);
         }
         res
     }
@@ -230,7 +333,7 @@ impl RiferimentoNISECI {
             // TODO: in v0.2, we can:
             // - drop the elenco_specie field
             // - avoiding cloning all SpecieNISECI on new()
-            interner.intern(&rec.id, rec.clone());
+            interner.intern(rec.id(), rec.clone());
         }
         #[allow(deprecated)]
         Self {
@@ -359,9 +462,9 @@ impl CampionamentoNISECI {
         };
 
         for pesce in self {
-            if pesce.specie.tipo_alloctono > 0 && pesce.specie.tipo_alloctono <= 3 {
+            if pesce.specie.tipo_alloctono() > 0 && pesce.specie.tipo_alloctono() <= 3 {
                 alieni_indigeni.alieni += 1;
-            } else if pesce.specie.tipo_autoctono == 1 || pesce.specie.tipo_autoctono == 2 {
+            } else if pesce.specie.tipo_autoctono() == 1 || pesce.specie.tipo_autoctono() == 2 {
                 alieni_indigeni.indigeni += 1;
             }
         }
@@ -373,10 +476,10 @@ impl CampionamentoNISECI {
         let mut map: HashMap<String, bool> = HashMap::new();
 
         for cattura in self {
-            if cattura.specie.specie_attesa
-                && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
+            if cattura.specie.specie_attesa()
+                && (cattura.specie.tipo_autoctono() == 1 || cattura.specie.tipo_autoctono() == 2)
             {
-                match map.entry(cattura.specie.id.clone()) {
+                match map.entry(cattura.specie.id().to_string()) {
                     Entry::Occupied(_) => {}
                     Entry::Vacant(entry) => {
                         entry.insert(true);
@@ -1402,13 +1505,13 @@ pub enum ClassiEta {
 
 impl ClassiEta {
     pub fn find_classe_eta(record: &RecordNISECI) -> ClassiEta {
-        if record.lunghezza < record.specie.cl_soglia1 {
+        if record.lunghezza < record.specie.cl_soglia_1() {
             ClassiEta::CL1
-        } else if record.lunghezza < record.specie.cl_soglia2 {
+        } else if record.lunghezza < record.specie.cl_soglia_2() {
             ClassiEta::CL2
-        } else if record.lunghezza < record.specie.cl_soglia3 {
+        } else if record.lunghezza < record.specie.cl_soglia_3() {
             ClassiEta::CL3
-        } else if record.lunghezza < record.specie.cl_soglia4 {
+        } else if record.lunghezza < record.specie.cl_soglia_4() {
             ClassiEta::CL4
         } else {
             ClassiEta::CL5

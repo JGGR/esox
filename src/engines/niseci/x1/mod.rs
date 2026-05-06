@@ -26,11 +26,11 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
     // m_a è il numero di altre specie autoctone attese
 
     // creo un set delle specie campionate
-    let mut specie_campionate_map: HashMap<String, &RecordNISECI> = HashMap::new();
+    let mut specie_campionate_map: HashMap<&str, &RecordNISECI> = HashMap::new();
     for camp in campionamento {
-        if camp.specie.specie_attesa {
+        if camp.specie.specie_attesa() {
             specie_campionate_map
-                .entry(camp.specie.id.clone())
+                .entry(camp.specie.id())
                 .or_insert(camp);
         }
     }
@@ -38,10 +38,10 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
     let mut n_i: f32 = 0.0;
     let mut n_a: f32 = 0.0;
     for spec in set_specie_campionate {
-        if spec.specie.tipo_autoctono == 1 {
+        if spec.specie.tipo_autoctono() == 1 {
             // tipo_autoctono == 1 allora specie importante
             n_i += 1.0;
-        } else if spec.specie.tipo_autoctono == 2 {
+        } else if spec.specie.tipo_autoctono() == 2 {
             n_a += 1.0;
         }
     }
@@ -49,20 +49,20 @@ pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &Riferimen
     // ora trovo le specie attese dal riferimento
     // per evitare doppioni, anche se non dovrebbero esserci,
     // ricavo il set delle specie attese
-    let mut specie_attese_map: HashMap<String, &SpecieNISECI> = HashMap::new();
+    let mut specie_attese_map: HashMap<&str, &SpecieNISECI> = HashMap::new();
     for specie in riferimento {
-        if specie.specie_attesa {
-            specie_attese_map.entry(specie.id.clone()).or_insert(specie);
+        if specie.specie_attesa() {
+            specie_attese_map.entry(specie.id()).or_insert(specie);
         }
     }
     let set_specie_attese: Vec<&SpecieNISECI> = specie_attese_map.into_values().collect();
     let mut m_i: f32 = 0.0;
     let mut m_a: f32 = 0.0;
     for spec in set_specie_attese {
-        if spec.tipo_autoctono == 1 {
+        if spec.tipo_autoctono() == 1 {
             // tipo_autoctono == 1 allora specie importante
             m_i += 1.0;
-        } else if spec.tipo_autoctono == 2 {
+        } else if spec.tipo_autoctono() == 2 {
             m_a += 1.0;
         }
     }

@@ -39,6 +39,7 @@
 - Deprecation warning for definition of `domain::hfbi::RIFERIMENTO_HFBI`
 - Deprecation warning for visibility of `domain::niseci::ValoriIntermediNISECI::{log, to_csv}`
 - Deprecation warning for visibility of `domain::niseci::EsemplariPerCattura` fields
+- Deprecation warning for visibility of `domain::niseci::SpecieNISECI` fields
 
 ## [0.1.5] - 2026-04-30
 

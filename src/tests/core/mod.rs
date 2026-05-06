@@ -217,23 +217,23 @@ fn test_empty_csv_campionamento_niseci() {
 
 #[test]
 fn test_valid_recordcsv_campionamento_niseci() {
-    let specie_1 = SpecieNISECI {
-        id: "1234".to_string(),
-        nome: "Cervus elaphus".to_string(),
-        tipo_autoctono: 1,
-        tipo_alloctono: 0,
-        specie_attesa: true,
-        cl_soglia1: 0, // in cm
-        cl_soglia2: 0, // in cm
-        cl_soglia3: 0, // in cm
-        cl_soglia4: 0, // in cm
-        ad_juv_soglia1: 0.0,
-        ad_juv_soglia2: 0.0,
-        ad_juv_soglia3: 0.0,
-        ad_juv_soglia4: 0.0,
-        dens_soglia1: 1.0,
-        dens_soglia2: 2.0,
-    };
+    let specie_1 = SpecieNISECI::new(
+        "1234",
+        "Cervus elaphus",
+        1,
+        0,
+        true,
+        0, // in cm
+        0, // in cm
+        0, // in cm
+        0, // in cm
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        2.0,
+    );
 
     let riferimento_specie = vec![specie_1];
 

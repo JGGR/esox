@@ -155,10 +155,10 @@ pub fn calculate_x2(
 
     let mut specie_campionate_set: HashMap<&str, bool> = HashMap::new();
     for cattura in campionamento {
-        if (cattura.specie.specie_attesa == require_specie_attesa)
-            && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
+        if (cattura.specie.specie_attesa() == require_specie_attesa)
+            && (cattura.specie.tipo_autoctono() == 1 || cattura.specie.tipo_autoctono() == 2)
         {
-            match specie_campionate_set.entry(&cattura.specie.id) {
+            match specie_campionate_set.entry(cattura.specie.id()) {
                 Entry::Occupied(_) => {}
                 Entry::Vacant(vacant_entry) => {
                     vacant_entry.insert(true);
@@ -208,8 +208,8 @@ pub fn calculate_x2_per_alloctone(
 
     let mut specie_campionate_set: HashMap<&str, bool> = HashMap::new();
     for cattura in campionamento {
-        if cattura.specie.tipo_alloctono > 0 {
-            match specie_campionate_set.entry(&cattura.specie.id) {
+        if cattura.specie.tipo_alloctono() > 0 {
+            match specie_campionate_set.entry(cattura.specie.id()) {
                 Entry::Occupied(_) => {}
                 Entry::Vacant(vacant_entry) => {
                     vacant_entry.insert(true);
@@ -281,10 +281,10 @@ fn calculate_sommatoria_x2_a(
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in c {
-        if (cattura.specie.specie_attesa == require_specie_attesa)
-            && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
+        if (cattura.specie.specie_attesa() == require_specie_attesa)
+            && (cattura.specie.tipo_autoctono() == 1 || cattura.specie.tipo_autoctono() == 2)
         {
-            match classi_eta_map.entry(&cattura.specie.id) {
+            match classi_eta_map.entry(cattura.specie.id()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
                 }
@@ -312,10 +312,10 @@ fn calculate_sommatoria_x2_b(
         HashMap::with_capacity(10);
 
     for cattura in c {
-        if (cattura.specie.specie_attesa == require_specie_attesa)
-            && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
+        if (cattura.specie.specie_attesa() == require_specie_attesa)
+            && (cattura.specie.tipo_autoctono() == 1 || cattura.specie.tipo_autoctono() == 2)
         {
-            match esemplari_per_cattura_map.entry(&cattura.specie.id) {
+            match esemplari_per_cattura_map.entry(cattura.specie.id()) {
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry
                         .get_mut()
@@ -343,8 +343,8 @@ fn calculate_sommatoria_x2_a_per_alloctone(
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in c {
-        if cattura.specie.tipo_alloctono > 0 {
-            match classi_eta_map.entry(&cattura.specie.id) {
+        if cattura.specie.tipo_alloctono() > 0 {
+            match classi_eta_map.entry(cattura.specie.id()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
                 }
@@ -381,8 +381,8 @@ fn calculate_sommatoria_x2_b_per_alloctone(
         HashMap::with_capacity(10);
 
     for cattura in c {
-        if cattura.specie.tipo_alloctono > 0 {
-            match esemplari_per_cattura_map.entry(&cattura.specie.id) {
+        if cattura.specie.tipo_alloctono() > 0 {
+            match esemplari_per_cattura_map.entry(cattura.specie.id()) {
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry
                         .get_mut()
@@ -473,13 +473,13 @@ fn calculate_sommatoria_x2_b_absolute(
 }
 
 fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) {
-    if record.lunghezza < record.specie.cl_soglia1 {
+    if record.lunghezza < record.specie.cl_soglia_1() {
         cl.cl1 += 1;
-    } else if record.lunghezza < record.specie.cl_soglia2 {
+    } else if record.lunghezza < record.specie.cl_soglia_2() {
         cl.cl2 += 1;
-    } else if record.lunghezza < record.specie.cl_soglia3 {
+    } else if record.lunghezza < record.specie.cl_soglia_3() {
         cl.cl3 += 1;
-    } else if record.lunghezza < record.specie.cl_soglia4 {
+    } else if record.lunghezza < record.specie.cl_soglia_4() {
         cl.cl4 += 1;
     } else {
         cl.cl5 += 1;
@@ -746,8 +746,8 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_b_test_intermedia() {
         let mut specie = get_ciaccio();
-        specie.dens_soglia1 = 20.0;
-        specie.dens_soglia2 = 30.0;
+        specie.set_dens_soglia_1(20.0);
+        specie.set_dens_soglia_2(30.0);
 
         let mut epc = EsemplariPerCattura::new(&specie);
         (0..30).for_each(|_| epc.fill_passaggio(1));
@@ -761,8 +761,8 @@ mod x2_private_tests {
     #[test]
     fn calculate_x2_b_test_scarsa() {
         let mut specie = get_ciaccio();
-        specie.dens_soglia1 = 30.0;
-        specie.dens_soglia2 = 40.0;
+        specie.set_dens_soglia_1(30.0);
+        specie.set_dens_soglia_2(40.0);
 
         let mut epc = EsemplariPerCattura::new(&specie);
         (0..30).for_each(|_| epc.fill_passaggio(1));

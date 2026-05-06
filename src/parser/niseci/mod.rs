@@ -237,6 +237,7 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
             continue;
         }
 
+        #[expect(deprecated)]
         let specie_rec = SpecieNISECI {
             id: id.clone(),
             nome,

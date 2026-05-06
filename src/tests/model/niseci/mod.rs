@@ -22,23 +22,23 @@ use crate::{
 
 #[test]
 fn test_calcolo_pesci_per_passaggio() {
-    let specie_1 = SpecieNISECI {
-        id: "1234".to_string(),
-        nome: "Cervus elaphus".to_string(),
-        tipo_autoctono: 1,
-        tipo_alloctono: 0,
-        specie_attesa: true,
-        cl_soglia1: 1,
-        cl_soglia2: 2,
-        cl_soglia3: 3,
-        cl_soglia4: 4,
-        ad_juv_soglia1: 1.0,
-        ad_juv_soglia2: 2.0,
-        ad_juv_soglia3: 3.0,
-        ad_juv_soglia4: 4.0,
-        dens_soglia1: 1.0,
-        dens_soglia2: 2.0,
-    };
+    let specie_1 = SpecieNISECI::new(
+        "1234",
+        "Cervus elaphus",
+        1,
+        0,
+        true,
+        1,
+        2,
+        3,
+        4,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        1.0,
+        2.0,
+    );
 
     let record_1 = RecordNISECI {
         specie: specie_1.clone(),
