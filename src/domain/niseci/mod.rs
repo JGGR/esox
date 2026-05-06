@@ -152,6 +152,7 @@ impl SpecieNISECI {
         }
     }
 
+    #[inline(always)]
     pub(crate) fn id(&self) -> &str {
         #[expect(deprecated)]
         &self.id
@@ -160,34 +161,42 @@ impl SpecieNISECI {
         #[expect(deprecated)]
         &self.nome
     }
+    #[inline(always)]
     pub(crate) fn specie_attesa(&self) -> bool {
         #[expect(deprecated)]
         self.specie_attesa
     }
+    #[inline(always)]
     pub(crate) fn tipo_autoctono(&self) -> u8 {
         #[expect(deprecated)]
         self.tipo_autoctono
     }
+    #[inline(always)]
     pub(crate) fn tipo_alloctono(&self) -> u8 {
         #[expect(deprecated)]
         self.tipo_alloctono
     }
+    #[inline(always)]
     pub(crate) fn cl_soglia_1(&self) -> u32 {
         #[expect(deprecated)]
         self.cl_soglia1
     }
+    #[inline(always)]
     pub(crate) fn cl_soglia_2(&self) -> u32 {
         #[expect(deprecated)]
         self.cl_soglia2
     }
+    #[inline(always)]
     pub(crate) fn cl_soglia_3(&self) -> u32 {
         #[expect(deprecated)]
         self.cl_soglia3
     }
+    #[inline(always)]
     pub(crate) fn cl_soglia_4(&self) -> u32 {
         #[expect(deprecated)]
         self.cl_soglia4
     }
+    #[inline(always)]
     pub(crate) fn dens_soglia_1(&self) -> f32 {
         #[expect(deprecated)]
         self.dens_soglia1
@@ -199,6 +208,7 @@ impl SpecieNISECI {
             self.dens_soglia1 = val;
         }
     }
+    #[inline(always)]
     pub(crate) fn dens_soglia_2(&self) -> f32 {
         #[expect(deprecated)]
         self.dens_soglia2
@@ -1366,6 +1376,7 @@ impl ClassiEtaSpecieNISECI {
         }
     }
 
+    #[inline(always)]
     pub(crate) fn id(&self) -> &str {
         #[expect(deprecated)]
         &self.specie.id
@@ -1376,36 +1387,43 @@ impl ClassiEtaSpecieNISECI {
         &self.specie.nome
     }
 
+    #[inline(always)]
     pub fn specie_attesa(&self) -> bool {
         #[expect(deprecated)]
         self.specie.specie_attesa
     }
 
+    #[inline(always)]
     pub(crate) fn tipo_autoctono(&self) -> u8 {
         #[expect(deprecated)]
         self.specie.tipo_autoctono
     }
 
+    #[inline(always)]
     pub(crate) fn tipo_alloctono(&self) -> u8 {
         #[expect(deprecated)]
         self.specie.tipo_alloctono
     }
 
+    #[inline(always)]
     pub fn ad_juv_soglia_1(&self) -> f32 {
         #[expect(deprecated)]
         self.specie.ad_juv_soglia1
     }
 
+    #[inline(always)]
     pub fn ad_juv_soglia_2(&self) -> f32 {
         #[expect(deprecated)]
         self.specie.ad_juv_soglia2
     }
 
+    #[inline(always)]
     pub fn ad_juv_soglia_3(&self) -> f32 {
         #[expect(deprecated)]
         self.specie.ad_juv_soglia3
     }
 
+    #[inline(always)]
     pub fn ad_juv_soglia_4(&self) -> f32 {
         #[expect(deprecated)]
         self.specie.ad_juv_soglia4
@@ -1717,14 +1735,17 @@ pub struct EsemplariPerCattura {
 }
 
 impl EsemplariPerCattura {
+    #[inline(always)]
     pub(crate) fn id(&self) -> &str {
         #[expect(deprecated)]
         self.specie.id()
     }
+    #[inline(always)]
     pub(crate) fn dens_soglia_1(&self) -> f32 {
         #[expect(deprecated)]
         self.specie.dens_soglia_1()
     }
+    #[inline(always)]
     pub(crate) fn dens_soglia_2(&self) -> f32 {
         #[expect(deprecated)]
         self.specie.dens_soglia_2()
