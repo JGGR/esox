@@ -375,6 +375,14 @@ impl RiferimentoNISECI {
     pub fn get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI> {
         self.map_ids.get(id)
     }
+
+    pub fn to_csv_intermediates_joined(
+        &self,
+        intermediates: &ValoriIntermediNISECI,
+        comma_csv_delimiter: bool,
+    ) -> String {
+        intermediates.to_csv_joined(self, comma_csv_delimiter)
+    }
 }
 
 impl From<RiferimentoNISECI> for Vec<SpecieNISECI> {

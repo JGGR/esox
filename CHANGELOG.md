@@ -14,7 +14,8 @@
   - `get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI>`
 - Add internal `domain::hfbi::RIFERIMENTO_HFBI_MAP`:
   - Next version will make it public as `domain::hfbi::RIFERIMENTO_HFBI`
-- Add internal `domain::niseci::ValoriIntermediNISECI::to_csv_joined()`
+- Add `domain::niseci::ValoriIntermediNISECI::to_csv_joined()`
+- Add `domain::niseci::RiferimentoNISECI::to_csv_intermediates_joined()`
 
 ### Changed
 
@@ -33,13 +34,14 @@
   - `csv::parser`
   - `csv::parser::{niseci,hfbi}`
   - `csv::parser::niseci::{parse,check}_anagrafica_niseci`
-- Deprecation warning for visibility of `csv::parser::hfbi::{parse,check}_anagrafica_hfbi`
-- Deprecation warning for visibility of `CampionamentoHFBI::check_record` (typo, use `_records`)
-- Deprecation warning for visibility of `ClassiEtaSpecieNISECI::{specie, new}`
-- Deprecation warning for definition of `domain::hfbi::RIFERIMENTO_HFBI`
-- Deprecation warning for visibility of `domain::niseci::ValoriIntermediNISECI::{log, to_csv}`
-- Deprecation warning for visibility of `domain::niseci::EsemplariPerCattura` fields
-- Deprecation warning for visibility of `domain::niseci::SpecieNISECI` fields
+- Deprecation warnings for visibility of:
+  - `csv::parser::hfbi::{parse,check}_anagrafica_hfbi`
+  - `CampionamentoHFBI::check_record` (typo, use `_records`)
+  - `ClassiEtaSpecieNISECI::{specie, new}`
+  - `domain::hfbi::RIFERIMENTO_HFBI`
+  - `domain::niseci::ValoriIntermediNISECI::{log, to_csv}`
+  - `domain::niseci::EsemplariPerCattura` fields
+  - `domain::niseci::SpecieNISECI` fields
 
 ## [0.1.5] - 2026-04-30
 
