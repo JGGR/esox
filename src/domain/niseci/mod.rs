@@ -429,16 +429,21 @@ pub struct RecordNISECI {
         note = "v0.2 will drop visibility. Consider using self.id(), self.specie_attesa() and other getters instead"
     )]
     pub specie: SpecieNISECI,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.passaggio_cattura() instead"
+    )]
     pub passaggio_cattura: u8,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.lunghezza() instead")]
     pub lunghezza: u32,
     /// in millimetri
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.peso() instead")]
     pub peso: f32, // in grammi
 }
 
 impl fmt::Display for RecordNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!("RecordNISECI: {{ specie: {{{}}}, passaggio_cattura {{{}}}, lunghezza: {{{}}}, peso: {{{}}}",
-                self.specie(), self.passaggio_cattura, self.lunghezza, self.peso);
+                self.specie(), self.passaggio_cattura(), self.lunghezza(), self.peso());
         write!(f, "{}", string_representation)
     }
 }
@@ -453,24 +458,27 @@ impl RecordNISECI {
         Self {
             #[expect(deprecated)]
             specie: specie.clone(),
+            #[expect(deprecated)]
             passaggio_cattura,
+            #[expect(deprecated)]
             lunghezza,
+            #[expect(deprecated)]
             peso,
         }
     }
     #[inline(always)]
-    #[expect(dead_code)]
-    pub(crate) fn passaggio_cattura(&self) -> u8 {
+    pub fn passaggio_cattura(&self) -> u8 {
+        #[expect(deprecated)]
         self.passaggio_cattura
     }
     #[inline(always)]
-    #[expect(dead_code)]
-    pub(crate) fn lunghezza(&self) -> u32 {
+    pub fn lunghezza(&self) -> u32 {
+        #[expect(deprecated)]
         self.lunghezza
     }
     #[inline(always)]
-    #[expect(dead_code)]
-    pub(crate) fn peso(&self) -> f32 {
+    pub fn peso(&self) -> f32 {
+        #[expect(deprecated)]
         self.peso
     }
     #[inline(always)]
@@ -578,14 +586,14 @@ impl CampionamentoNISECI {
     pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
         let mut max_pass = 0;
         for record in self {
-            if record.passaggio_cattura > max_pass {
-                max_pass = record.passaggio_cattura;
+            if record.passaggio_cattura() > max_pass {
+                max_pass = record.passaggio_cattura();
             }
         }
 
         let mut passaggi: Vec<i32> = vec![0; max_pass as usize];
         for record in self {
-            passaggi[(record.passaggio_cattura - 1) as usize] += 1;
+            passaggi[(record.passaggio_cattura() - 1) as usize] += 1;
         }
 
         let mut tot = 0;
@@ -607,15 +615,23 @@ impl CampionamentoNISECI {
 
     pub fn get_numero_pesci_alieni_e_indigeni(&self) -> AlieniIndigeni {
         let mut alieni_indigeni = AlieniIndigeni {
+            #[expect(deprecated)]
             alieni: 0,
+            #[expect(deprecated)]
             indigeni: 0,
         };
 
         for pesce in self {
             if pesce.tipo_alloctono() > 0 && pesce.tipo_alloctono() <= 3 {
-                alieni_indigeni.alieni += 1;
+                #[expect(deprecated)]
+                {
+                    alieni_indigeni.alieni += 1;
+                }
             } else if pesce.tipo_autoctono() == 1 || pesce.tipo_autoctono() == 2 {
-                alieni_indigeni.indigeni += 1;
+                #[expect(deprecated)]
+                {
+                    alieni_indigeni.indigeni += 1;
+                }
             }
         }
 
@@ -660,8 +676,23 @@ impl<'a> IntoIterator for &'a CampionamentoNISECI {
 }
 
 pub struct AlieniIndigeni {
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.alieni() instead")]
     pub alieni: u32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.indigeni() instead")]
     pub indigeni: u32,
+}
+
+impl AlieniIndigeni {
+    #[inline(always)]
+    pub fn alieni(&self) -> u32 {
+        #[expect(deprecated)]
+        self.alieni
+    }
+    #[inline(always)]
+    pub fn indigeni(&self) -> u32 {
+        #[expect(deprecated)]
+        self.indigeni
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -1013,8 +1044,11 @@ pub struct ValoriIntermediSpecieNISECI {
     pub quantita_stimata: u32,
     pub classi_eta: ClassiEtaSpecieNISECI,
     pub rapporto_ad_juv: Option<f32>,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_a_a()")]
     pub x2_a_a: u8,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_a_b()")]
     pub x2_a_b: u8,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_b()")]
     pub x2_b: f32,
 }
 
@@ -1031,55 +1065,117 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
             self.classi_eta,
             self.densita_stimata,
             self.quantita_stimata,
-            self.x2_b,
+            self.x2_b(),
             rapporto_ad_juv_str,
-            self.x2_a_a,
-            self.x2_a_b
+            self.x2_a_a(),
+            self.x2_a_b()
         );
         write!(f, "{}", string_representation)
+    }
+}
+
+impl ValoriIntermediSpecieNISECI {
+    pub fn x2_a_a(&self) -> u8 {
+        #[expect(deprecated)]
+        self.x2_a_a
+    }
+    pub fn x2_a_b(&self) -> u8 {
+        #[expect(deprecated)]
+        self.x2_a_b
+    }
+    pub fn x2_b(&self) -> f32 {
+        #[expect(deprecated)]
+        self.x2_b
     }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValoriIntermediNISECI {
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x1()")]
     pub x1: f32,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2()")]
     pub x2: Option<f32>,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x3()")]
     pub x3: f32,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.specie_specifici()")]
     pub specie_specifici: HashMap<String, ValoriIntermediSpecieNISECI>,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_a()")]
     pub x2_a: f32,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_b()")]
     pub x2_b: f32,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x3_a()")]
     pub x3_a: Option<f32>,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x3_b()")]
     pub x3_b: Option<f32>,
 }
 
 impl fmt::Display for ValoriIntermediNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let x2_str = match self.x2 {
+        let x2_str = match self.x2() {
             Some(v) => format!("{v}"),
             None => "NC".to_string(),
         };
-        let x3_a_str = match self.x3_a {
+        let x3_a_str = match self.x3_a() {
             Some(v) => format!("{v}"),
             None => "NC".to_string(),
         };
-        let x3_b_str = match self.x3_b {
+        let x3_b_str = match self.x3_b() {
             Some(v) => format!("{v}"),
             None => "NC".to_string(),
         };
         let mut string_representation = format!("x1: {}, x2: {}, x3: {},\nx2_a: {}, x2_b: {}, x3_a: {}, x3_b: {},\n\nspecie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2_b, rapporto ad/juv, x2a_a, x2a_b\n",
-        self.x1, x2_str, self.x3,
-        self.x2_a, self.x2_b, x3_a_str, x3_b_str);
+        self.x1(), x2_str, self.x3(),
+        self.x2_a(), self.x2_b(), x3_a_str, x3_b_str);
 
-        for (_k, v) in self.specie_specifici.iter() {
+        for (_k, v) in self.specie_specifici().iter() {
             string_representation = format!("{}\n{}", string_representation, v);
         }
-        string_representation = string_representation.to_string(); //FIXME: Why is this here?
         write!(f, "{}", string_representation)
     }
 }
 
 impl ValoriIntermediNISECI {
+    #[inline(always)]
+    pub(crate) fn x1(&self) -> f32 {
+        #[expect(deprecated)]
+        self.x1
+    }
+    #[inline(always)]
+    pub(crate) fn x2(&self) -> Option<f32> {
+        #[expect(deprecated)]
+        self.x2
+    }
+    #[inline(always)]
+    pub(crate) fn x3(&self) -> f32 {
+        #[expect(deprecated)]
+        self.x3
+    }
+    #[inline(always)]
+    pub(crate) fn x2_a(&self) -> f32 {
+        #[expect(deprecated)]
+        self.x2_a
+    }
+    #[inline(always)]
+    pub(crate) fn x2_b(&self) -> f32 {
+        #[expect(deprecated)]
+        self.x2_b
+    }
+    #[inline(always)]
+    pub(crate) fn x3_a(&self) -> Option<f32> {
+        #[expect(deprecated)]
+        self.x3_a
+    }
+    #[inline(always)]
+    pub(crate) fn x3_b(&self) -> Option<f32> {
+        #[expect(deprecated)]
+        self.x3_b
+    }
+    #[inline(always)]
+    pub(crate) fn specie_specifici(&self) -> &HashMap<String, ValoriIntermediSpecieNISECI> {
+        #[expect(deprecated)]
+        &self.specie_specifici
+    }
     #[deprecated(note = "v0.2 will drop visibility")]
     pub fn log(&self) {
         //TODO: a proper format? we count on the embedded newlines to leverage the
@@ -1094,7 +1190,7 @@ impl ValoriIntermediNISECI {
         } else {
             "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
         };
-        for (key_id, v) in self.specie_specifici.iter() {
+        for (key_id, v) in self.specie_specifici().iter() {
             let rapporto_ad_juv_str = match v.rapporto_ad_juv {
                 Some(v) => {
                     if comma_csv_delimiter {
@@ -1126,10 +1222,10 @@ impl ValoriIntermediNISECI {
                     v.classi_eta.cl_5(),
                     v.densita_stimata,
                     v.quantita_stimata,
-                    v.x2_b,
+                    v.x2_b(),
                     rapporto_ad_juv_str,
-                    v.x2_a_a,
-                    v.x2_a_b
+                    v.x2_a_a(),
+                    v.x2_a_b()
                 )
             } else {
                 format!(
@@ -1147,10 +1243,10 @@ impl ValoriIntermediNISECI {
                     v.classi_eta.cl_5(),
                     v.densita_stimata.comma(),
                     v.quantita_stimata,
-                    v.x2_b,
+                    v.x2_b(),
                     rapporto_ad_juv_str,
-                    v.x2_a_a,
-                    v.x2_a_b
+                    v.x2_a_a(),
+                    v.x2_a_b()
                 )
             }
         }
@@ -1166,7 +1262,7 @@ impl ValoriIntermediNISECI {
         } else {
             "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
         };
-        for (key_id, v) in self.specie_specifici.iter() {
+        for (key_id, v) in self.specie_specifici().iter() {
             let specie_ref = match riferimento.get_ref_by_id(key_id) {
                 Some(s) => s,
                 None => {
@@ -1208,10 +1304,10 @@ impl ValoriIntermediNISECI {
                     v.classi_eta.cl_5(),
                     v.densita_stimata,
                     v.quantita_stimata,
-                    v.x2_b,
+                    v.x2_b(),
                     rapporto_ad_juv_str,
-                    v.x2_a_a,
-                    v.x2_a_b
+                    v.x2_a_a(),
+                    v.x2_a_b()
                 )
             } else {
                 format!(
@@ -1229,10 +1325,10 @@ impl ValoriIntermediNISECI {
                     v.classi_eta.cl_5(),
                     v.densita_stimata.comma(),
                     v.quantita_stimata,
-                    v.x2_b,
+                    v.x2_b(),
                     rapporto_ad_juv_str,
-                    v.x2_a_a,
-                    v.x2_a_b
+                    v.x2_a_a(),
+                    v.x2_a_b()
                 )
             }
         }
@@ -1282,19 +1378,19 @@ impl RisultatoNISECI {
         self.rqe
     }
     pub fn get_x1(&self) -> f32 {
-        self.valori_intermedi.x1
+        self.valori_intermedi.x1()
     }
     pub fn get_x2(&self) -> Option<f32> {
-        self.valori_intermedi.x2
+        self.valori_intermedi.x2()
     }
     pub fn get_x3(&self) -> f32 {
-        self.valori_intermedi.x3
+        self.valori_intermedi.x3()
     }
     pub fn get_x3_a(&self) -> Option<f32> {
-        self.valori_intermedi.x3_a
+        self.valori_intermedi.x3_a()
     }
     pub fn get_x3_b(&self) -> Option<f32> {
-        self.valori_intermedi.x3_b
+        self.valori_intermedi.x3_b()
     }
 
     pub fn to_csv(&self, anagrafica: &AnagraficaNISECI, comma_csv_delimiter: bool) -> String {
@@ -1728,13 +1824,13 @@ pub enum ClassiEta {
 
 impl ClassiEta {
     pub fn find_classe_eta(record: &RecordNISECI) -> ClassiEta {
-        if record.lunghezza < record.cl_soglia_1() {
+        if record.lunghezza() < record.cl_soglia_1() {
             ClassiEta::CL1
-        } else if record.lunghezza < record.cl_soglia_2() {
+        } else if record.lunghezza() < record.cl_soglia_2() {
             ClassiEta::CL2
-        } else if record.lunghezza < record.cl_soglia_3() {
+        } else if record.lunghezza() < record.cl_soglia_3() {
             ClassiEta::CL3
-        } else if record.lunghezza < record.cl_soglia_4() {
+        } else if record.lunghezza() < record.cl_soglia_4() {
             ClassiEta::CL4
         } else {
             ClassiEta::CL5

@@ -16,7 +16,7 @@
   - Next version will make it public as `domain::hfbi::RIFERIMENTO_HFBI`
 - Add `domain::niseci::ValoriIntermediNISECI::to_csv_joined()`
 - Add `domain::niseci::RiferimentoNISECI::to_csv_intermediates_joined()`
-- Add `domain::niseci::RecordNISECI` getters
+- Add some getters for deprecated fields
 
 ### Changed
 
@@ -45,6 +45,10 @@
   - `domain::niseci::SpecieNISECI` fields
   - `domain::niseci::ClassiEtaSpecieNISECI` fields
   - `domain::niseci::ClassiEtaAlieniNISECI` fields
+  - `domain::niseci::AlieniIndigeni` fields
+  - `domain::niseci::RecordNISECI` fields
+  - `domain::niseci::ValoriIntermediNISECI` fields
+  - `domain::niseci::ValoriIntermediSpecieNISECI` fields
 
 ## [0.1.5] - 2026-04-30
 

@@ -114,9 +114,12 @@ pub fn calculate_niseci(
                 classi_eta,
                 densita_stimata,
                 quantita_stimata: 0,
+                #[expect(deprecated)]
                 x2_b: 0.0,
                 rapporto_ad_juv: val.get_rapporto_ad_juv(),
+                #[expect(deprecated)]
                 x2_a_a: subvalue_a,
+                #[expect(deprecated)]
                 x2_a_b: subvalue_b,
             };
             match valori_intermedi_specie.entry(specie) {
@@ -142,13 +145,21 @@ pub fn calculate_niseci(
     }
 
     let intermediates = ValoriIntermediNISECI {
+        #[expect(deprecated)]
         x1,
+        #[expect(deprecated)]
         x2,
+        #[expect(deprecated)]
         x3,
+        #[expect(deprecated)]
         specie_specifici: valori_intermedi_specie,
+        #[expect(deprecated)]
         x2_a: criteri_x2.get_criterio_a(),
+        #[expect(deprecated)]
         x2_b: criteri_x2.get_criterio_b(),
+        #[expect(deprecated)]
         x3_a: criteri_x3.as_ref().map(|v| v.get_criterio_a()),
+        #[expect(deprecated)]
         x3_b: criteri_x3.as_ref().map(|v| v.get_criterio_b()),
     };
 
@@ -203,8 +214,11 @@ fn get_valori_intermedi_specie(
             classi_eta,
             densita_stimata,
             quantita_stimata,
+            #[expect(deprecated)]
             x2_b,
+            #[expect(deprecated)]
             x2_a_a: criteri_x2_a.get_criterio_a(),
+            #[expect(deprecated)]
             x2_a_b: criteri_x2_a.get_criterio_b(),
             rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),
         };

@@ -90,12 +90,12 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
     let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
 
     // condizione 1
-    if alieni_indigeni.alieni == 0 {
+    if alieni_indigeni.alieni() == 0 {
         return Ok((1.0, None));
     }
 
     // condizione 2
-    if alieni_indigeni.alieni >= alieni_indigeni.indigeni {
+    if alieni_indigeni.alieni() >= alieni_indigeni.indigeni() {
         return Ok((0.0, None));
     }
 

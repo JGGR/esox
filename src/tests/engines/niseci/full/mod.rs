@@ -133,9 +133,9 @@ fn calculate_niseci_template() {
     let (niseci, intermediates) = calc_niseci_res.expect("is_ok() was checked before");
 
     assert_eq!(niseci, Some(0.209));
-    assert_eq!(intermediates.x1, 0.429);
-    assert_eq!(intermediates.x2, Some(0.267));
-    assert_eq!(intermediates.x3, 1.0);
+    assert_eq!(intermediates.x1(), 0.429);
+    assert_eq!(intermediates.x2(), Some(0.267));
+    assert_eq!(intermediates.x3(), 1.0);
 }
 
 fn calc_templates_with_area(

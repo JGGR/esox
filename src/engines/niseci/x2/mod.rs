@@ -319,11 +319,11 @@ fn calculate_sommatoria_x2_b(
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry
                         .get_mut()
-                        .fill_passaggio(cattura.passaggio_cattura);
+                        .fill_passaggio(cattura.passaggio_cattura());
                 }
                 Entry::Vacant(vacant_entry) => {
                     let mut epc = EsemplariPerCattura::new(cattura.specie());
-                    epc.fill_passaggio(cattura.passaggio_cattura);
+                    epc.fill_passaggio(cattura.passaggio_cattura());
                     vacant_entry.insert(epc);
                 }
             }
@@ -386,11 +386,11 @@ fn calculate_sommatoria_x2_b_per_alloctone(
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry
                         .get_mut()
-                        .fill_passaggio(cattura.passaggio_cattura);
+                        .fill_passaggio(cattura.passaggio_cattura());
                 }
                 Entry::Vacant(vacant_entry) => {
                     let mut epc = EsemplariPerCattura::new(cattura.specie());
-                    epc.fill_passaggio(cattura.passaggio_cattura);
+                    epc.fill_passaggio(cattura.passaggio_cattura());
                     vacant_entry.insert(epc);
                 }
             }
@@ -473,22 +473,22 @@ fn calculate_sommatoria_x2_b_absolute(
 }
 
 fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) {
-    if record.lunghezza < record.cl_soglia_1() {
+    if record.lunghezza() < record.cl_soglia_1() {
         #[expect(deprecated)]
         {
             cl.cl1 += 1;
         }
-    } else if record.lunghezza < record.cl_soglia_2() {
+    } else if record.lunghezza() < record.cl_soglia_2() {
         #[expect(deprecated)]
         {
             cl.cl2 += 1;
         }
-    } else if record.lunghezza < record.cl_soglia_3() {
+    } else if record.lunghezza() < record.cl_soglia_3() {
         #[expect(deprecated)]
         {
             cl.cl3 += 1;
         }
-    } else if record.lunghezza < record.cl_soglia_4() {
+    } else if record.lunghezza() < record.cl_soglia_4() {
         #[expect(deprecated)]
         {
             cl.cl4 += 1;
