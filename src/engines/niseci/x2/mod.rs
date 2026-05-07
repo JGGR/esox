@@ -44,14 +44,27 @@ impl SubmetricheX2 {
             metriche_x2_b,
         }
     }
+    #[inline(always)]
     pub fn get_metriche_x2_a(&self) -> MetricheX2A {
         self.metriche_x2_a
     }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_classi_eta()")]
+    #[inline(always)]
     pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
         self.classi_eta.clone()
     }
+    #[inline(always)]
+    pub(crate) fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
+        &self.classi_eta
+    }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_metriche_x2_b()")]
+    #[inline(always)]
     pub fn get_metriche_x2_b(&self) -> MetricheX2B {
         self.metriche_x2_b.clone()
+    }
+    #[inline(always)]
+    pub(crate) fn get_ref_metriche_x2_b(&self) -> &MetricheX2B {
+        &self.metriche_x2_b
     }
 }
 
@@ -73,14 +86,22 @@ impl MetricheX2 {
             submetriche_map,
         }
     }
+    #[inline(always)]
     pub fn get_criterio_a(&self) -> f32 {
         self.criterio_a
     }
+    #[inline(always)]
     pub fn get_criterio_b(&self) -> f32 {
         self.criterio_b
     }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_submetriche_map()")]
+    #[inline(always)]
     pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX2> {
         self.submetriche_map.clone()
+    }
+    #[inline(always)]
+    pub(crate) fn get_ref_submetriche_map(&self) -> &HashMap<String, SubmetricheX2> {
+        &self.submetriche_map
     }
 }
 
@@ -101,15 +122,24 @@ impl MetricheX2B {
             x2_b,
         }
     }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_id() instead")]
+    #[inline(always)]
     pub fn get_id(&self) -> String {
         self.id_specie.clone()
     }
+    #[inline(always)]
+    pub(crate) fn get_ref_id(&self) -> &String {
+        &self.id_specie
+    }
+    #[inline(always)]
     pub fn get_x2_b(&self) -> f32 {
         self.x2_b
     }
+    #[inline(always)]
     pub fn get_densita_stimata(&self) -> f32 {
         self.densita_stimata
     }
+    #[inline(always)]
     pub fn get_quantita_stimata(&self) -> u32 {
         self.quantita_stimata
     }
@@ -127,15 +157,15 @@ pub fn calculate_x2(
     let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
     for crit in &criteri_vec {
-        match submetriche.entry(crit.get_codice_specie()) {
+        match submetriche.entry(crit.get_ref_codice_specie().to_string()) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
                     // We fill densita_stimata later
                     SubmetricheX2::new(
                         crit.get_metriche_x2a(),
-                        crit.get_classi_eta(),
-                        MetricheX2B::new(crit.get_codice_specie(), -1.0, 0, 0.0),
+                        crit.get_ref_classi_eta().clone(),
+                        MetricheX2B::new(crit.get_ref_codice_specie().clone(), -1.0, 0, 0.0),
                     ),
                 );
             }
@@ -180,15 +210,15 @@ pub fn calculate_x2_per_alloctone(
     let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
     for crit in &criteri_vec {
-        match submetriche.entry(crit.get_codice_specie()) {
+        match submetriche.entry(crit.get_ref_codice_specie().to_string()) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
                     // We fill densita_stimata later
                     SubmetricheX2::new(
                         crit.get_metriche_x2a(),
-                        crit.get_classi_eta(),
-                        MetricheX2B::new(crit.get_codice_specie(), -1.0, 0, 0.0),
+                        crit.get_ref_classi_eta().clone(),
+                        MetricheX2B::new(crit.get_ref_codice_specie().to_string(), -1.0, 0, 0.0),
                     ),
                 );
             }
@@ -239,14 +269,17 @@ impl RecordSubmetricheX2A {
             classi_eta,
         }
     }
-    pub fn get_codice_specie(&self) -> String {
-        self.codice_specie.clone()
+    #[inline(always)]
+    pub(crate) fn get_ref_codice_specie(&self) -> &String {
+        &self.codice_specie
     }
+    #[inline(always)]
     pub fn get_metriche_x2a(&self) -> MetricheX2A {
         self.metriche_x2a
     }
-    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
-        self.classi_eta.clone()
+    #[inline(always)]
+    pub(crate) fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
+        &self.classi_eta
     }
 }
 
@@ -602,15 +635,15 @@ fn fill_submetriche(
     errors: &mut Vec<String>,
 ) {
     for dens in &densita_vec {
-        let id = dens.get_id();
+        let id = dens.get_ref_id();
         match submetriche.entry(id.clone()) {
             Entry::Occupied(mut entry) => {
                 let submetr = entry.get_mut();
                 *submetr = SubmetricheX2::new(
                     submetr.get_metriche_x2_a(),
-                    submetr.get_classi_eta(),
+                    submetr.get_ref_classi_eta().clone(),
                     MetricheX2B::new(
-                        id,
+                        id.to_string(),
                         dens.get_densita_stimata(),
                         dens.get_quantita_stimata(),
                         dens.get_x2_b(),

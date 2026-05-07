@@ -43,15 +43,24 @@ impl SubmetricheX3 {
             criterio_b,
         }
     }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_classi_eta()")]
+    #[inline(always)]
     pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
         self.classi_eta.clone()
     }
+    #[inline(always)]
+    pub(crate) fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
+        &self.classi_eta
+    }
+    #[inline(always)]
     pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
+    #[inline(always)]
     pub fn get_criterio_a(&self) -> u8 {
         self.criterio_a
     }
+    #[inline(always)]
     pub fn get_criterio_b(&self) -> u8 {
         self.criterio_b
     }
@@ -75,14 +84,22 @@ impl MetricheX3 {
             submetriche_map,
         }
     }
+    #[inline(always)]
     pub fn get_criterio_a(&self) -> f32 {
         self.criterio_a
     }
+    #[inline(always)]
     pub fn get_criterio_b(&self) -> f32 {
         self.criterio_b
     }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using get_ref_submetriche_map()")]
+    #[inline(always)]
     pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX3> {
         self.submetriche_map.clone()
+    }
+    #[inline(always)]
+    pub fn get_ref_submetriche_map(&self) -> &HashMap<String, SubmetricheX3> {
+        &self.submetriche_map
     }
 }
 

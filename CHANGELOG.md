@@ -52,6 +52,11 @@
   - `domain::niseci::InfoPopolazioniNISECI` fields
   - `domain::niseci::InfoPopolazioniAlieneNISECI` fields
   - `domain::niseci::ComunitaNISECI` fields
+  - `engines::niseci::x2::MetricheX2::get_submetriche_map`
+  - `engines::niseci::x2::SubmetricheX2::{get_classi_eta, get_metriche_x2_b}`
+  - `engines::niseci::x2::MetricheX2B::get_id`
+  - `engines::niseci::x3::MetricheX3::get_submetriche_map`
+  - `engines::niseci::x3::SubmetricheX3::get_classi_eta`
 
 ## [0.1.5] - 2026-04-30
 
