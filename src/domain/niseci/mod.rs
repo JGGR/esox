@@ -1040,9 +1040,13 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValoriIntermediSpecieNISECI {
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.densita_stimata()")]
     pub densita_stimata: f32,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.quantita_stimata()")]
     pub quantita_stimata: u32,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.classi_eta()")]
     pub classi_eta: ClassiEtaSpecieNISECI,
+    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.rapporto_ad_juv()")]
     pub rapporto_ad_juv: Option<f32>,
     #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_a_a()")]
     pub x2_a_a: u8,
@@ -1054,7 +1058,7 @@ pub struct ValoriIntermediSpecieNISECI {
 
 impl fmt::Display for ValoriIntermediSpecieNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let rapporto_ad_juv_str = match self.rapporto_ad_juv {
+        let rapporto_ad_juv_str = match self.rapporto_ad_juv() {
             Some(v) => {
                 format!("{v}")
             }
@@ -1062,9 +1066,9 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
         };
         let string_representation = format!(
             "{}; {}; {}; {}; {}; {}; {}",
-            self.classi_eta,
-            self.densita_stimata,
-            self.quantita_stimata,
+            self.classi_eta(),
+            self.densita_stimata(),
+            self.quantita_stimata(),
             self.x2_b(),
             rapporto_ad_juv_str,
             self.x2_a_a(),
@@ -1075,14 +1079,37 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
 }
 
 impl ValoriIntermediSpecieNISECI {
+    #[inline(always)]
+    pub fn densita_stimata(&self) -> f32 {
+        #[expect(deprecated)]
+        self.densita_stimata
+    }
+    #[inline(always)]
+    pub fn quantita_stimata(&self) -> u32 {
+        #[expect(deprecated)]
+        self.quantita_stimata
+    }
+    #[inline(always)]
+    pub(crate) fn classi_eta(&self) -> &ClassiEtaSpecieNISECI {
+        #[expect(deprecated)]
+        &self.classi_eta
+    }
+    #[inline(always)]
+    pub(crate) fn rapporto_ad_juv(&self) -> Option<f32> {
+        #[expect(deprecated)]
+        self.rapporto_ad_juv
+    }
+    #[inline(always)]
     pub fn x2_a_a(&self) -> u8 {
         #[expect(deprecated)]
         self.x2_a_a
     }
+    #[inline(always)]
     pub fn x2_a_b(&self) -> u8 {
         #[expect(deprecated)]
         self.x2_a_b
     }
+    #[inline(always)]
     pub fn x2_b(&self) -> f32 {
         #[expect(deprecated)]
         self.x2_b
@@ -1191,7 +1218,7 @@ impl ValoriIntermediNISECI {
             "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
         };
         for (key_id, v) in self.specie_specifici().iter() {
-            let rapporto_ad_juv_str = match v.rapporto_ad_juv {
+            let rapporto_ad_juv_str = match v.rapporto_ad_juv() {
                 Some(v) => {
                     if comma_csv_delimiter {
                         format!("{v}")
@@ -1201,7 +1228,7 @@ impl ValoriIntermediNISECI {
                 }
                 None => "NC".to_string(),
             };
-            let specie_attesa_str = if v.classi_eta.specie_attesa() {
+            let specie_attesa_str = if v.classi_eta().specie_attesa() {
                 "SI"
             } else {
                 "NO"
@@ -1211,17 +1238,17 @@ impl ValoriIntermediNISECI {
                     "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
                     string_representation,
                     key_id,
-                    v.classi_eta.nome(),
-                    v.classi_eta.tipo_autoctono(),
-                    v.classi_eta.tipo_alloctono(),
+                    v.classi_eta().nome(),
+                    v.classi_eta().tipo_autoctono(),
+                    v.classi_eta().tipo_alloctono(),
                     specie_attesa_str,
-                    v.classi_eta.cl_1(),
-                    v.classi_eta.cl_2(),
-                    v.classi_eta.cl_3(),
-                    v.classi_eta.cl_4(),
-                    v.classi_eta.cl_5(),
-                    v.densita_stimata,
-                    v.quantita_stimata,
+                    v.classi_eta().cl_1(),
+                    v.classi_eta().cl_2(),
+                    v.classi_eta().cl_3(),
+                    v.classi_eta().cl_4(),
+                    v.classi_eta().cl_5(),
+                    v.densita_stimata(),
+                    v.quantita_stimata(),
                     v.x2_b(),
                     rapporto_ad_juv_str,
                     v.x2_a_a(),
@@ -1232,17 +1259,17 @@ impl ValoriIntermediNISECI {
                     "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
                     string_representation,
                     key_id,
-                    v.classi_eta.nome(),
-                    v.classi_eta.tipo_autoctono(),
-                    v.classi_eta.tipo_alloctono(),
+                    v.classi_eta().nome(),
+                    v.classi_eta().tipo_autoctono(),
+                    v.classi_eta().tipo_alloctono(),
                     specie_attesa_str,
-                    v.classi_eta.cl_1(),
-                    v.classi_eta.cl_2(),
-                    v.classi_eta.cl_3(),
-                    v.classi_eta.cl_4(),
-                    v.classi_eta.cl_5(),
-                    v.densita_stimata.comma(),
-                    v.quantita_stimata,
+                    v.classi_eta().cl_1(),
+                    v.classi_eta().cl_2(),
+                    v.classi_eta().cl_3(),
+                    v.classi_eta().cl_4(),
+                    v.classi_eta().cl_5(),
+                    v.densita_stimata().comma(),
+                    v.quantita_stimata(),
                     v.x2_b(),
                     rapporto_ad_juv_str,
                     v.x2_a_a(),
@@ -1273,7 +1300,7 @@ impl ValoriIntermediNISECI {
                     return string_representation;
                 }
             };
-            let rapporto_ad_juv_str = match v.rapporto_ad_juv {
+            let rapporto_ad_juv_str = match v.rapporto_ad_juv() {
                 Some(v) => {
                     if comma_csv_delimiter {
                         format!("{v}")
@@ -1297,13 +1324,13 @@ impl ValoriIntermediNISECI {
                     specie_ref.tipo_autoctono(),
                     specie_ref.tipo_alloctono(),
                     specie_attesa_str,
-                    v.classi_eta.cl_1(),
-                    v.classi_eta.cl_2(),
-                    v.classi_eta.cl_3(),
-                    v.classi_eta.cl_4(),
-                    v.classi_eta.cl_5(),
-                    v.densita_stimata,
-                    v.quantita_stimata,
+                    v.classi_eta().cl_1(),
+                    v.classi_eta().cl_2(),
+                    v.classi_eta().cl_3(),
+                    v.classi_eta().cl_4(),
+                    v.classi_eta().cl_5(),
+                    v.densita_stimata(),
+                    v.quantita_stimata(),
                     v.x2_b(),
                     rapporto_ad_juv_str,
                     v.x2_a_a(),
@@ -1318,13 +1345,13 @@ impl ValoriIntermediNISECI {
                     specie_ref.tipo_autoctono(),
                     specie_ref.tipo_alloctono(),
                     specie_attesa_str,
-                    v.classi_eta.cl_1(),
-                    v.classi_eta.cl_2(),
-                    v.classi_eta.cl_3(),
-                    v.classi_eta.cl_4(),
-                    v.classi_eta.cl_5(),
-                    v.densita_stimata.comma(),
-                    v.quantita_stimata,
+                    v.classi_eta().cl_1(),
+                    v.classi_eta().cl_2(),
+                    v.classi_eta().cl_3(),
+                    v.classi_eta().cl_4(),
+                    v.classi_eta().cl_5(),
+                    v.densita_stimata().comma(),
+                    v.quantita_stimata(),
                     v.x2_b(),
                     rapporto_ad_juv_str,
                     v.x2_a_a(),
