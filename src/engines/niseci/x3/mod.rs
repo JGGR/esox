@@ -111,7 +111,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
 
     // condizione 3
     let epsilon: f32 = 1e-6;
-    if (info_pop_aliene.tipo_1.popolazione_piu_strutt - 1.0).abs() < epsilon {
+    if (info_pop_aliene.tipo_1().popolazione_piu_strutt() - 1.0).abs() < epsilon {
         return Ok((0.0, None));
     }
 
@@ -127,8 +127,8 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
     let mut errors = Vec::<String>::new();
     let mut submetriche = HashMap::<String, SubmetricheX3>::new();
 
-    for (key, val) in info_pop_aliene.tipo_1.intermediates_map {
-        match submetriche.entry(key) {
+    for (key, val) in info_pop_aliene.tipo_1().intermediates_map() {
+        match submetriche.entry(key.to_string()) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
@@ -165,8 +165,8 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
         }
     }
 
-    for (key, val) in info_pop_aliene.tipo_2.intermediates_map {
-        match submetriche.entry(key) {
+    for (key, val) in info_pop_aliene.tipo_2().intermediates_map() {
+        match submetriche.entry(key.to_string()) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
@@ -203,8 +203,8 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
         }
     }
 
-    for (key, val) in info_pop_aliene.tipo_3.intermediates_map {
-        match submetriche.entry(key) {
+    for (key, val) in info_pop_aliene.tipo_3().intermediates_map() {
+        match submetriche.entry(key.to_string()) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
@@ -301,19 +301,23 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
 }
 
 fn calculate_a(info: &InfoPopolazioniAlieneNISECI) -> f32 {
-    if info.tipo_1.tot_species > 0 && info.tipo_1.popolazione_piu_strutt < 1.0 {
+    if info.tipo_1().tot_species() > 0 && info.tipo_1().popolazione_piu_strutt() < 1.0 {
         return 0.5;
     }
-    if info.tipo_2.tot_species != 0 && info.tipo_2.tot_species >= info.tot_specie_autoctone {
+    if info.tipo_2().tot_species() != 0
+        && info.tipo_2().tot_species() >= info.tot_specie_autoctone()
+    {
         return 0.5;
     }
-    if info.tipo_2.tot_species != 0 && info.tipo_2.tot_species < info.tot_specie_autoctone {
+    if info.tipo_2().tot_species() != 0 && info.tipo_2().tot_species() < info.tot_specie_autoctone()
+    {
         return 0.75;
     }
-    if info.tipo_3.tot_species >= info.tot_specie_autoctone {
+    if info.tipo_3().tot_species() >= info.tot_specie_autoctone() {
         return 0.75;
     }
-    if info.tipo_3.tot_species != 0 && info.tipo_3.tot_species < info.tot_specie_autoctone {
+    if info.tipo_3().tot_species() != 0 && info.tipo_3().tot_species() < info.tot_specie_autoctone()
+    {
         return 0.85;
     }
 
@@ -324,8 +328,8 @@ fn calculate_b(info: &InfoPopolazioniAlieneNISECI) -> f32 {
     let specie_mediamente_strutt = info.get_species_mediamente_strutt();
     let species_destrutt = info.get_species_destrutt();
 
-    let i2 = 0.5 * (specie_mediamente_strutt as f32 / info.tot_specie_aliene as f32);
-    let i3 = species_destrutt as f32 / info.tot_specie_aliene as f32;
+    let i2 = 0.5 * (specie_mediamente_strutt as f32 / info.tot_specie_aliene() as f32);
+    let i3 = species_destrutt as f32 / info.tot_specie_aliene() as f32;
 
     i2 + i3
 }
@@ -338,17 +342,23 @@ pub mod tests {
     #[test]
     fn calculate_b_tutte_destrutt() {
         let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
-        info_aliene.tipo_3.species_destrutt = 10;
-        info_aliene.tipo_2.species_destrutt = 20;
-        info_aliene.tipo_3.species_strutt = 20;
-        info_aliene.tot_specie_aliene = 50;
+        #[expect(deprecated)]
+        {
+            info_aliene.tipo_3.species_destrutt = 10;
+            info_aliene.tipo_2.species_destrutt = 20;
+            info_aliene.tipo_3.species_strutt = 20;
+            info_aliene.tot_specie_aliene = 50;
+        }
 
         let b = calculate_b(&info_aliene);
 
         assert_eq!(b, 0.6);
 
-        info_aliene.tipo_3.species_strutt = 0;
-        info_aliene.tot_specie_aliene = 30;
+        #[expect(deprecated)]
+        {
+            info_aliene.tipo_3.species_strutt = 0;
+            info_aliene.tot_specie_aliene = 30;
+        }
 
         let b = calculate_b(&info_aliene);
 
@@ -358,17 +368,23 @@ pub mod tests {
     #[test]
     fn calculate_b_tutte_mediam_strutt() {
         let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
-        info_aliene.tipo_3.species_mediamente_strutt = 10;
-        info_aliene.tipo_2.species_mediamente_strutt = 20;
-        info_aliene.tipo_3.species_strutt = 20;
-        info_aliene.tot_specie_aliene = 50;
+        #[expect(deprecated)]
+        {
+            info_aliene.tipo_3.species_mediamente_strutt = 10;
+            info_aliene.tipo_2.species_mediamente_strutt = 20;
+            info_aliene.tipo_3.species_strutt = 20;
+            info_aliene.tot_specie_aliene = 50;
+        }
 
         let b = calculate_b(&info_aliene);
 
         assert_eq!(b, 0.3);
 
-        info_aliene.tipo_3.species_strutt = 0;
-        info_aliene.tot_specie_aliene = 30;
+        #[expect(deprecated)]
+        {
+            info_aliene.tipo_3.species_strutt = 0;
+            info_aliene.tot_specie_aliene = 30;
+        }
 
         let b = calculate_b(&info_aliene);
 
@@ -378,12 +394,15 @@ pub mod tests {
     #[test]
     fn calculate_b_miscellaneous() {
         let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
-        info_aliene.tipo_3.species_mediamente_strutt = 10;
-        info_aliene.tipo_2.species_mediamente_strutt = 20;
-        info_aliene.tipo_3.species_destrutt = 10;
-        info_aliene.tipo_2.species_destrutt = 20;
-        info_aliene.tipo_3.species_strutt = 20;
-        info_aliene.tot_specie_aliene = 80;
+        #[expect(deprecated)]
+        {
+            info_aliene.tipo_3.species_mediamente_strutt = 10;
+            info_aliene.tipo_2.species_mediamente_strutt = 20;
+            info_aliene.tipo_3.species_destrutt = 10;
+            info_aliene.tipo_2.species_destrutt = 20;
+            info_aliene.tipo_3.species_strutt = 20;
+            info_aliene.tot_specie_aliene = 80;
+        }
 
         let b = calculate_b(&info_aliene);
 
@@ -396,15 +415,21 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_1_presente_ma_no_strutt() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        info.tipo_1.tot_species = 2;
-        info.tipo_1.species_mediamente_strutt = 2;
-        info.tipo_1.popolazione_piu_strutt = 0.5;
+        #[expect(deprecated)]
+        {
+            info.tipo_1.tot_species = 2;
+            info.tipo_1.species_mediamente_strutt = 2;
+            info.tipo_1.popolazione_piu_strutt = 0.5;
+        }
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
 
-        info.tipo_1.species_destrutt = 1;
-        info.tipo_1.tot_species = 3;
+        #[expect(deprecated)]
+        {
+            info.tipo_1.species_destrutt = 1;
+            info.tipo_1.tot_species = 3;
+        }
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
@@ -416,8 +441,11 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_2_magg_autoctone() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        info.tipo_2.tot_species = 3;
-        info.tot_specie_autoctone = 2;
+        #[expect(deprecated)]
+        {
+            info.tipo_2.tot_species = 3;
+            info.tot_specie_autoctone = 2;
+        }
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
@@ -429,8 +457,11 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_2_min_autoctone() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        info.tipo_2.tot_species = 2;
-        info.tot_specie_autoctone = 3;
+        #[expect(deprecated)]
+        {
+            info.tipo_2.tot_species = 2;
+            info.tot_specie_autoctone = 3;
+        }
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.75);
@@ -442,8 +473,11 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_3_magg_autoctone() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        info.tipo_3.tot_species = 3;
-        info.tot_specie_autoctone = 2;
+        #[expect(deprecated)]
+        {
+            info.tipo_3.tot_species = 3;
+            info.tot_specie_autoctone = 2;
+        }
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.75);
@@ -455,8 +489,11 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_3_min_autoctone() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        info.tipo_3.tot_species = 2;
-        info.tot_specie_autoctone = 3;
+        #[expect(deprecated)]
+        {
+            info.tipo_3.tot_species = 2;
+            info.tot_specie_autoctone = 3;
+        }
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.85);
@@ -466,23 +503,35 @@ pub mod tests {
     fn calculate_a_progressive_scaling() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
 
-        info.tipo_3.tot_species = 2;
-        info.tot_specie_autoctone = 3;
+        #[expect(deprecated)]
+        {
+            info.tipo_3.tot_species = 2;
+            info.tot_specie_autoctone = 3;
+        }
         let a = calculate_a(&info);
         assert_eq!(a, 0.85);
 
-        info.tipo_2.tot_species = 2;
+        #[expect(deprecated)]
+        {
+            info.tipo_2.tot_species = 2;
+        }
         let a = calculate_a(&info);
         assert_eq!(a, 0.75);
 
-        info.tipo_1.tot_species = 2;
-        info.tipo_1.species_mediamente_strutt = 2;
-        info.tipo_1.popolazione_piu_strutt = 0.5;
+        #[expect(deprecated)]
+        {
+            info.tipo_1.tot_species = 2;
+            info.tipo_1.species_mediamente_strutt = 2;
+            info.tipo_1.popolazione_piu_strutt = 0.5;
+        }
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
 
-        info.tipo_1.species_destrutt = 1;
-        info.tipo_1.tot_species = 3;
+        #[expect(deprecated)]
+        {
+            info.tipo_1.species_destrutt = 1;
+            info.tipo_1.tot_species = 3;
+        }
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
     }

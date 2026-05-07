@@ -1869,11 +1869,25 @@ impl InfoIntermediePopolazioniNISECI {
 
 /// struct che aiuta nel calcolo di x3
 pub struct InfoPopolazioniNISECI {
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.popolazione_piu_strutt() instead"
+    )]
     pub popolazione_piu_strutt: f32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.species_strutt() instead")]
     pub species_strutt: u32,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.species_mediamente_strutt() instead"
+    )]
     pub species_mediamente_strutt: u32,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.species_destrutt() instead"
+    )]
     pub species_destrutt: u32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tot_species() instead")]
     pub tot_species: usize,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.intermediates_map() instead"
+    )]
     pub intermediates_map: HashMap<String, InfoIntermediePopolazioniNISECI>,
 }
 
@@ -1886,13 +1900,55 @@ impl Default for InfoPopolazioniNISECI {
 impl InfoPopolazioniNISECI {
     pub fn new() -> InfoPopolazioniNISECI {
         InfoPopolazioniNISECI {
+            #[expect(deprecated)]
             popolazione_piu_strutt: 0.0,
+            #[expect(deprecated)]
             species_strutt: 0,
+            #[expect(deprecated)]
             species_mediamente_strutt: 0,
+            #[expect(deprecated)]
             species_destrutt: 0,
+            #[expect(deprecated)]
             tot_species: 0,
+            #[expect(deprecated)]
             intermediates_map: HashMap::new(),
         }
+    }
+
+    #[inline(always)]
+    pub fn popolazione_piu_strutt(&self) -> f32 {
+        #[expect(deprecated)]
+        self.popolazione_piu_strutt
+    }
+
+    #[inline(always)]
+    pub fn species_strutt(&self) -> u32 {
+        #[expect(deprecated)]
+        self.species_strutt
+    }
+
+    #[inline(always)]
+    pub fn species_mediamente_strutt(&self) -> u32 {
+        #[expect(deprecated)]
+        self.species_mediamente_strutt
+    }
+
+    #[inline(always)]
+    pub fn species_destrutt(&self) -> u32 {
+        #[expect(deprecated)]
+        self.species_destrutt
+    }
+
+    #[inline(always)]
+    pub fn tot_species(&self) -> usize {
+        #[expect(deprecated)]
+        self.tot_species
+    }
+
+    #[inline(always)]
+    pub(crate) fn intermediates_map(&self) -> &HashMap<String, InfoIntermediePopolazioniNISECI> {
+        #[expect(deprecated)]
+        &self.intermediates_map
     }
 
     pub fn get_info_pop(
@@ -1901,27 +1957,43 @@ impl InfoPopolazioniNISECI {
         let mut errors: Vec<String> = Vec::with_capacity(map.len()); // prenoto ora e poi restringo dopo
 
         let mut info_pop = InfoPopolazioniNISECI::new();
-        info_pop.tot_species = map.len();
+        #[expect(deprecated)]
+        {
+            info_pop.tot_species = map.len();
+        }
         let epsilon: f32 = 1e-6;
         for classe in map.values() {
             match classe.calculate_struttura_popolazione() {
                 Ok((popolazione, criteri_x2_a)) => {
-                    if info_pop.popolazione_piu_strutt < popolazione {
-                        info_pop.popolazione_piu_strutt = popolazione;
+                    if info_pop.popolazione_piu_strutt() < popolazione {
+                        #[expect(deprecated)]
+                        {
+                            info_pop.popolazione_piu_strutt = popolazione;
+                        }
                     }
                     if (popolazione - 1.0).abs() < epsilon {
-                        info_pop.species_strutt += 1;
+                        #[expect(deprecated)]
+                        {
+                            info_pop.species_strutt += 1;
+                        }
                     }
                     if (popolazione - 0.5).abs() < epsilon {
-                        info_pop.species_mediamente_strutt += 1;
+                        #[expect(deprecated)]
+                        {
+                            info_pop.species_mediamente_strutt += 1;
+                        }
                     }
                     if popolazione.abs() < epsilon {
-                        info_pop.species_destrutt += 1;
+                        #[expect(deprecated)]
+                        {
+                            info_pop.species_destrutt += 1;
+                        }
                     }
                     let criterio_a = criteri_x2_a.get_criterio_a();
                     let criterio_b = criteri_x2_a.get_criterio_b();
                     let rapporto_ad_juv = criteri_x2_a.get_rapporto_ad_juv();
 
+                    #[expect(deprecated)]
                     info_pop.intermediates_map.insert(
                         classe.id().to_string(),
                         InfoIntermediePopolazioniNISECI::new(
@@ -1949,10 +2021,19 @@ impl InfoPopolazioniNISECI {
 /// a calcolare x3
 /// per ogni tipo di alloctono abbiamo una InfoPopolazioniNISECI
 pub struct InfoPopolazioniAlieneNISECI {
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_1() instead")]
     pub tipo_1: InfoPopolazioniNISECI,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_2() instead")]
     pub tipo_2: InfoPopolazioniNISECI,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_3() instead")]
     pub tipo_3: InfoPopolazioniNISECI,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.tot_specie_aliene() instead"
+    )]
     pub tot_specie_aliene: usize,
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using self.tot_specie_autoctone() instead"
+    )]
     pub tot_specie_autoctone: usize,
 }
 
@@ -1960,12 +2041,45 @@ impl InfoPopolazioniAlieneNISECI {
     #[cfg(test)]
     pub fn new() -> InfoPopolazioniAlieneNISECI {
         InfoPopolazioniAlieneNISECI {
+            #[expect(deprecated)]
             tipo_1: InfoPopolazioniNISECI::new(),
+            #[expect(deprecated)]
             tipo_2: InfoPopolazioniNISECI::new(),
+            #[expect(deprecated)]
             tipo_3: InfoPopolazioniNISECI::new(),
+            #[expect(deprecated)]
             tot_specie_aliene: 0,
+            #[expect(deprecated)]
             tot_specie_autoctone: 0,
         }
+    }
+
+    #[inline(always)]
+    pub(crate) fn tipo_1(&self) -> &InfoPopolazioniNISECI {
+        #[expect(deprecated)]
+        &self.tipo_1
+    }
+    #[inline(always)]
+    pub(crate) fn tipo_2(&self) -> &InfoPopolazioniNISECI {
+        #[expect(deprecated)]
+        &self.tipo_2
+    }
+    #[inline(always)]
+    pub(crate) fn tipo_3(&self) -> &InfoPopolazioniNISECI {
+        #[expect(deprecated)]
+        &self.tipo_3
+    }
+
+    #[inline(always)]
+    pub(crate) fn tot_specie_aliene(&self) -> usize {
+        #[expect(deprecated)]
+        self.tot_specie_aliene
+    }
+
+    #[inline(always)]
+    pub(crate) fn tot_specie_autoctone(&self) -> usize {
+        #[expect(deprecated)]
+        self.tot_specie_autoctone
     }
 
     pub fn get_info_pop_aliene(
@@ -1979,8 +2093,11 @@ impl InfoPopolazioniAlieneNISECI {
         let tipo_3 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3)?;
 
         let info_pop_aliene = InfoPopolazioniAlieneNISECI {
+            #[expect(deprecated)]
             tipo_1,
+            #[expect(deprecated)]
             tipo_2,
+            #[expect(deprecated)]
             tipo_3,
             #[expect(deprecated)]
             tot_specie_aliene: classi_eta.tot_specie_aliene,
@@ -1992,12 +2109,20 @@ impl InfoPopolazioniAlieneNISECI {
     }
 
     pub fn get_species_mediamente_strutt(&self) -> u32 {
-        self.tipo_1.species_mediamente_strutt
-            + self.tipo_2.species_mediamente_strutt
-            + self.tipo_3.species_mediamente_strutt
+        #[expect(deprecated)]
+        {
+            self.tipo_1.species_mediamente_strutt()
+                + self.tipo_2.species_mediamente_strutt()
+                + self.tipo_3.species_mediamente_strutt()
+        }
     }
     pub fn get_species_destrutt(&self) -> u32 {
-        self.tipo_1.species_destrutt + self.tipo_2.species_destrutt + self.tipo_3.species_destrutt
+        #[expect(deprecated)]
+        {
+            self.tipo_1.species_destrutt()
+                + self.tipo_2.species_destrutt()
+                + self.tipo_3.species_destrutt()
+        }
     }
 }
 
