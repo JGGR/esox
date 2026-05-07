@@ -695,7 +695,7 @@ impl AlieniIndigeni {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum TipoComunitaNISECI {
     Redatta,
@@ -735,47 +735,70 @@ impl TryFrom<i32> for TipoComunitaNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ComunitaNISECI {
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo()")]
     pub tipo: TipoComunitaNISECI,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.fonte()")]
     pub fonte: Option<String>,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.num_protocollo()")]
     pub numero_protocollo: Option<String>,
 }
 
 impl fmt::Display for ComunitaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_representation = match self.tipo {
+        let string_representation = match self.tipo() {
             TipoComunitaNISECI::Redatta | TipoComunitaNISECI::Dm260_2010 => {
-                format!("Comunita di Riferimento: tipo: {} ", self.tipo)
+                format!("Comunita di Riferimento: tipo: {} ", self.tipo())
             }
             TipoComunitaNISECI::Recuperata => {
-                if let Some(fonte) = &self.fonte {
+                if let Some(fonte) = self.fonte() {
                     //TODO: is this good?
                     format!(
                         "Comunita di Riferimento: tipo: {}, fonte: {}",
-                        self.tipo, fonte
+                        self.tipo(),
+                        fonte
                     )
                 } else {
                     format!(
                         "Comunita di Riferimento: tipo: {}, fonte: MANCANTE",
-                        self.tipo
+                        self.tipo()
                     )
                 }
             }
             TipoComunitaNISECI::AffinataDalMase => {
-                if let Some(num_proto) = &self.numero_protocollo {
+                if let Some(num_proto) = self.num_protocollo() {
                     //TODO: is this good?
                     format!(
                         "Comunita di Riferimento: tipo: {}, numero_protocollo: {}",
-                        self.tipo, num_proto
+                        self.tipo(),
+                        num_proto
                     )
                 } else {
                     format!(
                         "Comunita di Riferimento: tipo: {}, numero_protocollo: MANCANTE",
-                        self.tipo
+                        self.tipo()
                     )
                 }
             }
         };
         write!(f, "{}", string_representation)
+    }
+}
+
+impl ComunitaNISECI {
+    #[inline(always)]
+    pub fn tipo(&self) -> TipoComunitaNISECI {
+        #[expect(deprecated)]
+        self.tipo
+    }
+    #[inline(always)]
+    pub fn fonte(&self) -> Option<&str> {
+        #[expect(deprecated)]
+        self.fonte.as_deref()
+    }
+    #[inline(always)]
+    pub fn num_protocollo(&self) -> Option<&str> {
+        #[expect(deprecated)]
+        self.numero_protocollo.as_deref()
     }
 }
 

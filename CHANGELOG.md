@@ -51,6 +51,7 @@
   - `domain::niseci::ValoriIntermediSpecieNISECI` fields
   - `domain::niseci::InfoPopolazioniNISECI` fields
   - `domain::niseci::InfoPopolazioniAlieneNISECI` fields
+  - `domain::niseci::ComunitaNISECI` fields
 
 ## [0.1.5] - 2026-04-30
 

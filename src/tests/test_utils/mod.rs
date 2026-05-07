@@ -37,8 +37,11 @@ pub const ANAGRAFICA_HFBI_TEMPLATE_DATA: &[u8] =
 pub fn create_dummy_anagrafica() -> AnagraficaNISECI {
     return AnagraficaNISECI::new_raw_unchecked(
         ComunitaNISECI {
+            #[expect(deprecated)]
             tipo: TipoComunitaNISECI::Redatta,
+            #[expect(deprecated)]
             fonte: None,
+            #[expect(deprecated)]
             numero_protocollo: None,
         },
         "foo".to_string(),
