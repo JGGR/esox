@@ -474,15 +474,30 @@ fn calculate_sommatoria_x2_b_absolute(
 
 fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) {
     if record.lunghezza < record.cl_soglia_1() {
-        cl.cl1 += 1;
+        #[expect(deprecated)]
+        {
+            cl.cl1 += 1;
+        }
     } else if record.lunghezza < record.cl_soglia_2() {
-        cl.cl2 += 1;
+        #[expect(deprecated)]
+        {
+            cl.cl2 += 1;
+        }
     } else if record.lunghezza < record.cl_soglia_3() {
-        cl.cl3 += 1;
+        #[expect(deprecated)]
+        {
+            cl.cl3 += 1;
+        }
     } else if record.lunghezza < record.cl_soglia_4() {
-        cl.cl4 += 1;
+        #[expect(deprecated)]
+        {
+            cl.cl4 += 1;
+        }
     } else {
-        cl.cl5 += 1;
+        #[expect(deprecated)]
+        {
+            cl.cl5 += 1;
+        }
     }
 }
 

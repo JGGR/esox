@@ -144,6 +144,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
             }
         }
     }
+    #[expect(deprecated)]
     for (key, val) in classi_eta.map_tipo_1 {
         match submetriche.entry(key.clone()) {
             Entry::Occupied(mut entry) => {
@@ -181,6 +182,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
             }
         }
     }
+    #[expect(deprecated)]
     for (key, val) in classi_eta.map_tipo_2 {
         match submetriche.entry(key.clone()) {
             Entry::Occupied(mut entry) => {
@@ -218,6 +220,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
             }
         }
     }
+    #[expect(deprecated)]
     for (key, val) in classi_eta.map_tipo_3 {
         match submetriche.entry(key.clone()) {
             Entry::Occupied(mut entry) => {
@@ -252,6 +255,7 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
     // riempo l'hashmap con solo le specie alloctone campionate
     for cattura in c {
         if cattura.tipo_alloctono() == 1 {
+            #[expect(deprecated)]
             match classi_eta.map_tipo_1.entry(cattura.id().to_string()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
@@ -261,6 +265,7 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
                 }
             };
         } else if cattura.tipo_alloctono() == 2 {
+            #[expect(deprecated)]
             match classi_eta.map_tipo_2.entry(cattura.id().to_string()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
@@ -270,6 +275,7 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
                 }
             };
         } else if cattura.tipo_alloctono() == 3 {
+            #[expect(deprecated)]
             match classi_eta.map_tipo_3.entry(cattura.id().to_string()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
@@ -279,11 +285,17 @@ fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI
                 }
             };
         }
-        classi_eta.tot_specie_autoctone = c.get_tot_specie_autoctone_attese();
+        #[expect(deprecated)]
+        {
+            classi_eta.tot_specie_autoctone = c.get_tot_specie_autoctone_attese();
+        }
     }
 
-    classi_eta.tot_specie_aliene =
-        classi_eta.map_tipo_1.len() + classi_eta.map_tipo_2.len() + classi_eta.map_tipo_3.len();
+    #[expect(deprecated)]
+    {
+        classi_eta.tot_specie_aliene =
+            classi_eta.map_tipo_1.len() + classi_eta.map_tipo_2.len() + classi_eta.map_tipo_3.len();
+    }
 
     classi_eta
 }

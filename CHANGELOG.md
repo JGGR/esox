@@ -43,6 +43,8 @@
   - `domain::niseci::ValoriIntermediNISECI::{log, to_csv}`
   - `domain::niseci::EsemplariPerCattura` fields
   - `domain::niseci::SpecieNISECI` fields
+  - `domain::niseci::ClassiEtaSpecieNISECI` fields
+  - `domain::niseci::ClassiEtaAlieniNISECI` fields
 
 ## [0.1.5] - 2026-04-30
 

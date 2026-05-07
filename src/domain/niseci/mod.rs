@@ -1119,11 +1119,11 @@ impl ValoriIntermediNISECI {
                     v.classi_eta.tipo_autoctono(),
                     v.classi_eta.tipo_alloctono(),
                     specie_attesa_str,
-                    v.classi_eta.cl1,
-                    v.classi_eta.cl2,
-                    v.classi_eta.cl3,
-                    v.classi_eta.cl4,
-                    v.classi_eta.cl5,
+                    v.classi_eta.cl_1(),
+                    v.classi_eta.cl_2(),
+                    v.classi_eta.cl_3(),
+                    v.classi_eta.cl_4(),
+                    v.classi_eta.cl_5(),
                     v.densita_stimata,
                     v.quantita_stimata,
                     v.x2_b,
@@ -1140,11 +1140,11 @@ impl ValoriIntermediNISECI {
                     v.classi_eta.tipo_autoctono(),
                     v.classi_eta.tipo_alloctono(),
                     specie_attesa_str,
-                    v.classi_eta.cl1,
-                    v.classi_eta.cl2,
-                    v.classi_eta.cl3,
-                    v.classi_eta.cl4,
-                    v.classi_eta.cl5,
+                    v.classi_eta.cl_1(),
+                    v.classi_eta.cl_2(),
+                    v.classi_eta.cl_3(),
+                    v.classi_eta.cl_4(),
+                    v.classi_eta.cl_5(),
                     v.densita_stimata.comma(),
                     v.quantita_stimata,
                     v.x2_b,
@@ -1201,11 +1201,11 @@ impl ValoriIntermediNISECI {
                     specie_ref.tipo_autoctono(),
                     specie_ref.tipo_alloctono(),
                     specie_attesa_str,
-                    v.classi_eta.cl1,
-                    v.classi_eta.cl2,
-                    v.classi_eta.cl3,
-                    v.classi_eta.cl4,
-                    v.classi_eta.cl5,
+                    v.classi_eta.cl_1(),
+                    v.classi_eta.cl_2(),
+                    v.classi_eta.cl_3(),
+                    v.classi_eta.cl_4(),
+                    v.classi_eta.cl_5(),
                     v.densita_stimata,
                     v.quantita_stimata,
                     v.x2_b,
@@ -1222,11 +1222,11 @@ impl ValoriIntermediNISECI {
                     specie_ref.tipo_autoctono(),
                     specie_ref.tipo_alloctono(),
                     specie_attesa_str,
-                    v.classi_eta.cl1,
-                    v.classi_eta.cl2,
-                    v.classi_eta.cl3,
-                    v.classi_eta.cl4,
-                    v.classi_eta.cl5,
+                    v.classi_eta.cl_1(),
+                    v.classi_eta.cl_2(),
+                    v.classi_eta.cl_3(),
+                    v.classi_eta.cl_4(),
+                    v.classi_eta.cl_5(),
                     v.densita_stimata.comma(),
                     v.quantita_stimata,
                     v.x2_b,
@@ -1448,10 +1448,15 @@ pub struct ClassiEtaSpecieNISECI {
     ad_juv_soglia_2: f32,
     ad_juv_soglia_3: f32,
     ad_juv_soglia_4: f32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_1() instead")]
     pub cl1: u32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_2() instead")]
     pub cl2: u32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_3() instead")]
     pub cl3: u32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_4() instead")]
     pub cl4: u32,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_5() instead")]
     pub cl5: u32,
 }
 
@@ -1468,11 +1473,11 @@ impl fmt::Display for ClassiEtaSpecieNISECI {
             self.tipo_autoctono(),
             self.tipo_alloctono(),
             specie_attesa_str,
-            self.cl1,
-            self.cl2,
-            self.cl3,
-            self.cl4,
-            self.cl5
+            self.cl_1(),
+            self.cl_2(),
+            self.cl_3(),
+            self.cl_4(),
+            self.cl_5()
         );
         write!(f, "{}", string_representation)
     }
@@ -1486,7 +1491,9 @@ impl Default for ClassiEtaSpecieNISECI {
 }
 
 impl ClassiEtaSpecieNISECI {
-    #[deprecated(note = "v0.2 will drop visibility. Consider using new_cl_prevalorizzata instead")]
+    #[deprecated(
+        note = "v0.2 will drop visibility. Consider using ClassiEtaSpecieNISECI::new_cl_prevalorizzata instead"
+    )]
     pub fn new() -> ClassiEtaSpecieNISECI {
         ClassiEtaSpecieNISECI {
             #[expect(deprecated)]
@@ -1498,10 +1505,15 @@ impl ClassiEtaSpecieNISECI {
             ad_juv_soglia_2: 0.2,
             ad_juv_soglia_3: 0.3,
             ad_juv_soglia_4: 0.4,
+            #[expect(deprecated)]
             cl1: 0,
+            #[expect(deprecated)]
             cl2: 0,
+            #[expect(deprecated)]
             cl3: 0,
+            #[expect(deprecated)]
             cl4: 0,
+            #[expect(deprecated)]
             cl5: 0,
         }
     }
@@ -1517,10 +1529,15 @@ impl ClassiEtaSpecieNISECI {
             ad_juv_soglia_2: record.ad_juv_soglia_2(),
             ad_juv_soglia_3: record.ad_juv_soglia_3(),
             ad_juv_soglia_4: record.ad_juv_soglia_4(),
+            #[expect(deprecated)]
             cl1: 0,
+            #[expect(deprecated)]
             cl2: 0,
+            #[expect(deprecated)]
             cl3: 0,
+            #[expect(deprecated)]
             cl4: 0,
+            #[expect(deprecated)]
             cl5: 0,
         };
         classe.update_classi_eta(record);
@@ -1529,12 +1546,43 @@ impl ClassiEtaSpecieNISECI {
 
     pub fn update_classi_eta(&mut self, record: &RecordNISECI) {
         match ClassiEta::find_classe_eta(record) {
+            #[expect(deprecated)]
             ClassiEta::CL1 => self.cl1 += 1,
+            #[expect(deprecated)]
             ClassiEta::CL2 => self.cl2 += 1,
+            #[expect(deprecated)]
             ClassiEta::CL3 => self.cl3 += 1,
+            #[expect(deprecated)]
             ClassiEta::CL4 => self.cl4 += 1,
+            #[expect(deprecated)]
             ClassiEta::CL5 => self.cl5 += 1,
         }
+    }
+
+    #[inline(always)]
+    pub(crate) fn cl_1(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl1
+    }
+    #[inline(always)]
+    pub(crate) fn cl_2(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl2
+    }
+    #[inline(always)]
+    pub(crate) fn cl_3(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl3
+    }
+    #[inline(always)]
+    pub(crate) fn cl_4(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl4
+    }
+    #[inline(always)]
+    pub(crate) fn cl_5(&self) -> u32 {
+        #[expect(deprecated)]
+        self.cl5
     }
 
     #[inline(always)]
@@ -1584,6 +1632,7 @@ impl ClassiEtaSpecieNISECI {
     }
 
     fn get_how_many_classes(&self) -> usize {
+        #[expect(deprecated)]
         [self.cl1, self.cl2, self.cl3, self.cl4, self.cl5]
             .into_iter()
             .filter(|&value| value > 0)
@@ -1602,10 +1651,12 @@ impl ClassiEtaSpecieNISECI {
     }
 
     pub fn get_x2_a_criterio_b(&self) -> (u8, Option<f32>) {
+        #[expect(deprecated)]
         if (self.cl2 + self.cl3) == 0 {
             return (3, None);
         }
 
+        #[expect(deprecated)]
         let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
         if ad_juv < self.ad_juv_soglia_1() {
             return (3, Some(ad_juv));
@@ -1824,15 +1875,20 @@ impl InfoPopolazioniAlieneNISECI {
     pub fn get_info_pop_aliene(
         classi_eta: &ClassiEtaAlieniNISECI,
     ) -> Result<InfoPopolazioniAlieneNISECI, Vec<String>> {
+        #[expect(deprecated)]
         let tipo_1 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1)?;
+        #[expect(deprecated)]
         let tipo_2 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_2)?;
+        #[expect(deprecated)]
         let tipo_3 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3)?;
 
         let info_pop_aliene = InfoPopolazioniAlieneNISECI {
             tipo_1,
             tipo_2,
             tipo_3,
+            #[expect(deprecated)]
             tot_specie_aliene: classi_eta.tot_specie_aliene,
+            #[expect(deprecated)]
             tot_specie_autoctone: classi_eta.tot_specie_autoctone,
         };
 
@@ -1852,10 +1908,15 @@ impl InfoPopolazioniAlieneNISECI {
 /// struct che aiuta nel calcolo x3
 /// ci aiuta a suddividere le specie aliene in base alla tipologia
 pub struct ClassiEtaAlieniNISECI {
+    #[deprecated(note = "v0.2 will drop visibility.")]
     pub map_tipo_1: HashMap<String, ClassiEtaSpecieNISECI>,
+    #[deprecated(note = "v0.2 will drop visibility.")]
     pub map_tipo_2: HashMap<String, ClassiEtaSpecieNISECI>,
+    #[deprecated(note = "v0.2 will drop visibility.")]
     pub map_tipo_3: HashMap<String, ClassiEtaSpecieNISECI>,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tot_specie_aliene()")]
     pub tot_specie_aliene: usize,
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tot_specie_autoctone()")]
     pub tot_specie_autoctone: usize,
 }
 
@@ -1868,12 +1929,25 @@ impl Default for ClassiEtaAlieniNISECI {
 impl ClassiEtaAlieniNISECI {
     pub fn new() -> ClassiEtaAlieniNISECI {
         ClassiEtaAlieniNISECI {
+            #[expect(deprecated)]
             map_tipo_1: HashMap::with_capacity(10),
+            #[expect(deprecated)]
             map_tipo_2: HashMap::with_capacity(10),
+            #[expect(deprecated)]
             map_tipo_3: HashMap::with_capacity(10),
+            #[expect(deprecated)]
             tot_specie_aliene: 0,
+            #[expect(deprecated)]
             tot_specie_autoctone: 0,
         }
+    }
+    pub fn tot_specie_aliene(&self) -> usize {
+        #[expect(deprecated)]
+        self.tot_specie_aliene
+    }
+    pub fn tot_specie_autoctone(&self) -> usize {
+        #[expect(deprecated)]
+        self.tot_specie_autoctone
     }
 }
 
@@ -2027,10 +2101,15 @@ mod domain_niseci_private_tests {
                 ad_juv_soglia_2: specie.ad_juv_soglia_2(),
                 ad_juv_soglia_3: specie.ad_juv_soglia_3(),
                 ad_juv_soglia_4: specie.ad_juv_soglia_4(),
+                #[expect(deprecated)]
                 cl1,
+                #[expect(deprecated)]
                 cl2,
+                #[expect(deprecated)]
                 cl3,
+                #[expect(deprecated)]
                 cl4,
+                #[expect(deprecated)]
                 cl5,
             }
         }
