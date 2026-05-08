@@ -15,30 +15,26 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::collections::HashMap;
-
-use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI, SpecieHFBI};
+use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 use crate::domain::posf32::PositiveF32;
+use std::collections::HashSet;
 
 pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
     let bmig = calc_bmig(campione, anagrafica)?;
 
-    let mut specie_map: HashMap<String, SpecieHFBI> = HashMap::with_capacity(10);
     // trovo il numero di specie trovate
+    let mut specie = HashSet::new();
+
     for cattura in campione {
         match cattura.specie.gruppo_eco {
             GruppoEcoHFBI::Diadromi | GruppoEcoHFBI::MigratoriMarini => {
-                specie_map.insert(
-                    cattura.specie.codice_specie.to_string(),
-                    cattura.specie.clone(),
-                );
+                specie.insert(cattura.specie.codice_specie.as_str());
             }
             _ => {}
         }
     }
 
-    let smig = specie_map.len();
-
+    let smig = specie.len();
     if smig == 0 {
         return Ok(0.0);
     }
