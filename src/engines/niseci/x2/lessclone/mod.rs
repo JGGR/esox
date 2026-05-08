@@ -329,7 +329,7 @@ fn calculate_sommatoria_x2_a(
         }
     }
 
-    calculate_sommatoria_x2_a_absolute(classi_eta_map)
+    calculate_sommatoria_x2_a_absolute(classi_eta_map, r)
 }
 
 fn calculate_sommatoria_x2_b(
@@ -361,11 +361,7 @@ fn calculate_sommatoria_x2_b(
                         .fill_passaggio(cattura.passaggio_cattura());
                 }
                 Entry::Vacant(vacant_entry) => {
-                    let mut epc = EsemplariPerCattura::new(
-                        id,
-                        cattura.dens_soglia_1(),
-                        cattura.dens_soglia_2(),
-                    );
+                    let mut epc = EsemplariPerCattura::new(id);
                     epc.fill_passaggio(cattura.passaggio_cattura());
                     vacant_entry.insert(epc);
                 }
@@ -373,7 +369,7 @@ fn calculate_sommatoria_x2_b(
         }
     }
 
-    calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map, superficie)
+    calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map, r, superficie)
 }
 
 fn calculate_sommatoria_x2_a_per_alloctone(
@@ -405,7 +401,7 @@ fn calculate_sommatoria_x2_a_per_alloctone(
         }
     }
 
-    calculate_sommatoria_x2_a_absolute(classi_eta_map)
+    calculate_sommatoria_x2_a_absolute(classi_eta_map, r)
 }
 
 fn calculate_sommatoria_x2_b_per_alloctone(
@@ -444,11 +440,7 @@ fn calculate_sommatoria_x2_b_per_alloctone(
                         .fill_passaggio(cattura.passaggio_cattura());
                 }
                 Entry::Vacant(vacant_entry) => {
-                    let mut epc = EsemplariPerCattura::new(
-                        id,
-                        cattura.dens_soglia_1(),
-                        cattura.dens_soglia_2(),
-                    );
+                    let mut epc = EsemplariPerCattura::new(id);
                     epc.fill_passaggio(cattura.passaggio_cattura());
                     vacant_entry.insert(epc);
                 }
@@ -456,11 +448,12 @@ fn calculate_sommatoria_x2_b_per_alloctone(
         }
     }
 
-    calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map, superficie)
+    calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map, r, superficie)
 }
 
 fn calculate_sommatoria_x2_a_absolute(
     classi_eta_map: HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
+    r: &RiferimentoNISECI,
 ) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
     // ora la mappa è riempita e tutte le classi sono state riempite
     // si procede quindi al calcolo di x2 a per ogni specie campionata autoctona
@@ -470,7 +463,7 @@ fn calculate_sommatoria_x2_a_absolute(
     let mut errors: Vec<String> = Vec::with_capacity(classi_eta_map.len()); // prenoto ora e poi restringo dopo
     let mut criteri_vec: Vec<RecordSubmetricheX2A> = Vec::with_capacity(classi_eta_map.len());
     for classe in classi_eta_map.values() {
-        match calculate_x2_a(classe) {
+        match calculate_x2_a(classe, r) {
             Ok((x2_a, criteri_x2_a)) => {
                 let criterio_a = criteri_x2_a.get_criterio_a();
                 let criterio_b = criteri_x2_a.get_criterio_b();
@@ -498,6 +491,7 @@ fn calculate_sommatoria_x2_a_absolute(
 
 fn calculate_sommatoria_x2_b_absolute(
     esemplari_per_cattura_map: HashMap<IdSpecieNISECI, EsemplariPerCattura>,
+    r: &RiferimentoNISECI,
     superficie: f32,
 ) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
     // ora che abbiamo riempito la mappa con tutte le catture, possiamo andare
@@ -506,7 +500,7 @@ fn calculate_sommatoria_x2_b_absolute(
     let mut errors: Vec<String> = Vec::with_capacity(esemplari_per_cattura_map.len()); // prenoto ora e poi restringo dopo
     let mut densita_vec: Vec<MetricheX2B> = Vec::with_capacity(esemplari_per_cattura_map.len());
     for catture in esemplari_per_cattura_map.values() {
-        match calculate_x2_b(catture, &superficie) {
+        match calculate_x2_b(catture, r, &superficie) {
             Ok((x2_b, densita_stimata, quantita_stimata)) => {
                 sommatoria_x2_b += x2_b;
                 densita_vec.push(MetricheX2B::new(
@@ -532,21 +526,34 @@ fn calculate_sommatoria_x2_b_absolute(
 }
 
 /// fn wrapper del calcolo della struttura di una popolazione
-fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<(f32, MetricheX2A), String> {
-    classe.calculate_struttura_popolazione()
+fn calculate_x2_a(
+    classe: &ClassiEtaSpecieNISECI,
+    r: &RiferimentoNISECI,
+) -> Result<(f32, MetricheX2A), String> {
+    classe.calculate_struttura_popolazione(r)
 }
 
-fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32, f32, u32), String> {
+fn calculate_x2_b(
+    e: &EsemplariPerCattura,
+    r: &RiferimentoNISECI,
+    superficie: &f32,
+) -> Result<(f32, f32, u32), String> {
     match get_quantita_stimata(e.mappa()) {
         Ok(q_stimata) => {
             // calcolo densita stimata
             let densita_stimata = q_stimata as f32 / superficie;
 
             // trovo ora x2_b
-            if densita_stimata > e.dens_soglia_2() {
+            if densita_stimata
+                > e.dens_soglia_2(r)
+                    .ok_or(format!("id: {} not present in RiferimentoNISECI", e.id()))?
+            {
                 return Ok((1.0, densita_stimata, q_stimata));
             }
-            if densita_stimata > e.dens_soglia_1() {
+            if densita_stimata
+                > e.dens_soglia_1(r)
+                    .ok_or(format!("id: {} not present in RiferimentoNISECI", e.id()))?
+            {
                 return Ok((0.5, densita_stimata, q_stimata));
             }
             Ok((0.0, densita_stimata, q_stimata))
@@ -777,12 +784,12 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_b_buona() {
-        let specie = get_ciaccio();
-        let mut epc = EsemplariPerCattura::new(1, specie.dens_soglia_1(), specie.dens_soglia_2());
+        let mut epc = EsemplariPerCattura::new(0);
         (0..30).for_each(|_| epc.fill_passaggio(1));
         (0..15).for_each(|_| epc.fill_passaggio(2));
 
-        let x2_b = calculate_x2_b(&epc, &2.0);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_b = calculate_x2_b(&epc, &rif, &2.0);
 
         assert_eq!(Ok(1.0), x2_b.map(|(x2_b, _, _)| x2_b));
     }
@@ -793,11 +800,12 @@ mod x2_private_tests {
         specie.set_dens_soglia_1(20.0);
         specie.set_dens_soglia_2(30.0);
 
-        let mut epc = EsemplariPerCattura::new(1, specie.dens_soglia_1(), specie.dens_soglia_2());
+        let mut epc = EsemplariPerCattura::new(0);
         (0..30).for_each(|_| epc.fill_passaggio(1));
         (0..15).for_each(|_| epc.fill_passaggio(2));
+        let rif = RiferimentoNISECI::new(vec![specie]);
 
-        let x2_b = calculate_x2_b(&epc, &2.0);
+        let x2_b = calculate_x2_b(&epc, &rif, &2.0);
 
         assert_eq!(Ok(0.5), x2_b.map(|(x2_b, _, _)| x2_b));
     }
@@ -808,155 +816,156 @@ mod x2_private_tests {
         specie.set_dens_soglia_1(30.0);
         specie.set_dens_soglia_2(40.0);
 
-        let mut epc = EsemplariPerCattura::new(1, specie.dens_soglia_1(), specie.dens_soglia_2());
+        let mut epc = EsemplariPerCattura::new(0);
         (0..30).for_each(|_| epc.fill_passaggio(1));
         (0..15).for_each(|_| epc.fill_passaggio(2));
+        let rif = RiferimentoNISECI::new(vec![specie]);
 
-        let x2_b = calculate_x2_b(&epc, &2.0);
+        let x2_b = calculate_x2_b(&epc, &rif, &2.0);
 
         assert_eq!(Ok(0.0), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 3, 3, 1, 1);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 3, 3, 1, 1);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 1, 1, 3, 3);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 1, 1, 3, 3);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 1, 1, 2, 2);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 1, 1, 2, 2);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(1.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 2, 2, 1, 1);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 2, 2, 1, 1);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(1.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_1() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 1, 1, 1, 1);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 1, 1, 1, 1);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(1.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_1() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 2, 1, 1);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 2, 1, 1);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 2, 2, 2);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 2, 2, 2);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 2, 2, 2, 0);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 2, 2, 2, 0);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 2, 3, 3);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 2, 3, 3);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 6, 1, 1);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 6, 1, 1);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 1, 0, 6);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 1, 0, 6);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 6, 0, 1);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 6, 0, 1);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_1() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 1, 0, 1);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 1, 0, 1);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 2, 0, 1);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 2, 0, 1);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 0, 0, 1, 0, 2);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 0, 0, 1, 0, 2);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.0), x2_a.map(|(x2_a, _)| x2_a));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_adulti_cl1_valorizzato() {
-        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 420, 5, 0, 10, 20, 10);
-
-        let x2_a = calculate_x2_a(&classe);
+        let classe = ClassiEtaSpecieNISECI::new_custom(0, 5, 0, 10, 20, 10);
+        let rif = RiferimentoNISECI::new(vec![get_ciaccio()]);
+        let x2_a = calculate_x2_a(&classe, &rif);
 
         assert_eq!(Ok(0.5), x2_a.map(|(x2_a, _)| x2_a));
     }

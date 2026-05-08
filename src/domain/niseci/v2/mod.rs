@@ -439,13 +439,6 @@ impl RisultatoNISECI {
 #[serde(deny_unknown_fields)]
 pub struct ClassiEtaSpecieNISECI {
     id: IdSpecieNISECI,
-    tipo_autoctono: u8,
-    tipo_alloctono: u8,
-    specie_attesa: bool,
-    ad_juv_soglia_1: f32,
-    ad_juv_soglia_2: f32,
-    ad_juv_soglia_3: f32,
-    ad_juv_soglia_4: f32,
     cl1: u32,
     cl2: u32,
     cl3: u32,
@@ -455,16 +448,9 @@ pub struct ClassiEtaSpecieNISECI {
 
 impl fmt::Display for ClassiEtaSpecieNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let specie_attesa_str = match self.specie_attesa() {
-            true => "SI".to_string(),
-            false => "NO".to_string(),
-        };
         let string_representation = format!(
-            "{}; {}; {}; {}; {}; {}; {}; {}; {}",
+            "{}; {}; {}; {}; {}; {}",
             self.id(),
-            self.tipo_autoctono(),
-            self.tipo_alloctono(),
-            specie_attesa_str,
             self.cl_1(),
             self.cl_2(),
             self.cl_3(),
@@ -479,13 +465,6 @@ impl ClassiEtaSpecieNISECI {
     pub(crate) fn new_empty() -> Self {
         Self {
             id: 420,
-            specie_attesa: false,
-            tipo_autoctono: 0,
-            tipo_alloctono: 0,
-            ad_juv_soglia_1: 0.0,
-            ad_juv_soglia_2: 0.0,
-            ad_juv_soglia_3: 0.0,
-            ad_juv_soglia_4: 0.0,
             cl1: 0,
             cl2: 0,
             cl3: 0,
@@ -500,13 +479,6 @@ impl ClassiEtaSpecieNISECI {
         let id = riferimento.get_inner_id(record.id())?;
         let mut classe = ClassiEtaSpecieNISECI {
             id,
-            specie_attesa: record.specie_attesa(),
-            tipo_autoctono: record.tipo_autoctono(),
-            tipo_alloctono: record.tipo_alloctono(),
-            ad_juv_soglia_1: record.ad_juv_soglia_1(),
-            ad_juv_soglia_2: record.ad_juv_soglia_2(),
-            ad_juv_soglia_3: record.ad_juv_soglia_3(),
-            ad_juv_soglia_4: record.ad_juv_soglia_4(),
             cl1: 0,
             cl2: 0,
             cl3: 0,
@@ -554,38 +526,42 @@ impl ClassiEtaSpecieNISECI {
     }
 
     #[inline(always)]
-    pub fn specie_attesa(&self) -> bool {
-        self.specie_attesa
+    pub fn specie_attesa(&self, r: &RiferimentoNISECI) -> Option<bool> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.specie_attesa())
     }
 
     #[inline(always)]
-    pub(crate) fn tipo_autoctono(&self) -> u8 {
-        self.tipo_autoctono
+    pub fn tipo_autoctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_autoctono())
     }
 
     #[inline(always)]
-    pub(crate) fn tipo_alloctono(&self) -> u8 {
-        self.tipo_alloctono
+    pub fn tipo_alloctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_alloctono())
     }
 
     #[inline(always)]
-    pub fn ad_juv_soglia_1(&self) -> f32 {
-        self.ad_juv_soglia_1
+    pub fn ad_juv_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_1())
     }
 
     #[inline(always)]
-    pub fn ad_juv_soglia_2(&self) -> f32 {
-        self.ad_juv_soglia_2
+    pub fn ad_juv_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_2())
     }
 
     #[inline(always)]
-    pub fn ad_juv_soglia_3(&self) -> f32 {
-        self.ad_juv_soglia_3
+    pub fn ad_juv_soglia_3(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_3())
     }
 
     #[inline(always)]
-    pub fn ad_juv_soglia_4(&self) -> f32 {
-        self.ad_juv_soglia_4
+    pub fn ad_juv_soglia_4(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_4())
     }
 
     fn get_how_many_classes(&self) -> usize {
@@ -606,32 +582,37 @@ impl ClassiEtaSpecieNISECI {
         3
     }
 
-    pub fn get_x2_a_criterio_b(&self) -> (u8, Option<f32>) {
+    pub fn get_x2_a_criterio_b(&self, r: &RiferimentoNISECI) -> Option<(u8, Option<f32>)> {
         if (self.cl2 + self.cl3) == 0 {
-            return (3, None);
+            return Some((3, None));
         }
 
         let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
-        if ad_juv < self.ad_juv_soglia_1() {
-            return (3, Some(ad_juv));
+        if ad_juv < self.ad_juv_soglia_1(r)? {
+            return Some((3, Some(ad_juv)));
         }
-        if ad_juv <= self.ad_juv_soglia_2() {
-            return (2, Some(ad_juv));
+        if ad_juv <= self.ad_juv_soglia_2(r)? {
+            return Some((2, Some(ad_juv)));
         }
-        if ad_juv <= self.ad_juv_soglia_3() {
-            return (1, Some(ad_juv));
+        if ad_juv <= self.ad_juv_soglia_3(r)? {
+            return Some((1, Some(ad_juv)));
         }
-        if ad_juv <= self.ad_juv_soglia_4() {
-            return (2, Some(ad_juv));
+        if ad_juv <= self.ad_juv_soglia_4(r)? {
+            return Some((2, Some(ad_juv)));
         }
-        (3, Some(ad_juv))
+        Some((3, Some(ad_juv)))
     }
 
     /// questa fn viene usata sia per x2_a che per x3
     /// i suoi test sono esattamente quelli per calculate_x2_a
-    pub fn calculate_struttura_popolazione(&self) -> Result<(f32, MetricheX2A), String> {
+    pub fn calculate_struttura_popolazione(
+        &self,
+        r: &RiferimentoNISECI,
+    ) -> Result<(f32, MetricheX2A), String> {
         let criterio_a: u8 = self.get_x2_a_criterio_a();
-        let (criterio_b, ad_juv): (u8, Option<f32>) = self.get_x2_a_criterio_b();
+        let (criterio_b, ad_juv): (u8, Option<f32>) = self.get_x2_a_criterio_b(r).ok_or(
+            format!("id: {} not present in RiferimentoNISECI", self.id()),
+        )?;
 
         if criterio_a == 1 && criterio_b == 3 {
             return Ok((
@@ -729,6 +710,7 @@ impl InfoPopolazioniNISECI {
 
     pub fn get_info_pop(
         map: &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
+        r: &RiferimentoNISECI,
     ) -> Result<InfoPopolazioniNISECI, Vec<String>> {
         let mut errors: Vec<String> = Vec::with_capacity(map.len()); // prenoto ora e poi restringo dopo
 
@@ -736,7 +718,7 @@ impl InfoPopolazioniNISECI {
         info_pop.tot_species = map.len();
         let epsilon: f32 = 1e-6;
         for classe in map.values() {
-            match classe.calculate_struttura_popolazione() {
+            match classe.calculate_struttura_popolazione(r) {
                 Ok((popolazione, criteri_x2_a)) => {
                     if info_pop.popolazione_piu_strutt() < popolazione {
                         info_pop.popolazione_piu_strutt = popolazione;
@@ -825,10 +807,11 @@ impl InfoPopolazioniAlieneNISECI {
 
     pub fn get_info_pop_aliene(
         classi_eta: &ClassiEtaAlieniNISECI,
+        r: &RiferimentoNISECI,
     ) -> Result<InfoPopolazioniAlieneNISECI, Vec<String>> {
-        let tipo_1 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1)?;
-        let tipo_2 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_2)?;
-        let tipo_3 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3)?;
+        let tipo_1 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1, r)?;
+        let tipo_2 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_2, r)?;
+        let tipo_3 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3, r)?;
 
         let info_pop_aliene = InfoPopolazioniAlieneNISECI {
             tipo_1,
@@ -916,31 +899,30 @@ impl ClassiEtaAlieniNISECI {
 pub struct EsemplariPerCattura {
     id: IdSpecieNISECI,
     mappa: HashMap<u8, u32>, // la key è il numero del passaggio
-    dens_soglia_1: f32,
-    dens_soglia_2: f32,
 }
 
 impl EsemplariPerCattura {
+    #[inline(always)]
     pub fn id(&self) -> IdSpecieNISECI {
         self.id
     }
+    #[inline(always)]
     pub fn mappa(&self) -> &HashMap<u8, u32> {
         &self.mappa
     }
-    pub fn dens_soglia_1(&self) -> f32 {
-        self.dens_soglia_1
+    #[inline(always)]
+    pub fn dens_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_1())
     }
     #[inline(always)]
-    pub fn dens_soglia_2(&self) -> f32 {
-        self.dens_soglia_2
+    pub fn dens_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_2())
     }
 
-    pub fn new(id: IdSpecieNISECI, dens_soglia_1: f32, dens_soglia_2: f32) -> Self {
+    pub fn new(id: IdSpecieNISECI) -> Self {
         EsemplariPerCattura {
             id,
             mappa: HashMap::new(),
-            dens_soglia_1,
-            dens_soglia_2,
         }
     }
 
@@ -959,14 +941,12 @@ impl EsemplariPerCattura {
 
 #[cfg(test)]
 mod domain_niseci_private_tests {
-    use super::*;
-    use crate::domain::niseci::SpecieNISECI;
+    use crate::domain::niseci::v2::*;
 
     #[cfg(test)]
     impl ClassiEtaSpecieNISECI {
         #[cfg(test)]
         pub(crate) fn new_custom(
-            specie: &SpecieNISECI,
             id: IdSpecieNISECI,
             cl1: u32,
             cl2: u32,
@@ -976,13 +956,6 @@ mod domain_niseci_private_tests {
         ) -> Self {
             Self {
                 id,
-                tipo_autoctono: specie.tipo_autoctono(),
-                tipo_alloctono: specie.tipo_alloctono(),
-                specie_attesa: specie.specie_attesa(),
-                ad_juv_soglia_1: specie.ad_juv_soglia_1(),
-                ad_juv_soglia_2: specie.ad_juv_soglia_2(),
-                ad_juv_soglia_3: specie.ad_juv_soglia_3(),
-                ad_juv_soglia_4: specie.ad_juv_soglia_4(),
                 cl1,
                 cl2,
                 cl3,

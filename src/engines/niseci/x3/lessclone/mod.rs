@@ -118,7 +118,7 @@ pub fn calculate_x3(
 
     // ora ho ottenuto le classi di eta per ogni specie aliena trovata
 
-    let info_pop_aliene = InfoPopolazioniAlieneNISECI::get_info_pop_aliene(&classi_eta)?;
+    let info_pop_aliene = InfoPopolazioniAlieneNISECI::get_info_pop_aliene(&classi_eta, r)?;
 
     // condizione 3
     let epsilon: f32 = 1e-6;
