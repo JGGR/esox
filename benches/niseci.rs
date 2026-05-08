@@ -284,19 +284,11 @@ fn bench_name(tag: &str) -> String {
     const BACKEND: &'static str = "CSV v2-dev";
     #[cfg(not(feature = "lessclone"))]
     const BACKEND: &'static str = "CSV v1.6";
-    format!(
-        "{}: {tag} padded-sequential-id, prefix_len: {PREFIX_LEN}, backend: {}",
-        module_path!(),
-        BACKEND
-    )
+    format!("{}: {tag}, prefix: {PREFIX_LEN}", BACKEND)
 }
 
 fn full_bench(c: &mut Criterion) {
-    run_bench(
-        c,
-        &bench_name("late join (linear search worst case)"),
-        make_nice_input,
-    );
+    run_bench(c, &bench_name("late join"), make_nice_input);
     run_bench(
         c,
         &bench_name("avg (shuffle)"),

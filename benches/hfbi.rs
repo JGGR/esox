@@ -39,12 +39,7 @@ fn bench_name(tag: &str) -> String {
     const BACKEND: &'static str = "CSV v2-dev";
     #[cfg(not(feature = "lessclone"))]
     const BACKEND: &'static str = "CSV v1.6";
-    format!(
-        "{}: {} last-defined-id, backend: {}",
-        module_path!(),
-        tag,
-        BACKEND
-    )
+    format!("{}: {}", BACKEND, tag,)
 }
 
 fn full_bench(c: &mut Criterion) {
