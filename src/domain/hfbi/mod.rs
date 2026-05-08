@@ -122,7 +122,7 @@ impl SpecieHFBI {
     }
 }
 
-macro_rules! define_species {
+macro_rules! define_riferimento_hfbi {
     (
         $(
             $code:literal => {
@@ -133,13 +133,13 @@ macro_rules! define_species {
             }
         ),* $(,)?
     ) => {
-        pub struct HfbiRegistry {
+        struct InternerSpecieHFBI {
             species: Vec<SpecieHFBI>,
             index: std::collections::HashMap<&'static str, usize>,
         }
 
-        impl HfbiRegistry {
-            pub fn new() -> Self {
+        impl InternerSpecieHFBI {
+            fn new() -> Self {
                 let mut species = Vec::new();
                 let mut index = std::collections::HashMap::new();
 
@@ -159,11 +159,27 @@ macro_rules! define_species {
 
                 Self { species, index }
             }
+            fn get(&self, id: &str) -> Option<&SpecieHFBI> {
+                self.index.get(id).and_then(|idx| self.species.get(*idx))
+            }
+        }
+
+        pub struct RiferimentoHFBI {
+            map_ids: InternerSpecieHFBI,
+        }
+
+        impl RiferimentoHFBI {
+            fn new() -> Self {
+                Self { map_ids: InternerSpecieHFBI::new() }
+            }
+            pub(crate) fn get(&self, id: &str) -> Option<&SpecieHFBI> {
+                self.map_ids.get(id)
+            }
         }
     };
 }
 
-define_species! {
+define_riferimento_hfbi! {
     "CH" => {
         "Cheppia",
         true,
@@ -600,7 +616,7 @@ define_species! {
     },
 }
 
-#[deprecated(note = "v0.2 will change type to HashMap<String, SpecieHFBI>")]
+#[deprecated(note = "v0.2 will change type to RiferimentoHFBI")]
 pub static RIFERIMENTO_HFBI: LazyLock<Vec<SpecieHFBI>> = LazyLock::new(|| {
     vec![
         SpecieHFBI {
@@ -1073,14 +1089,8 @@ pub static RIFERIMENTO_HFBI: LazyLock<Vec<SpecieHFBI>> = LazyLock::new(|| {
 
 /// v0.2 will have this public as RIFERIMENTO_HFBI,
 /// avoiding the cloning.
-pub(crate) static RIFERIMENTO_HFBI_MAP: LazyLock<HashMap<String, SpecieHFBI>> =
-    LazyLock::new(|| {
-        #[expect(deprecated)]
-        RIFERIMENTO_HFBI
-            .iter()
-            .map(|s| (s.codice_specie.clone(), s.clone()))
-            .collect()
-    });
+pub(crate) static RIFERIMENTO_HFBI_MAP: LazyLock<RiferimentoHFBI> =
+    LazyLock::new(RiferimentoHFBI::new);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
