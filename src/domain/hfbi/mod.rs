@@ -104,6 +104,502 @@ impl fmt::Display for SpecieHFBI {
     }
 }
 
+impl SpecieHFBI {
+    fn new(
+        nome_comune: &'static str,
+        codice_specie: &'static str,
+        autoctono: bool,
+        gruppo_eco: GruppoEcoHFBI,
+        gruppo_trofico: GruppoTrofHFBI,
+    ) -> Self {
+        Self {
+            nome_comune: nome_comune.to_string(),
+            codice_specie: codice_specie.to_string(),
+            autoctono,
+            gruppo_eco,
+            gruppo_trofico,
+        }
+    }
+}
+
+macro_rules! define_species {
+    (
+        $(
+            $code:literal => {
+                $nome:literal,
+                $auto:expr,
+                $eco:expr,
+                $trofico:expr
+            }
+        ),* $(,)?
+    ) => {
+        pub struct HfbiRegistry {
+            species: Vec<SpecieHFBI>,
+            index: std::collections::HashMap<&'static str, usize>,
+        }
+
+        impl HfbiRegistry {
+            pub fn new() -> Self {
+                let mut species = Vec::new();
+                let mut index = std::collections::HashMap::new();
+
+                $(
+                    let i = species.len();
+
+                    species.push(SpecieHFBI::new(
+                        $nome,
+                        $code,
+                        $auto,
+                        $eco,
+                        $trofico,
+                    ));
+
+                    index.insert($code, i);
+                )*
+
+                Self { species, index }
+            }
+        }
+    };
+}
+
+define_species! {
+    "CH" => {
+        "Cheppia",
+        true,
+        GruppoEcoHFBI::Diadromi,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "AN" => {
+        "Anguilla",
+        true,
+        GruppoEcoHFBI::Diadromi,
+        GruppoTrofHFBI {
+            microbentivori: 0.2,
+            macrobentivori: 0.4,
+            iperbentivori: 0.4,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "NO" => {
+        "Nono",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 0.5,
+            macrobentivori: 0.0,
+            iperbentivori: 0.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.5,
+        }
+    },
+    "LAT" => {
+        "Latterino di lago",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "BBE" => {
+        "Aguglia",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "CLU" => {
+        "Gallinella",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.4,
+            macrobentivori: 0.4,
+            iperbentivori: 0.2,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "CEL" => {
+        "Muggine labbrone",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 0.5,
+            erbivori: 0.0,
+            detritivori: 0.5,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "DIC" => {
+        "Spigola branzino",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "EEN" => {
+        "Alice (Acciuga Europea)",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 0.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 1.0,
+            onnivori: 0.0,
+        }
+    },
+    "GHN" => {
+        "Ghiozzo nero",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 0.4,
+            macrobentivori: 0.4,
+            iperbentivori: 0.2,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "HGU" => {
+        "Cavalluccio marino",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 0.5,
+            macrobentivori: 0.0,
+            iperbentivori: 0.5,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "HHI" => {
+        "Cavalluccio camuso",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 0.5,
+            macrobentivori: 0.0,
+            iperbentivori: 0.5,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "GHL" => {
+        "Ghiozzetto di laguna",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 2.0 / 3.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0 / 3.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "CED" => {
+        "Muggine dorato",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 0.5,
+            erbivori: 0.0,
+            detritivori: 0.5,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "CEC" => {
+        "Muggine calamita",
+        true,
+        GruppoEcoHFBI::Diadromi,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 0.5,
+            erbivori: 0.0,
+            detritivori: 0.5,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "MUS" => {
+        "Muggine musino",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 0.5,
+            erbivori: 0.0,
+            detritivori: 0.5,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "MUG" => {
+        "Cefalo",
+        true,
+        GruppoEcoHFBI::Diadromi,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 0.5,
+            erbivori: 0.0,
+            detritivori: 0.5,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "MSU" => {
+        "Triglia di scoglio",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 2.0 / 3.0,
+            macrobentivori: 1.0 / 3.0,
+            iperbentivori: 0.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "NOP" => {
+        "Pesce ago sottile",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 1.0,
+            macrobentivori: 0.0,
+            iperbentivori: 0.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "PFL" => {
+        "Passera pianuzza",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.4,
+            macrobentivori: 0.4,
+            iperbentivori: 0.2,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "GHC" => {
+        "Ghiozzetto cenerino",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 2.0 / 3.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0 / 3.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "GHM" => {
+        "Ghiozzetto marmorizzato",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 2.0 / 3.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0 / 3.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "GHE" => {
+        "Ghiozzetto minuto",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 2.0 / 3.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0 / 3.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "BAP" => {
+        "Bavosa pavone",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 0.5,
+            macrobentivori: 0.0,
+            iperbentivori: 0.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.5,
+        }
+    },
+    "SPI" => {
+        "Sardina",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 0.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 1.0,
+            onnivori: 0.0,
+        }
+    },
+    "SSO" => {
+        "Sogliola comune",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 2.0 / 3.0,
+            macrobentivori: 1.0 / 3.0,
+            iperbentivori: 0.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "SAU" => {
+        "Orata",
+        true,
+        GruppoEcoHFBI::MigratoriMarini,
+        GruppoTrofHFBI {
+            microbentivori: 0.4,
+            macrobentivori: 0.2,
+            iperbentivori: 0.4,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "PAR" => {
+        "Pesce ago di rio",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 2.0 / 3.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0 / 3.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "STA" => {
+        "Pesce ago adriatico",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 0.0,
+            macrobentivori: 0.0,
+            iperbentivori: 1.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "STY" => {
+        "Pesce ago cavallino",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 0.2,
+            macrobentivori: 0.0,
+            iperbentivori: 0.8,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+    "GHG" => {
+        "Ghiozzo gò",
+        true,
+        GruppoEcoHFBI::ResidentiDiEstuario,
+        GruppoTrofHFBI {
+            microbentivori: 1.0 / 3.0,
+            macrobentivori: 1.0 / 3.0,
+            iperbentivori: 1.0 / 3.0,
+            erbivori: 0.0,
+            detritivori: 0.0,
+            planctivori: 0.0,
+            onnivori: 0.0,
+        }
+    },
+}
+
 #[deprecated(note = "v0.2 will change type to HashMap<String, SpecieHFBI>")]
 pub static RIFERIMENTO_HFBI: LazyLock<Vec<SpecieHFBI>> = LazyLock::new(|| {
     vec![
@@ -229,7 +725,7 @@ pub static RIFERIMENTO_HFBI: LazyLock<Vec<SpecieHFBI>> = LazyLock::new(|| {
         },
         SpecieHFBI {
             nome_comune: "Alice (Acciuga Europea)".to_string(),
-            codice_specie: "DIC".to_string(),
+            codice_specie: "EEN".to_string(),
             autoctono: true,
             gruppo_eco: GruppoEcoHFBI::MigratoriMarini,
             gruppo_trofico: GruppoTrofHFBI {

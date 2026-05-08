@@ -21,6 +21,7 @@
 
 ### Changed
 
+- Fixed wrong id for `Alice (Acciuga Europea)` in `RIFERIMENTO_HFBI`
 - Improved worst cases parsing performance
 - Refactor internal `engines::niseci::x2` methods to avoid some cloning
 - Corrected deprecation message for `csv::{deser,load}::{niseci,hfbi}` generic methods
