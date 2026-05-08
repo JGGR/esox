@@ -785,6 +785,20 @@ impl fmt::Display for ComunitaNISECI {
 }
 
 impl ComunitaNISECI {
+    pub fn new(
+        tipo: TipoComunitaNISECI,
+        fonte: Option<String>,
+        num_protocollo: Option<String>,
+    ) -> Self {
+        Self {
+            #[expect(deprecated)]
+            tipo,
+            #[expect(deprecated)]
+            fonte,
+            #[expect(deprecated)]
+            numero_protocollo: num_protocollo,
+        }
+    }
     #[inline(always)]
     pub fn tipo(&self) -> TipoComunitaNISECI {
         #[expect(deprecated)]
