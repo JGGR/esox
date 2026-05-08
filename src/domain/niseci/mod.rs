@@ -31,6 +31,9 @@ use super::posf32::{PositiveF32, PositiveF32Error};
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
                                                       // in test builds
 
+#[cfg(feature = "lessclone")]
+pub mod v2;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpecieNISECI {
@@ -242,7 +245,7 @@ impl SpecieNISECI {
     }
 }
 
-type IdSpecieNISECI = u32;
+pub(crate) type IdSpecieNISECI = u32;
 
 #[derive(Debug, Clone, Serialize)]
 pub(crate) struct StoreSpecieNISECI {
@@ -306,6 +309,14 @@ impl InternerSpecieNISECI {
     #[inline(always)]
     pub(crate) fn get(&self, s: &str) -> Option<&SpecieNISECI> {
         self.map.get(s).and_then(|k| self.store.get(*k))
+    }
+    #[inline(always)]
+    pub(crate) fn get_by_id(&self, id: IdSpecieNISECI) -> Option<&SpecieNISECI> {
+        self.store.get(id)
+    }
+    #[inline(always)]
+    pub(crate) fn get_by_str_id(&self, s: &str) -> Option<IdSpecieNISECI> {
+        self.map.get(s).copied()
     }
     #[inline(always)]
     pub(crate) fn intern(&mut self, s: &str, val: SpecieNISECI) -> IdSpecieNISECI {
@@ -395,6 +406,14 @@ impl RiferimentoNISECI {
     pub fn get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI> {
         self.map_ids.get(id)
     }
+    #[inline(always)]
+    pub fn get_ref_by_plain_id(&self, id: IdSpecieNISECI) -> Option<&SpecieNISECI> {
+        self.map_ids.get_by_id(id)
+    }
+    #[inline(always)]
+    pub fn get_inner_id(&self, id: &str) -> Option<IdSpecieNISECI> {
+        self.map_ids.get_by_str_id(id)
+    }
 
     pub fn to_csv_intermediates_joined(
         &self,
@@ -425,19 +444,11 @@ impl<'a> IntoIterator for &'a RiferimentoNISECI {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RecordNISECI {
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.id(), self.specie_attesa() and other getters instead"
-    )]
-    pub specie: SpecieNISECI,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.passaggio_cattura() instead"
-    )]
-    pub passaggio_cattura: u8,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.lunghezza() instead")]
-    pub lunghezza: u32,
+    specie: SpecieNISECI,
+    passaggio_cattura: u8,
+    lunghezza: u32,
     /// in millimetri
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.peso() instead")]
-    pub peso: f32, // in grammi
+    peso: f32, // in grammi
 }
 
 impl fmt::Display for RecordNISECI {
@@ -449,113 +460,84 @@ impl fmt::Display for RecordNISECI {
 }
 
 impl RecordNISECI {
-    pub(crate) fn new(
-        specie: &SpecieNISECI,
-        passaggio_cattura: u8,
-        lunghezza: u32,
-        peso: f32,
-    ) -> Self {
+    pub fn new(specie: &SpecieNISECI, passaggio_cattura: u8, lunghezza: u32, peso: f32) -> Self {
         Self {
-            #[expect(deprecated)]
             specie: specie.clone(),
-            #[expect(deprecated)]
             passaggio_cattura,
-            #[expect(deprecated)]
             lunghezza,
-            #[expect(deprecated)]
             peso,
         }
     }
     #[inline(always)]
     pub fn passaggio_cattura(&self) -> u8 {
-        #[expect(deprecated)]
         self.passaggio_cattura
     }
     #[inline(always)]
     pub fn lunghezza(&self) -> u32 {
-        #[expect(deprecated)]
         self.lunghezza
     }
     #[inline(always)]
     pub fn peso(&self) -> f32 {
-        #[expect(deprecated)]
         self.peso
     }
     #[inline(always)]
     pub(crate) fn specie(&self) -> &SpecieNISECI {
-        #[expect(deprecated)]
         &self.specie
     }
     #[inline(always)]
     pub(crate) fn id(&self) -> &str {
-        #[expect(deprecated)]
         self.specie.id()
     }
     #[inline(always)]
     pub(crate) fn tipo_autoctono(&self) -> u8 {
-        #[expect(deprecated)]
         self.specie.tipo_autoctono()
     }
     #[inline(always)]
     pub(crate) fn tipo_alloctono(&self) -> u8 {
-        #[expect(deprecated)]
         self.specie.tipo_alloctono()
     }
     #[inline(always)]
     pub(crate) fn specie_attesa(&self) -> bool {
-        #[expect(deprecated)]
         self.specie.specie_attesa()
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_1(&self) -> u32 {
-        #[expect(deprecated)]
         self.specie.cl_soglia_1()
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_2(&self) -> u32 {
-        #[expect(deprecated)]
         self.specie.cl_soglia_2()
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_3(&self) -> u32 {
-        #[expect(deprecated)]
         self.specie.cl_soglia_3()
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_4(&self) -> u32 {
-        #[expect(deprecated)]
         self.specie.cl_soglia_4()
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_1(&self) -> f32 {
-        #[expect(deprecated)]
         self.specie.ad_juv_soglia_1()
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_2(&self) -> f32 {
-        #[expect(deprecated)]
         self.specie.ad_juv_soglia_2()
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_3(&self) -> f32 {
-        #[expect(deprecated)]
         self.specie.ad_juv_soglia_3()
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_4(&self) -> f32 {
-        #[expect(deprecated)]
         self.specie.ad_juv_soglia_4()
     }
     #[inline(always)]
-    #[expect(dead_code)]
-    pub(crate) fn dens_soglia_1(&self) -> f32 {
-        #[expect(deprecated)]
+    pub fn dens_soglia_1(&self) -> f32 {
         self.specie.dens_soglia_1()
     }
     #[inline(always)]
-    #[expect(dead_code)]
-    pub(crate) fn dens_soglia_2(&self) -> f32 {
-        #[expect(deprecated)]
+    pub fn dens_soglia_2(&self) -> f32 {
         self.specie.dens_soglia_2()
     }
 }

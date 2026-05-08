@@ -15,14 +15,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::niseci::{
-    CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI,
+use crate::domain::niseci::v2::{
+    ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI,
 };
+use crate::domain::niseci::{CampionamentoNISECI, IdSpecieNISECI, RiferimentoNISECI};
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
-
-#[cfg(feature = "lessclone")]
-pub mod lessclone;
 
 #[derive(Clone)]
 pub struct SubmetricheX3 {
@@ -46,13 +44,8 @@ impl SubmetricheX3 {
             criterio_b,
         }
     }
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_classi_eta()")]
     #[inline(always)]
-    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
-        self.classi_eta.clone()
-    }
-    #[inline(always)]
-    pub(crate) fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
+    pub fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
         &self.classi_eta
     }
     #[inline(always)]
@@ -72,14 +65,14 @@ impl SubmetricheX3 {
 pub struct MetricheX3 {
     criterio_a: f32,
     criterio_b: f32,
-    submetriche_map: HashMap<String, SubmetricheX3>,
+    submetriche_map: HashMap<IdSpecieNISECI, SubmetricheX3>,
 }
 
 impl MetricheX3 {
     pub fn new(
         criterio_a: f32,
         criterio_b: f32,
-        submetriche_map: HashMap<String, SubmetricheX3>,
+        submetriche_map: HashMap<IdSpecieNISECI, SubmetricheX3>,
     ) -> Self {
         Self {
             criterio_a,
@@ -95,18 +88,16 @@ impl MetricheX3 {
     pub fn get_criterio_b(&self) -> f32 {
         self.criterio_b
     }
-    #[deprecated(note = "v0.2 will drop visibility. Consider using get_ref_submetriche_map()")]
     #[inline(always)]
-    pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX3> {
-        self.submetriche_map.clone()
-    }
-    #[inline(always)]
-    pub fn get_ref_submetriche_map(&self) -> &HashMap<String, SubmetricheX3> {
+    pub fn get_ref_submetriche_map(&self) -> &HashMap<IdSpecieNISECI, SubmetricheX3> {
         &self.submetriche_map
     }
 }
 
-pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
+pub fn calculate_x3(
+    c: &CampionamentoNISECI,
+    r: &RiferimentoNISECI,
+) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
     let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
 
     // condizione 1
@@ -123,7 +114,7 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
     // il calcolo è simile a quello usato per calcolare x2_a
     // solo che questa volta lo faccio sulle specie aliene
     // e suddivido in base al tipo di specie aliena
-    let classi_eta = calculate_classi_eta_alieni(c);
+    let classi_eta = calculate_classi_eta_alieni(c, r);
 
     // ora ho ottenuto le classi di eta per ogni specie aliena trovata
 
@@ -145,17 +136,16 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
     let rounded_x3 = (1000.0 * x3).round() / 1000.0;
 
     let mut errors = Vec::<String>::new();
-    let mut submetriche = HashMap::<String, SubmetricheX3>::new();
+    let mut submetriche = HashMap::<IdSpecieNISECI, SubmetricheX3>::new();
 
     for (key, val) in info_pop_aliene.tipo_1().intermediates_map() {
-        match submetriche.entry(key.to_string()) {
+        match submetriche.entry(*key) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
                     //We fill classi_eta later
                     SubmetricheX3::new(
-                        #[expect(deprecated)]
-                        ClassiEtaSpecieNISECI::new(),
+                        ClassiEtaSpecieNISECI::new_empty(),
                         val.get_rapporto_ad_juv(),
                         val.get_criterio_a(),
                         val.get_criterio_b(),
@@ -164,13 +154,12 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
             }
         }
     }
-    #[expect(deprecated)]
-    for (key, val) in classi_eta.map_tipo_1 {
-        match submetriche.entry(key.clone()) {
+    for (key, val) in classi_eta.map_tipo_1() {
+        match submetriche.entry(*key) {
             Entry::Occupied(mut entry) => {
                 let submetr = entry.get_mut();
                 *submetr = SubmetricheX3::new(
-                    val,
+                    val.clone(),
                     submetr.get_rapporto_ad_juv(),
                     submetr.get_criterio_a(),
                     submetr.get_criterio_b(),
@@ -186,14 +175,13 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
     }
 
     for (key, val) in info_pop_aliene.tipo_2().intermediates_map() {
-        match submetriche.entry(key.to_string()) {
+        match submetriche.entry(*key) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
                     //We fill classi_eta later
                     SubmetricheX3::new(
-                        #[expect(deprecated)]
-                        ClassiEtaSpecieNISECI::new(),
+                        ClassiEtaSpecieNISECI::new_empty(),
                         val.get_rapporto_ad_juv(),
                         val.get_criterio_a(),
                         val.get_criterio_b(),
@@ -202,13 +190,12 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
             }
         }
     }
-    #[expect(deprecated)]
-    for (key, val) in classi_eta.map_tipo_2 {
-        match submetriche.entry(key.clone()) {
+    for (key, val) in classi_eta.map_tipo_2() {
+        match submetriche.entry(*key) {
             Entry::Occupied(mut entry) => {
                 let submetr = entry.get_mut();
                 *submetr = SubmetricheX3::new(
-                    val,
+                    val.clone(),
                     submetr.get_rapporto_ad_juv(),
                     submetr.get_criterio_a(),
                     submetr.get_criterio_b(),
@@ -224,14 +211,13 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
     }
 
     for (key, val) in info_pop_aliene.tipo_3().intermediates_map() {
-        match submetriche.entry(key.to_string()) {
+        match submetriche.entry(*key) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
                     //We fill classi_eta later
                     SubmetricheX3::new(
-                        #[expect(deprecated)]
-                        ClassiEtaSpecieNISECI::new(),
+                        ClassiEtaSpecieNISECI::new_empty(),
                         val.get_rapporto_ad_juv(),
                         val.get_criterio_a(),
                         val.get_criterio_b(),
@@ -240,13 +226,12 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
             }
         }
     }
-    #[expect(deprecated)]
-    for (key, val) in classi_eta.map_tipo_3 {
-        match submetriche.entry(key.clone()) {
+    for (key, val) in classi_eta.map_tipo_3() {
+        match submetriche.entry(*key) {
             Entry::Occupied(mut entry) => {
                 let submetr = entry.get_mut();
                 *submetr = SubmetricheX3::new(
-                    val,
+                    val.clone(),
                     submetr.get_rapporto_ad_juv(),
                     submetr.get_criterio_a(),
                     submetr.get_criterio_b(),
@@ -269,54 +254,60 @@ pub fn calculate_x3(c: &CampionamentoNISECI) -> Result<(f32, Option<MetricheX3>)
     Ok((rounded_x3, Some(MetricheX3::new(a, b, submetriche))))
 }
 
-fn calculate_classi_eta_alieni(c: &CampionamentoNISECI) -> ClassiEtaAlieniNISECI {
+fn calculate_classi_eta_alieni(
+    c: &CampionamentoNISECI,
+    r: &RiferimentoNISECI,
+) -> ClassiEtaAlieniNISECI {
     let mut classi_eta = ClassiEtaAlieniNISECI::new();
 
     // riempo l'hashmap con solo le specie alloctone campionate
     for cattura in c {
+        debug_assert!(r.contains_id(cattura.id()));
+        let id = r
+            .get_inner_id(cattura.id())
+            .expect("Riferimento should contain this id");
         if cattura.tipo_alloctono() == 1 {
-            #[expect(deprecated)]
-            match classi_eta.map_tipo_1.entry(cattura.id().to_string()) {
+            match classi_eta.map_tipo_1.entry(id) {
                 Entry::Occupied(mut entry) => {
-                    entry.get_mut().update_classi_eta(cattura);
+                    let v: &mut ClassiEtaSpecieNISECI = entry.get_mut();
+                    v.update_classi_eta(cattura);
                 }
                 Entry::Vacant(entry) => {
-                    entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
+                    ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
+                        .and_then(|c| Some(entry.insert(c)));
                 }
             };
         } else if cattura.tipo_alloctono() == 2 {
-            #[expect(deprecated)]
-            match classi_eta.map_tipo_2.entry(cattura.id().to_string()) {
+            match classi_eta.map_tipo_2.entry(id) {
                 Entry::Occupied(mut entry) => {
-                    entry.get_mut().update_classi_eta(cattura);
+                    let v: &mut ClassiEtaSpecieNISECI = entry.get_mut();
+                    v.update_classi_eta(cattura);
                 }
                 Entry::Vacant(entry) => {
-                    entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
+                    ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
+                        .and_then(|c| Some(entry.insert(c)));
                 }
             };
         } else if cattura.tipo_alloctono() == 3 {
-            #[expect(deprecated)]
-            match classi_eta.map_tipo_3.entry(cattura.id().to_string()) {
+            match classi_eta.map_tipo_3.entry(id) {
                 Entry::Occupied(mut entry) => {
-                    entry.get_mut().update_classi_eta(cattura);
+                    let v: &mut ClassiEtaSpecieNISECI = entry.get_mut();
+                    v.update_classi_eta(cattura);
                 }
                 Entry::Vacant(entry) => {
-                    entry.insert(ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura));
+                    ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
+                        .and_then(|c| Some(entry.insert(c)));
                 }
             };
         }
-        #[expect(deprecated)]
-        {
-            classi_eta.tot_specie_autoctone = c.get_tot_specie_autoctone_attese();
-        }
+        classi_eta.set_tot_specie_autoctone(c.get_tot_specie_autoctone_attese());
     }
 
-    #[expect(deprecated)]
-    {
-        classi_eta.tot_specie_aliene =
-            classi_eta.map_tipo_1.len() + classi_eta.map_tipo_2.len() + classi_eta.map_tipo_3.len();
-    }
-
+    classi_eta.set_tot_specie_aliene(
+        classi_eta.map_tipo_1().len()
+            + classi_eta.map_tipo_2().len()
+            + classi_eta.map_tipo_3().len(),
+    );
     classi_eta
 }
 
@@ -362,23 +353,17 @@ pub mod tests {
     #[test]
     fn calculate_b_tutte_destrutt() {
         let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
-        #[expect(deprecated)]
-        {
-            info_aliene.tipo_3.species_destrutt = 10;
-            info_aliene.tipo_2.species_destrutt = 20;
-            info_aliene.tipo_3.species_strutt = 20;
-            info_aliene.tot_specie_aliene = 50;
-        }
+        info_aliene.tipo_3.species_destrutt = 10;
+        info_aliene.tipo_2.species_destrutt = 20;
+        info_aliene.tipo_3.species_strutt = 20;
+        info_aliene.tot_specie_aliene = 50;
 
         let b = calculate_b(&info_aliene);
 
         assert_eq!(b, 0.6);
 
-        #[expect(deprecated)]
-        {
-            info_aliene.tipo_3.species_strutt = 0;
-            info_aliene.tot_specie_aliene = 30;
-        }
+        info_aliene.tipo_3.species_strutt = 0;
+        info_aliene.tot_specie_aliene = 30;
 
         let b = calculate_b(&info_aliene);
 
@@ -388,23 +373,17 @@ pub mod tests {
     #[test]
     fn calculate_b_tutte_mediam_strutt() {
         let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
-        #[expect(deprecated)]
-        {
-            info_aliene.tipo_3.species_mediamente_strutt = 10;
-            info_aliene.tipo_2.species_mediamente_strutt = 20;
-            info_aliene.tipo_3.species_strutt = 20;
-            info_aliene.tot_specie_aliene = 50;
-        }
+        info_aliene.tipo_3.species_mediamente_strutt = 10;
+        info_aliene.tipo_2.species_mediamente_strutt = 20;
+        info_aliene.tipo_3.species_strutt = 20;
+        info_aliene.tot_specie_aliene = 50;
 
         let b = calculate_b(&info_aliene);
 
         assert_eq!(b, 0.3);
 
-        #[expect(deprecated)]
-        {
-            info_aliene.tipo_3.species_strutt = 0;
-            info_aliene.tot_specie_aliene = 30;
-        }
+        info_aliene.tipo_3.species_strutt = 0;
+        info_aliene.tot_specie_aliene = 30;
 
         let b = calculate_b(&info_aliene);
 
@@ -414,15 +393,12 @@ pub mod tests {
     #[test]
     fn calculate_b_miscellaneous() {
         let mut info_aliene = InfoPopolazioniAlieneNISECI::new();
-        #[expect(deprecated)]
-        {
-            info_aliene.tipo_3.species_mediamente_strutt = 10;
-            info_aliene.tipo_2.species_mediamente_strutt = 20;
-            info_aliene.tipo_3.species_destrutt = 10;
-            info_aliene.tipo_2.species_destrutt = 20;
-            info_aliene.tipo_3.species_strutt = 20;
-            info_aliene.tot_specie_aliene = 80;
-        }
+        info_aliene.tipo_3.species_mediamente_strutt = 10;
+        info_aliene.tipo_2.species_mediamente_strutt = 20;
+        info_aliene.tipo_3.species_destrutt = 10;
+        info_aliene.tipo_2.species_destrutt = 20;
+        info_aliene.tipo_3.species_strutt = 20;
+        info_aliene.tot_specie_aliene = 80;
 
         let b = calculate_b(&info_aliene);
 
@@ -435,21 +411,15 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_1_presente_ma_no_strutt() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        #[expect(deprecated)]
-        {
-            info.tipo_1.tot_species = 2;
-            info.tipo_1.species_mediamente_strutt = 2;
-            info.tipo_1.popolazione_piu_strutt = 0.5;
-        }
+        info.tipo_1.tot_species = 2;
+        info.tipo_1.species_mediamente_strutt = 2;
+        info.tipo_1.popolazione_piu_strutt = 0.5;
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
 
-        #[expect(deprecated)]
-        {
-            info.tipo_1.species_destrutt = 1;
-            info.tipo_1.tot_species = 3;
-        }
+        info.tipo_1.species_destrutt = 1;
+        info.tipo_1.tot_species = 3;
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
@@ -461,11 +431,8 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_2_magg_autoctone() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        #[expect(deprecated)]
-        {
-            info.tipo_2.tot_species = 3;
-            info.tot_specie_autoctone = 2;
-        }
+        info.tipo_2.tot_species = 3;
+        info.tot_specie_autoctone = 2;
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
@@ -477,11 +444,8 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_2_min_autoctone() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        #[expect(deprecated)]
-        {
-            info.tipo_2.tot_species = 2;
-            info.tot_specie_autoctone = 3;
-        }
+        info.tipo_2.tot_species = 2;
+        info.tot_specie_autoctone = 3;
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.75);
@@ -493,11 +457,8 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_3_magg_autoctone() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        #[expect(deprecated)]
-        {
-            info.tipo_3.tot_species = 3;
-            info.tot_specie_autoctone = 2;
-        }
+        info.tipo_3.tot_species = 3;
+        info.tot_specie_autoctone = 2;
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.75);
@@ -509,11 +470,8 @@ pub mod tests {
     #[test]
     fn calculate_a_tipo_3_min_autoctone() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
-        #[expect(deprecated)]
-        {
-            info.tipo_3.tot_species = 2;
-            info.tot_specie_autoctone = 3;
-        }
+        info.tipo_3.tot_species = 2;
+        info.tot_specie_autoctone = 3;
 
         let a = calculate_a(&info);
         assert_eq!(a, 0.85);
@@ -523,35 +481,23 @@ pub mod tests {
     fn calculate_a_progressive_scaling() {
         let mut info = InfoPopolazioniAlieneNISECI::new();
 
-        #[expect(deprecated)]
-        {
-            info.tipo_3.tot_species = 2;
-            info.tot_specie_autoctone = 3;
-        }
+        info.tipo_3.tot_species = 2;
+        info.tot_specie_autoctone = 3;
         let a = calculate_a(&info);
         assert_eq!(a, 0.85);
 
-        #[expect(deprecated)]
-        {
-            info.tipo_2.tot_species = 2;
-        }
+        info.tipo_2.tot_species = 2;
         let a = calculate_a(&info);
         assert_eq!(a, 0.75);
 
-        #[expect(deprecated)]
-        {
-            info.tipo_1.tot_species = 2;
-            info.tipo_1.species_mediamente_strutt = 2;
-            info.tipo_1.popolazione_piu_strutt = 0.5;
-        }
+        info.tipo_1.tot_species = 2;
+        info.tipo_1.species_mediamente_strutt = 2;
+        info.tipo_1.popolazione_piu_strutt = 0.5;
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
 
-        #[expect(deprecated)]
-        {
-            info.tipo_1.species_destrutt = 1;
-            info.tipo_1.tot_species = 3;
-        }
+        info.tipo_1.species_destrutt = 1;
+        info.tipo_1.tot_species = 3;
         let a = calculate_a(&info);
         assert_eq!(a, 0.5);
     }
