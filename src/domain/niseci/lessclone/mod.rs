@@ -24,6 +24,7 @@ use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::vec::Vec;
 
+use crate::capacity::{Capacity, DefaultConfig};
 use crate::domain::localize::CommaFormat;
 use crate::domain::niseci::{
     AlieniIndigeni, AnagraficaNISECI, IdSpecieNISECI, InfoIntermediePopolazioniNISECI, MetricheX2A,
@@ -1110,10 +1111,13 @@ impl Default for ClassiEtaAlieniNISECI {
 
 impl ClassiEtaAlieniNISECI {
     pub fn new() -> ClassiEtaAlieniNISECI {
+        Self::new_with_capacity::<DefaultConfig>()
+    }
+    pub(crate) fn new_with_capacity<C: Capacity>() -> ClassiEtaAlieniNISECI {
         ClassiEtaAlieniNISECI {
-            map_tipo_1: HashMap::with_capacity(100),
-            map_tipo_2: HashMap::with_capacity(100),
-            map_tipo_3: HashMap::with_capacity(100),
+            map_tipo_1: HashMap::with_capacity(C::VALUE),
+            map_tipo_2: HashMap::with_capacity(C::VALUE),
+            map_tipo_3: HashMap::with_capacity(C::VALUE),
             tot_specie_aliene: 0,
             tot_specie_autoctone: 0,
         }

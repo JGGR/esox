@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/*
+    Copyright (C) 2024-2026 jgabaut, gioninjo
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+pub(crate) trait Capacity {
+    const VALUE: usize;
+}
+
+pub(crate) struct Small;
+pub(crate) struct Medium;
+#[derive(Default)]
+pub(crate) struct DefaultConfig;
+pub(crate) struct Custom<const N: usize>;
+
+const SMALL_CAP: usize = 100;
+const MEDIUM_CAP: usize = 1000;
+
+impl Capacity for Small {
+    const VALUE: usize = SMALL_CAP;
+}
+
+impl Capacity for Medium {
+    const VALUE: usize = MEDIUM_CAP;
+}
+
+impl Capacity for DefaultConfig {
+    const VALUE: usize = SMALL_CAP;
+}

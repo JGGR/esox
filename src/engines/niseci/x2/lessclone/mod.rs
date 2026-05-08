@@ -17,6 +17,7 @@
 
 use std::collections::{hash_map::Entry, HashMap, HashSet};
 
+use crate::capacity::{Capacity, DefaultConfig};
 use crate::domain::niseci::lessclone::{
     CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura,
 };
@@ -24,7 +25,6 @@ use crate::domain::niseci::{
     AnagraficaNISECI, IdSpecieNISECI, MetricheX2A, MetricheX2aB, RiferimentoNISECI,
 };
 use crate::domain::posf32::PositiveF32;
-
 use crate::engines::niseci::linear_regression::{calculate_quantita_with_regression, Point};
 
 #[derive(Clone)]
@@ -138,9 +138,12 @@ pub fn calculate_x2(
     riferimento: &RiferimentoNISECI,
     require_specie_attesa: bool,
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
-    let (x2_a, criteri_vec) =
-        calculate_sommatoria_x2_a(campionamento, riferimento, require_specie_attesa)?;
-    let (x2_b, densita_vec) = calculate_sommatoria_x2_b(
+    let (x2_a, criteri_vec) = calculate_sommatoria_x2_a::<DefaultConfig>(
+        campionamento,
+        riferimento,
+        require_specie_attesa,
+    )?;
+    let (x2_b, densita_vec) = calculate_sommatoria_x2_b::<DefaultConfig>(
         campionamento,
         anagrafica,
         riferimento,
@@ -198,9 +201,13 @@ pub fn calculate_x2_per_alloctone(
     riferimento: &RiferimentoNISECI,
     anagrafica: &AnagraficaNISECI,
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
-    let (x2_a, criteri_vec) = calculate_sommatoria_x2_a_per_alloctone(campionamento, riferimento)?;
-    let (x2_b, densita_vec) =
-        calculate_sommatoria_x2_b_per_alloctone(campionamento, riferimento, anagrafica)?;
+    let (x2_a, criteri_vec) =
+        calculate_sommatoria_x2_a_per_alloctone::<DefaultConfig>(campionamento, riferimento)?;
+    let (x2_b, densita_vec) = calculate_sommatoria_x2_b_per_alloctone::<DefaultConfig>(
+        campionamento,
+        riferimento,
+        anagrafica,
+    )?;
 
     let mut submetriche = HashMap::<IdSpecieNISECI, SubmetricheX2>::new();
 
@@ -297,7 +304,7 @@ fn calculate_x2_absolute(
     Ok((Some(rounded_result), metriche_x2))
 }
 
-fn calculate_sommatoria_x2_a(
+fn calculate_sommatoria_x2_a<C: Capacity>(
     c: &CampionamentoNISECI,
     r: &RiferimentoNISECI,
     require_specie_attesa: bool,
@@ -306,7 +313,7 @@ fn calculate_sommatoria_x2_a(
     // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
     // per sicurezza prealloco memoria per 10 classi di eta
     let mut classi_eta_map: HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> =
-        HashMap::with_capacity(10);
+        HashMap::with_capacity(C::VALUE);
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in c {
@@ -333,7 +340,7 @@ fn calculate_sommatoria_x2_a(
     calculate_sommatoria_x2_a_absolute(classi_eta_map, r)
 }
 
-fn calculate_sommatoria_x2_b(
+fn calculate_sommatoria_x2_b<C: Capacity>(
     c: &CampionamentoNISECI,
     anagrafica: &AnagraficaNISECI,
     r: &RiferimentoNISECI,
@@ -345,7 +352,7 @@ fn calculate_sommatoria_x2_b(
     let length_checked = PositiveF32::new(length).map_err(|e| vec![e.to_string()])?;
     let superficie: f32 = *width_checked * *length_checked;
     let mut esemplari_per_cattura_map: HashMap<IdSpecieNISECI, EsemplariPerCattura> =
-        HashMap::with_capacity(10);
+        HashMap::with_capacity(C::VALUE);
 
     for cattura in c {
         let id = cattura.id();
@@ -374,7 +381,7 @@ fn calculate_sommatoria_x2_b(
     calculate_sommatoria_x2_b_absolute(esemplari_per_cattura_map, r, superficie)
 }
 
-fn calculate_sommatoria_x2_a_per_alloctone(
+fn calculate_sommatoria_x2_a_per_alloctone<C: Capacity>(
     c: &CampionamentoNISECI,
     r: &RiferimentoNISECI,
 ) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
@@ -382,7 +389,7 @@ fn calculate_sommatoria_x2_a_per_alloctone(
     // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
     // per sicurezza prealloco memoria per 10 classi di eta
     let mut classi_eta_map: HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> =
-        HashMap::with_capacity(10);
+        HashMap::with_capacity(C::VALUE);
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in c {
@@ -407,7 +414,7 @@ fn calculate_sommatoria_x2_a_per_alloctone(
     calculate_sommatoria_x2_a_absolute(classi_eta_map, r)
 }
 
-fn calculate_sommatoria_x2_b_per_alloctone(
+fn calculate_sommatoria_x2_b_per_alloctone<C: Capacity>(
     c: &CampionamentoNISECI,
     r: &RiferimentoNISECI,
     anagrafica: &AnagraficaNISECI,
@@ -428,7 +435,7 @@ fn calculate_sommatoria_x2_b_per_alloctone(
     }
     let superficie = width * length;
     let mut esemplari_per_cattura_map: HashMap<IdSpecieNISECI, EsemplariPerCattura> =
-        HashMap::with_capacity(10);
+        HashMap::with_capacity(C::VALUE);
 
     for cattura in c {
         let id = cattura.id();

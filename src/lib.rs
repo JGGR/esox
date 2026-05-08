@@ -98,6 +98,8 @@
 //! let anagrafica = load_anagrafica_hfbi_from_path("./templates/anagrafica_hfbi.csv", has_headers, format).unwrap();
 //! let (hfbi, intermediates) = calculate_hfbi(&campionamento, &anagrafica).unwrap();
 //!```
+
+pub(crate) mod capacity;
 pub mod csv;
 pub mod deser;
 pub mod domain;
