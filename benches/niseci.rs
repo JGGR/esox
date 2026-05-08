@@ -17,7 +17,10 @@ use esox::domain::niseci::{
     RiferimentoNISECI, TipoComunitaNISECI,
 };
 use esox::domain::posf32::PositiveF32;
+#[cfg(not(feature = "lessclone"))]
 use esox::engines::niseci::full::calculate_niseci;
+#[cfg(feature = "lessclone")]
+use esox::engines::niseci::full::lessclone::calculate_niseci;
 use rand::rng;
 use rand::seq::SliceRandom;
 use std::hint::black_box;
@@ -77,7 +80,7 @@ fn make_input(
     rif_builder: fn(usize, usize) -> String,
     camp_builder: fn(usize, usize) -> String,
 ) -> (Vec<u8>, Vec<u8>) {
-    let prefix_len = 16;
+    let prefix_len = PREFIX_LEN;
     let rif_data = rif_builder(n, prefix_len);
     let camp_data = camp_builder(n, prefix_len);
     let rif = format!(
@@ -238,11 +241,7 @@ fn run_bench(c: &mut Criterion, name: &str, build_input: fn(usize) -> (Vec<u8>, 
         // -------------------------
         let posf32 = PositiveF32::new(1.0).expect("1.0 should be a valid positive finite f32");
         let anagrafica = AnagraficaNISECI::new(
-            ComunitaNISECI {
-                tipo: TipoComunitaNISECI::Redatta,
-                fonte: None,
-                numero_protocollo: None,
-            },
+            ComunitaNISECI::new(TipoComunitaNISECI::Redatta, None, None),
             "A".to_string(),
             "A".to_string(),
             AreaNISECI::Mediterranea,
@@ -278,13 +277,35 @@ fn run_bench(c: &mut Criterion, name: &str, build_input: fn(usize) -> (Vec<u8>, 
     group.finish();
 }
 
+const PREFIX_LEN: usize = 16;
+
+fn bench_name(tag: &str) -> String {
+    #[cfg(feature = "lessclone")]
+    const BACKEND: &'static str = "CSV v2-dev";
+    #[cfg(not(feature = "lessclone"))]
+    const BACKEND: &'static str = "CSV v1.6";
+    format!(
+        "{}: {tag} padded-sequential-id, prefix_len: {PREFIX_LEN}, backend: {}",
+        module_path!(),
+        BACKEND
+    )
+}
+
 fn full_bench(c: &mut Criterion) {
-    run_bench(c, "niseci - worst", make_nice_input);
-    run_bench(c, "niseci - avg", make_randorder_success_input);
+    run_bench(
+        c,
+        &bench_name("late join (linear search worst case)"),
+        make_nice_input,
+    );
+    run_bench(
+        c,
+        &bench_name("avg (shuffle)"),
+        make_randorder_success_input,
+    );
 }
 
 fn custom_criterion() -> Criterion {
-    Criterion::default().measurement_time(Duration::from_secs(20))
+    Criterion::default().measurement_time(Duration::from_secs(35))
 }
 
 criterion_group! { name = benches;

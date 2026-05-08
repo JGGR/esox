@@ -34,8 +34,21 @@ fn make_raw_input(n: usize) -> Vec<u8> {
     camp.into_bytes()
 }
 
+fn bench_name(tag: &str) -> String {
+    #[cfg(feature = "lessclone")]
+    const BACKEND: &'static str = "CSV v2-dev";
+    #[cfg(not(feature = "lessclone"))]
+    const BACKEND: &'static str = "CSV v1.6";
+    format!(
+        "{}: {} last-defined-id, backend: {}",
+        module_path!(),
+        tag,
+        BACKEND
+    )
+}
+
 fn full_bench(c: &mut Criterion) {
-    let mut group = c.benchmark_group("hfbi");
+    let mut group = c.benchmark_group(&bench_name("hfbi"));
     let has_headers = true;
 
     for &n in &[10, 50, 100, 500, 1_000, 5_000, 10_000] {
@@ -125,7 +138,7 @@ fn full_bench(c: &mut Criterion) {
 }
 
 fn custom_criterion() -> Criterion {
-    Criterion::default().measurement_time(Duration::from_secs(20))
+    Criterion::default().measurement_time(Duration::from_secs(35))
 }
 
 criterion_group! { name = benches;
