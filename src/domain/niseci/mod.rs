@@ -15,6 +15,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+/// We use [`hashbrown::HashMap`] only for [`InternerSpecieNISECI`].
+/// This is because [`std::collections::hash_map::RawEntryMut`] is not stable yet.
+/// See [`esox::domain::niseci::InternerSpecieNISECI::intern`].
+/// Other maps in this file use [`std::collections::HashMap`].
+use hashbrown::{hash_map::RawEntryMut as HBRawEntryMut, HashMap as HBHashMap};
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
@@ -32,7 +37,7 @@ use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_ev
                                                       // in test builds
 
 #[cfg(feature = "lessclone")]
-pub mod v2;
+pub mod lessclone;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -289,7 +294,7 @@ impl StoreSpecieNISECI {
 
 #[derive(Debug, Clone, Serialize)]
 pub(crate) struct InternerSpecieNISECI {
-    map: HashMap<String, IdSpecieNISECI>,
+    map: HBHashMap<String, IdSpecieNISECI>,
     store: StoreSpecieNISECI,
     next_id: IdSpecieNISECI,
 }
@@ -297,7 +302,7 @@ pub(crate) struct InternerSpecieNISECI {
 impl InternerSpecieNISECI {
     pub(crate) fn new() -> Self {
         Self {
-            map: HashMap::new(),
+            map: HBHashMap::new(),
             next_id: 0,
             store: StoreSpecieNISECI::new(),
         }
@@ -305,6 +310,10 @@ impl InternerSpecieNISECI {
     #[inline(always)]
     pub(crate) fn contains_id(&self, s: &str) -> bool {
         self.map.contains_key(s)
+    }
+    #[inline(always)]
+    pub(crate) fn contains_plain_id(&self, id: IdSpecieNISECI) -> bool {
+        self.store.get(id).is_some()
     }
     #[inline(always)]
     pub(crate) fn get(&self, s: &str) -> Option<&SpecieNISECI> {
@@ -318,16 +327,26 @@ impl InternerSpecieNISECI {
     pub(crate) fn get_by_str_id(&self, s: &str) -> Option<IdSpecieNISECI> {
         self.map.get(s).copied()
     }
+    /// This API allows:
+    /// - Avoiding always allocating a String from s
+    /// - Avoiding double lookup to avoid reinsert
+    ///
+    /// It needs [`hashbrown::hash_map`] since [`std::collections::hash_map::RawEntryMut`] is
+    /// still unstable.
     #[inline(always)]
     pub(crate) fn intern(&mut self, s: &str, val: SpecieNISECI) -> IdSpecieNISECI {
-        if let Some(&id) = self.map.get(s) {
-            id
-        } else {
-            let id = self.next_id;
-            self.next_id += 1;
-            self.map.insert(s.to_string(), id);
-            self.store.insert(id, val);
-            id
+        match self.map.raw_entry_mut().from_key(s) {
+            HBRawEntryMut::Occupied(entry) => *entry.get(),
+
+            HBRawEntryMut::Vacant(entry) => {
+                let id = self.next_id;
+                self.next_id += 1;
+
+                entry.insert(s.to_owned(), id);
+                self.store.insert(id, val);
+
+                id
+            }
         }
     }
 }
@@ -352,7 +371,7 @@ pub struct RiferimentoNISECI {
     pub elenco_specie: Vec<SpecieNISECI>,
     // TODO: in v0.2, we can:
     // - drop the elenco_specie field
-    // - avoiding cloning all SpecieNISECI on new()
+    // - avoiding cloning all SpecieNISECI on new(), the map will move them in
     map_ids: InternerSpecieNISECI,
 }
 
@@ -401,6 +420,10 @@ impl RiferimentoNISECI {
     #[inline(always)]
     pub fn contains_id(&self, id: &str) -> bool {
         self.map_ids.contains_id(id)
+    }
+    #[inline(always)]
+    pub fn contains_plain_id(&self, id: IdSpecieNISECI) -> bool {
+        self.map_ids.contains_plain_id(id)
     }
     #[inline(always)]
     pub fn get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI> {
@@ -2346,6 +2369,45 @@ impl From<(f32, &AreaNISECI)> for StatoEcologicoNISECI {
 #[cfg(test)]
 mod domain_niseci_private_tests {
     use super::*;
+    #[cfg(test)]
+    impl RiferimentoNISECI {
+        #[cfg(test)]
+        pub(crate) fn push(&mut self, value: SpecieNISECI) -> IdSpecieNISECI {
+            eprintln!("Pushing specie {} in riferimento", value.id());
+            if !self.contains_id(value.id()) {
+                eprintln!(
+                    "Specie id {} nome {} was NOT in riferimento already",
+                    value.id(),
+                    value.nome()
+                );
+                self.map_ids.intern(value.id(), value.clone())
+            } else {
+                let inner_id = self
+                    .get_inner_id(value.id())
+                    .expect("contains_id was checked");
+                eprintln!(
+                    "Specie id {} nome {} was in riferimento already with id",
+                    inner_id,
+                    value.nome()
+                );
+                inner_id
+            }
+        }
+    }
+
+    #[cfg(test)]
+    impl CampionamentoNISECI {
+        #[cfg(test)]
+        pub(crate) fn push(&mut self, value: RecordNISECI) {
+            #[allow(deprecated)]
+            self.campionamento.push(value);
+        }
+        #[cfg(test)]
+        pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
+            #[allow(deprecated)]
+            &mut self.campionamento
+        }
+    }
 
     #[cfg(test)]
     impl ClassiEtaSpecieNISECI {

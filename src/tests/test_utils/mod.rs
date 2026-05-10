@@ -15,11 +15,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#[cfg(feature = "lessclone")]
+use crate::domain::niseci::lessclone::{CampionamentoNISECI, RecordNISECI};
+#[cfg(not(feature = "lessclone"))]
+use crate::domain::niseci::{CampionamentoNISECI, RecordNISECI};
 use crate::domain::{
     location::Location,
     niseci::{
-        AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
-        RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
+        AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdSpecieNISECI, IdroEcoRegioneNISECI,
+        RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
     },
 };
 
@@ -60,170 +64,210 @@ pub fn create_dummy_anagrafica() -> AnagraficaNISECI {
 }
 
 pub struct DummySetSpecieNISECI {
-    importante_1: SpecieNISECI,
-    importante_2: SpecieNISECI,
-    importante_3: SpecieNISECI,
-    normale_1: SpecieNISECI,
-    normale_2: SpecieNISECI,
-    alloctono_1: SpecieNISECI,
-    alloctono_2: SpecieNISECI,
-    inatteso_1: SpecieNISECI,
-    inatteso_2: SpecieNISECI,
+    importante_1: (SpecieNISECI, IdSpecieNISECI),
+    importante_2: (SpecieNISECI, IdSpecieNISECI),
+    importante_3: (SpecieNISECI, IdSpecieNISECI),
+    normale_1: (SpecieNISECI, IdSpecieNISECI),
+    normale_2: (SpecieNISECI, IdSpecieNISECI),
+    alloctono_1: (SpecieNISECI, IdSpecieNISECI),
+    alloctono_2: (SpecieNISECI, IdSpecieNISECI),
+    inatteso_1: (SpecieNISECI, IdSpecieNISECI),
+    inatteso_2: (SpecieNISECI, IdSpecieNISECI),
+}
+
+#[derive(Debug, Clone, Copy)]
+enum IdDummySetSpecieNISECI {
+    CiaccioCiaccensis = 0,
+    CiaccioSbribbrensis = 1,
+    CiaccioCozzensis = 2,
+    NormusSempliciottum = 3,
+    NormusQualunquis = 4,
+    DisturbusInfognatus = 5,
+    DisturbusSotterfugius = 6,
+    SorprendoSorprendentes = 7, // TODO: Check if non-duplicate id still passes the test, i think so
+    SorprendoImprovvisus = 8,
 }
 
 pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
-    let importante_1 = SpecieNISECI::new(
-        &1.to_string(),
-        "Ciaccio ciaccensis",
-        2,
-        0,
-        true,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let importante_1 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::CiaccioCiaccensis as u32).to_string(),
+            "Ciaccio ciaccensis",
+            2,
+            0,
+            true,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::CiaccioCiaccensis as u32,
     );
-    let importante_2 = SpecieNISECI::new(
-        &2.to_string(),
-        "Ciaccio sbribbrensis",
-        2,
-        0,
-        true,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let importante_2 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::CiaccioSbribbrensis as u32).to_string(),
+            "Ciaccio sbribbrensis",
+            2,
+            0,
+            true,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::CiaccioSbribbrensis as u32,
     );
-    let importante_3 = SpecieNISECI::new(
-        &3.to_string(),
-        "Ciaccio cozzensis",
-        2,
-        0,
-        true,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let importante_3 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::CiaccioCozzensis as u32).to_string(),
+            "Ciaccio cozzensis",
+            2,
+            0,
+            true,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::CiaccioCozzensis as u32,
     );
-    let normale_1 = SpecieNISECI::new(
-        &4.to_string(),
-        "Normus sempliciottum",
-        1,
-        0,
-        true,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let normale_1 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::NormusSempliciottum as u32).to_string(),
+            "Normus sempliciottum",
+            1,
+            0,
+            true,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::NormusSempliciottum as u32,
     );
-    let normale_2 = SpecieNISECI::new(
-        &5.to_string(),
-        "Normus qualunquis",
-        1,
-        0,
-        true,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let normale_2 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::NormusQualunquis as u32).to_string(),
+            "Normus qualunquis",
+            1,
+            0,
+            true,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::NormusQualunquis as u32,
     );
-    let alloctono_1 = SpecieNISECI::new(
-        &6.to_string(),
-        "Disturbus infognatus",
-        0,
-        1,
-        true,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let alloctono_1 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::DisturbusInfognatus as u32).to_string(),
+            "Disturbus infognatus",
+            0,
+            1,
+            true,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::DisturbusInfognatus as u32,
     );
-    let alloctono_2 = SpecieNISECI::new(
-        &7.to_string(),
-        "Disturbus sotterfugius",
-        0,
-        1,
-        true,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let alloctono_2 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::DisturbusSotterfugius as u32).to_string(),
+            "Disturbus sotterfugius",
+            0,
+            1,
+            true,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::DisturbusSotterfugius as u32,
     );
-    let inatteso_1 = SpecieNISECI::new(
-        &7.to_string(),
-        "Sorprendo sorprendentes",
-        0,
-        1,
-        false,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let inatteso_1 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::SorprendoSorprendentes as u32).to_string(),
+            "Sorprendo sorprendentes",
+            0,
+            1,
+            false,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::SorprendoSorprendentes as u32,
     );
-    let inatteso_2 = SpecieNISECI::new(
-        &8.to_string(),
-        "Sorprendo improvvisus",
-        2,
-        0,
-        false,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
+    let inatteso_2 = (
+        SpecieNISECI::new(
+            &(IdDummySetSpecieNISECI::SorprendoImprovvisus as u32).to_string(),
+            "Sorprendo improvvisus",
+            2,
+            0,
+            false,
+            1,
+            2,
+            3,
+            4,
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            1.0,
+            2.0,
+        ),
+        IdDummySetSpecieNISECI::SorprendoImprovvisus as u32,
     );
 
     DummySetSpecieNISECI {
@@ -243,15 +287,15 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
     let ds = create_dummy_specie_niseci_set();
 
     let mut elenco_specie = Vec::with_capacity(9);
-    elenco_specie.push(ds.importante_1);
-    elenco_specie.push(ds.importante_2);
-    elenco_specie.push(ds.importante_3);
-    elenco_specie.push(ds.normale_1);
-    elenco_specie.push(ds.normale_2);
-    elenco_specie.push(ds.alloctono_1);
-    elenco_specie.push(ds.alloctono_2);
-    elenco_specie.push(ds.inatteso_1);
-    elenco_specie.push(ds.inatteso_2);
+    elenco_specie.push(ds.importante_1.0);
+    elenco_specie.push(ds.importante_2.0);
+    elenco_specie.push(ds.importante_3.0);
+    elenco_specie.push(ds.normale_1.0);
+    elenco_specie.push(ds.normale_2.0);
+    elenco_specie.push(ds.alloctono_1.0);
+    elenco_specie.push(ds.alloctono_2.0);
+    elenco_specie.push(ds.inatteso_1.0);
+    elenco_specie.push(ds.inatteso_2.0);
 
     RiferimentoNISECI::new_from_map(elenco_specie.into())
 }
@@ -263,15 +307,50 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
 /// che servono in @test_calculate_x1
 pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     let ds = create_dummy_specie_niseci_set();
-    let record_1 = RecordNISECI::new(&ds.importante_1, 5, 1, 5.0);
-    let record_2 = RecordNISECI::new(&ds.importante_2, 5, 1, 5.0);
-    let record_3 = RecordNISECI::new(&ds.importante_3, 5, 1, 5.0);
-    let record_4 = RecordNISECI::new(&ds.normale_2, 5, 1, 5.0);
-    let record_5 = RecordNISECI::new(&ds.normale_1, 5, 1, 5.0);
-    let record_6 = RecordNISECI::new(&ds.inatteso_1, 5, 1, 5.0);
-    let record_7 = RecordNISECI::new(&ds.inatteso_2, 5, 1, 5.0);
-    let record_8 = RecordNISECI::new(&ds.alloctono_1, 5, 1, 5.0);
-    let record_9 = RecordNISECI::new(&ds.alloctono_2, 5, 1, 5.0);
+    #[cfg(not(feature = "lessclone"))]
+    let record_1 = RecordNISECI::new(&ds.importante_1.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_1 = RecordNISECI::new(ds.importante_1.1, 5, 1, 5.0);
+
+    #[cfg(not(feature = "lessclone"))]
+    let record_2 = RecordNISECI::new(&ds.importante_2.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_2 = RecordNISECI::new(ds.importante_2.1, 5, 1, 5.0);
+
+    #[cfg(not(feature = "lessclone"))]
+    let record_3 = RecordNISECI::new(&ds.importante_3.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_3 = RecordNISECI::new(ds.importante_3.1, 5, 1, 5.0);
+
+    #[cfg(not(feature = "lessclone"))]
+    let record_4 = RecordNISECI::new(&ds.normale_2.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_4 = RecordNISECI::new(ds.normale_2.1, 5, 1, 5.0);
+
+    #[cfg(not(feature = "lessclone"))]
+    let record_5 = RecordNISECI::new(&ds.normale_1.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_5 = RecordNISECI::new(ds.normale_1.1, 5, 1, 5.0);
+
+    #[cfg(not(feature = "lessclone"))]
+    let record_6 = RecordNISECI::new(&ds.inatteso_1.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_6 = RecordNISECI::new(ds.inatteso_1.1, 5, 1, 5.0);
+
+    #[cfg(not(feature = "lessclone"))]
+    let record_7 = RecordNISECI::new(&ds.inatteso_2.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_7 = RecordNISECI::new(ds.inatteso_2.1, 5, 1, 5.0);
+
+    #[cfg(not(feature = "lessclone"))]
+    let record_8 = RecordNISECI::new(&ds.alloctono_1.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_8 = RecordNISECI::new(ds.alloctono_1.1, 5, 1, 5.0);
+
+    #[cfg(not(feature = "lessclone"))]
+    let record_9 = RecordNISECI::new(&ds.alloctono_2.0, 5, 1, 5.0);
+    #[cfg(feature = "lessclone")]
+    let record_9 = RecordNISECI::new(ds.alloctono_2.1, 5, 1, 5.0);
 
     let mut campionamento = Vec::with_capacity(9);
     campionamento.push(record_1);
@@ -299,18 +378,6 @@ pub fn create_dummy_campionamento_chopped() -> CampionamentoNISECI {
     CampionamentoNISECI::new(chopped)
 }
 
-#[cfg(test)]
-impl CampionamentoNISECI {
-    pub(crate) fn push(&mut self, value: RecordNISECI) {
-        #[allow(deprecated)]
-        self.campionamento.push(value);
-    }
-    pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
-        #[allow(deprecated)]
-        &mut self.campionamento
-    }
-}
-
 /// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
@@ -321,14 +388,39 @@ impl CampionamentoNISECI {
 ///   -> 5 ciacci cl1
 /// aggiungo in C2 anche una specie alloctono per testare la conta delle specie autoctone trovate
 /// x2a qua vale 1.0 e x2b 1.0
+#[cfg(not(feature = "lessclone"))]
 pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
     let mut c = create_massive_campionamento_ciacci_solo_autoctoni_1();
 
+    let t = &get_trocchio();
     // pesce alloctono in C2
-    let trocchio = RecordNISECI::new(&get_trocchio(), 2, 2, 2.0);
+    let trocchio = RecordNISECI::new(t, 2, 2, 2.0);
     c.push(trocchio);
 
     c
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
+    let mut c = create_massive_campionamento_ciacci_solo_autoctoni_1();
+
+    let r = create_massive_riferimento_ciacci();
+
+    let t = r
+        .get_inner_id(&(DummyIds::Trocchio as u32).to_string())
+        .expect("create_massive_riferimento_niseci has a Trocchio");
+    // pesce alloctono in C2
+    let trocchio = RecordNISECI::new(t, 2, 2, 2.0);
+    c.push(trocchio);
+
+    c
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci() -> RiferimentoNISECI {
+    let mut r = create_massive_riferimento_ciacci_solo_autoctoni_1();
+    r.push(get_trocchio());
+    r
 }
 
 /// In questo campionamento troverai:
@@ -341,14 +433,37 @@ pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
 ///   -> 5 ciacci cl1
 /// aggiungo in C2 anche una specie alloctono per testare la conta delle specie autoctone trovate
 /// x2a qua vale 0.5 e x2b 1.0
+#[cfg(not(feature = "lessclone"))]
 pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
     let mut c = create_massive_campionamento_ciacci_solo_autoctoni_2();
-
+    let t = &get_trocchio();
     // pesce alloctono in C2
-    let trocchio = RecordNISECI::new(&get_trocchio(), 2, 2, 2.0);
+    let trocchio = RecordNISECI::new(t, 2, 2, 2.0);
     c.push(trocchio);
 
     c
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
+    let mut c = create_massive_campionamento_ciacci_solo_autoctoni_2();
+    let r = create_massive_riferimento_ciacci_2();
+
+    let t = r
+        .get_inner_id(&(DummyIds::Trocchio as u32).to_string())
+        .expect("create_massive_riferimento_niseci has a Trocchio");
+    assert_eq!(t, 1);
+    // pesce alloctono in C2
+    let trocchio = RecordNISECI::new(t, 2, 2, 2.0);
+    c.push(trocchio);
+    c
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci_2() -> RiferimentoNISECI {
+    let mut r = create_massive_riferimento_ciacci_solo_autoctoni_2();
+    r.push(get_trocchio());
+    r
 }
 
 /// In questo campionamento troverai:
@@ -361,43 +476,59 @@ pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
 ///   -> 5 ciacci cl1
 /// non sono presenti specie alloctone
 pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNISECI {
-    let mut ciaccio = get_ciaccio();
-    ciaccio.set_dens_soglia_1(3.0);
-    ciaccio.set_dens_soglia_2(5.0);
+    let mut ciaccio_v1 = get_ciaccio();
+    ciaccio_v1.set_dens_soglia_1(3.0);
+    ciaccio_v1.set_dens_soglia_2(5.0);
+    #[cfg(not(feature = "lessclone"))]
+    let ciaccio = &ciaccio_v1;
+    #[cfg(feature = "lessclone")]
+    let ciaccio = DummyIds::Ciaccio as u32;
 
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
     // 10 ciacci cl5 in c1
-    let ciaccio_cl5_c1 = RecordNISECI::new(&ciaccio, 1, 13, 10.0);
+    let ciaccio_cl5_c1 = RecordNISECI::new(ciaccio, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl5_c1.clone());
     }
 
     // 10 ciacci cl4 in c1
-    let ciaccio_cl4_c1 = RecordNISECI::new(&ciaccio, 1, 10, 10.0);
+    let ciaccio_cl4_c1 = RecordNISECI::new(ciaccio, 1, 10, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c1.clone());
     }
 
     // 10 ciacci cl3 in c1
-    let ciaccio_cl3_c1 = RecordNISECI::new(&ciaccio, 1, 7, 10.0);
+    let ciaccio_cl3_c1 = RecordNISECI::new(ciaccio, 1, 7, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl3_c1.clone());
     }
 
     // 10 ciacci cl4 in c2
-    let ciaccio_cl4_c2 = RecordNISECI::new(&ciaccio, 2, 10, 10.0);
+    let ciaccio_cl4_c2 = RecordNISECI::new(ciaccio, 2, 10, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c2.clone());
     }
 
     // 5 ciacci cl1 in c2
-    let ciaccio_cl1_c2 = RecordNISECI::new(&ciaccio, 2, 2, 10.0);
+    let ciaccio_cl1_c2 = RecordNISECI::new(ciaccio, 2, 2, 10.0);
     for _ in 0..5 {
         campionamento.push(ciaccio_cl1_c2.clone());
     }
 
     CampionamentoNISECI::new(campionamento)
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci_solo_autoctoni_2() -> RiferimentoNISECI {
+    let c = create_massive_campionamento_ciacci_solo_autoctoni_2();
+    let mut rif = Vec::new();
+    for r in &c {
+        let id = r.id();
+        assert_eq!(id, DummyIds::Ciaccio as u32);
+        rif.push(get_ciaccio());
+    }
+    RiferimentoNISECI::new(rif)
 }
 
 /// In questo campionamento troverai:
@@ -410,43 +541,59 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
 ///   -> 5 ciacci cl1
 /// non sono presenti specie alloctone
 pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNISECI {
-    let mut ciaccio = get_ciaccio();
-    ciaccio.set_dens_soglia_1(3.0);
-    ciaccio.set_dens_soglia_2(5.0);
+    let mut ciaccio_v1 = get_ciaccio();
+    ciaccio_v1.set_dens_soglia_1(3.0);
+    ciaccio_v1.set_dens_soglia_2(5.0);
+    #[cfg(not(feature = "lessclone"))]
+    let ciaccio = &ciaccio_v1;
+    #[cfg(feature = "lessclone")]
+    let ciaccio = DummyIds::Ciaccio as u32;
 
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
 
     // 10 ciacci cl5 in c1
-    let ciaccio_cl5_c1 = RecordNISECI::new(&ciaccio, 1, 13, 10.0);
+    let ciaccio_cl5_c1 = RecordNISECI::new(ciaccio, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl5_c1.clone());
     }
 
     // 10 ciacci cl4 in c1
-    let ciaccio_cl4_c1 = RecordNISECI::new(&ciaccio, 1, 10, 10.0);
+    let ciaccio_cl4_c1 = RecordNISECI::new(ciaccio, 1, 10, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl4_c1.clone());
     }
 
     // 10 ciacci cl3 in c1
-    let ciaccio_cl3_c1 = RecordNISECI::new(&ciaccio, 1, 7, 10.0);
+    let ciaccio_cl3_c1 = RecordNISECI::new(ciaccio, 1, 7, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl3_c1.clone());
     }
 
     // 10 ciacci cl2 in c2
-    let ciaccio_cl2_c2 = RecordNISECI::new(&ciaccio, 2, 4, 10.0);
+    let ciaccio_cl2_c2 = RecordNISECI::new(ciaccio, 2, 4, 10.0);
     for _ in 0..10 {
         campionamento.push(ciaccio_cl2_c2.clone());
     }
 
     // 5 ciacci cl1 in c2
-    let ciaccio_cl1_c2 = RecordNISECI::new(&ciaccio, 2, 4, 10.0);
+    let ciaccio_cl1_c2 = RecordNISECI::new(ciaccio, 2, 4, 10.0);
     for _ in 0..5 {
         campionamento.push(ciaccio_cl1_c2.clone());
     }
 
     CampionamentoNISECI::new(campionamento)
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci_solo_autoctoni_1() -> RiferimentoNISECI {
+    let c = create_massive_campionamento_ciacci_solo_autoctoni_1();
+    let mut rif = Vec::new();
+    for r in &c {
+        let id = r.id();
+        assert_eq!(id, DummyIds::Ciaccio as u32);
+        rif.push(get_ciaccio());
+    }
+    RiferimentoNISECI::new(rif)
 }
 
 /// In questo campionamento troverai:
@@ -461,8 +608,18 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_1_strutt() -> Campioname
     let mut trocchio = get_trocchio();
     trocchio.set_dens_soglia_1(3.0);
     trocchio.set_dens_soglia_2(5.0);
+    #[cfg(feature = "lessclone")]
+    let trocchio = 1;
 
     create_campionamento_strutturato_data_una_specie(trocchio)
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_solo_tipo_alloctono_1_strutt() -> RiferimentoNISECI {
+    let mut species = Vec::new();
+    species.push(get_ciaccio());
+    species.push(get_trocchio());
+    RiferimentoNISECI::new(species)
 }
 
 /// In questo campionamento troverai:
@@ -477,8 +634,18 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_2_strutt() -> Campioname
     let mut bronzo = get_bronzo();
     bronzo.set_dens_soglia_1(3.0);
     bronzo.set_dens_soglia_2(5.0);
+    #[cfg(feature = "lessclone")]
+    let bronzo = 1;
 
     create_campionamento_strutturato_data_una_specie(bronzo)
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_solo_tipo_alloctono_2_strutt() -> RiferimentoNISECI {
+    let mut species = Vec::new();
+    species.push(get_ciaccio());
+    species.push(get_bronzo());
+    RiferimentoNISECI::new(species)
 }
 
 /// In questo campionamento troverai:
@@ -493,8 +660,18 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_strutt() -> Campioname
     let mut tappo = get_tappo();
     tappo.set_dens_soglia_1(3.0);
     tappo.set_dens_soglia_2(5.0);
+    #[cfg(feature = "lessclone")]
+    let tappo = 1;
 
     create_campionamento_strutturato_data_una_specie(tappo)
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_solo_tipo_alloctono_3_strutt() -> RiferimentoNISECI {
+    let mut species = Vec::new();
+    species.push(get_ciaccio());
+    species.push(get_tappo());
+    RiferimentoNISECI::new(species)
 }
 
 /// In questo campionamento troverai:
@@ -507,8 +684,18 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_destrutt() -> Campiona
     let mut tappo = get_tappo();
     tappo.set_dens_soglia_1(3.0);
     tappo.set_dens_soglia_2(5.0);
+    #[cfg(feature = "lessclone")]
+    let tappo = 1;
 
     create_campionamento_destrutturato_data_una_specie(tappo)
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_solo_tipo_alloctono_3_destrutt() -> RiferimentoNISECI {
+    let mut species = Vec::new();
+    species.push(get_ciaccio());
+    species.push(get_tappo());
+    RiferimentoNISECI::new(species)
 }
 
 /// In questo campionamento troverai:
@@ -522,8 +709,18 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_mediam_strutt() -> Cam
     let mut tappo = get_tappo();
     tappo.set_dens_soglia_1(3.0);
     tappo.set_dens_soglia_2(5.0);
+    #[cfg(feature = "lessclone")]
+    let tappo = 1;
 
     create_campionamento_mediam_strutturato_data_una_specie(tappo)
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_solo_tipo_alloctono_3_mediam_strutt() -> RiferimentoNISECI {
+    let mut species = Vec::new();
+    species.push(get_ciaccio());
+    species.push(get_tappo());
+    RiferimentoNISECI::new(species)
 }
 
 /// In questo campionamento troverai:
@@ -548,6 +745,16 @@ pub fn create_massive_campionamento_ciacci_con_trocchi_strutt() -> Campionamento
     c_trocchi
 }
 
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci_con_trocchi_strutt() -> RiferimentoNISECI {
+    let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
+    let r_2 = create_massive_riferimento_solo_tipo_alloctono_1_strutt();
+    for s in &r_2 {
+        r_1.push(s.clone());
+    }
+    r_1
+}
+
 /// In questo campionamento troverai:
 /// -> C1
 ///   -> 10 ciacci cl5
@@ -567,7 +774,24 @@ pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoN
 
     c_bronzi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
+    #[cfg(not(feature = "lessclone"))]
+    let ciaccio = &get_ciaccio();
+    #[cfg(feature = "lessclone")]
+    let ciaccio = DummyIds::Ciaccio as u32;
+    let ciaccio = RecordNISECI::new(ciaccio, 2, 2, 2.0);
+    c_bronzi.push(ciaccio);
+
     c_bronzi
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci_con_bronzi_strutt() -> RiferimentoNISECI {
+    let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
+    let r_2 = create_massive_riferimento_solo_tipo_alloctono_2_strutt();
+    for s in &r_2 {
+        r_1.push(s.clone());
+    }
+    r_1
 }
 
 /// In questo campionamento troverai:
@@ -589,7 +813,24 @@ pub fn create_massive_campionamento_ciacci_con_tappi_strutt() -> CampionamentoNI
 
     c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
+    #[cfg(not(feature = "lessclone"))]
+    let ciaccio = &get_ciaccio();
+    #[cfg(feature = "lessclone")]
+    let ciaccio = DummyIds::Ciaccio as u32;
+    let ciaccio = RecordNISECI::new(ciaccio, 2, 2, 2.0);
+    c_tappi.push(ciaccio);
+
     c_tappi
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci_con_tappi_strutt() -> RiferimentoNISECI {
+    let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
+    let r_2 = create_massive_riferimento_solo_tipo_alloctono_3_strutt();
+    for s in &r_2 {
+        r_1.push(s.clone());
+    }
+    r_1
 }
 
 /// In questo campionamento troverai:
@@ -609,7 +850,24 @@ pub fn create_massive_campionamento_ciacci_con_tappi_destrutt() -> Campionamento
 
     c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
+    #[cfg(not(feature = "lessclone"))]
+    let ciaccio = &get_ciaccio();
+    #[cfg(feature = "lessclone")]
+    let ciaccio = DummyIds::Ciaccio as u32;
+    let ciaccio = RecordNISECI::new(ciaccio, 2, 2, 2.0);
+    c_tappi.push(ciaccio);
+
     c_tappi
+}
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci_con_tappi_destrutt() -> RiferimentoNISECI {
+    let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
+    let r_2 = create_massive_riferimento_solo_tipo_alloctono_3_destrutt();
+    for s in &r_2 {
+        r_1.push(s.clone());
+    }
+    r_1
 }
 
 /// In questo campionamento troverai:
@@ -630,8 +888,30 @@ pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> Campiona
 
     c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
+    #[cfg(not(feature = "lessclone"))]
+    let ciaccio = &get_ciaccio();
+    #[cfg(feature = "lessclone")]
+    let ciaccio = DummyIds::Ciaccio as u32;
+    let ciaccio = RecordNISECI::new(ciaccio, 2, 2, 2.0);
+    c_tappi.push(ciaccio);
+
     c_tappi
 }
+
+#[cfg(feature = "lessclone")]
+pub fn create_massive_riferimento_ciacci_con_tappi_mediam_strutt() -> RiferimentoNISECI {
+    let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
+    let r_2 = create_massive_riferimento_solo_tipo_alloctono_3_mediam_strutt();
+    for s in &r_2 {
+        r_1.push(s.clone());
+    }
+    r_1
+}
+
+#[cfg(not(feature = "lessclone"))]
+type ArgSpecieNISECI = SpecieNISECI;
+#[cfg(feature = "lessclone")]
+type ArgSpecieNISECI = IdSpecieNISECI;
 
 /// In questo campionamento troverai:
 /// -> C1
@@ -641,35 +921,39 @@ pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> Campiona
 /// -> C2
 ///   -> 10 esemplari cl2
 ///   -> 5 esemplari cl1
-fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> CampionamentoNISECI {
+fn create_campionamento_strutturato_data_una_specie(
+    specie: ArgSpecieNISECI,
+) -> CampionamentoNISECI {
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
+    #[cfg(not(feature = "lessclone"))]
+    let specie = &specie;
 
     // 10 esemplari cl5 in c1
-    let cl5_c1 = RecordNISECI::new(&specie, 1, 13, 10.0);
+    let cl5_c1 = RecordNISECI::new(specie, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
     }
 
     // 10 esemplari cl4 in c1
-    let cl4_c1 = RecordNISECI::new(&specie, 1, 10, 10.0);
+    let cl4_c1 = RecordNISECI::new(specie, 1, 10, 10.0);
     for _ in 0..10 {
         campionamento.push(cl4_c1.clone());
     }
 
     // 10 esemplari cl3 in c1
-    let cl3_c1 = RecordNISECI::new(&specie, 1, 7, 10.0);
+    let cl3_c1 = RecordNISECI::new(specie, 1, 7, 10.0);
     for _ in 0..10 {
         campionamento.push(cl3_c1.clone());
     }
 
     // 10 esemplari cl2 in c2
-    let cl2_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
+    let cl2_c2 = RecordNISECI::new(specie, 2, 4, 10.0);
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
     }
 
     // 5 esemplari cl1 in c2
-    let cl1_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
+    let cl1_c2 = RecordNISECI::new(specie, 2, 4, 10.0);
     for _ in 0..5 {
         campionamento.push(cl1_c2.clone());
     }
@@ -683,23 +967,27 @@ fn create_campionamento_strutturato_data_una_specie(specie: SpecieNISECI) -> Cam
 ///   -> 20 esemplari cl4
 /// -> C2
 ///   -> 5 esemplari cl2
-fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> CampionamentoNISECI {
+fn create_campionamento_destrutturato_data_una_specie(
+    specie: ArgSpecieNISECI,
+) -> CampionamentoNISECI {
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
+    #[cfg(not(feature = "lessclone"))]
+    let specie = &specie;
 
     // 10 esemplari cl5 in c1
-    let cl5_c1 = RecordNISECI::new(&specie, 1, 13, 10.0);
+    let cl5_c1 = RecordNISECI::new(specie, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
     }
 
     // 20 esemplari cl4 in c1
-    let cl4_c1 = RecordNISECI::new(&specie, 1, 10, 10.0);
+    let cl4_c1 = RecordNISECI::new(specie, 1, 10, 10.0);
     for _ in 0..20 {
         campionamento.push(cl4_c1.clone());
     }
 
     // 10 esemplari cl2 in c2
-    let cl2_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
+    let cl2_c2 = RecordNISECI::new(specie, 2, 4, 10.0);
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
     }
@@ -715,30 +1003,32 @@ fn create_campionamento_destrutturato_data_una_specie(specie: SpecieNISECI) -> C
 ///   -> 5 esemplari cl2
 ///   -> 5 esemplari cl1
 fn create_campionamento_mediam_strutturato_data_una_specie(
-    specie: SpecieNISECI,
+    specie: ArgSpecieNISECI,
 ) -> CampionamentoNISECI {
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
+    #[cfg(not(feature = "lessclone"))]
+    let specie = &specie;
 
     // 10 esemplari cl5 in c1
-    let cl5_c1 = RecordNISECI::new(&specie, 1, 13, 10.0);
+    let cl5_c1 = RecordNISECI::new(specie, 1, 13, 10.0);
     for _ in 0..10 {
         campionamento.push(cl5_c1.clone());
     }
 
     // 20 esemplari cl4 in c1
-    let cl4_c1 = RecordNISECI::new(&specie, 1, 10, 10.0);
+    let cl4_c1 = RecordNISECI::new(specie, 1, 10, 10.0);
     for _ in 0..20 {
         campionamento.push(cl4_c1.clone());
     }
 
     // 10 esemplari cl2 in c2
-    let cl2_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
+    let cl2_c2 = RecordNISECI::new(specie, 2, 4, 10.0);
     for _ in 0..10 {
         campionamento.push(cl2_c2.clone());
     }
 
     // 5 esemplari cl1 in c2
-    let cl1_c2 = RecordNISECI::new(&specie, 2, 4, 10.0);
+    let cl1_c2 = RecordNISECI::new(specie, 2, 4, 10.0);
     for _ in 0..5 {
         campionamento.push(cl1_c2.clone());
     }
@@ -746,10 +1036,32 @@ fn create_campionamento_mediam_strutturato_data_una_specie(
     CampionamentoNISECI::new(campionamento)
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum DummyIds {
+    Ciaccio = 0,
+    Trocchio = 1,
+    Bronzo = 2,
+    Tappo = 3,
+}
+
+impl TryFrom<u32> for DummyIds {
+    type Error = ();
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(DummyIds::Ciaccio),
+            1 => Ok(DummyIds::Trocchio),
+            2 => Ok(DummyIds::Bronzo),
+            3 => Ok(DummyIds::Tappo),
+            _ => Err(()),
+        }
+    }
+}
+
 /// id == 1
 pub fn get_ciaccio() -> SpecieNISECI {
     SpecieNISECI::new(
-        &1.to_string(),
+        &(DummyIds::Ciaccio as u32).to_string(),
         "Ciaccio ciaccensis",
         2,
         0,
@@ -762,19 +1074,19 @@ pub fn get_ciaccio() -> SpecieNISECI {
         0.67,
         1.5,
         2.0,
+        3.0,
         5.0,
-        10.0,
     )
 }
 
 /// id == 2
 pub fn get_trocchio() -> SpecieNISECI {
     SpecieNISECI::new(
-        &2.to_string(),
+        &(DummyIds::Trocchio as u32).to_string(),
         "Trocchio trocchiensis",
         0,
         1,
-        true,
+        false,
         3,
         6,
         9,
@@ -783,19 +1095,19 @@ pub fn get_trocchio() -> SpecieNISECI {
         0.67,
         1.5,
         2.0,
-        1.0,
-        2.0,
+        3.0,
+        5.0,
     )
 }
 
 /// id == 3
 pub fn get_bronzo() -> SpecieNISECI {
     SpecieNISECI::new(
-        &3.to_string(),
+        &(DummyIds::Bronzo as u32).to_string(),
         "Bronzo bronzensis",
         0,
         2,
-        true,
+        false,
         3,
         6,
         9,
@@ -804,19 +1116,19 @@ pub fn get_bronzo() -> SpecieNISECI {
         0.67,
         1.5,
         2.0,
-        1.0,
-        2.0,
+        3.0,
+        5.0,
     )
 }
 
 /// id == 4
 pub fn get_tappo() -> SpecieNISECI {
     SpecieNISECI::new(
-        &4.to_string(),
+        &(DummyIds::Tappo as u32).to_string(),
         "Tappo sugheribus",
         0,
         3,
-        true,
+        false,
         3,
         6,
         9,
@@ -825,7 +1137,7 @@ pub fn get_tappo() -> SpecieNISECI {
         0.67,
         1.5,
         2.0,
-        1.0,
-        2.0,
+        3.0,
+        5.0,
     )
 }

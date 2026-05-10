@@ -15,12 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::collections::{hash_map::Entry, HashMap};
+use std::collections::{hash_map::Entry, HashMap, HashSet};
 
-use crate::domain::niseci::v2::{ClassiEtaSpecieNISECI, EsemplariPerCattura};
+use crate::domain::niseci::lessclone::{
+    CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura,
+};
 use crate::domain::niseci::{
-    AnagraficaNISECI, CampionamentoNISECI, IdSpecieNISECI, MetricheX2A, MetricheX2aB,
-    RiferimentoNISECI,
+    AnagraficaNISECI, IdSpecieNISECI, MetricheX2A, MetricheX2aB, RiferimentoNISECI,
 };
 use crate::domain::posf32::PositiveF32;
 
@@ -175,21 +176,21 @@ pub fn calculate_x2(
 
     let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
 
-    let mut specie_campionate_set: HashMap<&str, bool> = HashMap::new();
+    let mut set_specie_campionate = HashSet::new();
     for cattura in campionamento {
-        if (cattura.specie_attesa() == require_specie_attesa)
-            && (cattura.tipo_autoctono() == 1 || cattura.tipo_autoctono() == 2)
+        let id = cattura.id();
+        debug_assert!(riferimento.contains_plain_id(id));
+        let specie = riferimento
+            .get_ref_by_plain_id(id)
+            .expect("Riferimento should contain this id");
+        if (specie.specie_attesa() == require_specie_attesa)
+            && (specie.tipo_autoctono() == 1 || specie.tipo_autoctono() == 2)
         {
-            match specie_campionate_set.entry(cattura.id()) {
-                Entry::Occupied(_) => {}
-                Entry::Vacant(vacant_entry) => {
-                    vacant_entry.insert(true);
-                }
-            }
+            set_specie_campionate.insert(id);
         }
     }
 
-    calculate_x2_absolute(metriche_x2, x2_a, x2_b, &specie_campionate_set)
+    calculate_x2_absolute(metriche_x2, x2_a, x2_b, &set_specie_campionate)
 }
 
 pub fn calculate_x2_per_alloctone(
@@ -230,19 +231,18 @@ pub fn calculate_x2_per_alloctone(
 
     let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
 
-    let mut specie_campionate_set: HashMap<&str, bool> = HashMap::new();
+    let mut set_specie_campionate = HashSet::new();
     for cattura in campionamento {
-        if cattura.tipo_alloctono() > 0 {
-            match specie_campionate_set.entry(cattura.id()) {
-                Entry::Occupied(_) => {}
-                Entry::Vacant(vacant_entry) => {
-                    vacant_entry.insert(true);
-                }
-            }
+        let id = cattura.id();
+        let specie = riferimento
+            .get_ref_by_plain_id(id)
+            .expect("Riferimento should contain this id");
+        if specie.tipo_alloctono() > 0 {
+            set_specie_campionate.insert(id);
         }
     }
 
-    calculate_x2_absolute(metriche_x2, x2_a, x2_b, &specie_campionate_set)
+    calculate_x2_absolute(metriche_x2, x2_a, x2_b, &set_specie_campionate)
 }
 
 struct RecordSubmetricheX2A {
@@ -281,7 +281,7 @@ fn calculate_x2_absolute(
     metriche_x2: MetricheX2,
     x2_a: f32,
     x2_b: f32,
-    specie_campionate_set: &HashMap<&str, bool>,
+    specie_campionate_set: &HashSet<IdSpecieNISECI>,
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
     let tot_specie_attese_trovate = specie_campionate_set.len();
 
@@ -310,16 +310,17 @@ fn calculate_sommatoria_x2_a(
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in c {
-        if (cattura.specie_attesa() == require_specie_attesa)
-            && (cattura.tipo_autoctono() == 1 || cattura.tipo_autoctono() == 2)
+        let id = cattura.id();
+        debug_assert!(r.contains_plain_id(id));
+        let specie = r
+            .get_ref_by_plain_id(id)
+            .expect("Riferimento should contain this id");
+        if (specie.specie_attesa() == require_specie_attesa)
+            && (specie.tipo_autoctono() == 1 || specie.tipo_autoctono() == 2)
         {
-            debug_assert!(r.contains_id(cattura.id()));
-            let id = r
-                .get_inner_id(cattura.id())
-                .expect("Riferimento should contain this id");
             match classi_eta_map.entry(id) {
                 Entry::Occupied(mut entry) => {
-                    entry.get_mut().update_classi_eta(cattura);
+                    entry.get_mut().update_classi_eta(cattura, r);
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
@@ -347,13 +348,14 @@ fn calculate_sommatoria_x2_b(
         HashMap::with_capacity(10);
 
     for cattura in c {
-        if (cattura.specie_attesa() == require_specie_attesa)
-            && (cattura.tipo_autoctono() == 1 || cattura.tipo_autoctono() == 2)
+        let id = cattura.id();
+        debug_assert!(r.contains_plain_id(id));
+        let specie = r
+            .get_ref_by_plain_id(id)
+            .expect("Riferimento should contain this id");
+        if (specie.specie_attesa() == require_specie_attesa)
+            && (specie.tipo_autoctono() == 1 || specie.tipo_autoctono() == 2)
         {
-            debug_assert!(r.contains_id(cattura.id()));
-            let id = r
-                .get_inner_id(cattura.id())
-                .expect("Riferimento should contain this id");
             match esemplari_per_cattura_map.entry(id) {
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry
@@ -384,14 +386,15 @@ fn calculate_sommatoria_x2_a_per_alloctone(
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in c {
-        if cattura.tipo_alloctono() > 0 {
-            debug_assert!(r.contains_id(cattura.id()));
-            let id = r
-                .get_inner_id(cattura.id())
-                .expect("Riferimento should contain this id");
+        let id = cattura.id();
+        debug_assert!(r.contains_plain_id(id));
+        let specie = r
+            .get_ref_by_plain_id(id)
+            .expect("Riferimento should contain this id");
+        if specie.tipo_alloctono() > 0 {
             match classi_eta_map.entry(id) {
                 Entry::Occupied(mut entry) => {
-                    entry.get_mut().update_classi_eta(cattura);
+                    entry.get_mut().update_classi_eta(cattura, r);
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
@@ -428,11 +431,12 @@ fn calculate_sommatoria_x2_b_per_alloctone(
         HashMap::with_capacity(10);
 
     for cattura in c {
-        if cattura.tipo_alloctono() > 0 {
-            debug_assert!(r.contains_id(cattura.id()));
-            let id = r
-                .get_inner_id(cattura.id())
-                .expect("Riferimento should contain this id");
+        let id = cattura.id();
+        debug_assert!(r.contains_plain_id(id));
+        let specie = r
+            .get_ref_by_plain_id(id)
+            .expect("Riferimento should contain this id");
+        if specie.tipo_alloctono() > 0 {
             match esemplari_per_cattura_map.entry(id) {
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry

@@ -13,14 +13,20 @@ use esox::csv::parser::niseci::{
 use esox::csv::{CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER};
 use esox::domain::location::Location;
 use esox::domain::niseci::{
-    AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
-    RiferimentoNISECI, TipoComunitaNISECI,
+    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, RiferimentoNISECI,
+    TipoComunitaNISECI,
 };
 use esox::domain::posf32::PositiveF32;
+
+#[cfg(feature = "lessclone")]
+use esox::domain::niseci::lessclone::CampionamentoNISECI;
+#[cfg(not(feature = "lessclone"))]
+use esox::domain::niseci::CampionamentoNISECI;
 #[cfg(not(feature = "lessclone"))]
 use esox::engines::niseci::full::calculate_niseci;
 #[cfg(feature = "lessclone")]
 use esox::engines::niseci::full::lessclone::calculate_niseci;
+
 use rand::rng;
 use rand::seq::SliceRandom;
 use std::hint::black_box;
@@ -297,7 +303,7 @@ fn full_bench(c: &mut Criterion) {
 }
 
 fn custom_criterion() -> Criterion {
-    Criterion::default().measurement_time(Duration::from_secs(35))
+    Criterion::default().measurement_time(Duration::from_secs(70))
 }
 
 criterion_group! { name = benches;

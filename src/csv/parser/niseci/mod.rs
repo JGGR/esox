@@ -16,7 +16,11 @@
 */
 
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
-use crate::domain::niseci::{AnagraficaNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI};
+#[cfg(feature = "lessclone")]
+use crate::domain::niseci::lessclone::RecordNISECI;
+#[cfg(not(feature = "lessclone"))]
+use crate::domain::niseci::RecordNISECI;
+use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, SpecieNISECI};
 use crate::parser::niseci::{
     parse_records_anagrafica_niseci, parse_records_campionamento_niseci,
     parse_records_riferimento_niseci, RecordAnagraficaNISECIError, RecordCampionamentoNISECIError,

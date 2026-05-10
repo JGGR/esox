@@ -27,7 +27,11 @@ use crate::csv::stanis::niseci::{
     VeryItalianRecordRiferimentoNISECI,
 };
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
-use crate::domain::niseci::{AnagraficaNISECI, CampionamentoNISECI, RiferimentoNISECI};
+#[cfg(feature = "lessclone")]
+use crate::domain::niseci::lessclone::CampionamentoNISECI;
+#[cfg(not(feature = "lessclone"))]
+use crate::domain::niseci::CampionamentoNISECI;
+use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI};
 use crate::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci, RecordAnagraficaNISECIError, RecordCampionamentoNISECIError,

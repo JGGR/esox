@@ -30,10 +30,17 @@ use esox::csv::stanis::niseci::{
     VeryItalianRecordRiferimentoNISECI,
 };
 
+use esox::domain::niseci::RiferimentoNISECI;
+
+#[cfg(not(feature = "lessclone"))]
+use esox::{domain::niseci::CampionamentoNISECI, engines::niseci::full::calculate_niseci};
+
+#[cfg(feature = "lessclone")]
 use esox::{
-    domain::niseci::{CampionamentoNISECI, RiferimentoNISECI},
-    engines::niseci::full::calculate_niseci,
+    domain::niseci::lessclone::CampionamentoNISECI,
+    engines::niseci::full::lessclone::calculate_niseci,
 };
+
 use std::io::Cursor;
 
 const RIFERIMENTO_NISECI_TEMPLATE_DATA: &[u8] =
@@ -114,12 +121,24 @@ fn calculate_niseci_template() {
     let (niseci, intermediates) = calc_niseci_res.expect("is_ok() was checked before");
 
     assert_eq!(niseci, Some(0.209));
+    #[cfg(not(feature = "lessclone"))]
     #[expect(deprecated)]
     let x1 = intermediates.x1;
+    #[cfg(feature = "lessclone")]
+    let x1 = intermediates.x1();
+
+    #[cfg(not(feature = "lessclone"))]
     #[expect(deprecated)]
     let x2 = intermediates.x2;
+    #[cfg(feature = "lessclone")]
+    let x2 = intermediates.x2();
+
+    #[cfg(not(feature = "lessclone"))]
     #[expect(deprecated)]
     let x3 = intermediates.x3;
+    #[cfg(feature = "lessclone")]
+    let x3 = intermediates.x3();
+
     assert_eq!(x1, 0.429);
     assert_eq!(x2, Some(0.267));
     assert_eq!(x3, 1.0);

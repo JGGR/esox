@@ -133,7 +133,7 @@ fn full_bench(c: &mut Criterion) {
 }
 
 fn custom_criterion() -> Criterion {
-    Criterion::default().measurement_time(Duration::from_secs(35))
+    Criterion::default().measurement_time(Duration::from_secs(70))
 }
 
 criterion_group! { name = benches;

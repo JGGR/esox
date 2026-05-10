@@ -15,6 +15,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#[cfg(not(feature = "lessclone"))]
+use crate::engines::niseci::x2::calculate_x2;
+#[cfg(feature = "lessclone")]
+use crate::engines::niseci::x2::lessclone::calculate_x2;
+
+#[cfg(feature = "lessclone")]
+use crate::tests::test_utils::{
+    create_massive_riferimento_ciacci, create_massive_riferimento_ciacci_2,
+};
+
 use crate::{
     domain::{
         location::Location,
@@ -23,7 +33,6 @@ use crate::{
             IdroEcoRegioneNISECI, TipoComunitaNISECI,
         },
     },
-    engines::niseci::x2::calculate_x2,
     tests::test_utils::{
         create_massive_campionamento_ciacci, create_massive_campionamento_ciacci_2, get_ciaccio,
     },
@@ -130,7 +139,15 @@ fn calculate_x2_test_1() {
         10.0,
     );
 
+    #[cfg(not(feature = "lessclone"))]
     let x2 = calculate_x2(&campionamento, &anagrafica, true);
+    #[cfg(feature = "lessclone")]
+    let x2 = calculate_x2(
+        &campionamento,
+        &anagrafica,
+        &create_massive_riferimento_ciacci(),
+        true,
+    );
 
     assert!(x2.is_ok());
 
@@ -166,7 +183,15 @@ fn calculate_x2_test_1() {
         10.0,
     );
 
+    #[cfg(not(feature = "lessclone"))]
     let x2 = calculate_x2(&campionamento, &anagrafica, true);
+    #[cfg(feature = "lessclone")]
+    let x2 = calculate_x2(
+        &campionamento,
+        &anagrafica,
+        &create_massive_riferimento_ciacci_2(),
+        true,
+    );
 
     assert!(x2.is_ok());
     let epsilon: f32 = 1e-6;

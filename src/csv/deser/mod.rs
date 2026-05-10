@@ -172,7 +172,7 @@ impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaNISECI {}
 impl DefaultRecordCsv for crate::deser::PlainRecordCampionamentoHFBI {}
 impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaHFBI {}
 
-fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
+fn parse_csv_pos(pos: Option<&csv::Position>) -> String {
     let res;
     match pos {
         Some(p) => {
@@ -212,7 +212,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
                 };
                 let mut curr_err = format!(
                     "  Errore di deserializzazione alla posizione: {}: campo {}",
-                    parse_csv_pos(pos),
+                    parse_csv_pos(pos.as_ref()),
                     field_str,
                 );
                 match err.kind() {
@@ -249,7 +249,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
             csv::ErrorKind::Utf8 { pos, err } => {
                 res.push(format!(
                     "  Errore UTF-8 alla posizione: {}: {}",
-                    parse_csv_pos(pos),
+                    parse_csv_pos(pos.as_ref()),
                     priv_translate(&err.to_string())
                 ));
             }
@@ -260,7 +260,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
             } => {
                 res.push(format!(
                     "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
-                    parse_csv_pos(pos),
+                    parse_csv_pos(pos.as_ref()),
                     expected_len,
                     len // no priv_translate() anche se teoricamente lo supporta
                 ));

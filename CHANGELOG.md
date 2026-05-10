@@ -18,9 +18,15 @@
 - Add `domain::niseci::RiferimentoNISECI::to_csv_intermediates_joined()`
 - Add `domain::niseci::ComunitaNISECI::new()`
 - Add some getters for deprecated fields
+- Add `lessclone` feature
+  - Building with this feature turns on breaking changes
+  - Usage is recommended but not default yet
+  - The new APIs better reflect what `v0.2` will support
 
 ### Changed
 
+- Small breaking change for `csv::deser::utils::diagnostic`, introduced in the last patch
+  - Prefer `Option<&Foo>` to `&Option<Foo>`
 - Fixed wrong id for `Alice (Acciuga Europea)` in `RIFERIMENTO_HFBI`
 - Improved worst cases parsing performance
 - Refactor internal `engines::niseci::x2` methods to avoid some cloning

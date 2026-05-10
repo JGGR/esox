@@ -67,7 +67,7 @@ impl CsvDiagnosticLocalization for ItalianCsvDiagnostic {
 pub struct ItalianCsvPosition;
 
 impl CsvPositionFormatter for ItalianCsvPosition {
-    fn format(&self, pos: &Option<csv::Position>) -> String {
+    fn format(&self, pos: Option<&csv::Position>) -> String {
         let res;
         match pos {
             Some(p) => {

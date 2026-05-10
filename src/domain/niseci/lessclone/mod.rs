@@ -14,18 +14,246 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! This module contains refactored domain structs, used with lessclone feature.
+//!
+//! Next version will have these as the base domain module.
 
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::vec::Vec;
 
 use crate::domain::localize::CommaFormat;
 use crate::domain::niseci::{
-    AnagraficaNISECI, ClassiEta, IdSpecieNISECI, InfoIntermediePopolazioniNISECI, MetricheX2A,
-    MetricheX2aB, RecordNISECI, RiferimentoNISECI, StatoEcologicoNISECI,
+    AlieniIndigeni, AnagraficaNISECI, IdSpecieNISECI, InfoIntermediePopolazioniNISECI, MetricheX2A,
+    MetricheX2aB, RiferimentoNISECI, StatoEcologicoNISECI,
 };
+
+#[cfg(test)]
+use crate::engines::niseci::linear_regression::Point;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RecordNISECI {
+    id: IdSpecieNISECI,
+    passaggio_cattura: u8,
+    lunghezza: u32,
+    /// in millimetri
+    peso: f32, // in grammi
+}
+
+impl fmt::Display for RecordNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = format!("RecordNISECI: {{ specie: {{{}}}, passaggio_cattura {{{}}}, lunghezza: {{{}}}, peso: {{{}}}",
+                self.id(), self.passaggio_cattura(), self.lunghezza(), self.peso());
+        write!(f, "{}", string_representation)
+    }
+}
+
+impl RecordNISECI {
+    pub fn new(id: IdSpecieNISECI, passaggio_cattura: u8, lunghezza: u32, peso: f32) -> Self {
+        Self {
+            id,
+            passaggio_cattura,
+            lunghezza,
+            peso,
+        }
+    }
+    #[inline(always)]
+    pub fn passaggio_cattura(&self) -> u8 {
+        self.passaggio_cattura
+    }
+    #[inline(always)]
+    pub fn lunghezza(&self) -> u32 {
+        self.lunghezza
+    }
+    #[inline(always)]
+    pub fn peso(&self) -> f32 {
+        self.peso
+    }
+    #[inline(always)]
+    pub(crate) fn id(&self) -> IdSpecieNISECI {
+        self.id
+    }
+    #[inline(always)]
+    pub(crate) fn tipo_autoctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_autoctono())
+    }
+    #[inline(always)]
+    pub(crate) fn tipo_alloctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_alloctono())
+    }
+    #[inline(always)]
+    pub(crate) fn specie_attesa(&self, r: &RiferimentoNISECI) -> Option<bool> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.specie_attesa())
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_1(&self, r: &RiferimentoNISECI) -> Option<u32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.cl_soglia_1())
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_2(&self, r: &RiferimentoNISECI) -> Option<u32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.cl_soglia_2())
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_3(&self, r: &RiferimentoNISECI) -> Option<u32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.cl_soglia_3())
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_4(&self, r: &RiferimentoNISECI) -> Option<u32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.cl_soglia_4())
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_1())
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_2())
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_3(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_3())
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_4(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_4())
+    }
+    #[inline(always)]
+    pub fn dens_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_1())
+    }
+    #[inline(always)]
+    pub fn dens_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_2())
+    }
+}
+
+#[derive(Clone, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct CampionamentoNISECI {
+    campionamento: Vec<RecordNISECI>,
+}
+
+impl fmt::Display for CampionamentoNISECI {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut string_representation = "CampionamentoNISECI: {".to_string();
+        for r in self {
+            string_representation = format!("{string_representation}\n  {{{r}}},");
+        }
+        string_representation = format!("{string_representation}\n}}");
+        write!(f, "{}", string_representation)
+    }
+}
+
+impl CampionamentoNISECI {
+    #[cfg(test)]
+    pub fn fishes_for_every_passage(&self) -> Vec<Point<i32>> {
+        let mut max_pass = 0;
+        for record in self {
+            if record.passaggio_cattura() > max_pass {
+                max_pass = record.passaggio_cattura();
+            }
+        }
+
+        let mut passaggi: Vec<i32> = vec![0; max_pass as usize];
+        for record in self {
+            passaggi[(record.passaggio_cattura() - 1) as usize] += 1;
+        }
+
+        let mut tot = 0;
+
+        // x = pesci totali fino a quel passaggio y = pesci del passaggio
+        let mut pass_sum: Vec<Point<i32>> = Vec::with_capacity(max_pass as usize);
+        for pass in passaggi.iter() {
+            tot += pass;
+            pass_sum.push(Point::new(tot, *pass));
+        }
+
+        pass_sum
+    }
+
+    pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
+        Self { campionamento }
+    }
+
+    pub fn get_numero_pesci_alieni_e_indigeni(&self, r: &RiferimentoNISECI) -> AlieniIndigeni {
+        let mut alieni_indigeni = AlieniIndigeni {
+            #[expect(deprecated)]
+            alieni: 0,
+            #[expect(deprecated)]
+            indigeni: 0,
+        };
+
+        for pesce in self {
+            debug_assert!(
+                r.contains_plain_id(pesce.id()),
+                "Riferimento did not contain id {}",
+                pesce.id()
+            );
+            let specie = r
+                .get_ref_by_plain_id(pesce.id())
+                .expect("Riferimento should contain this id");
+            let tipo_autoctono = specie.tipo_autoctono();
+            let tipo_alloctono = specie.tipo_alloctono();
+            if tipo_alloctono > 0 && tipo_alloctono <= 3 {
+                #[expect(deprecated)]
+                {
+                    alieni_indigeni.alieni += 1;
+                }
+            } else if tipo_autoctono == 1 || tipo_autoctono == 2 {
+                #[expect(deprecated)]
+                {
+                    alieni_indigeni.indigeni += 1;
+                }
+            }
+        }
+
+        alieni_indigeni
+    }
+
+    pub fn get_tot_specie_autoctone_attese(&self, r: &RiferimentoNISECI) -> usize {
+        let mut set = HashSet::new();
+
+        for cattura in self {
+            debug_assert!(
+                r.contains_plain_id(cattura.id()),
+                "Riferimento did not contain id {}",
+                cattura.id()
+            );
+            let specie = r
+                .get_ref_by_plain_id(cattura.id())
+                .expect("Riferimento should contain this id");
+            if specie.specie_attesa()
+                && (specie.tipo_autoctono() == 1 || specie.tipo_autoctono() == 2)
+            {
+                set.insert(cattura.id());
+            }
+        }
+
+        set.len()
+    }
+}
+
+impl From<CampionamentoNISECI> for Vec<RecordNISECI> {
+    fn from(val: CampionamentoNISECI) -> Self {
+        val.campionamento
+    }
+}
+
+impl<'a> IntoIterator for &'a CampionamentoNISECI {
+    type Item = &'a RecordNISECI;
+    type IntoIter = std::slice::Iter<'a, RecordNISECI>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.campionamento.iter()
+    }
+}
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -435,6 +663,35 @@ impl RisultatoNISECI {
     }
 }
 
+/// enum che aiuta a valorizzare ClassiEtaSpecieNISECI
+/// (vedi update_classi_eta)
+pub enum ClassiEta {
+    CL1,
+    CL2,
+    CL3,
+    CL4,
+    CL5,
+}
+
+impl ClassiEta {
+    pub fn find_classe_eta(record: &RecordNISECI, r: &RiferimentoNISECI) -> ClassiEta {
+        let specie = r
+            .get_ref_by_plain_id(record.id())
+            .expect("Riferimento should contain this id");
+        if record.lunghezza() < specie.cl_soglia_1() {
+            ClassiEta::CL1
+        } else if record.lunghezza() < specie.cl_soglia_2() {
+            ClassiEta::CL2
+        } else if record.lunghezza() < specie.cl_soglia_3() {
+            ClassiEta::CL3
+        } else if record.lunghezza() < specie.cl_soglia_4() {
+            ClassiEta::CL4
+        } else {
+            ClassiEta::CL5
+        }
+    }
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ClassiEtaSpecieNISECI {
@@ -474,23 +731,22 @@ impl ClassiEtaSpecieNISECI {
     }
     pub fn new_cl_prevalorizzata(
         record: &RecordNISECI,
-        riferimento: &RiferimentoNISECI,
+        r: &RiferimentoNISECI,
     ) -> Option<ClassiEtaSpecieNISECI> {
-        let id = riferimento.get_inner_id(record.id())?;
         let mut classe = ClassiEtaSpecieNISECI {
-            id,
+            id: record.id(),
             cl1: 0,
             cl2: 0,
             cl3: 0,
             cl4: 0,
             cl5: 0,
         };
-        classe.update_classi_eta(record);
+        classe.update_classi_eta(record, r);
         Some(classe)
     }
 
-    pub fn update_classi_eta(&mut self, record: &RecordNISECI) {
-        match ClassiEta::find_classe_eta(record) {
+    pub fn update_classi_eta(&mut self, record: &RecordNISECI, r: &RiferimentoNISECI) {
+        match ClassiEta::find_classe_eta(record, r) {
             ClassiEta::CL1 => self.cl1 += 1,
             ClassiEta::CL2 => self.cl2 += 1,
             ClassiEta::CL3 => self.cl3 += 1,
@@ -868,11 +1124,11 @@ impl ClassiEtaAlieniNISECI {
     }
     #[inline(always)]
     pub fn map_tipo_2(&self) -> &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> {
-        &self.map_tipo_1
+        &self.map_tipo_2
     }
     #[inline(always)]
     pub fn map_tipo_3(&self) -> &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> {
-        &self.map_tipo_1
+        &self.map_tipo_3
     }
     #[inline(always)]
     pub fn tot_specie_aliene(&self) -> usize {
@@ -941,7 +1197,7 @@ impl EsemplariPerCattura {
 
 #[cfg(test)]
 mod domain_niseci_private_tests {
-    use crate::domain::niseci::v2::*;
+    use crate::domain::niseci::lessclone::*;
 
     #[cfg(test)]
     impl ClassiEtaSpecieNISECI {
@@ -962,6 +1218,19 @@ mod domain_niseci_private_tests {
                 cl4,
                 cl5,
             }
+        }
+    }
+    #[cfg(test)]
+    impl CampionamentoNISECI {
+        #[cfg(test)]
+        pub(crate) fn push(&mut self, value: RecordNISECI) {
+            #[allow(deprecated)]
+            self.campionamento.push(value);
+        }
+        #[cfg(test)]
+        pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
+            #[allow(deprecated)]
+            &mut self.campionamento
         }
     }
 }

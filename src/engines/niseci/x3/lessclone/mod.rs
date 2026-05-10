@@ -15,10 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::niseci::v2::{
-    ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI,
+use crate::domain::niseci::lessclone::{
+    CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI,
 };
-use crate::domain::niseci::{CampionamentoNISECI, IdSpecieNISECI, RiferimentoNISECI};
+use crate::domain::niseci::{IdSpecieNISECI, RiferimentoNISECI};
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
@@ -98,7 +98,7 @@ pub fn calculate_x3(
     c: &CampionamentoNISECI,
     r: &RiferimentoNISECI,
 ) -> Result<(f32, Option<MetricheX3>), Vec<String>> {
-    let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni();
+    let alieni_indigeni = c.get_numero_pesci_alieni_e_indigeni(r);
 
     // condizione 1
     if alieni_indigeni.alieni() == 0 {
@@ -262,37 +262,38 @@ fn calculate_classi_eta_alieni(
 
     // riempo l'hashmap con solo le specie alloctone campionate
     for cattura in c {
-        debug_assert!(r.contains_id(cattura.id()));
-        let id = r
-            .get_inner_id(cattura.id())
+        let id = cattura.id();
+        debug_assert!(r.contains_plain_id(id));
+        let specie = r
+            .get_ref_by_plain_id(id)
             .expect("Riferimento should contain this id");
-        if cattura.tipo_alloctono() == 1 {
+        if specie.tipo_alloctono() == 1 {
             match classi_eta.map_tipo_1.entry(id) {
                 Entry::Occupied(mut entry) => {
                     let v: &mut ClassiEtaSpecieNISECI = entry.get_mut();
-                    v.update_classi_eta(cattura);
+                    v.update_classi_eta(cattura, r);
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
                         .and_then(|c| Some(entry.insert(c)));
                 }
             };
-        } else if cattura.tipo_alloctono() == 2 {
+        } else if specie.tipo_alloctono() == 2 {
             match classi_eta.map_tipo_2.entry(id) {
                 Entry::Occupied(mut entry) => {
                     let v: &mut ClassiEtaSpecieNISECI = entry.get_mut();
-                    v.update_classi_eta(cattura);
+                    v.update_classi_eta(cattura, r);
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
                         .and_then(|c| Some(entry.insert(c)));
                 }
             };
-        } else if cattura.tipo_alloctono() == 3 {
+        } else if specie.tipo_alloctono() == 3 {
             match classi_eta.map_tipo_3.entry(id) {
                 Entry::Occupied(mut entry) => {
                     let v: &mut ClassiEtaSpecieNISECI = entry.get_mut();
-                    v.update_classi_eta(cattura);
+                    v.update_classi_eta(cattura, r);
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
@@ -300,7 +301,7 @@ fn calculate_classi_eta_alieni(
                 }
             };
         }
-        classi_eta.set_tot_specie_autoctone(c.get_tot_specie_autoctone_attese());
+        classi_eta.set_tot_specie_autoctone(c.get_tot_specie_autoctone_attese(r));
     }
 
     classi_eta.set_tot_specie_aliene(

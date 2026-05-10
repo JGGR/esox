@@ -15,15 +15,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::domain::niseci::v2::{ValoriIntermediNISECI, ValoriIntermediSpecieNISECI};
+//! This module contains refactored [`calculate_niseci`], used with lessclone feature.
+//!
+//! Next version will have these as the base [`engines::niseci::full`] module.
+
+use crate::domain::niseci::lessclone::{
+    CampionamentoNISECI, ValoriIntermediNISECI, ValoriIntermediSpecieNISECI,
+};
 use crate::domain::niseci::{
-    AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, IdSpecieNISECI, RiferimentoNISECI,
-    StatoEcologicoNISECI,
+    AnagraficaNISECI, AreaNISECI, IdSpecieNISECI, RiferimentoNISECI, StatoEcologicoNISECI,
 };
 use crate::engines::niseci::x2::lessclone::MetricheX2;
 use std::collections::{hash_map::Entry, HashMap};
 
-use crate::engines::niseci::x1::calculate_x1;
+use crate::engines::niseci::x1::lessclone::calculate_x1;
 use crate::engines::niseci::x2::lessclone::calculate_x2;
 use crate::engines::niseci::x2::lessclone::calculate_x2_per_alloctone;
 use crate::engines::niseci::x3::lessclone::calculate_x3;

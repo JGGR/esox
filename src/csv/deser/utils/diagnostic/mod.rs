@@ -221,7 +221,7 @@ pub trait CsvDiagnosticLocalization {
 }
 
 pub trait CsvPositionFormatter {
-    fn format(&self, pos: &Option<csv::Position>) -> String;
+    fn format(&self, pos: Option<&csv::Position>) -> String;
 }
 
 pub trait CsvFieldResolver {
@@ -256,11 +256,11 @@ where
 {
     pub fn format(&self, err: &CsvDiagnostic, record: TipoRecord) -> String {
         let pos = self.pos.format(match err {
-            CsvDiagnostic::Deserialize { pos, .. } => pos,
-            CsvDiagnostic::Io { pos, .. } => pos,
-            CsvDiagnostic::Utf8 { pos, .. } => pos,
-            CsvDiagnostic::UnequalLengths { pos, .. } => pos,
-            CsvDiagnostic::Unknown { pos, .. } => pos,
+            CsvDiagnostic::Deserialize { pos, .. } => pos.as_ref(),
+            CsvDiagnostic::Io { pos, .. } => pos.as_ref(),
+            CsvDiagnostic::Utf8 { pos, .. } => pos.as_ref(),
+            CsvDiagnostic::UnequalLengths { pos, .. } => pos.as_ref(),
+            CsvDiagnostic::Unknown { pos, .. } => pos.as_ref(),
         });
 
         match err {
