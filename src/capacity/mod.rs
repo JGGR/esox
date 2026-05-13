@@ -22,7 +22,7 @@ pub(crate) trait Capacity {
 pub(crate) struct Small;
 pub(crate) struct Medium;
 #[derive(Default)]
-pub(crate) struct DefaultConfig;
+pub(crate) struct DefaultCapacity;
 pub(crate) struct Custom<const N: usize>;
 
 const SMALL_CAP: usize = 100;
@@ -36,6 +36,6 @@ impl Capacity for Medium {
     const VALUE: usize = MEDIUM_CAP;
 }
 
-impl Capacity for DefaultConfig {
+impl Capacity for DefaultCapacity {
     const VALUE: usize = SMALL_CAP;
 }

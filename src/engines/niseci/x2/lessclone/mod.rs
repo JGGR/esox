@@ -17,7 +17,7 @@
 
 use std::collections::{hash_map::Entry, HashMap, HashSet};
 
-use crate::capacity::{Capacity, DefaultConfig};
+use crate::capacity::{Capacity, DefaultCapacity};
 use crate::domain::niseci::lessclone::{
     CampionamentoNISECI, ClassiEtaSpecieNISECI, EsemplariPerCattura,
 };
@@ -138,12 +138,12 @@ pub fn calculate_x2(
     riferimento: &RiferimentoNISECI,
     require_specie_attesa: bool,
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
-    let (x2_a, criteri_vec) = calculate_sommatoria_x2_a::<DefaultConfig>(
+    let (x2_a, criteri_vec) = calculate_sommatoria_x2_a::<DefaultCapacity>(
         campionamento,
         riferimento,
         require_specie_attesa,
     )?;
-    let (x2_b, densita_vec) = calculate_sommatoria_x2_b::<DefaultConfig>(
+    let (x2_b, densita_vec) = calculate_sommatoria_x2_b::<DefaultCapacity>(
         campionamento,
         anagrafica,
         riferimento,
@@ -202,8 +202,8 @@ pub fn calculate_x2_per_alloctone(
     anagrafica: &AnagraficaNISECI,
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
     let (x2_a, criteri_vec) =
-        calculate_sommatoria_x2_a_per_alloctone::<DefaultConfig>(campionamento, riferimento)?;
-    let (x2_b, densita_vec) = calculate_sommatoria_x2_b_per_alloctone::<DefaultConfig>(
+        calculate_sommatoria_x2_a_per_alloctone::<DefaultCapacity>(campionamento, riferimento)?;
+    let (x2_b, densita_vec) = calculate_sommatoria_x2_b_per_alloctone::<DefaultCapacity>(
         campionamento,
         riferimento,
         anagrafica,

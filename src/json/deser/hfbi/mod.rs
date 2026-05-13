@@ -20,6 +20,7 @@
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
+use crate::deser::limits::DefaultByteLimit;
 use crate::deser::{parse_serialized_records, RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::json::deser::{dispatch_json_input, JsonDeserError, JsonPathCheckError};
 use std::fs::File;
@@ -31,7 +32,7 @@ where
     R: std::io::Read,
     T: RecordCampionamentoHFBI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {
@@ -47,7 +48,7 @@ pub fn check_campionamento_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, 
 where
     T: RecordCampionamentoHFBI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {
@@ -75,7 +76,7 @@ where
     R: std::io::Read,
     T: RecordAnagraficaHFBI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {
@@ -91,7 +92,7 @@ pub fn check_anagrafica_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, Jso
 where
     T: RecordAnagraficaHFBI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {

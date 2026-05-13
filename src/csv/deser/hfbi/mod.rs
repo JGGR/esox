@@ -27,6 +27,7 @@ use crate::csv::stanis::giorgio::csv_error_handler;
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
+use crate::deser::limits::{ByteLimit, DefaultByteLimit};
 use crate::deser::{
     parse_serialized_records, RecordAnagraficaHFBI, RecordCampionamentoHFBI, TipoRecord,
 };
@@ -106,7 +107,7 @@ where
         _ => b',',
     };
 
-    check_campionamento_hfbi_reader_conf::<R, T>(
+    private_check_campionamento_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
             .with_delimiter(delimiter)
@@ -121,7 +122,17 @@ pub fn check_campionamento_hfbi_reader_conf<R: Read, T>(
 where
     T: RecordCampionamentoHFBI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
+    private_check_campionamento_hfbi_reader_conf::<R, DefaultByteLimit, T>(reader, config)
+}
+
+fn private_check_campionamento_hfbi_reader_conf<R: Read, BL: ByteLimit, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCampionamentoHFBI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
 
     let mut rdr = csv::ReaderBuilder::new()
         .delimiter(config.delimiter())
@@ -176,7 +187,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_campionamento_hfbi_reader_conf(file, config)
+    private_check_campionamento_hfbi_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }
 
 #[deprecated(
@@ -289,7 +300,7 @@ where
         _ => b',',
     };
 
-    check_anagrafica_hfbi_reader_conf::<R, T>(
+    private_check_anagrafica_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
             .with_delimiter(delimiter)
@@ -304,7 +315,17 @@ pub fn check_anagrafica_hfbi_reader_conf<R: Read, T>(
 where
     T: RecordAnagraficaHFBI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
+    private_check_anagrafica_hfbi_reader_conf::<R, DefaultByteLimit, T>(reader, config)
+}
+
+fn private_check_anagrafica_hfbi_reader_conf<R: Read, BL: ByteLimit, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordAnagraficaHFBI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
 
     let mut rdr = csv::ReaderBuilder::new()
         .delimiter(config.delimiter())
@@ -359,5 +380,5 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_anagrafica_hfbi_reader_conf(file, config)
+    private_check_anagrafica_hfbi_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }

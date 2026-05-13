@@ -23,6 +23,9 @@
 //!
 //! To validate intermediate structs into [`crate::domain`] structs, see:
 //! - [`crate::parser`]
+
+pub(crate) mod limits;
+
 use std::fmt;
 
 #[derive(Copy, Clone)]

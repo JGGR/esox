@@ -20,6 +20,7 @@
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
+use crate::deser::limits::DefaultByteLimit;
 use crate::deser::{
     parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
     RecordRiferimentoNISECI,
@@ -34,7 +35,7 @@ where
     R: std::io::Read,
     T: RecordRiferimentoNISECI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {
@@ -50,7 +51,7 @@ pub fn check_riferimento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>, 
 where
     T: RecordRiferimentoNISECI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {
@@ -68,7 +69,7 @@ where
     R: std::io::Read,
     T: RecordCampionamentoNISECI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {
@@ -84,7 +85,7 @@ pub fn check_campionamento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>
 where
     T: RecordCampionamentoNISECI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {
@@ -102,7 +103,7 @@ where
     R: std::io::Read,
     T: RecordAnagraficaNISECI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {
@@ -118,7 +119,7 @@ pub fn check_anagrafica_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>, J
 where
     T: RecordAnagraficaNISECI,
 {
-    dispatch_json_input(
+    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
         reader,
         |res| res.map_err(Into::into),
         |deser| {

@@ -18,6 +18,8 @@
 pub mod hfbi;
 pub mod niseci;
 
+use crate::deser::limits::ByteLimit;
+
 pub enum JsonDispatchError {
     Io(std::io::Error),
     JsonArray(serde_json::Error),
@@ -81,18 +83,19 @@ use std::io::{BufRead, BufReader, Read};
 ///
 /// This function is intended for internal use in implementing APIs that accept
 /// both batched and streaming JSON inputs.
-fn dispatch_json_input<R, T, FArray, FStream, Out>(
+fn dispatch_json_input<R, BL, T, FArray, FStream, Out>(
     reader: R,
     array_fn: FArray,
     stream_fn: FStream,
 ) -> Out
 where
     R: Read,
+    BL: ByteLimit,
     T: DeserializeOwned,
     FArray: FnOnce(Result<Vec<T>, JsonDispatchError>) -> Out,
-    FStream: FnOnce(Deserializer<serde_json::de::IoRead<BufReader<R>>>) -> Out,
+    FStream: FnOnce(Deserializer<serde_json::de::IoRead<std::io::Take<BufReader<R>>>>) -> Out,
 {
-    let mut reader = BufReader::new(reader);
+    let mut reader = BufReader::new(reader).take(BL::MAX_BYTES);
     let peek = match reader.fill_buf() {
         Ok(buf) => buf,
         Err(e) => {
