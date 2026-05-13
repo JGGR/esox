@@ -78,54 +78,6 @@ impl RecordNISECI {
         self.id
     }
     #[inline(always)]
-    pub(crate) fn tipo_autoctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
-        r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_autoctono())
-    }
-    #[inline(always)]
-    pub(crate) fn tipo_alloctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
-        r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_alloctono())
-    }
-    #[inline(always)]
-    pub(crate) fn specie_attesa(&self, r: &RiferimentoNISECI) -> Option<bool> {
-        r.get_ref_by_plain_id(self.id()).map(|s| s.specie_attesa())
-    }
-    #[inline(always)]
-    pub(crate) fn cl_soglia_1(&self, r: &RiferimentoNISECI) -> Option<u32> {
-        r.get_ref_by_plain_id(self.id()).map(|s| s.cl_soglia_1())
-    }
-    #[inline(always)]
-    pub(crate) fn cl_soglia_2(&self, r: &RiferimentoNISECI) -> Option<u32> {
-        r.get_ref_by_plain_id(self.id()).map(|s| s.cl_soglia_2())
-    }
-    #[inline(always)]
-    pub(crate) fn cl_soglia_3(&self, r: &RiferimentoNISECI) -> Option<u32> {
-        r.get_ref_by_plain_id(self.id()).map(|s| s.cl_soglia_3())
-    }
-    #[inline(always)]
-    pub(crate) fn cl_soglia_4(&self, r: &RiferimentoNISECI) -> Option<u32> {
-        r.get_ref_by_plain_id(self.id()).map(|s| s.cl_soglia_4())
-    }
-    #[inline(always)]
-    pub(crate) fn ad_juv_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
-        r.get_ref_by_plain_id(self.id())
-            .map(|s| s.ad_juv_soglia_1())
-    }
-    #[inline(always)]
-    pub(crate) fn ad_juv_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
-        r.get_ref_by_plain_id(self.id())
-            .map(|s| s.ad_juv_soglia_2())
-    }
-    #[inline(always)]
-    pub(crate) fn ad_juv_soglia_3(&self, r: &RiferimentoNISECI) -> Option<f32> {
-        r.get_ref_by_plain_id(self.id())
-            .map(|s| s.ad_juv_soglia_3())
-    }
-    #[inline(always)]
-    pub(crate) fn ad_juv_soglia_4(&self, r: &RiferimentoNISECI) -> Option<f32> {
-        r.get_ref_by_plain_id(self.id())
-            .map(|s| s.ad_juv_soglia_4())
-    }
-    #[inline(always)]
     pub fn dens_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_1())
     }

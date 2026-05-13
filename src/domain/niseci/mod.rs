@@ -2369,8 +2369,11 @@ impl From<(f32, &AreaNISECI)> for StatoEcologicoNISECI {
 #[cfg(test)]
 mod domain_niseci_private_tests {
     use super::*;
+
+    #[cfg(feature = "lessclone")]
     #[cfg(test)]
     impl RiferimentoNISECI {
+        #[cfg(feature = "lessclone")]
         #[cfg(test)]
         pub(crate) fn push(&mut self, value: SpecieNISECI) -> IdSpecieNISECI {
             eprintln!("Pushing specie {} in riferimento", value.id());
@@ -2395,13 +2398,16 @@ mod domain_niseci_private_tests {
         }
     }
 
+    #[cfg(not(feature = "lessclone"))]
     #[cfg(test)]
     impl CampionamentoNISECI {
+        #[cfg(not(feature = "lessclone"))]
         #[cfg(test)]
         pub(crate) fn push(&mut self, value: RecordNISECI) {
             #[allow(deprecated)]
             self.campionamento.push(value);
         }
+        #[cfg(not(feature = "lessclone"))]
         #[cfg(test)]
         pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
             #[allow(deprecated)]

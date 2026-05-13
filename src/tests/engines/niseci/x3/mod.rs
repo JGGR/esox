@@ -27,7 +27,6 @@ use crate::tests::test_utils::{
 };
 #[cfg(feature = "lessclone")]
 use crate::{
-    domain::niseci::lessclone::RecordNISECI,
     engines::niseci::x3::lessclone::calculate_x3,
     tests::test_utils::{
         create_massive_riferimento_ciacci_2, create_massive_riferimento_ciacci_con_bronzi_strutt,

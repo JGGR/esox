@@ -19,30 +19,28 @@ pub(crate) trait ByteLimit {
     const MAX_BYTES: u64;
 }
 
-pub(crate) struct SmallByteLimit;
-pub(crate) struct MediumByteLimit;
-pub(crate) struct LargeByteLimit;
+#[expect(dead_code)]
+struct SmallByteLimit;
+#[expect(dead_code)]
+struct MediumByteLimit;
 #[derive(Default)]
 pub(crate) struct DefaultByteLimit;
+#[expect(dead_code)]
 pub(crate) struct CustomByteLimit<const N: usize>;
 
 const ONE_KI_B: u64 = 1024; // 1 KiB
-const ONE_HUNDRED_KI_B: u64 = 100 * ONE_KI_B; // 100 KiB
+#[expect(dead_code)]
 const FIVE_HUNDRED_KI_B: u64 = 500 * ONE_KI_B; // 500 KiB
 const ONE_MI_B: u64 = 1024 * ONE_KI_B; // 1 MiB
 
 impl ByteLimit for SmallByteLimit {
-    const MAX_BYTES: u64 = ONE_HUNDRED_KI_B;
-}
-
-impl ByteLimit for MediumByteLimit {
     const MAX_BYTES: u64 = FIVE_HUNDRED_KI_B;
 }
 
-impl ByteLimit for LargeByteLimit {
+impl ByteLimit for MediumByteLimit {
     const MAX_BYTES: u64 = ONE_MI_B;
 }
 
 impl ByteLimit for DefaultByteLimit {
-    const MAX_BYTES: u64 = FIVE_HUNDRED_KI_B;
+    const MAX_BYTES: u64 = ONE_MI_B;
 }
