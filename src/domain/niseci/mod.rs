@@ -254,13 +254,7 @@ pub(crate) type IdSpecieNISECI = u32;
 
 #[derive(Debug, Clone, Serialize)]
 pub(crate) struct StoreSpecieNISECI {
-    values: Vec<EntryStateSpecieNISECI>,
-}
-
-#[derive(Debug, Clone, Serialize)]
-enum EntryStateSpecieNISECI {
-    Missing,
-    Present(SpecieNISECI),
+    values: Vec<SpecieNISECI>,
 }
 
 impl StoreSpecieNISECI {
@@ -269,26 +263,18 @@ impl StoreSpecieNISECI {
     }
 
     #[inline(always)]
-    fn ensure_len(&mut self, id: IdSpecieNISECI) {
-        let idx = id as usize;
-        if idx >= self.values.len() {
-            self.values
-                .resize_with(idx + 1, || EntryStateSpecieNISECI::Missing);
-        }
-    }
-
-    #[inline(always)]
     fn insert(&mut self, id: IdSpecieNISECI, value: SpecieNISECI) {
-        self.ensure_len(id);
-        self.values[id as usize] = EntryStateSpecieNISECI::Present(value);
+        debug_assert_eq!(
+            id as usize,
+            self.values.len(),
+            "Ids are supposed to be dense"
+        );
+        self.values.push(value);
     }
 
     #[inline(always)]
     fn get(&self, id: IdSpecieNISECI) -> Option<&SpecieNISECI> {
-        match self.values.get(id as usize)? {
-            EntryStateSpecieNISECI::Present(v) => Some(v),
-            EntryStateSpecieNISECI::Missing => None,
-        }
+        self.values.get(id as usize)
     }
 }
 
@@ -409,10 +395,8 @@ impl RiferimentoNISECI {
         // - drop the elenco_specie field
         // - avoiding cloning all SpecieNISECI on new()
         let mut elenco_specie = Vec::new();
-        for v in map_ids.store.values.iter() {
-            if let EntryStateSpecieNISECI::Present(s) = v {
-                elenco_specie.push(s.clone());
-            }
+        for s in map_ids.store.values.iter() {
+            elenco_specie.push(s.clone());
         }
         #[allow(deprecated)]
         Self {
@@ -457,35 +441,12 @@ impl From<RiferimentoNISECI> for Vec<SpecieNISECI> {
     }
 }
 
-pub struct RiferimentoIter<'a> {
-    map_iter: hashbrown::hash_map::Values<'a, String, IdSpecieNISECI>,
-    store: &'a StoreSpecieNISECI,
-}
-
-impl<'a> Iterator for RiferimentoIter<'a> {
-    type Item = &'a SpecieNISECI;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let id = self.map_iter.next().copied()? as usize;
-
-        match &self.store.values[id] {
-            EntryStateSpecieNISECI::Present(v) => Some(v),
-            EntryStateSpecieNISECI::Missing => {
-                unreachable!("Invariant broken: InternerSpecieNISECI.map_ids must only contain present entries. Check InternerSpecieNISECI::intern() for bugs")
-            }
-        }
-    }
-}
-
 impl<'a> IntoIterator for &'a RiferimentoNISECI {
     type Item = &'a SpecieNISECI;
-    type IntoIter = RiferimentoIter<'a>;
+    type IntoIter = std::slice::Iter<'a, SpecieNISECI>;
 
     fn into_iter(self) -> Self::IntoIter {
-        RiferimentoIter {
-            map_iter: self.map_ids.map.values(),
-            store: &self.map_ids.store,
-        }
+        self.map_ids.store.values.iter()
     }
 }
 
