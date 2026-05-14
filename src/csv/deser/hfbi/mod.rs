@@ -27,7 +27,7 @@ use crate::csv::stanis::giorgio::csv_error_handler;
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
-use crate::deser::limits::{ByteLimit, DefaultByteLimit};
+use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{
     parse_serialized_records, RecordAnagraficaHFBI, RecordCampionamentoHFBI, TipoRecord,
 };
@@ -133,16 +133,22 @@ where
     T: RecordCampionamentoHFBI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
-
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::CampionamentoHFBI)(errors);
-    })
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::CampionamentoHFBI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(
@@ -326,16 +332,22 @@ where
     T: RecordAnagraficaHFBI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
-
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::AnagraficaHFBI)(errors);
-    })
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::AnagraficaHFBI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(

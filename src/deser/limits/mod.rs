@@ -15,6 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use std::io::{self, Read};
+
 pub(crate) trait ByteLimit {
     const MAX_BYTES: u64;
 }
@@ -43,4 +45,34 @@ impl ByteLimit for MediumByteLimit {
 
 impl ByteLimit for DefaultByteLimit {
     const MAX_BYTES: u64 = ONE_MI_B;
+}
+
+pub(crate) fn with_limited_reader<R, F, O, E, M>(
+    mut reader: R,
+    byte_limit: u64,
+    f: F,
+    map_io_error: M,
+) -> Result<O, E>
+where
+    R: Read,
+    F: FnOnce(&mut dyn Read) -> Result<O, E>,
+    M: FnOnce(io::Error) -> E,
+{
+    let mut limited = reader.by_ref().take(byte_limit);
+
+    let output = f(&mut limited)?;
+
+    // IMPORTANT: drop limited reader
+    drop(limited);
+
+    let mut extra = [0u8; 1];
+
+    match reader.read(&mut extra) {
+        Ok(0) => Ok(output),
+        Ok(_) => Err(map_io_error(io::Error::new(
+            io::ErrorKind::Other,
+            "input exceeded maximum byte limit",
+        ))),
+        Err(e) => Err(map_io_error(e)),
+    }
 }

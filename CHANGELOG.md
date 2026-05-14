@@ -23,7 +23,7 @@
   - Usage is recommended but not default yet
   - The new APIs better reflect what `v0.2` will support
 - Add `deser::limits` module
-  - `deser::limits::ByteLimit` ensures bytes limit on reader methods
+  - `deser::limits::with_limited_reader` ensures bytes limit on reader methods
   - Will allow external customisation in a future version
 
 ### Changed

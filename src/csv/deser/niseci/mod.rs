@@ -28,7 +28,7 @@ use crate::csv::stanis::giorgio::csv_error_handler;
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
-use crate::deser::limits::{ByteLimit, DefaultByteLimit};
+use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{
     parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
     RecordRiferimentoNISECI, TipoRecord,
@@ -192,17 +192,23 @@ fn private_check_riferimento_niseci_reader<R: Read, BL: ByteLimit, T>(
 where
     T: RecordRiferimentoNISECI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
-
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::RiferimentoNISECI)(errors);
-    })
+    let normalizing_reader = NormalizerReader::new(reader);
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::RiferimentoNISECI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(
@@ -359,16 +365,22 @@ where
     T: RecordCampionamentoNISECI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
-
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::CampionamentoNISECI)(errors);
-    })
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::CampionamentoNISECI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(
@@ -568,16 +580,22 @@ where
     T: RecordAnagraficaNISECI + 'static,
 {
     let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
-
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::AnagraficaNISECI)(errors);
-    })
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::AnagraficaNISECI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(

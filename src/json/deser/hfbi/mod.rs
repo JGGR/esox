@@ -20,7 +20,7 @@
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
-use crate::deser::limits::DefaultByteLimit;
+use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{parse_serialized_records, RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::json::deser::{dispatch_json_input, JsonDeserError, JsonPathCheckError};
 use std::fs::File;
@@ -32,15 +32,22 @@ where
     R: std::io::Read,
     T: RecordCampionamentoHFBI,
 {
-    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
-            errs.is_empty()
-                .then_some(records)
-                .ok_or(JsonDeserError::Json(errs))
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
+                    errs.is_empty()
+                        .then_some(records)
+                        .ok_or(JsonDeserError::Json(errs))
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
@@ -48,16 +55,23 @@ pub fn check_campionamento_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, 
 where
     T: RecordCampionamentoHFBI,
 {
-    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            #[allow(deprecated)]
-            validate_serialized_records(deser.into_iter::<T>(), |errs| {
-                errs.iter().for_each(|e| eprintln!("  {}", e));
-            })
-            .map_err(JsonDeserError::Json)
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    #[allow(deprecated)]
+                    validate_serialized_records(deser.into_iter::<T>(), |errs| {
+                        errs.iter().for_each(|e| eprintln!("  {}", e));
+                    })
+                    .map_err(JsonDeserError::Json)
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
@@ -76,15 +90,22 @@ where
     R: std::io::Read,
     T: RecordAnagraficaHFBI,
 {
-    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
-            errs.is_empty()
-                .then_some(records)
-                .ok_or(JsonDeserError::Json(errs))
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
+                    errs.is_empty()
+                        .then_some(records)
+                        .ok_or(JsonDeserError::Json(errs))
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
@@ -92,16 +113,23 @@ pub fn check_anagrafica_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, Jso
 where
     T: RecordAnagraficaHFBI,
 {
-    dispatch_json_input::<_, DefaultByteLimit, T, _, _, _>(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            #[allow(deprecated)]
-            validate_serialized_records(deser.into_iter::<T>(), |errs| {
-                errs.iter().for_each(|e| eprintln!("  {}", e));
-            })
-            .map_err(JsonDeserError::Json)
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    #[allow(deprecated)]
+                    validate_serialized_records(deser.into_iter::<T>(), |errs| {
+                        errs.iter().for_each(|e| eprintln!("  {}", e));
+                    })
+                    .map_err(JsonDeserError::Json)
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
