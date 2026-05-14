@@ -16,7 +16,7 @@
 */
 //! This module contains refactored domain structs, used with lessclone feature.
 //!
-//! Next version will have these as the base domain module.
+//! Next version will have these in the base [`esox::domain::niseci`] module.
 
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry;

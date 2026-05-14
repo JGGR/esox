@@ -14,6 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! This module contains refactored methods used with lessclone feature.
+//!
+//! Next version will have these in the base [`esox::engines::niseci::x2`] module.
 
 use std::collections::{hash_map::Entry, HashMap, HashSet};
 

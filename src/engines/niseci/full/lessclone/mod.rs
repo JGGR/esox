@@ -17,7 +17,7 @@
 
 //! This module contains refactored [`calculate_niseci`], used with lessclone feature.
 //!
-//! Next version will have these as the base [`engines::niseci::full`] module.
+//! Next version will have these in the base [`esox::engines::niseci::full`] module.
 
 use crate::domain::niseci::lessclone::{
     CampionamentoNISECI, ValoriIntermediNISECI, ValoriIntermediSpecieNISECI,
