@@ -333,6 +333,9 @@ impl InternerSpecieNISECI {
     ///
     /// It needs [`hashbrown::hash_map`] since [`std::collections::hash_map::RawEntryMut`] is
     /// still unstable.
+    ///
+    /// Holds invariant: the underlying map is holding the set of present entries.
+    /// Do not modify if you don't want to break stuff.
     #[inline(always)]
     pub(crate) fn intern(&mut self, s: &str, val: SpecieNISECI) -> IdSpecieNISECI {
         match self.map.raw_entry_mut().from_key(s) {
@@ -454,13 +457,35 @@ impl From<RiferimentoNISECI> for Vec<SpecieNISECI> {
     }
 }
 
+pub struct RiferimentoIter<'a> {
+    map_iter: hashbrown::hash_map::Values<'a, String, IdSpecieNISECI>,
+    store: &'a StoreSpecieNISECI,
+}
+
+impl<'a> Iterator for RiferimentoIter<'a> {
+    type Item = &'a SpecieNISECI;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let id = self.map_iter.next().copied()? as usize;
+
+        match &self.store.values[id] {
+            EntryStateSpecieNISECI::Present(v) => Some(v),
+            EntryStateSpecieNISECI::Missing => {
+                unreachable!("Invariant broken: InternerSpecieNISECI.map_ids must only contain present entries. Check InternerSpecieNISECI::intern() for bugs")
+            }
+        }
+    }
+}
+
 impl<'a> IntoIterator for &'a RiferimentoNISECI {
     type Item = &'a SpecieNISECI;
-    type IntoIter = std::slice::Iter<'a, SpecieNISECI>;
+    type IntoIter = RiferimentoIter<'a>;
 
     fn into_iter(self) -> Self::IntoIter {
-        #[allow(deprecated)]
-        self.elenco_specie.iter()
+        RiferimentoIter {
+            map_iter: self.map_ids.map.values(),
+            store: &self.map_ids.store,
+        }
     }
 }
 
