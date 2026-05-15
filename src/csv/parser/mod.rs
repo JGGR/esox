@@ -19,10 +19,10 @@
 pub use crate::parser::parse_date;
 
 #[deprecated(
-    note = "v0.2 will remove this module.\nConsider using symbols from esox::parser::hfbi"
+    note = "v0.2 will remove this module.\nConsider using methods parse_records or check_records on esox::domain::hfbi types"
 )]
 pub mod hfbi;
 #[deprecated(
-    note = "v0.2 will remove this module.\nConsider using symbols from esox::parser::niseci"
+    note = "v0.2 will remove this module.\nConsider using methods parse_records or check_records on esox::domain::niseci types"
 )]
 pub mod niseci;

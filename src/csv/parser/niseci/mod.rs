@@ -16,7 +16,11 @@
 */
 
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
-use crate::domain::niseci::{AnagraficaNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI};
+#[cfg(feature = "lessclone")]
+use crate::domain::niseci::lessclone::RecordNISECI;
+#[cfg(not(feature = "lessclone"))]
+use crate::domain::niseci::RecordNISECI;
+use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI, SpecieNISECI};
 use crate::parser::niseci::{
     parse_records_anagrafica_niseci, parse_records_campionamento_niseci,
     parse_records_riferimento_niseci, RecordAnagraficaNISECIError, RecordCampionamentoNISECIError,
@@ -52,7 +56,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCampionamentoNISECI>(
 ) -> (Vec<RecordNISECI>, Vec<RecordCampionamentoNISECIError>) {
     let (camp, errs) = parse_records_campionamento_niseci::<T>(
         records,
-        &RiferimentoNISECI::new(riferimento_specie),
+        &RiferimentoNISECI::new_from_map(riferimento_specie.into()),
     )
     .into_parts();
     (camp.into(), errs)
@@ -64,7 +68,7 @@ pub fn parse_recordcsv_campionamento_niseci<T: RecordCampionamentoNISECI>(
 pub use crate::parser::niseci::RecordAnagraficaNISECIError as RecordCsvAnagraficaNISECIError;
 
 #[deprecated(
-    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::parse_records(records).into_parts()"
+    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::parse_records(records)"
 )]
 pub fn parse_recordcsv_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     records: Vec<T>,
@@ -90,13 +94,13 @@ pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
 ) -> Result<Vec<RecordNISECI>, Vec<RecordCampionamentoNISECIError>> {
     crate::parser::niseci::check_records_campionamento_niseci::<T>(
         records,
-        &RiferimentoNISECI::new(riferimento_specie),
+        &RiferimentoNISECI::new_from_map(riferimento_specie.into()),
     )
     .map(|v| v.into())
 }
 
 #[deprecated(
-    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::check_records(records).into_parts()"
+    note = "v0.2 will drop visibility.\nConsider using AnagraficaNISECI::check_records(records)"
 )]
 pub fn check_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     records: Vec<T>,

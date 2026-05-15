@@ -25,6 +25,9 @@ use crate::domain::posf32::PositiveF32;
 
 use super::linear_regression::{calculate_quantita_with_regression, Point};
 
+#[cfg(feature = "lessclone")]
+pub mod lessclone;
+
 #[derive(Clone)]
 pub struct SubmetricheX2 {
     metriche_x2_a: MetricheX2A,
@@ -44,14 +47,27 @@ impl SubmetricheX2 {
             metriche_x2_b,
         }
     }
+    #[inline(always)]
     pub fn get_metriche_x2_a(&self) -> MetricheX2A {
         self.metriche_x2_a
     }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_classi_eta()")]
+    #[inline(always)]
     pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
         self.classi_eta.clone()
     }
+    #[inline(always)]
+    pub(crate) fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
+        &self.classi_eta
+    }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_metriche_x2_b()")]
+    #[inline(always)]
     pub fn get_metriche_x2_b(&self) -> MetricheX2B {
         self.metriche_x2_b.clone()
+    }
+    #[inline(always)]
+    pub(crate) fn get_ref_metriche_x2_b(&self) -> &MetricheX2B {
+        &self.metriche_x2_b
     }
 }
 
@@ -73,14 +89,22 @@ impl MetricheX2 {
             submetriche_map,
         }
     }
+    #[inline(always)]
     pub fn get_criterio_a(&self) -> f32 {
         self.criterio_a
     }
+    #[inline(always)]
     pub fn get_criterio_b(&self) -> f32 {
         self.criterio_b
     }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_submetriche_map()")]
+    #[inline(always)]
     pub fn get_submetriche_map(&self) -> HashMap<String, SubmetricheX2> {
         self.submetriche_map.clone()
+    }
+    #[inline(always)]
+    pub(crate) fn get_ref_submetriche_map(&self) -> &HashMap<String, SubmetricheX2> {
+        &self.submetriche_map
     }
 }
 
@@ -101,15 +125,24 @@ impl MetricheX2B {
             x2_b,
         }
     }
+    #[deprecated(note = "v0.2 will drop visibility. Consider using self.get_ref_id() instead")]
+    #[inline(always)]
     pub fn get_id(&self) -> String {
         self.id_specie.clone()
     }
+    #[inline(always)]
+    pub(crate) fn get_ref_id(&self) -> &String {
+        &self.id_specie
+    }
+    #[inline(always)]
     pub fn get_x2_b(&self) -> f32 {
         self.x2_b
     }
+    #[inline(always)]
     pub fn get_densita_stimata(&self) -> f32 {
         self.densita_stimata
     }
+    #[inline(always)]
     pub fn get_quantita_stimata(&self) -> u32 {
         self.quantita_stimata
     }
@@ -127,15 +160,15 @@ pub fn calculate_x2(
     let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
     for crit in &criteri_vec {
-        match submetriche.entry(crit.get_codice_specie()) {
+        match submetriche.entry(crit.get_ref_codice_specie().to_string()) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
                     // We fill densita_stimata later
                     SubmetricheX2::new(
                         crit.get_metriche_x2a(),
-                        crit.get_classi_eta(),
-                        MetricheX2B::new(crit.get_codice_specie(), -1.0, 0, 0.0),
+                        crit.get_ref_classi_eta().clone(),
+                        MetricheX2B::new(crit.get_ref_codice_specie().clone(), -1.0, 0, 0.0),
                     ),
                 );
             }
@@ -153,12 +186,12 @@ pub fn calculate_x2(
 
     let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
 
-    let mut specie_campionate_set: HashMap<String, bool> = HashMap::new();
+    let mut specie_campionate_set: HashMap<&str, bool> = HashMap::new();
     for cattura in campionamento {
-        if (cattura.specie.specie_attesa == require_specie_attesa)
-            && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
+        if (cattura.specie_attesa() == require_specie_attesa)
+            && (cattura.tipo_autoctono() == 1 || cattura.tipo_autoctono() == 2)
         {
-            match specie_campionate_set.entry(cattura.specie.id.clone()) {
+            match specie_campionate_set.entry(cattura.id()) {
                 Entry::Occupied(_) => {}
                 Entry::Vacant(vacant_entry) => {
                     vacant_entry.insert(true);
@@ -180,15 +213,15 @@ pub fn calculate_x2_per_alloctone(
     let mut submetriche = HashMap::<String, SubmetricheX2>::new();
 
     for crit in &criteri_vec {
-        match submetriche.entry(crit.get_codice_specie()) {
+        match submetriche.entry(crit.get_ref_codice_specie().to_string()) {
             Entry::Occupied(_) => {}
             Entry::Vacant(vacant_entry) => {
                 vacant_entry.insert(
                     // We fill densita_stimata later
                     SubmetricheX2::new(
                         crit.get_metriche_x2a(),
-                        crit.get_classi_eta(),
-                        MetricheX2B::new(crit.get_codice_specie(), -1.0, 0, 0.0),
+                        crit.get_ref_classi_eta().clone(),
+                        MetricheX2B::new(crit.get_ref_codice_specie().to_string(), -1.0, 0, 0.0),
                     ),
                 );
             }
@@ -206,10 +239,10 @@ pub fn calculate_x2_per_alloctone(
 
     let metriche_x2 = MetricheX2::new(x2_a, x2_b, submetriche);
 
-    let mut specie_campionate_set: HashMap<String, bool> = HashMap::new();
+    let mut specie_campionate_set: HashMap<&str, bool> = HashMap::new();
     for cattura in campionamento {
-        if cattura.specie.tipo_alloctono > 0 {
-            match specie_campionate_set.entry(cattura.specie.id.clone()) {
+        if cattura.tipo_alloctono() > 0 {
+            match specie_campionate_set.entry(cattura.id()) {
                 Entry::Occupied(_) => {}
                 Entry::Vacant(vacant_entry) => {
                     vacant_entry.insert(true);
@@ -239,14 +272,17 @@ impl RecordSubmetricheX2A {
             classi_eta,
         }
     }
-    pub fn get_codice_specie(&self) -> String {
-        self.codice_specie.clone()
+    #[inline(always)]
+    pub(crate) fn get_ref_codice_specie(&self) -> &String {
+        &self.codice_specie
     }
+    #[inline(always)]
     pub fn get_metriche_x2a(&self) -> MetricheX2A {
         self.metriche_x2a
     }
-    pub fn get_classi_eta(&self) -> ClassiEtaSpecieNISECI {
-        self.classi_eta.clone()
+    #[inline(always)]
+    pub(crate) fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
+        &self.classi_eta
     }
 }
 
@@ -254,7 +290,7 @@ fn calculate_x2_absolute(
     metriche_x2: MetricheX2,
     x2_a: f32,
     x2_b: f32,
-    specie_campionate_set: &HashMap<String, bool>,
+    specie_campionate_set: &HashMap<&str, bool>,
 ) -> Result<(Option<f32>, MetricheX2), Vec<String>> {
     let tot_specie_attese_trovate = specie_campionate_set.len();
 
@@ -277,14 +313,14 @@ fn calculate_sommatoria_x2_a(
     // ad ogni specie associo le loro classi che andrò poi a riempire
     // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
     // per sicurezza prealloco memoria per 10 classi di eta
-    let mut classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI> = HashMap::with_capacity(10);
+    let mut classi_eta_map: HashMap<&str, ClassiEtaSpecieNISECI> = HashMap::with_capacity(10);
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in c {
-        if (cattura.specie.specie_attesa == require_specie_attesa)
-            && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
+        if (cattura.specie_attesa() == require_specie_attesa)
+            && (cattura.tipo_autoctono() == 1 || cattura.tipo_autoctono() == 2)
         {
-            match classi_eta_map.entry(cattura.specie.id.clone()) {
+            match classi_eta_map.entry(cattura.id()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
                 }
@@ -308,24 +344,23 @@ fn calculate_sommatoria_x2_b(
     let width_checked = PositiveF32::new(width).map_err(|e| vec![e.to_string()])?;
     let length_checked = PositiveF32::new(length).map_err(|e| vec![e.to_string()])?;
     let superficie: f32 = *width_checked * *length_checked;
-    let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
+    let mut esemplari_per_cattura_map: HashMap<&str, EsemplariPerCattura> =
         HashMap::with_capacity(10);
 
     for cattura in c {
-        if (cattura.specie.specie_attesa == require_specie_attesa)
-            && (cattura.specie.tipo_autoctono == 1 || cattura.specie.tipo_autoctono == 2)
+        if (cattura.specie_attesa() == require_specie_attesa)
+            && (cattura.tipo_autoctono() == 1 || cattura.tipo_autoctono() == 2)
         {
-            match esemplari_per_cattura_map.entry(cattura.specie.id.clone()) {
+            match esemplari_per_cattura_map.entry(cattura.id()) {
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry
                         .get_mut()
-                        .fill_passaggio(cattura.passaggio_cattura);
+                        .fill_passaggio(cattura.passaggio_cattura());
                 }
                 Entry::Vacant(vacant_entry) => {
-                    vacant_entry.insert(EsemplariPerCattura::new_prevalorized(
-                        cattura.passaggio_cattura,
-                        &cattura.specie,
-                    ));
+                    let mut epc = EsemplariPerCattura::new(cattura.specie());
+                    epc.fill_passaggio(cattura.passaggio_cattura());
+                    vacant_entry.insert(epc);
                 }
             }
         }
@@ -340,12 +375,12 @@ fn calculate_sommatoria_x2_a_per_alloctone(
     // ad ogni specie associo le loro classi che andrò poi a riempire
     // ho controllato i campionamenti di andrea e trovto massimo 9 specie diverse
     // per sicurezza prealloco memoria per 10 classi di eta
-    let mut classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI> = HashMap::with_capacity(10);
+    let mut classi_eta_map: HashMap<&str, ClassiEtaSpecieNISECI> = HashMap::with_capacity(10);
 
     // riempo l'hashmap con solo le specie autoctone campionate
     for cattura in c {
-        if cattura.specie.tipo_alloctono > 0 {
-            match classi_eta_map.entry(cattura.specie.id.clone()) {
+        if cattura.tipo_alloctono() > 0 {
+            match classi_eta_map.entry(cattura.id()) {
                 Entry::Occupied(mut entry) => {
                     entry.get_mut().update_classi_eta(cattura);
                 }
@@ -378,22 +413,21 @@ fn calculate_sommatoria_x2_b_per_alloctone(
         return Err(vec!["Length not finite".to_string()]);
     }
     let superficie = width * length;
-    let mut esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura> =
+    let mut esemplari_per_cattura_map: HashMap<&str, EsemplariPerCattura> =
         HashMap::with_capacity(10);
 
     for cattura in c {
-        if cattura.specie.tipo_alloctono > 0 {
-            match esemplari_per_cattura_map.entry(cattura.specie.id.clone()) {
+        if cattura.tipo_alloctono() > 0 {
+            match esemplari_per_cattura_map.entry(cattura.id()) {
                 Entry::Occupied(mut occupied_entry) => {
                     occupied_entry
                         .get_mut()
-                        .fill_passaggio(cattura.passaggio_cattura);
+                        .fill_passaggio(cattura.passaggio_cattura());
                 }
                 Entry::Vacant(vacant_entry) => {
-                    vacant_entry.insert(EsemplariPerCattura::new_prevalorized(
-                        cattura.passaggio_cattura,
-                        &cattura.specie,
-                    ));
+                    let mut epc = EsemplariPerCattura::new(cattura.specie());
+                    epc.fill_passaggio(cattura.passaggio_cattura());
+                    vacant_entry.insert(epc);
                 }
             }
         }
@@ -403,7 +437,7 @@ fn calculate_sommatoria_x2_b_per_alloctone(
 }
 
 fn calculate_sommatoria_x2_a_absolute(
-    classi_eta_map: HashMap<String, ClassiEtaSpecieNISECI>,
+    classi_eta_map: HashMap<&str, ClassiEtaSpecieNISECI>,
 ) -> Result<(f32, Vec<RecordSubmetricheX2A>), Vec<String>> {
     // ora la mappa è riempita e tutte le classi sono state riempite
     // si procede quindi al calcolo di x2 a per ogni specie campionata autoctona
@@ -420,7 +454,7 @@ fn calculate_sommatoria_x2_a_absolute(
                 let ad_juv = criteri_x2_a.get_rapporto_ad_juv();
                 sommatoria_x2_a += x2_a;
                 criteri_vec.push(RecordSubmetricheX2A::new(
-                    classe.specie.id.clone(),
+                    classe.id().to_string(),
                     MetricheX2A::new(criterio_a, MetricheX2aB::new(criterio_b, ad_juv)),
                     classe.clone(),
                 ));
@@ -440,7 +474,7 @@ fn calculate_sommatoria_x2_a_absolute(
 }
 
 fn calculate_sommatoria_x2_b_absolute(
-    esemplari_per_cattura_map: HashMap<String, EsemplariPerCattura>,
+    esemplari_per_cattura_map: HashMap<&str, EsemplariPerCattura>,
     superficie: f32,
 ) -> Result<(f32, Vec<MetricheX2B>), Vec<String>> {
     // ora che abbiamo riempito la mappa con tutte le catture, possiamo andare
@@ -453,7 +487,7 @@ fn calculate_sommatoria_x2_b_absolute(
             Ok((x2_b, densita_stimata, quantita_stimata)) => {
                 sommatoria_x2_b += x2_b;
                 densita_vec.push(MetricheX2B::new(
-                    catture.specie.id.clone(),
+                    catture.id().to_string(),
                     densita_stimata,
                     quantita_stimata,
                     x2_b,
@@ -475,16 +509,31 @@ fn calculate_sommatoria_x2_b_absolute(
 }
 
 fn _update_classi_eta(cl: &mut ClassiEtaSpecieNISECI, record: &RecordNISECI) {
-    if record.lunghezza < record.specie.cl_soglia1 {
-        cl.cl1 += 1;
-    } else if record.lunghezza < record.specie.cl_soglia2 {
-        cl.cl2 += 1;
-    } else if record.lunghezza < record.specie.cl_soglia3 {
-        cl.cl3 += 1;
-    } else if record.lunghezza < record.specie.cl_soglia4 {
-        cl.cl4 += 1;
+    if record.lunghezza() < record.cl_soglia_1() {
+        #[expect(deprecated)]
+        {
+            cl.cl1 += 1;
+        }
+    } else if record.lunghezza() < record.cl_soglia_2() {
+        #[expect(deprecated)]
+        {
+            cl.cl2 += 1;
+        }
+    } else if record.lunghezza() < record.cl_soglia_3() {
+        #[expect(deprecated)]
+        {
+            cl.cl3 += 1;
+        }
+    } else if record.lunghezza() < record.cl_soglia_4() {
+        #[expect(deprecated)]
+        {
+            cl.cl4 += 1;
+        }
     } else {
-        cl.cl5 += 1;
+        #[expect(deprecated)]
+        {
+            cl.cl5 += 1;
+        }
     }
 }
 
@@ -494,16 +543,17 @@ fn calculate_x2_a(classe: &ClassiEtaSpecieNISECI) -> Result<(f32, MetricheX2A), 
 }
 
 fn calculate_x2_b(e: &EsemplariPerCattura, superficie: &f32) -> Result<(f32, f32, u32), String> {
+    #[expect(deprecated)]
     match get_quantita_stimata(&e.mappa) {
         Ok(q_stimata) => {
             // calcolo densita stimata
             let densita_stimata = q_stimata as f32 / superficie;
 
             // trovo ora x2_b
-            if densita_stimata > e.specie.dens_soglia2 {
+            if densita_stimata > e.dens_soglia_2() {
                 return Ok((1.0, densita_stimata, q_stimata));
             }
-            if densita_stimata > e.specie.dens_soglia1 {
+            if densita_stimata > e.dens_soglia_1() {
                 return Ok((0.5, densita_stimata, q_stimata));
             }
             Ok((0.0, densita_stimata, q_stimata))
@@ -588,15 +638,15 @@ fn fill_submetriche(
     errors: &mut Vec<String>,
 ) {
     for dens in &densita_vec {
-        let id = dens.get_id();
+        let id = dens.get_ref_id();
         match submetriche.entry(id.clone()) {
             Entry::Occupied(mut entry) => {
                 let submetr = entry.get_mut();
                 *submetr = SubmetricheX2::new(
                     submetr.get_metriche_x2_a(),
-                    submetr.get_classi_eta(),
+                    submetr.get_ref_classi_eta().clone(),
                     MetricheX2B::new(
-                        id,
+                        id.to_string(),
                         dens.get_densita_stimata(),
                         dens.get_quantita_stimata(),
                         dens.get_x2_b(),
@@ -734,72 +784,49 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_b_buona() {
-        let mut passaggi: HashMap<u8, u32> = HashMap::new();
-        passaggi.insert(1, 30);
-        passaggi.insert(2, 15);
-
         let specie = get_ciaccio();
+        let mut epc = EsemplariPerCattura::new(&specie);
+        (0..30).for_each(|_| epc.fill_passaggio(1));
+        (0..15).for_each(|_| epc.fill_passaggio(2));
 
-        let esemplari_per_cattura = EsemplariPerCattura {
-            specie: specie,
-            mappa: passaggi,
-        };
-
-        let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
+        let x2_b = calculate_x2_b(&epc, &2.0);
 
         assert_eq!(Ok(1.0), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
     fn calculate_x2_b_test_intermedia() {
-        let mut passaggi: HashMap<u8, u32> = HashMap::new();
-        passaggi.insert(1, 30);
-        passaggi.insert(2, 15);
-
         let mut specie = get_ciaccio();
-        specie.dens_soglia1 = 20.0;
-        specie.dens_soglia2 = 30.0;
+        specie.set_dens_soglia_1(20.0);
+        specie.set_dens_soglia_2(30.0);
 
-        let esemplari_per_cattura = EsemplariPerCattura {
-            specie: specie,
-            mappa: passaggi,
-        };
+        let mut epc = EsemplariPerCattura::new(&specie);
+        (0..30).for_each(|_| epc.fill_passaggio(1));
+        (0..15).for_each(|_| epc.fill_passaggio(2));
 
-        let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
+        let x2_b = calculate_x2_b(&epc, &2.0);
 
         assert_eq!(Ok(0.5), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
     fn calculate_x2_b_test_scarsa() {
-        let mut passaggi: HashMap<u8, u32> = HashMap::new();
-        passaggi.insert(1, 30);
-        passaggi.insert(2, 15);
-
         let mut specie = get_ciaccio();
-        specie.dens_soglia1 = 30.0;
-        specie.dens_soglia2 = 40.0;
+        specie.set_dens_soglia_1(30.0);
+        specie.set_dens_soglia_2(40.0);
 
-        let esemplari_per_cattura = EsemplariPerCattura {
-            specie: specie,
-            mappa: passaggi,
-        };
+        let mut epc = EsemplariPerCattura::new(&specie);
+        (0..30).for_each(|_| epc.fill_passaggio(1));
+        (0..15).for_each(|_| epc.fill_passaggio(2));
 
-        let x2_b = calculate_x2_b(&esemplari_per_cattura, &2.0);
+        let x2_b = calculate_x2_b(&epc, &2.0);
 
         assert_eq!(Ok(0.0), x2_b.map(|(x2_b, _, _)| x2_b));
     }
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 3,
-            cl3: 3,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 3, 3, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -808,14 +835,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 1,
-            cl3: 1,
-            cl4: 3,
-            cl5: 3,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 3, 3);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -824,14 +844,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 1,
-            cl3: 1,
-            cl4: 2,
-            cl5: 2,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 2, 2);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -840,14 +853,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 2,
-            cl3: 2,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 2, 2, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -856,14 +862,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_1() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 1,
-            cl3: 1,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -872,14 +871,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_1() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 2,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 2, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -888,14 +880,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 2,
-            cl4: 2,
-            cl5: 2,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 2, 2, 2);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -904,14 +889,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 2,
-            cl3: 2,
-            cl4: 2,
-            cl5: 0,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 2, 2, 2, 0);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -920,14 +898,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 2,
-            cl4: 3,
-            cl5: 3,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 2, 3, 3);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -936,14 +907,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_2_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 6,
-            cl4: 1,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 6, 1, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -952,14 +916,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_3_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 1,
-            cl4: 0,
-            cl5: 6,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 1, 0, 6);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -968,14 +925,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_3_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 6,
-            cl4: 0,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 6, 0, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -984,14 +934,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_1() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 1,
-            cl4: 0,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 1, 0, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -1000,14 +943,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_2_giovani() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 2,
-            cl4: 0,
-            cl5: 1,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 2, 0, 1);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -1016,14 +952,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_3_cb_2_adulti() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 0,
-            cl2: 0,
-            cl3: 1,
-            cl4: 0,
-            cl5: 2,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 1, 0, 2);
 
         let x2_a = calculate_x2_a(&classe);
 
@@ -1032,14 +961,7 @@ mod x2_private_tests {
 
     #[test]
     fn calculate_x2_a_test_ca_1_cb_3_adulti_cl1_valorizzato() {
-        let classe = ClassiEtaSpecieNISECI {
-            specie: get_ciaccio(),
-            cl1: 5,
-            cl2: 0,
-            cl3: 10,
-            cl4: 20,
-            cl5: 10,
-        };
+        let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 5, 0, 10, 20, 10);
 
         let x2_a = calculate_x2_a(&classe);
 

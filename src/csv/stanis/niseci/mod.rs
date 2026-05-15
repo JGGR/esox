@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+use crate::csv::deser::{RecordCsv, SemicolonDelimiter};
 use crate::csv::stanis::deserialize_comma_f32;
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use std::fmt;
@@ -102,6 +103,10 @@ impl RecordRiferimentoNISECI for VeryItalianRecordRiferimentoNISECI {
     }
 }
 
+impl RecordCsv for VeryItalianRecordRiferimentoNISECI {
+    type D = SemicolonDelimiter;
+}
+
 impl fmt::Display for VeryItalianRecordRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
@@ -149,6 +154,10 @@ impl RecordCampionamentoNISECI for VeryItalianRecordCampionamentoNISECI {
     fn peso(&self) -> f32 {
         self.peso
     }
+}
+
+impl RecordCsv for VeryItalianRecordCampionamentoNISECI {
+    type D = SemicolonDelimiter;
 }
 
 impl fmt::Display for VeryItalianRecordCampionamentoNISECI {
@@ -224,6 +233,10 @@ impl RecordAnagraficaNISECI for VeryItalianRecordAnagraficaNISECI {
     fn nome_bacino(&self) -> String {
         self.nome_bacino.clone()
     }
+}
+
+impl RecordCsv for VeryItalianRecordAnagraficaNISECI {
+    type D = SemicolonDelimiter;
 }
 
 impl fmt::Display for VeryItalianRecordAnagraficaNISECI {

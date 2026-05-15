@@ -20,6 +20,7 @@
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
+use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{
     parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
     RecordRiferimentoNISECI,
@@ -34,15 +35,22 @@ where
     R: std::io::Read,
     T: RecordRiferimentoNISECI,
 {
-    dispatch_json_input(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
-            errs.is_empty()
-                .then_some(records)
-                .ok_or(JsonDeserError::Json(errs))
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
+                    errs.is_empty()
+                        .then_some(records)
+                        .ok_or(JsonDeserError::Json(errs))
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
@@ -50,16 +58,23 @@ pub fn check_riferimento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>, 
 where
     T: RecordRiferimentoNISECI,
 {
-    dispatch_json_input(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            #[allow(deprecated)]
-            validate_serialized_records(deser.into_iter::<T>(), |errs| {
-                errs.iter().for_each(|e| eprintln!("  {}", e));
-            })
-            .map_err(JsonDeserError::Json)
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    #[allow(deprecated)]
+                    validate_serialized_records(deser.into_iter::<T>(), |errs| {
+                        errs.iter().for_each(|e| eprintln!("  {}", e));
+                    })
+                    .map_err(JsonDeserError::Json)
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
@@ -68,15 +83,22 @@ where
     R: std::io::Read,
     T: RecordCampionamentoNISECI,
 {
-    dispatch_json_input(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
-            errs.is_empty()
-                .then_some(records)
-                .ok_or(JsonDeserError::Json(errs))
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
+                    errs.is_empty()
+                        .then_some(records)
+                        .ok_or(JsonDeserError::Json(errs))
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
@@ -84,16 +106,23 @@ pub fn check_campionamento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>
 where
     T: RecordCampionamentoNISECI,
 {
-    dispatch_json_input(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            #[allow(deprecated)]
-            validate_serialized_records(deser.into_iter::<T>(), |errs| {
-                errs.iter().for_each(|e| eprintln!("  {}", e));
-            })
-            .map_err(JsonDeserError::Json)
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    #[allow(deprecated)]
+                    validate_serialized_records(deser.into_iter::<T>(), |errs| {
+                        errs.iter().for_each(|e| eprintln!("  {}", e));
+                    })
+                    .map_err(JsonDeserError::Json)
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
@@ -102,15 +131,22 @@ where
     R: std::io::Read,
     T: RecordAnagraficaNISECI,
 {
-    dispatch_json_input(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
-            errs.is_empty()
-                .then_some(records)
-                .ok_or(JsonDeserError::Json(errs))
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    let (records, errs) = parse_serialized_records(deser.into_iter::<T>());
+                    errs.is_empty()
+                        .then_some(records)
+                        .ok_or(JsonDeserError::Json(errs))
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 
@@ -118,16 +154,23 @@ pub fn check_anagrafica_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>, J
 where
     T: RecordAnagraficaNISECI,
 {
-    dispatch_json_input(
+    with_limited_reader(
         reader,
-        |res| res.map_err(Into::into),
-        |deser| {
-            #[allow(deprecated)]
-            validate_serialized_records(deser.into_iter::<T>(), |errs| {
-                errs.iter().for_each(|e| eprintln!("  {}", e));
-            })
-            .map_err(JsonDeserError::Json)
+        DefaultByteLimit::MAX_BYTES,
+        |limited_reader| {
+            dispatch_json_input(
+                limited_reader,
+                |res| res.map_err(Into::into),
+                |deser| {
+                    #[allow(deprecated)]
+                    validate_serialized_records(deser.into_iter::<T>(), |errs| {
+                        errs.iter().for_each(|e| eprintln!("  {}", e));
+                    })
+                    .map_err(JsonDeserError::Json)
+                },
+            )
         },
+        |limit_error| JsonDeserError::Io(limit_error),
     )
 }
 

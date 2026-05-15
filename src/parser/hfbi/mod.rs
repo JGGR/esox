@@ -18,7 +18,7 @@
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{
     AnagraficaHFBI, CampionamentoHFBI, HabitatHFBI, RecordHFBI, StagioneHFBI,
-    TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI,
+    TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI_MAP,
 };
 use crate::domain::location::Location;
 use crate::domain::posf32::PositiveF32;
@@ -81,15 +81,7 @@ pub(crate) fn parse_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
             continue;
         }
         let codice_specie = r.codice_specie();
-        let mut opt_matched_specie = None;
-        for s in RIFERIMENTO_HFBI.iter() {
-            // FIXME: this is O(n^2).
-            if s.codice_specie == codice_specie {
-                opt_matched_specie = Some(s);
-                break; // TODO: mmmh
-            }
-        }
-
+        let opt_matched_specie = RIFERIMENTO_HFBI_MAP.get(&codice_specie);
         let matched_specie;
         if let Some(specie) = opt_matched_specie {
             matched_specie = specie;
@@ -431,11 +423,18 @@ impl CampionamentoHFBI {
     {
         CampionamentoHFBIParseResult::parse::<T>(vec)
     }
-    pub fn check_record<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
+    pub fn check_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
     where
         T: RecordCampionamentoHFBI,
     {
         check_records_campionamento_hfbi::<T>(vec)
+    }
+    #[deprecated(note = "v0.2 will drop visibility.\nConsider using check_records instead")]
+    pub fn check_record<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
+    where
+        T: RecordCampionamentoHFBI,
+    {
+        Self::check_records::<T>(vec)
     }
 }
 

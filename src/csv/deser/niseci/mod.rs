@@ -15,7 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
+use crate::csv::deser::{
+    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader,
+};
 
 /// Used as the closure argument for
 /// validate_serialized_records(), to print italian error messages.
@@ -26,6 +28,7 @@ use crate::csv::stanis::giorgio::csv_error_handler;
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
+use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{
     parse_serialized_records, RecordAnagraficaNISECI, RecordCampionamentoNISECI,
     RecordRiferimentoNISECI, TipoRecord,
@@ -120,6 +123,8 @@ impl RecordRiferimentoNISECI for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
+impl DefaultRecordCsv for PlainRecordCsvRiferimentoNISECI {}
+
 impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
@@ -134,6 +139,9 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_riferimento_niseci_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -144,7 +152,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_riferimento_niseci_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_riferimento_niseci_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_riferimento_niseci_reader<R: Read, T>(
     reader: R,
@@ -164,7 +172,7 @@ where
     let config = CsvConfig::default()
         .with_delimiter(delimiter)
         .with_headers(has_headers);
-    check_riferimento_niseci_reader_conf::<R, T>(reader, config)
+    private_check_riferimento_niseci_reader::<R, DefaultByteLimit, T>(reader, config)
 }
 
 pub fn check_riferimento_niseci_reader_conf<R: Read, T>(
@@ -174,21 +182,37 @@ pub fn check_riferimento_niseci_reader_conf<R: Read, T>(
 where
     T: RecordRiferimentoNISECI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
+    private_check_riferimento_niseci_reader::<R, DefaultByteLimit, T>(reader, config)
+}
 
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::RiferimentoNISECI)(errors);
-    })
+fn private_check_riferimento_niseci_reader<R: Read, BL: ByteLimit, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordRiferimentoNISECI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader);
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::RiferimentoNISECI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_riferimento_niseci_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_riferimento_niseci_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_riferimento_niseci_path<T>(
     path: PathBuf,
@@ -229,7 +253,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_riferimento_niseci_reader_conf(file, config)
+    private_check_riferimento_niseci_reader::<File, DefaultByteLimit, T>(file, config)
 }
 
 #[deprecated(
@@ -272,6 +296,8 @@ impl RecordCampionamentoNISECI for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
+impl DefaultRecordCsv for PlainRecordCsvCampionamentoNISECI {}
+
 impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
@@ -283,6 +309,9 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_campionamento_niseci_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -293,7 +322,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_campionamento_niseci_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_campionamento_niseci_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_campionamento_niseci_reader<R: Read, T>(
     reader: R,
@@ -310,7 +339,7 @@ where
         _ => b',',
     };
 
-    check_campionamento_niseci_reader_conf::<R, T>(
+    private_check_campionamento_niseci_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
             .with_delimiter(delimiter)
@@ -325,21 +354,37 @@ pub fn check_campionamento_niseci_reader_conf<R: Read, T>(
 where
     T: RecordCampionamentoNISECI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
+    private_check_campionamento_niseci_reader_conf::<R, DefaultByteLimit, T>(reader, config)
+}
 
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::CampionamentoNISECI)(errors);
-    })
+fn private_check_campionamento_niseci_reader_conf<R: Read, BL: ByteLimit, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCampionamentoNISECI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::CampionamentoNISECI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_campionamento_niseci_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_campionamento_niseci_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_campionamento_niseci_path<T>(
     path: PathBuf,
@@ -380,7 +425,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_campionamento_niseci_reader_conf(file, config)
+    private_check_campionamento_niseci_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }
 
 #[deprecated(
@@ -451,6 +496,8 @@ impl RecordAnagraficaNISECI for PlainRecordCsvAnagraficaNISECI {
     }
 }
 
+impl DefaultRecordCsv for PlainRecordCsvAnagraficaNISECI {}
+
 impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
@@ -477,6 +524,9 @@ impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_anagrafica_niseci_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -487,7 +537,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_anagrafica_niseci_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_anagrafica_niseci_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_anagrafica_niseci_reader<R: Read, T>(
     reader: R,
@@ -504,7 +554,7 @@ where
         _ => b',',
     };
 
-    check_anagrafica_niseci_reader_conf::<R, T>(
+    private_check_anagrafica_niseci_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
             .with_delimiter(delimiter)
@@ -519,21 +569,37 @@ pub fn check_anagrafica_niseci_reader_conf<R: Read, T>(
 where
     T: RecordAnagraficaNISECI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
+    private_check_anagrafica_niseci_reader_conf::<R, DefaultByteLimit, T>(reader, config)
+}
 
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::AnagraficaNISECI)(errors);
-    })
+fn private_check_anagrafica_niseci_reader_conf<R: Read, BL: ByteLimit, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordAnagraficaNISECI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::AnagraficaNISECI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::niseci::check_anagrafica_niseci_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_anagrafica_niseci_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_anagrafica_niseci_path<T>(
     path: PathBuf,
@@ -573,5 +639,5 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_anagrafica_niseci_reader_conf(file, config)
+    private_check_anagrafica_niseci_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }

@@ -27,6 +27,9 @@ use super::x2::calculate_x2;
 use super::x2::calculate_x2_per_alloctone;
 use super::x3::calculate_x3;
 
+#[cfg(feature = "lessclone")]
+pub mod lessclone;
+
 const RQE_NISECI_MAGIC_ADDEND: f32 = std::f32::consts::FRAC_2_SQRT_PI;
 const RQE_NISECI_MAGIC_QUOTIENT: f32 = 1.0603;
 
@@ -103,20 +106,27 @@ pub fn calculate_niseci(
     let (x3, criteri_x3) = x3.expect("calc_niseci() returned earlier on Err match");
 
     if let Some(ref crit) = criteri_x3 {
-        let submetriche_map_x3 = crit.get_submetriche_map();
+        let submetriche_map_x3 = crit.get_ref_submetriche_map();
         for (key, val) in submetriche_map_x3 {
-            let classi_eta = val.get_classi_eta();
+            let classi_eta = val.get_ref_classi_eta();
             let specie = key.clone();
             let densita_stimata = -1.0; //TODO: check if this is correct
             let subvalue_a = val.get_criterio_a();
             let subvalue_b = val.get_criterio_b();
             let val = ValoriIntermediSpecieNISECI {
-                classi_eta,
+                #[expect(deprecated)]
+                classi_eta: classi_eta.clone(),
+                #[expect(deprecated)]
                 densita_stimata,
+                #[expect(deprecated)]
                 quantita_stimata: 0,
+                #[expect(deprecated)]
                 x2_b: 0.0,
+                #[expect(deprecated)]
                 rapporto_ad_juv: val.get_rapporto_ad_juv(),
+                #[expect(deprecated)]
                 x2_a_a: subvalue_a,
+                #[expect(deprecated)]
                 x2_a_b: subvalue_b,
             };
             match valori_intermedi_specie.entry(specie) {
@@ -142,13 +152,21 @@ pub fn calculate_niseci(
     }
 
     let intermediates = ValoriIntermediNISECI {
+        #[expect(deprecated)]
         x1,
+        #[expect(deprecated)]
         x2,
+        #[expect(deprecated)]
         x3,
+        #[expect(deprecated)]
         specie_specifici: valori_intermedi_specie,
+        #[expect(deprecated)]
         x2_a: criteri_x2.get_criterio_a(),
+        #[expect(deprecated)]
         x2_b: criteri_x2.get_criterio_b(),
+        #[expect(deprecated)]
         x3_a: criteri_x3.as_ref().map(|v| v.get_criterio_a()),
+        #[expect(deprecated)]
         x3_b: criteri_x3.as_ref().map(|v| v.get_criterio_b()),
     };
 
@@ -191,21 +209,28 @@ fn get_valori_intermedi_specie(
 ) -> HashMap<String, ValoriIntermediSpecieNISECI> {
     let mut valori_intermedi_specie: HashMap<String, ValoriIntermediSpecieNISECI> = HashMap::new();
 
-    let submetriche_map = criteri.get_submetriche_map();
+    let submetriche_map = criteri.get_ref_submetriche_map();
     for (key, val) in submetriche_map.iter() {
         let criteri_x2_a = val.get_metriche_x2_a();
-        let classi_eta = val.get_classi_eta();
+        let classi_eta = val.get_ref_classi_eta();
         let specie = key.clone();
-        let densita_stimata = val.get_metriche_x2_b().get_densita_stimata();
-        let quantita_stimata = val.get_metriche_x2_b().get_quantita_stimata();
-        let x2_b = val.get_metriche_x2_b().get_x2_b();
+        let densita_stimata = val.get_ref_metriche_x2_b().get_densita_stimata();
+        let quantita_stimata = val.get_ref_metriche_x2_b().get_quantita_stimata();
+        let x2_b = val.get_ref_metriche_x2_b().get_x2_b();
         let val = ValoriIntermediSpecieNISECI {
-            classi_eta,
+            #[expect(deprecated)]
+            classi_eta: classi_eta.clone(),
+            #[expect(deprecated)]
             densita_stimata,
+            #[expect(deprecated)]
             quantita_stimata,
+            #[expect(deprecated)]
             x2_b,
+            #[expect(deprecated)]
             x2_a_a: criteri_x2_a.get_criterio_a(),
+            #[expect(deprecated)]
             x2_a_b: criteri_x2_a.get_criterio_b(),
+            #[expect(deprecated)]
             rapporto_ad_juv: criteri_x2_a.get_rapporto_ad_juv(),
         };
         match valori_intermedi_specie.entry(specie) {

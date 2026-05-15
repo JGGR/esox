@@ -14,10 +14,25 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! CSV deserialization and validation module.
+//!
+//! Provides support for:
+//!
+//! - Deserialization and fields type check of raw CSV data into typed intermediate structs
+//! - Generic diagnostic formatting for [`csv::Error`]
+//!   - [`deser`]
+//! - Validation of intermediate structs into [`crate::domain`] structs (deprecated)
+//!   - [`parser`]
+//! - Semicolon input format and italian diagnostic formatting for [`csv::Error`]
+//!   - [`stanis`]
+//! - Single-step load ([`deser`] + [`parse`])
+//!   - [`load`]
 
 pub mod deser;
 pub mod load;
-#[deprecated(note = "v0.2 will remove this module.\nConsider using symbols from esox::parser")]
+#[deprecated(
+    note = "v0.2 will remove this module.\nConsider using methods parse_records or check_records on esox::domain types"
+)]
 pub mod parser;
 pub mod stanis;
 

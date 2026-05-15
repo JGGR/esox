@@ -14,7 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use crate::csv::deser::{check_path_is_file_ends_with_csv, CsvConfig, NormalizerReader};
+use crate::csv::deser::{
+    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader,
+};
 
 /// Used as the closure argument for
 /// validate_serialized_records(), to print italian error messages.
@@ -25,6 +27,7 @@ use crate::csv::stanis::giorgio::csv_error_handler;
 #[allow(deprecated)]
 use crate::deser::validate_serialized_records;
 
+use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{
     parse_serialized_records, RecordAnagraficaHFBI, RecordCampionamentoHFBI, TipoRecord,
 };
@@ -62,6 +65,8 @@ impl RecordCampionamentoHFBI for PlainRecordCsvCampionamentoHFBI {
     }
 }
 
+impl DefaultRecordCsv for PlainRecordCsvCampionamentoHFBI {}
+
 impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
@@ -72,6 +77,9 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -82,7 +90,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_campionamento_hfbi_reader<R: Read, T>(
     reader: R,
@@ -99,7 +107,7 @@ where
         _ => b',',
     };
 
-    check_campionamento_hfbi_reader_conf::<R, T>(
+    private_check_campionamento_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
             .with_delimiter(delimiter)
@@ -114,21 +122,37 @@ pub fn check_campionamento_hfbi_reader_conf<R: Read, T>(
 where
     T: RecordCampionamentoHFBI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
+    private_check_campionamento_hfbi_reader_conf::<R, DefaultByteLimit, T>(reader, config)
+}
 
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::CampionamentoHFBI)(errors);
-    })
+fn private_check_campionamento_hfbi_reader_conf<R: Read, BL: ByteLimit, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordCampionamentoHFBI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::CampionamentoHFBI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_campionamento_hfbi_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_campionamento_hfbi_path<T>(
     path: PathBuf,
@@ -169,7 +193,7 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_campionamento_hfbi_reader_conf(file, config)
+    private_check_campionamento_hfbi_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }
 
 #[deprecated(
@@ -228,6 +252,8 @@ impl RecordAnagraficaHFBI for PlainRecordCsvAnagraficaHFBI {
     }
 }
 
+impl DefaultRecordCsv for PlainRecordCsvAnagraficaHFBI {}
+
 impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!(
@@ -250,6 +276,9 @@ impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
     }
 }
 
+#[deprecated(
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() if you need runtime delimiter selection instead"
+)]
 pub fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -260,7 +289,7 @@ where
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     reader: R,
@@ -277,7 +306,7 @@ where
         _ => b',',
     };
 
-    check_anagrafica_hfbi_reader_conf::<R, T>(
+    private_check_anagrafica_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
             .with_delimiter(delimiter)
@@ -292,21 +321,37 @@ pub fn check_anagrafica_hfbi_reader_conf<R: Read, T>(
 where
     T: RecordAnagraficaHFBI + 'static,
 {
-    let normalizing_reader = NormalizerReader::new(reader);
+    private_check_anagrafica_hfbi_reader_conf::<R, DefaultByteLimit, T>(reader, config)
+}
 
-    let mut rdr = csv::ReaderBuilder::new()
-        .delimiter(config.delimiter())
-        .has_headers(config.has_headers())
-        .from_reader(normalizing_reader);
-    let iter = rdr.deserialize();
-    #[allow(deprecated)]
-    validate_serialized_records(iter, |errors| {
-        csv_error_handler(TipoRecord::AnagraficaHFBI)(errors);
-    })
+fn private_check_anagrafica_hfbi_reader_conf<R: Read, BL: ByteLimit, T>(
+    reader: R,
+    config: CsvConfig,
+) -> Result<Vec<T>, Vec<csv::Error>>
+where
+    T: RecordAnagraficaHFBI + 'static,
+{
+    let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
+    with_limited_reader(
+        normalizing_reader,
+        BL::MAX_BYTES,
+        |limited_reader| {
+            let mut rdr = csv::ReaderBuilder::new()
+                .delimiter(config.delimiter())
+                .has_headers(config.has_headers())
+                .from_reader(limited_reader);
+            let iter = rdr.deserialize();
+            #[allow(deprecated)]
+            validate_serialized_records(iter, |errors| {
+                csv_error_handler(TipoRecord::AnagraficaHFBI)(errors);
+            })
+        },
+        |limit_error| vec![csv::Error::from(limit_error)],
+    )
 }
 
 #[deprecated(
-    note = "v0.2 will change signature to expect an explicit delimiter argument.\nConsider using crate::csv::deser::hfbi::check_anagrafica_hfbi_path_conf() instead"
+    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_path_conf() if you need runtime delimiter selection instead"
 )]
 pub fn check_anagrafica_hfbi_path<T>(
     path: PathBuf,
@@ -347,5 +392,5 @@ where
         return Err(err_vec);
     }
     let file = File::open(path).expect("Unable to open file");
-    check_anagrafica_hfbi_reader_conf(file, config)
+    private_check_anagrafica_hfbi_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }

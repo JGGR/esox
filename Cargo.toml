@@ -1,6 +1,6 @@
 [package]
 name = "esox"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 description = "Library for NISECI and HFBI calc"
 license = "GPL-3.0-only"
@@ -14,10 +14,24 @@ include = [
 [features]
 experimental = []
 json = ["dep:json", "dep:serde_json"]
+lessclone = []
 
 [dependencies]
 chrono = { version = "0.4.44", default-features = false }
 csv = "1.4.0"
+hashbrown = { version = "0.17.1", default-features = false, features = ["default-hasher", "inline-more", "raw-entry", "serde"]}
 json = { version = "0.12.4", optional = true }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.149", optional = true }
+
+[dev-dependencies]
+criterion = "0.8.2"
+rand = "0.10.1"
+
+[[bench]]
+name = "niseci"
+harness = false
+
+[[bench]]
+name = "hfbi"
+harness = false

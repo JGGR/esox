@@ -14,6 +14,18 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! Deserialization module for intermediate structs.
+//!
+//! This module provides generic support for:
+//! - Converting raw data into typed intermediate structs
+//! - Validating raw data structure and field types
+//!   - Eg. Integer fields must not be `"foo"`)
+//!
+//! To validate intermediate structs into [`crate::domain`] structs, see:
+//! - [`crate::parser`]
+
+pub(crate) mod limits;
+
 use std::fmt;
 
 #[derive(Copy, Clone)]
@@ -26,7 +38,6 @@ pub enum TipoRecord {
 }
 
 pub trait RecordRiferimentoNISECI: serde::de::DeserializeOwned {
-    #[allow(dead_code)]
     fn nome_comune(&self) -> String;
     fn nome_latino(&self) -> String;
     fn codice_specie(&self) -> String;
@@ -47,9 +58,7 @@ pub trait RecordRiferimentoNISECI: serde::de::DeserializeOwned {
 }
 
 pub trait RecordCampionamentoNISECI: serde::de::DeserializeOwned {
-    #[allow(dead_code)]
     fn data(&self) -> String;
-    #[allow(dead_code)]
     fn stazione(&self) -> String;
     fn num_passaggio(&self) -> u32;
     fn codice_specie(&self) -> String;

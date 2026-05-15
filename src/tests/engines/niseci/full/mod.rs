@@ -31,19 +31,25 @@ use crate::csv::stanis::niseci::{
     VeryItalianRecordAnagraficaNISECI, VeryItalianRecordCampionamentoNISECI,
     VeryItalianRecordRiferimentoNISECI,
 };
+#[cfg(not(feature = "lessclone"))]
+use crate::engines::niseci::full::calculate_niseci;
+#[cfg(feature = "lessclone")]
+use crate::engines::niseci::full::lessclone::calculate_niseci;
 use crate::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci,
 };
-use crate::{
-    domain::niseci::ValoriIntermediNISECI,
-    engines::niseci::full::calculate_niseci,
-    tests::test_utils::{
-        create_dummy_anagrafica, create_dummy_campionamento_chopped,
-        create_dummy_campionamento_full, create_dummy_riferimento, ANAGRAFICA_NISECI_TEMPLATE_DATA,
-        CAMPIONAMENTO_NISECI_TEMPLATE_DATA, RIFERIMENTO_NISECI_TEMPLATE_DATA,
-    },
+use crate::tests::test_utils::{
+    create_dummy_anagrafica, create_dummy_campionamento_chopped, create_dummy_campionamento_full,
+    create_dummy_riferimento, ANAGRAFICA_NISECI_TEMPLATE_DATA, CAMPIONAMENTO_NISECI_TEMPLATE_DATA,
+    RIFERIMENTO_NISECI_TEMPLATE_DATA,
 };
+
+#[cfg(feature = "lessclone")]
+use crate::domain::niseci::lessclone::ValoriIntermediNISECI;
+#[cfg(not(feature = "lessclone"))]
+use crate::domain::niseci::ValoriIntermediNISECI;
+
 use std::io::Cursor;
 
 #[test]
@@ -133,9 +139,9 @@ fn calculate_niseci_template() {
     let (niseci, intermediates) = calc_niseci_res.expect("is_ok() was checked before");
 
     assert_eq!(niseci, Some(0.209));
-    assert_eq!(intermediates.x1, 0.429);
-    assert_eq!(intermediates.x2, Some(0.267));
-    assert_eq!(intermediates.x3, 1.0);
+    assert_eq!(intermediates.x1(), 0.429);
+    assert_eq!(intermediates.x2(), Some(0.267));
+    assert_eq!(intermediates.x3(), 1.0);
 }
 
 fn calc_templates_with_area(

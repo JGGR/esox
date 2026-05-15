@@ -14,6 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! CSV loading module.
+//!
+//! This module provides support for single step load of CSV data:
+//! - [`crate::csv::deser`] + [`crate::csv::parser`]
 
 pub mod hfbi;
 pub mod niseci;

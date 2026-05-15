@@ -19,8 +19,8 @@ const W_DHZP: f32 = 0.84;
 const HFBI_T: f32 = -0.167;
 const HFBI_S: f32 = 0.150;
 
-/// This calculation is order-dependent due to calc_ddom() being order-dependent.
-/// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
+/// This calculation is order-dependent due to [`crate::engines::hfbi::ddom::calc_ddom`] being order-dependent.
+/// Proper ordering of `campionamento` is by descending `peso` ([`crate::domain::hfbi::RecordHFBI`].peso).
 pub fn calculate_mmi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
@@ -72,11 +72,9 @@ pub fn calculate_mmi(
     Ok(intermediates)
 }
 
-/// This calculation is order-dependent due to:
-/// - calc_mmi() being order-dependent
-///   - Due to calc_ddom() being order-dependent
+/// This calculation is order-dependent due to [`calc_mmi`] being order-dependent.
 ///
-/// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
+/// Proper ordering of `campionamento` is by descending `peso` (see [`crate::domain::hfbi::RecordHFBI`]).
 pub fn calculate_hfbi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,

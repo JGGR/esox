@@ -14,6 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! Deserialization module for CSV to intermediate structs.
+//!
+//! Provides support for:
+//!
+//! - Converting raw CSV data into typed intermediate structs
+//! - Validating raw CSV data structure and field types
+//!   - Eg. Integer fields must not be `"foo"`)
+//!
+//! To validate intermediate structs into [`crate::domain`] structs, see:
+//!
+//! - [`crate::parser`]
+//!
+//! To do deser and parse steps at once (go from raw CSV to domain structs) see:
+//!
+//! - [`crate::csv::load`]
 
 pub mod utils;
 
@@ -88,7 +103,76 @@ impl CsvConfig {
     }
 }
 
-fn parse_csv_pos(pos: &Option<csv::Position>) -> String {
+/// Preset [`Delimiter`] for comma (`b','`).
+///
+/// # Example
+/// ```
+/// use esox::csv::deser::{Delimiter, CommaDelimiter};
+///
+/// assert_eq!(CommaDelimiter::DELIMITER, b',');
+/// ```
+pub struct CommaDelimiter;
+
+/// Preset [`Delimiter`] for semicolon (`b';'`).
+///
+/// # Example
+/// ```
+/// use esox::csv::deser::{Delimiter, SemicolonDelimiter};
+///
+/// assert_eq!(SemicolonDelimiter::DELIMITER, b';');
+/// ```
+pub struct SemicolonDelimiter;
+
+/// A type-level delimiter.
+///
+/// Implemented by marker types like [`CommaDelimiter`]
+/// and [`SemicolonDelimiter`].
+pub trait Delimiter {
+    const DELIMITER: u8;
+}
+
+impl Delimiter for CommaDelimiter {
+    const DELIMITER: u8 = b',';
+}
+impl Delimiter for SemicolonDelimiter {
+    const DELIMITER: u8 = b';';
+}
+
+/// A CSV record configuration.
+///
+/// This trait associates a [`Delimiter`] with a record type.
+/// Available presets:
+/// - [`CommaDelimiter`]
+/// - [`SemicolonDelimiter`].
+///
+/// # Example
+/// ```
+/// use esox::csv::deser::{RecordCsv, CommaDelimiter};
+///
+/// struct MyRecord;
+///
+/// impl RecordCsv for MyRecord {
+///     type D = CommaDelimiter;
+/// }
+/// ```
+pub trait RecordCsv {
+    type D: Delimiter;
+}
+
+/// Internal helper used by PlainRecord structs to autoimpl RecordCsv
+trait DefaultRecordCsv: RecordCsv {}
+
+impl<T: DefaultRecordCsv> RecordCsv for T {
+    type D = CommaDelimiter;
+}
+
+impl DefaultRecordCsv for crate::deser::PlainRecordRiferimentoNISECI {}
+impl DefaultRecordCsv for crate::deser::PlainRecordCampionamentoNISECI {}
+impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaNISECI {}
+impl DefaultRecordCsv for crate::deser::PlainRecordCampionamentoHFBI {}
+impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaHFBI {}
+
+fn parse_csv_pos(pos: Option<&csv::Position>) -> String {
     let res;
     match pos {
         Some(p) => {
@@ -128,7 +212,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
                 };
                 let mut curr_err = format!(
                     "  Errore di deserializzazione alla posizione: {}: campo {}",
-                    parse_csv_pos(pos),
+                    parse_csv_pos(pos.as_ref()),
                     field_str,
                 );
                 match err.kind() {
@@ -165,7 +249,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
             csv::ErrorKind::Utf8 { pos, err } => {
                 res.push(format!(
                     "  Errore UTF-8 alla posizione: {}: {}",
-                    parse_csv_pos(pos),
+                    parse_csv_pos(pos.as_ref()),
                     priv_translate(&err.to_string())
                 ));
             }
@@ -176,7 +260,7 @@ pub fn process_csv_errors(errors: &Vec<csv::Error>, tipo_csv: TipoRecord) -> Vec
             } => {
                 res.push(format!(
                     "  Errore numero campi alla posizione: {}: lunghezza attesa {}, trovata {}",
-                    parse_csv_pos(pos),
+                    parse_csv_pos(pos.as_ref()),
                     expected_len,
                     len // no priv_translate() anche se teoricamente lo supporta
                 ));

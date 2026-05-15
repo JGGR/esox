@@ -14,6 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! HFBI computation module.
+//!
+//! Routines and types for computing HFBI index from [`crate::domain::hfbi`] structs.
+//!
+//! The main methods are:
+//!
+//! - [`full::calculate_hfbi`]
+//! - [`full::calculate_mmi`]
+//! - [`full::calculate_stato_ecologico_hfbi`]
 
 pub mod bbent;
 pub mod bn;

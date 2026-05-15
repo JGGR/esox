@@ -15,6 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Types for modeling the domain of index computation.
+
 pub mod hfbi;
 pub mod index;
 pub(crate) mod localize;

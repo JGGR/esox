@@ -14,6 +14,24 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! Parsing module for intermediate structs.
+//!
+//! This module provides support for:
+//!
+//! - Validation of the intermediate structs
+//! - Enforcement of [`crate::domain`] invariants
+//!
+//! Next version will:
+//!
+//! - Drop the [`crate::csv::parser`] module
+//! - Expose more methods here to provide the same functionality
+//!
+//! In the meantime, consider using:
+//!
+//! - `parse_records`
+//! - `check_records`
+//!
+//! from [`crate::domain`] structs.
 
 use chrono::NaiveDate;
 

@@ -1,3 +1,75 @@
+## [0.1.6] - 2026-05-15
+
+### Added
+
+- Add `csv::deser::{RecordCsv, CommaDelimiter, SemicolonDelimiter}`
+  - Will allow compile-type definition of csv delimiter for impls of:
+    - `deser::Record{Riferimento,Campionamento,Anagrafica}NISECI`
+    - `deser::Record{Campionamento,Anagrafica}HFBI`
+- Add `tests` folder for integration tests
+  - `{niseci,hfbi}::italian::template` tests full pipeline with italian templates, using deprecated methods
+- Add `benches` folder for benchmarks
+- Add new APIs to `domain::niseci::RiferimentoNISECI`:
+  - `contains_id(&self, id: &str) -> bool`
+  - `get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI>`
+- Add internal `domain::hfbi::RIFERIMENTO_HFBI_MAP`:
+  - Next version will make it public as `domain::hfbi::RIFERIMENTO_HFBI`
+- Add `domain::niseci::ValoriIntermediNISECI::to_csv_joined()`
+- Add `domain::niseci::RiferimentoNISECI::to_csv_intermediates_joined()`
+- Add `domain::niseci::ComunitaNISECI::new()`
+- Add some getters for deprecated fields
+- Add `lessclone` feature
+  - Building with this feature turns on breaking changes
+  - Usage is recommended but not default yet
+  - The new APIs better reflect what `v0.2` will support
+- Add `deser::limits` module
+  - `deser::limits::with_limited_reader` ensures bytes limit on reader methods
+  - Will allow external customisation in a future version
+
+### Changed
+
+- Small breaking change for `csv::deser::utils::diagnostic`, introduced in the last patch
+  - Prefer `Option<&Foo>` to `&Option<Foo>`
+- Fixed wrong id for `Alice (Acciuga Europea)` in `RIFERIMENTO_HFBI`
+- Improved worst cases parsing performance
+- Refactor internal `engines::niseci::x2` methods to avoid some cloning
+- Refactor internal `engines::hfbi::dmig` to avoid some cloning
+- Corrected deprecation message for `csv::{deser,load}::{niseci,hfbi}` generic methods
+  - Next version will add a `RecordCsv` bound on `T`
+  - New bound will NOT apply to `*_conf` methods, allowing runtime delimiter selection
+  - Provided types are already compliant:
+    - `csv::deser::{niseci,hfbi}::PlainRecord*` structs (using `csv::deser::CommaDelimiter`)
+    - `csv::stanis::{niseci,hfbi}::VeryItalianRecord*` structs (using `csv::deser::SemicolonDelimiter`)
+    - `deser::PlainRecord*` structs (using `csv::deser::CommaDelimiter`)
+  - Consider adding `impl RecordCsv` on your custom types if needed
+  - Consider using `csv::deser::{CommaDelimiter,SemicolonDelimiter}` for `type D: Delimiter`in `RecordCsv`
+- Corrected deprecation message for:
+  - `csv::parser`
+  - `csv::parser::{niseci,hfbi}`
+  - `csv::parser::niseci::{parse,check}_anagrafica_niseci`
+- Deprecation warnings for visibility of:
+  - `csv::parser::hfbi::{parse,check}_anagrafica_hfbi`
+  - `CampionamentoHFBI::check_record` (typo, use `_records`)
+  - `ClassiEtaSpecieNISECI::{specie, new}`
+  - `domain::hfbi::RIFERIMENTO_HFBI`
+  - `domain::niseci::ValoriIntermediNISECI::{log, to_csv}`
+  - `domain::niseci::EsemplariPerCattura` fields
+  - `domain::niseci::SpecieNISECI` fields
+  - `domain::niseci::ClassiEtaSpecieNISECI` fields
+  - `domain::niseci::ClassiEtaAlieniNISECI` fields
+  - `domain::niseci::AlieniIndigeni` fields
+  - `domain::niseci::RecordNISECI` fields
+  - `domain::niseci::ValoriIntermediNISECI` fields
+  - `domain::niseci::ValoriIntermediSpecieNISECI` fields
+  - `domain::niseci::InfoPopolazioniNISECI` fields
+  - `domain::niseci::InfoPopolazioniAlieneNISECI` fields
+  - `domain::niseci::ComunitaNISECI` fields
+  - `engines::niseci::x2::MetricheX2::get_submetriche_map`
+  - `engines::niseci::x2::SubmetricheX2::{get_classi_eta, get_metriche_x2_b}`
+  - `engines::niseci::x2::MetricheX2B::get_id`
+  - `engines::niseci::x3::MetricheX3::get_submetriche_map`
+  - `engines::niseci::x3::SubmetricheX3::get_classi_eta`
+
 ## [0.1.5] - 2026-04-30
 
 ### Added

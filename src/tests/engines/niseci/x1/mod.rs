@@ -15,7 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#[cfg(not(feature = "lessclone"))]
 use crate::engines::niseci::x1::calculate_x1;
+#[cfg(feature = "lessclone")]
+use crate::engines::niseci::x1::lessclone::calculate_x1;
 use crate::tests::test_utils::{
     create_dummy_campionamento_chopped, create_dummy_campionamento_full, create_dummy_riferimento,
 };

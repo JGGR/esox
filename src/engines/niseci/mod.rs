@@ -14,6 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! NISECI computation module.
+//!
+//! Routines and types for computing NISECI index from [`crate::domain::niseci`] structs.
+//!
+//! The main methods are:
+//!
+//! - [`full::calculate_niseci`]
+//! - [`full::calculate_rqe_niseci`]
+//! - [`full::calculate_stato_ecologico_niseci`]
 
 pub mod full;
 pub mod linear_regression;

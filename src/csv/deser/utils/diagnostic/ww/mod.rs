@@ -60,7 +60,7 @@ impl CsvDiagnosticLocalization for EngCsvDiagnostic {
 pub struct EngCsvPosition;
 
 impl CsvPositionFormatter for EngCsvPosition {
-    fn format(&self, pos: &Option<csv::Position>) -> String {
+    fn format(&self, pos: Option<&csv::Position>) -> String {
         match pos {
             Some(p) => format!(
                 "line {}, record {}, byte {}",
