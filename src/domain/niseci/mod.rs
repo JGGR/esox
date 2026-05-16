@@ -436,8 +436,7 @@ impl RiferimentoNISECI {
 
 impl From<RiferimentoNISECI> for Vec<SpecieNISECI> {
     fn from(val: RiferimentoNISECI) -> Self {
-        #[allow(deprecated)]
-        val.elenco_specie
+        val.map_ids.store.values
     }
 }
 

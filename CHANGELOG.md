@@ -1,3 +1,9 @@
+## [0.1.7] - Unreleased
+
+### Changed
+
+- Fixed `impl From<RiferimentoNISECI> for Vec<SpecieNISECI>` to use `map_ids` field
+
 ## [0.1.6] - 2026-05-15
 
 ### Added
