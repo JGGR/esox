@@ -17,7 +17,7 @@ json = ["dep:json", "dep:serde_json"]
 lessclone = []
 
 [dependencies]
-chrono = { version = "0.4.44", default-features = false }
+chrono = { version = "0.4.45", default-features = false }
 csv = "1.4.0"
 hashbrown = { version = "0.17.1", default-features = false, features = ["default-hasher", "inline-more", "raw-entry", "serde"]}
 json = { version = "0.12.4", optional = true }
