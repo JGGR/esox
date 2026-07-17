@@ -253,6 +253,7 @@ impl SpecieNISECI {
 pub(crate) type IdSpecieNISECI = u32;
 
 #[derive(Debug, Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
 pub(crate) struct StoreSpecieNISECI {
     values: Vec<SpecieNISECI>,
 }
@@ -279,6 +280,7 @@ impl StoreSpecieNISECI {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[cfg_attr(feature = "experimental", derive(Deserialize))]
 pub(crate) struct InternerSpecieNISECI {
     map: HBHashMap<String, IdSpecieNISECI>,
     store: StoreSpecieNISECI,

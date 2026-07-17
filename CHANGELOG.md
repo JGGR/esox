@@ -3,6 +3,9 @@
 ### Changed
 
 - Fixed `impl From<RiferimentoNISECI> for Vec<SpecieNISECI>` to use `map_ids` field
+- Fixed build for `experimental` feature by deriving `Deserialize` for:
+  - `InternerSpecieNISECI`
+  - `StoreSpecieNISECI`
 - Bump `chrono` to `0.4.45`
 - Bump `serde_json` to `1.0.150`
 - Bump `rand` to `0.10.2`
