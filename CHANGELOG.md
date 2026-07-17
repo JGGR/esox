@@ -6,6 +6,7 @@
 - Fixed build for `experimental` feature by deriving `Deserialize` for:
   - `InternerSpecieNISECI`
   - `StoreSpecieNISECI`
+- Change `allow(deprecated)` to `expect(deprecated)`
 - Bump `chrono` to `0.4.45`
 - Bump `serde_json` to `1.0.150`
 - Bump `rand` to `0.10.2`

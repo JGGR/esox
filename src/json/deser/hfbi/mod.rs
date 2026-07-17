@@ -17,7 +17,7 @@
 /// v0.2 will drop implicit logging, hence this method will not be needed anymore.
 /// Callsites will switch to crate::deser::check_serialized_records.
 /// Usercode will need to handle the format/printing of errors separately.
-#[allow(deprecated)]
+#[expect(deprecated)]
 use crate::deser::validate_serialized_records;
 
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
@@ -63,7 +63,7 @@ where
                 limited_reader,
                 |res| res.map_err(Into::into),
                 |deser| {
-                    #[allow(deprecated)]
+                    #[expect(deprecated)]
                     validate_serialized_records(deser.into_iter::<T>(), |errs| {
                         errs.iter().for_each(|e| eprintln!("  {}", e));
                     })
@@ -121,7 +121,7 @@ where
                 limited_reader,
                 |res| res.map_err(Into::into),
                 |deser| {
-                    #[allow(deprecated)]
+                    #[expect(deprecated)]
                     validate_serialized_records(deser.into_iter::<T>(), |errs| {
                         errs.iter().for_each(|e| eprintln!("  {}", e));
                     })

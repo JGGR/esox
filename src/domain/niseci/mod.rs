@@ -386,7 +386,7 @@ impl RiferimentoNISECI {
             // - avoiding cloning all SpecieNISECI on new()
             interner.intern(rec.id(), rec.clone());
         }
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         Self {
             elenco_specie,
             map_ids: interner,
@@ -400,7 +400,7 @@ impl RiferimentoNISECI {
         for s in map_ids.store.values.iter() {
             elenco_specie.push(s.clone());
         }
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         Self {
             elenco_specie,
             map_ids,
@@ -601,7 +601,7 @@ impl CampionamentoNISECI {
     }
 
     pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         Self { campionamento }
     }
 
@@ -652,7 +652,7 @@ impl CampionamentoNISECI {
 
 impl From<CampionamentoNISECI> for Vec<RecordNISECI> {
     fn from(val: CampionamentoNISECI) -> Self {
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         val.campionamento
     }
 }
@@ -662,7 +662,7 @@ impl<'a> IntoIterator for &'a CampionamentoNISECI {
     type IntoIter = std::slice::Iter<'a, RecordNISECI>;
 
     fn into_iter(self) -> Self::IntoIter {
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         self.campionamento.iter()
     }
 }
@@ -898,14 +898,14 @@ impl AnagraficaNISECI {
             bacino_appartenenza,
             idro_eco_regione,
             posizione,
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             lunghezza_media_stazione: *lunghezza_media_stazione,
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             larghezza_media_stazione: *larghezza_media_stazione,
         }
     }
     pub fn get_lunghezza_media(&self) -> f32 {
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         self.lunghezza_media_stazione
     }
     pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
@@ -915,14 +915,14 @@ impl AnagraficaNISECI {
         if val <= 0.0 {
             return Err(PositiveF32Error::NotPositive);
         }
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         {
             self.lunghezza_media_stazione = val;
         }
         Ok(())
     }
     pub fn get_larghezza_media(&self) -> f32 {
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         self.larghezza_media_stazione
     }
     pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
@@ -932,7 +932,7 @@ impl AnagraficaNISECI {
         if val <= 0.0 {
             return Err(PositiveF32Error::NotPositive);
         }
-        #[allow(deprecated)]
+        #[expect(deprecated)]
         {
             self.larghezza_media_stazione = val;
         }
@@ -2391,13 +2391,13 @@ mod domain_niseci_private_tests {
         #[cfg(not(feature = "lessclone"))]
         #[cfg(test)]
         pub(crate) fn push(&mut self, value: RecordNISECI) {
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             self.campionamento.push(value);
         }
         #[cfg(not(feature = "lessclone"))]
         #[cfg(test)]
         pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             &mut self.campionamento
         }
     }
@@ -2461,16 +2461,16 @@ mod domain_niseci_private_tests {
                 bacino_appartenenza,
                 idro_eco_regione,
                 posizione,
-                #[allow(deprecated)]
+                #[expect(deprecated)]
                 lunghezza_media_stazione,
-                #[allow(deprecated)]
+                #[expect(deprecated)]
                 larghezza_media_stazione,
             }
         }
         /// Test helper to mutate lunghezza with no checks
         #[cfg(test)]
         pub(crate) fn set_lunghezza_unchecked(&mut self, val: f32) {
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             {
                 self.lunghezza_media_stazione = val;
             }
@@ -2478,7 +2478,7 @@ mod domain_niseci_private_tests {
         /// Test helper to mutate larghezza with no checks
         #[cfg(test)]
         pub(crate) fn set_larghezza_unchecked(&mut self, val: f32) {
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             {
                 self.larghezza_media_stazione = val;
             }
