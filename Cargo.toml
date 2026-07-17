@@ -26,7 +26,7 @@ serde_json = { version = "1.0.150", optional = true }
 
 [dev-dependencies]
 criterion = "0.8.2"
-rand = "0.10.1"
+rand = "0.10.2"
 
 [[bench]]
 name = "niseci"
