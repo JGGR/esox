@@ -1,3 +1,16 @@
+## [0.1.7] - 2026-07-17
+
+### Changed
+
+- Fixed `impl From<RiferimentoNISECI> for Vec<SpecieNISECI>` to use `map_ids` field
+- Fixed build for `experimental` feature by deriving `Deserialize` for:
+  - `InternerSpecieNISECI`
+  - `StoreSpecieNISECI`
+- Change `allow(deprecated)` to `expect(deprecated)`
+- Bump `chrono` to `0.4.45`
+- Bump `serde_json` to `1.0.150`
+- Bump `rand` to `0.10.2`
+
 ## [0.1.6] - 2026-05-15
 
 ### Added

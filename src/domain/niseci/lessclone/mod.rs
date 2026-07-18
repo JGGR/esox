@@ -1182,12 +1182,12 @@ mod domain_niseci_private_tests {
     impl CampionamentoNISECI {
         #[cfg(test)]
         pub(crate) fn push(&mut self, value: RecordNISECI) {
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             self.campionamento.push(value);
         }
         #[cfg(test)]
         pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             &mut self.campionamento
         }
     }

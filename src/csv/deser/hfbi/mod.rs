@@ -24,7 +24,7 @@ use crate::csv::stanis::giorgio::csv_error_handler;
 /// v0.2 will drop implicit logging, hence this method will not be needed anymore.
 /// Callsites will switch to crate::deser::check_serialized_records.
 /// Usercode will need to handle the format/printing of errors separately.
-#[allow(deprecated)]
+#[expect(deprecated)]
 use crate::deser::validate_serialized_records;
 
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
@@ -142,7 +142,7 @@ where
                 .has_headers(config.has_headers())
                 .from_reader(limited_reader);
             let iter = rdr.deserialize();
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             validate_serialized_records(iter, |errors| {
                 csv_error_handler(TipoRecord::CampionamentoHFBI)(errors);
             })
@@ -341,7 +341,7 @@ where
                 .has_headers(config.has_headers())
                 .from_reader(limited_reader);
             let iter = rdr.deserialize();
-            #[allow(deprecated)]
+            #[expect(deprecated)]
             validate_serialized_records(iter, |errors| {
                 csv_error_handler(TipoRecord::AnagraficaHFBI)(errors);
             })

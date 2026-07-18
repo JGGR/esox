@@ -140,7 +140,7 @@ pub fn validate_serialized_records<T, E, F>(
 where
     F: Fn(&Vec<E>),
 {
-    #[allow(deprecated)]
+    #[expect(deprecated)]
     debug_serialized_records::<T, E, F>(iter, on_error)
 }
 
