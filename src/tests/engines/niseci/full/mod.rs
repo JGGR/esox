@@ -31,10 +31,7 @@ use crate::csv::stanis::niseci::{
     VeryItalianRecordAnagraficaNISECI, VeryItalianRecordCampionamentoNISECI,
     VeryItalianRecordRiferimentoNISECI,
 };
-#[cfg(not(feature = "lessclone"))]
 use crate::engines::niseci::full::calculate_niseci;
-#[cfg(feature = "lessclone")]
-use crate::engines::niseci::full::lessclone::calculate_niseci;
 use crate::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci,
@@ -45,9 +42,6 @@ use crate::tests::test_utils::{
     RIFERIMENTO_NISECI_TEMPLATE_DATA,
 };
 
-#[cfg(feature = "lessclone")]
-use crate::domain::niseci::lessclone::ValoriIntermediNISECI;
-#[cfg(not(feature = "lessclone"))]
 use crate::domain::niseci::ValoriIntermediNISECI;
 
 use std::io::Cursor;

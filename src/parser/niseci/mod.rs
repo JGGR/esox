@@ -17,14 +17,10 @@
 
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use crate::domain::location::Location;
-#[cfg(feature = "lessclone")]
-use crate::domain::niseci::lessclone::{CampionamentoNISECI, RecordNISECI};
 use crate::domain::niseci::{
-    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, InternerSpecieNISECI,
-    RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
+    AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
+    InternerSpecieNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
 };
-#[cfg(not(feature = "lessclone"))]
-use crate::domain::niseci::{CampionamentoNISECI, RecordNISECI};
 use crate::domain::posf32::PositiveF32;
 use crate::parser::parse_date;
 use chrono::format::ParseErrorKind;
@@ -361,7 +357,6 @@ pub(crate) fn parse_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
             continue;
         }
 
-        #[cfg(feature = "lessclone")]
         let matched_specie = riferimento_specie
             .get_inner_id(matched_specie.id())
             .expect("Riferimento should contain this id");

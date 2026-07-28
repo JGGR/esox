@@ -65,10 +65,7 @@
 //! use std::io::Cursor;
 //! use esox::csv::load::InputFormat;
 //! use esox::csv::load::niseci::*;
-//! #[cfg(not(feature = "lessclone"))]
 //! use esox::engines::niseci::full::calculate_niseci;
-//! #[cfg(feature = "lessclone")]
-//! use esox::engines::niseci::full::lessclone::calculate_niseci;
 //! const RIFERIMENTO_DATA: &[u8] =
 //! include_bytes!("../templates/riferimento_niseci.csv");
 //!

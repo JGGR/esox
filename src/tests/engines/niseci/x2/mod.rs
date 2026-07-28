@@ -15,14 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#[cfg(not(feature = "lessclone"))]
 use crate::engines::niseci::x2::calculate_x2;
-#[cfg(feature = "lessclone")]
-use crate::engines::niseci::x2::lessclone::calculate_x2;
 
-#[cfg(feature = "lessclone")]
 use crate::tests::test_utils::{
-    create_massive_riferimento_ciacci, create_massive_riferimento_ciacci_2,
+    create_massive_riferimento_ciacci, create_massive_riferimento_ciacci_2, DummyIds,
 };
 
 use crate::{
@@ -30,7 +26,7 @@ use crate::{
         location::Location,
         niseci::{
             AnagraficaNISECI, AreaNISECI, ClassiEtaSpecieNISECI, ComunitaNISECI,
-            IdroEcoRegioneNISECI, TipoComunitaNISECI,
+            IdroEcoRegioneNISECI, RiferimentoNISECI, TipoComunitaNISECI,
         },
     },
     tests::test_utils::{
@@ -40,7 +36,7 @@ use crate::{
 
 #[test]
 fn calculate_x2_a_criterio_a_5_classi_valorizzate() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 1, 1, 1, 1, 1);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 1, 1, 1, 1, 1);
 
     let x2_a_criterio_a = classe.get_x2_a_criterio_a();
     assert_eq!(1, x2_a_criterio_a)
@@ -48,7 +44,7 @@ fn calculate_x2_a_criterio_a_5_classi_valorizzate() {
 
 #[test]
 fn calculate_x2_a_criterio_a_3_classi_valorizzate() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 1, 1, 1);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 0, 0, 1, 1, 1);
 
     let x2_a_criterio_a = classe.get_x2_a_criterio_a();
     assert_eq!(2, x2_a_criterio_a)
@@ -56,7 +52,7 @@ fn calculate_x2_a_criterio_a_3_classi_valorizzate() {
 
 #[test]
 fn calculate_x2_a_criterio_a_2_classi_valorizzate() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 0, 1, 1);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 0, 0, 0, 1, 1);
 
     let x2_a_criterio_a = classe.get_x2_a_criterio_a();
     assert_eq!(3, x2_a_criterio_a)
@@ -64,49 +60,73 @@ fn calculate_x2_a_criterio_a_2_classi_valorizzate() {
 
 #[test]
 fn calculate_x2_a_criterio_b_zero_giovani() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 0, 0, 1, 1);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 0, 0, 0, 1, 1);
 
-    let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
+    let Some((x2_a_criterio_b, _ad_juv)) =
+        classe.get_x2_a_criterio_b(&RiferimentoNISECI::new(vec![get_ciaccio()]))
+    else {
+        panic!("Unexpected None")
+    };
     assert_eq!(3, x2_a_criterio_b)
 }
 
 #[test]
 fn calculate_x2_a_criterio_b_1_bilanciato() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 1, 1);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 0, 1, 1, 1, 1);
 
-    let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
+    let Some((x2_a_criterio_b, _ad_juv)) =
+        classe.get_x2_a_criterio_b(&RiferimentoNISECI::new(vec![get_ciaccio()]))
+    else {
+        panic!("Unexpected None")
+    };
     assert_eq!(1, x2_a_criterio_b)
 }
 
 #[test]
 fn calculate_x2_a_criterio_b_2_medio_sbilanciato_adulti() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 2, 2);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 0, 1, 1, 2, 2);
 
-    let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
+    let Some((x2_a_criterio_b, _ad_juv)) =
+        classe.get_x2_a_criterio_b(&RiferimentoNISECI::new(vec![get_ciaccio()]))
+    else {
+        panic!("Unexpected None")
+    };
     assert_eq!(2, x2_a_criterio_b)
 }
 
 #[test]
 fn calculate_x2_a_criterio_b_2_medio_sbilanciato_giovani() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 2, 2, 1, 1);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 0, 2, 2, 1, 1);
 
-    let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
+    let Some((x2_a_criterio_b, _ad_juv)) =
+        classe.get_x2_a_criterio_b(&RiferimentoNISECI::new(vec![get_ciaccio()]))
+    else {
+        panic!("Unexpected None")
+    };
     assert_eq!(2, x2_a_criterio_b)
 }
 
 #[test]
 fn calculate_x2_a_criterio_b_3_molto_sbilanciato_adulti() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 1, 1, 3, 3);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 0, 1, 1, 3, 3);
 
-    let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
+    let Some((x2_a_criterio_b, _ad_juv)) =
+        classe.get_x2_a_criterio_b(&RiferimentoNISECI::new(vec![get_ciaccio()]))
+    else {
+        panic!("Unexpected None")
+    };
     assert_eq!(3, x2_a_criterio_b)
 }
 
 #[test]
 fn calculate_x2_a_criterio_b_3_molto_sbilanciato_giovani() {
-    let classe = ClassiEtaSpecieNISECI::new_custom(&get_ciaccio(), 0, 3, 3, 1, 1);
+    let classe = ClassiEtaSpecieNISECI::new_custom(DummyIds::Ciaccio as u32, 0, 3, 3, 1, 1);
 
-    let (x2_a_criterio_b, _ad_juv) = classe.get_x2_a_criterio_b();
+    let Some((x2_a_criterio_b, _ad_juv)) =
+        classe.get_x2_a_criterio_b(&RiferimentoNISECI::new(vec![get_ciaccio()]))
+    else {
+        panic!("Unexpected None")
+    };
     assert_eq!(3, x2_a_criterio_b)
 }
 
@@ -139,9 +159,6 @@ fn calculate_x2_test_1() {
         10.0,
     );
 
-    #[cfg(not(feature = "lessclone"))]
-    let x2 = calculate_x2(&campionamento, &anagrafica, true);
-    #[cfg(feature = "lessclone")]
     let x2 = calculate_x2(
         &campionamento,
         &anagrafica,
@@ -183,9 +200,6 @@ fn calculate_x2_test_1() {
         10.0,
     );
 
-    #[cfg(not(feature = "lessclone"))]
-    let x2 = calculate_x2(&campionamento, &anagrafica, true);
-    #[cfg(feature = "lessclone")]
     let x2 = calculate_x2(
         &campionamento,
         &anagrafica,

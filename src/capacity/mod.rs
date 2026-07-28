@@ -15,14 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#[cfg_attr(not(feature = "lessclone"), expect(dead_code))]
 pub(crate) trait Capacity {
     const VALUE: usize;
 }
 
-#[cfg_attr(feature = "lessclone", expect(dead_code))]
+#[expect(dead_code)]
 struct Small;
-#[cfg_attr(feature = "lessclone", expect(dead_code))]
+#[expect(dead_code)]
 struct Medium;
 #[derive(Default)]
 pub(crate) struct DefaultCapacity;
@@ -30,7 +29,7 @@ pub(crate) struct DefaultCapacity;
 struct Custom<const N: usize>;
 
 const SMALL_CAP: usize = 100;
-#[cfg_attr(feature = "lessclone", expect(dead_code))]
+#[expect(dead_code)]
 const MEDIUM_CAP: usize = 1000;
 
 impl Capacity for Small {

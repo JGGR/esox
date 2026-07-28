@@ -15,7 +15,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#[cfg(not(feature = "lessclone"))]
 use crate::engines::niseci::x3::calculate_x3;
 use crate::tests::test_utils::{
     create_massive_campionamento_ciacci_2, create_massive_campionamento_ciacci_con_bronzi_strutt,
@@ -25,25 +24,18 @@ use crate::tests::test_utils::{
     create_massive_campionamento_ciacci_con_trocchi_strutt,
     create_massive_campionamento_ciacci_solo_autoctoni_1,
 };
-#[cfg(feature = "lessclone")]
-use crate::{
-    engines::niseci::x3::lessclone::calculate_x3,
-    tests::test_utils::{
-        create_massive_riferimento_ciacci_2, create_massive_riferimento_ciacci_con_bronzi_strutt,
-        create_massive_riferimento_ciacci_con_tappi_destrutt,
-        create_massive_riferimento_ciacci_con_tappi_mediam_strutt,
-        create_massive_riferimento_ciacci_con_tappi_strutt,
-        create_massive_riferimento_ciacci_con_trocchi_strutt,
-        create_massive_riferimento_ciacci_solo_autoctoni_1,
-    },
+use crate::tests::test_utils::{
+    create_massive_riferimento_ciacci_2, create_massive_riferimento_ciacci_con_bronzi_strutt,
+    create_massive_riferimento_ciacci_con_tappi_destrutt,
+    create_massive_riferimento_ciacci_con_tappi_mediam_strutt,
+    create_massive_riferimento_ciacci_con_tappi_strutt,
+    create_massive_riferimento_ciacci_con_trocchi_strutt,
+    create_massive_riferimento_ciacci_solo_autoctoni_1,
 };
 
 #[test]
 fn calculate_x3_assenza_specie_aliene() {
     let c = create_massive_campionamento_ciacci_solo_autoctoni_1();
-    #[cfg(not(feature = "lessclone"))]
-    let x3 = calculate_x3(&c);
-    #[cfg(feature = "lessclone")]
     let x3 = calculate_x3(&c, &create_massive_riferimento_ciacci_solo_autoctoni_1());
 
     assert!(x3.is_ok());
@@ -54,9 +46,6 @@ fn calculate_x3_assenza_specie_aliene() {
 #[test]
 fn calculate_x3_un_trocchio() {
     let c = create_massive_campionamento_ciacci_2();
-    #[cfg(not(feature = "lessclone"))]
-    let x3 = calculate_x3(&c);
-    #[cfg(feature = "lessclone")]
     let x3 = calculate_x3(&c, &create_massive_riferimento_ciacci_2());
 
     assert!(x3.is_ok());
@@ -67,9 +56,6 @@ fn calculate_x3_un_trocchio() {
 #[test]
 fn calculate_x3_alieni_magg_uguale_autoctoni() {
     let c = create_massive_campionamento_ciacci_con_trocchi_strutt();
-    #[cfg(not(feature = "lessclone"))]
-    let x3 = calculate_x3(&c);
-    #[cfg(feature = "lessclone")]
     let x3 = calculate_x3(&c, &create_massive_riferimento_ciacci_con_trocchi_strutt());
 
     assert!(x3.is_ok());
@@ -81,9 +67,6 @@ fn calculate_x3_alieni_magg_uguale_autoctoni() {
 fn calculate_x3_alieni_tipo_1_strutt() {
     let c = create_massive_campionamento_ciacci_con_trocchi_strutt();
 
-    #[cfg(not(feature = "lessclone"))]
-    let x3 = calculate_x3(&c);
-    #[cfg(feature = "lessclone")]
     let x3 = calculate_x3(&c, &create_massive_riferimento_ciacci_con_trocchi_strutt());
 
     assert!(x3.is_ok());
@@ -95,12 +78,8 @@ fn calculate_x3_alieni_tipo_1_strutt() {
 fn calculate_x3_alieni_tipo_2_strutt() {
     let c = create_massive_campionamento_ciacci_con_bronzi_strutt();
 
-    #[cfg(feature = "lessclone")]
     let r = create_massive_riferimento_ciacci_con_bronzi_strutt();
 
-    #[cfg(not(feature = "lessclone"))]
-    let x3 = calculate_x3(&c);
-    #[cfg(feature = "lessclone")]
     let x3 = calculate_x3(&c, &r);
 
     assert!(x3.is_ok());
@@ -112,12 +91,8 @@ fn calculate_x3_alieni_tipo_2_strutt() {
 fn calculate_x3_alieni_tipo_3_strutt() {
     let c = create_massive_campionamento_ciacci_con_tappi_strutt();
 
-    #[cfg(feature = "lessclone")]
     let r = create_massive_riferimento_ciacci_con_tappi_strutt();
 
-    #[cfg(not(feature = "lessclone"))]
-    let x3 = calculate_x3(&c);
-    #[cfg(feature = "lessclone")]
     let x3 = calculate_x3(&c, &r);
 
     assert!(x3.is_ok());
@@ -129,12 +104,8 @@ fn calculate_x3_alieni_tipo_3_strutt() {
 fn calculate_x3_alieni_tipo_3_destrutt() {
     let c = create_massive_campionamento_ciacci_con_tappi_destrutt();
 
-    #[cfg(feature = "lessclone")]
     let r = create_massive_riferimento_ciacci_con_tappi_destrutt();
 
-    #[cfg(not(feature = "lessclone"))]
-    let x3 = calculate_x3(&c);
-    #[cfg(feature = "lessclone")]
     let x3 = calculate_x3(&c, &r);
 
     assert!(x3.is_ok());
@@ -146,12 +117,8 @@ fn calculate_x3_alieni_tipo_3_destrutt() {
 fn calculate_x3_alieni_tipo_3_mediam_strutt() {
     let c = create_massive_campionamento_ciacci_con_tappi_mediam_strutt();
 
-    #[cfg(feature = "lessclone")]
     let r = create_massive_riferimento_ciacci_con_tappi_mediam_strutt();
 
-    #[cfg(not(feature = "lessclone"))]
-    let x3 = calculate_x3(&c);
-    #[cfg(feature = "lessclone")]
     let x3 = calculate_x3(&c, &r);
 
     assert!(x3.is_ok());

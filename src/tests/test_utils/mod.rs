@@ -15,9 +15,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#[cfg(feature = "lessclone")]
-use crate::domain::niseci::lessclone::{CampionamentoNISECI, RecordNISECI};
-#[cfg(not(feature = "lessclone"))]
 use crate::domain::niseci::{CampionamentoNISECI, RecordNISECI};
 use crate::domain::{
     location::Location,
@@ -307,49 +304,22 @@ pub fn create_dummy_riferimento() -> RiferimentoNISECI {
 /// che servono in @test_calculate_x1
 pub fn create_dummy_campionamento_full() -> CampionamentoNISECI {
     let ds = create_dummy_specie_niseci_set();
-    #[cfg(not(feature = "lessclone"))]
-    let record_1 = RecordNISECI::new(&ds.importante_1.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_1 = RecordNISECI::new(ds.importante_1.1, 5, 1, 5.0);
 
-    #[cfg(not(feature = "lessclone"))]
-    let record_2 = RecordNISECI::new(&ds.importante_2.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_2 = RecordNISECI::new(ds.importante_2.1, 5, 1, 5.0);
 
-    #[cfg(not(feature = "lessclone"))]
-    let record_3 = RecordNISECI::new(&ds.importante_3.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_3 = RecordNISECI::new(ds.importante_3.1, 5, 1, 5.0);
 
-    #[cfg(not(feature = "lessclone"))]
-    let record_4 = RecordNISECI::new(&ds.normale_2.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_4 = RecordNISECI::new(ds.normale_2.1, 5, 1, 5.0);
 
-    #[cfg(not(feature = "lessclone"))]
-    let record_5 = RecordNISECI::new(&ds.normale_1.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_5 = RecordNISECI::new(ds.normale_1.1, 5, 1, 5.0);
 
-    #[cfg(not(feature = "lessclone"))]
-    let record_6 = RecordNISECI::new(&ds.inatteso_1.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_6 = RecordNISECI::new(ds.inatteso_1.1, 5, 1, 5.0);
 
-    #[cfg(not(feature = "lessclone"))]
-    let record_7 = RecordNISECI::new(&ds.inatteso_2.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_7 = RecordNISECI::new(ds.inatteso_2.1, 5, 1, 5.0);
 
-    #[cfg(not(feature = "lessclone"))]
-    let record_8 = RecordNISECI::new(&ds.alloctono_1.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_8 = RecordNISECI::new(ds.alloctono_1.1, 5, 1, 5.0);
 
-    #[cfg(not(feature = "lessclone"))]
-    let record_9 = RecordNISECI::new(&ds.alloctono_2.0, 5, 1, 5.0);
-    #[cfg(feature = "lessclone")]
     let record_9 = RecordNISECI::new(ds.alloctono_2.1, 5, 1, 5.0);
 
     let mut campionamento = Vec::with_capacity(9);
@@ -388,19 +358,6 @@ pub fn create_dummy_campionamento_chopped() -> CampionamentoNISECI {
 ///   -> 5 ciacci cl1
 /// aggiungo in C2 anche una specie alloctono per testare la conta delle specie autoctone trovate
 /// x2a qua vale 1.0 e x2b 1.0
-#[cfg(not(feature = "lessclone"))]
-pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
-    let mut c = create_massive_campionamento_ciacci_solo_autoctoni_1();
-
-    let t = &get_trocchio();
-    // pesce alloctono in C2
-    let trocchio = RecordNISECI::new(t, 2, 2, 2.0);
-    c.push(trocchio);
-
-    c
-}
-
-#[cfg(feature = "lessclone")]
 pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
     let mut c = create_massive_campionamento_ciacci_solo_autoctoni_1();
 
@@ -416,7 +373,6 @@ pub fn create_massive_campionamento_ciacci() -> CampionamentoNISECI {
     c
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci() -> RiferimentoNISECI {
     let mut r = create_massive_riferimento_ciacci_solo_autoctoni_1();
     r.push(get_trocchio());
@@ -433,18 +389,6 @@ pub fn create_massive_riferimento_ciacci() -> RiferimentoNISECI {
 ///   -> 5 ciacci cl1
 /// aggiungo in C2 anche una specie alloctono per testare la conta delle specie autoctone trovate
 /// x2a qua vale 0.5 e x2b 1.0
-#[cfg(not(feature = "lessclone"))]
-pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
-    let mut c = create_massive_campionamento_ciacci_solo_autoctoni_2();
-    let t = &get_trocchio();
-    // pesce alloctono in C2
-    let trocchio = RecordNISECI::new(t, 2, 2, 2.0);
-    c.push(trocchio);
-
-    c
-}
-
-#[cfg(feature = "lessclone")]
 pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
     let mut c = create_massive_campionamento_ciacci_solo_autoctoni_2();
     let r = create_massive_riferimento_ciacci_2();
@@ -459,7 +403,6 @@ pub fn create_massive_campionamento_ciacci_2() -> CampionamentoNISECI {
     c
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci_2() -> RiferimentoNISECI {
     let mut r = create_massive_riferimento_ciacci_solo_autoctoni_2();
     r.push(get_trocchio());
@@ -479,9 +422,6 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
     let mut ciaccio_v1 = get_ciaccio();
     ciaccio_v1.set_dens_soglia_1(3.0);
     ciaccio_v1.set_dens_soglia_2(5.0);
-    #[cfg(not(feature = "lessclone"))]
-    let ciaccio = &ciaccio_v1;
-    #[cfg(feature = "lessclone")]
     let ciaccio = DummyIds::Ciaccio as u32;
 
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
@@ -519,7 +459,6 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_2() -> CampionamentoNI
     CampionamentoNISECI::new(campionamento)
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci_solo_autoctoni_2() -> RiferimentoNISECI {
     let c = create_massive_campionamento_ciacci_solo_autoctoni_2();
     let mut rif = Vec::new();
@@ -544,9 +483,6 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
     let mut ciaccio_v1 = get_ciaccio();
     ciaccio_v1.set_dens_soglia_1(3.0);
     ciaccio_v1.set_dens_soglia_2(5.0);
-    #[cfg(not(feature = "lessclone"))]
-    let ciaccio = &ciaccio_v1;
-    #[cfg(feature = "lessclone")]
     let ciaccio = DummyIds::Ciaccio as u32;
 
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
@@ -584,7 +520,6 @@ pub fn create_massive_campionamento_ciacci_solo_autoctoni_1() -> CampionamentoNI
     CampionamentoNISECI::new(campionamento)
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci_solo_autoctoni_1() -> RiferimentoNISECI {
     let c = create_massive_campionamento_ciacci_solo_autoctoni_1();
     let mut rif = Vec::new();
@@ -608,13 +543,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_1_strutt() -> Campioname
     let mut trocchio = get_trocchio();
     trocchio.set_dens_soglia_1(3.0);
     trocchio.set_dens_soglia_2(5.0);
-    #[cfg(feature = "lessclone")]
     let trocchio = 1;
 
     create_campionamento_strutturato_data_una_specie(trocchio)
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_solo_tipo_alloctono_1_strutt() -> RiferimentoNISECI {
     let mut species = Vec::new();
     species.push(get_ciaccio());
@@ -634,13 +567,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_2_strutt() -> Campioname
     let mut bronzo = get_bronzo();
     bronzo.set_dens_soglia_1(3.0);
     bronzo.set_dens_soglia_2(5.0);
-    #[cfg(feature = "lessclone")]
     let bronzo = 1;
 
     create_campionamento_strutturato_data_una_specie(bronzo)
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_solo_tipo_alloctono_2_strutt() -> RiferimentoNISECI {
     let mut species = Vec::new();
     species.push(get_ciaccio());
@@ -660,13 +591,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_strutt() -> Campioname
     let mut tappo = get_tappo();
     tappo.set_dens_soglia_1(3.0);
     tappo.set_dens_soglia_2(5.0);
-    #[cfg(feature = "lessclone")]
     let tappo = 1;
 
     create_campionamento_strutturato_data_una_specie(tappo)
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_solo_tipo_alloctono_3_strutt() -> RiferimentoNISECI {
     let mut species = Vec::new();
     species.push(get_ciaccio());
@@ -684,13 +613,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_destrutt() -> Campiona
     let mut tappo = get_tappo();
     tappo.set_dens_soglia_1(3.0);
     tappo.set_dens_soglia_2(5.0);
-    #[cfg(feature = "lessclone")]
     let tappo = 1;
 
     create_campionamento_destrutturato_data_una_specie(tappo)
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_solo_tipo_alloctono_3_destrutt() -> RiferimentoNISECI {
     let mut species = Vec::new();
     species.push(get_ciaccio());
@@ -709,13 +636,11 @@ pub fn create_massive_campionamento_solo_tipo_alloctono_3_mediam_strutt() -> Cam
     let mut tappo = get_tappo();
     tappo.set_dens_soglia_1(3.0);
     tappo.set_dens_soglia_2(5.0);
-    #[cfg(feature = "lessclone")]
     let tappo = 1;
 
     create_campionamento_mediam_strutturato_data_una_specie(tappo)
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_solo_tipo_alloctono_3_mediam_strutt() -> RiferimentoNISECI {
     let mut species = Vec::new();
     species.push(get_ciaccio());
@@ -745,7 +670,6 @@ pub fn create_massive_campionamento_ciacci_con_trocchi_strutt() -> Campionamento
     c_trocchi
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci_con_trocchi_strutt() -> RiferimentoNISECI {
     let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
     let r_2 = create_massive_riferimento_solo_tipo_alloctono_1_strutt();
@@ -774,9 +698,6 @@ pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoN
 
     c_bronzi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
-    #[cfg(not(feature = "lessclone"))]
-    let ciaccio = &get_ciaccio();
-    #[cfg(feature = "lessclone")]
     let ciaccio = DummyIds::Ciaccio as u32;
     let ciaccio = RecordNISECI::new(ciaccio, 2, 2, 2.0);
     c_bronzi.push(ciaccio);
@@ -784,7 +705,6 @@ pub fn create_massive_campionamento_ciacci_con_bronzi_strutt() -> CampionamentoN
     c_bronzi
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci_con_bronzi_strutt() -> RiferimentoNISECI {
     let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
     let r_2 = create_massive_riferimento_solo_tipo_alloctono_2_strutt();
@@ -813,9 +733,6 @@ pub fn create_massive_campionamento_ciacci_con_tappi_strutt() -> CampionamentoNI
 
     c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
-    #[cfg(not(feature = "lessclone"))]
-    let ciaccio = &get_ciaccio();
-    #[cfg(feature = "lessclone")]
     let ciaccio = DummyIds::Ciaccio as u32;
     let ciaccio = RecordNISECI::new(ciaccio, 2, 2, 2.0);
     c_tappi.push(ciaccio);
@@ -823,7 +740,6 @@ pub fn create_massive_campionamento_ciacci_con_tappi_strutt() -> CampionamentoNI
     c_tappi
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci_con_tappi_strutt() -> RiferimentoNISECI {
     let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
     let r_2 = create_massive_riferimento_solo_tipo_alloctono_3_strutt();
@@ -850,9 +766,6 @@ pub fn create_massive_campionamento_ciacci_con_tappi_destrutt() -> Campionamento
 
     c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
-    #[cfg(not(feature = "lessclone"))]
-    let ciaccio = &get_ciaccio();
-    #[cfg(feature = "lessclone")]
     let ciaccio = DummyIds::Ciaccio as u32;
     let ciaccio = RecordNISECI::new(ciaccio, 2, 2, 2.0);
     c_tappi.push(ciaccio);
@@ -860,7 +773,6 @@ pub fn create_massive_campionamento_ciacci_con_tappi_destrutt() -> Campionamento
     c_tappi
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci_con_tappi_destrutt() -> RiferimentoNISECI {
     let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
     let r_2 = create_massive_riferimento_solo_tipo_alloctono_3_destrutt();
@@ -888,9 +800,6 @@ pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> Campiona
 
     c_tappi.as_mut_vec().append(&mut c_ciacci.as_mut_vec());
 
-    #[cfg(not(feature = "lessclone"))]
-    let ciaccio = &get_ciaccio();
-    #[cfg(feature = "lessclone")]
     let ciaccio = DummyIds::Ciaccio as u32;
     let ciaccio = RecordNISECI::new(ciaccio, 2, 2, 2.0);
     c_tappi.push(ciaccio);
@@ -898,7 +807,6 @@ pub fn create_massive_campionamento_ciacci_con_tappi_mediam_strutt() -> Campiona
     c_tappi
 }
 
-#[cfg(feature = "lessclone")]
 pub fn create_massive_riferimento_ciacci_con_tappi_mediam_strutt() -> RiferimentoNISECI {
     let mut r_1 = create_massive_riferimento_ciacci_solo_autoctoni_1();
     let r_2 = create_massive_riferimento_solo_tipo_alloctono_3_mediam_strutt();
@@ -908,9 +816,6 @@ pub fn create_massive_riferimento_ciacci_con_tappi_mediam_strutt() -> Riferiment
     r_1
 }
 
-#[cfg(not(feature = "lessclone"))]
-type ArgSpecieNISECI = SpecieNISECI;
-#[cfg(feature = "lessclone")]
 type ArgSpecieNISECI = IdSpecieNISECI;
 
 /// In questo campionamento troverai:
@@ -925,8 +830,6 @@ fn create_campionamento_strutturato_data_una_specie(
     specie: ArgSpecieNISECI,
 ) -> CampionamentoNISECI {
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
-    #[cfg(not(feature = "lessclone"))]
-    let specie = &specie;
 
     // 10 esemplari cl5 in c1
     let cl5_c1 = RecordNISECI::new(specie, 1, 13, 10.0);
@@ -971,8 +874,6 @@ fn create_campionamento_destrutturato_data_una_specie(
     specie: ArgSpecieNISECI,
 ) -> CampionamentoNISECI {
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
-    #[cfg(not(feature = "lessclone"))]
-    let specie = &specie;
 
     // 10 esemplari cl5 in c1
     let cl5_c1 = RecordNISECI::new(specie, 1, 13, 10.0);
@@ -1006,8 +907,6 @@ fn create_campionamento_mediam_strutturato_data_una_specie(
     specie: ArgSpecieNISECI,
 ) -> CampionamentoNISECI {
     let mut campionamento: Vec<RecordNISECI> = Vec::with_capacity(45);
-    #[cfg(not(feature = "lessclone"))]
-    let specie = &specie;
 
     // 10 esemplari cl5 in c1
     let cl5_c1 = RecordNISECI::new(specie, 1, 13, 10.0);

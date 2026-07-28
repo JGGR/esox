@@ -6,7 +6,7 @@
   - Visibility changes:
     - `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
     - `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
-    - `SpecieNISECI` fields
+    - `SpecieNISECI`, `ValoriIntermediSpecieNISECI`, `ValoriIntermediNISECI`, `ClassiEtaSpecieNISECI`, `InfoPopolazioniNISECI`, `InfoPopolazioniAlieneNISECI`, `ClassiEtaAlieniNISECI`, `EsemplariPerCattura` fields
     - `SpecieNISECI::new_dummy_specie()`
     - `csv::parser` module
     - `csv::deser::{niseci,hfbi}::VeryItalianRecordCsv*` structs
@@ -16,6 +16,7 @@
     - `CampionamentoHFBI::check_record`
   - Type changes:
     - `domain::hfbi::RIFERIMENTO_HFBI`: `LazyLock<Vec<SpecieHFBI>>` -> `LazyLock<RiferimentoHFBI>`
+  - Drop `lessclone` feature, now default behaviour
 - Drop `'static` bound on `csv::deser` methods
 - Drop implicit logging on check functions
   - Usercode can use `csv::stanis::giorgio::format_csv_errors` explicitly instead
