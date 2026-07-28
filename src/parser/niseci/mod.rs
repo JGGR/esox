@@ -623,14 +623,7 @@ pub fn parse_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     }
 
     let res = AnagraficaNISECI::new(
-        ComunitaNISECI {
-            #[expect(deprecated)]
-            tipo: tipo_comunita,
-            #[expect(deprecated)]
-            fonte: Some(r.fonte()),
-            #[expect(deprecated)]
-            numero_protocollo: Some(r.numero_protocollo()),
-        },
+        ComunitaNISECI::new(tipo_comunita, Some(r.fonte()), Some(r.numero_protocollo())),
         r.codice_stazione(),
         r.data(), // Formato gg/mm/aaaa
         area,

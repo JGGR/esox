@@ -134,14 +134,11 @@ fn calculate_x2_a_criterio_b_3_molto_sbilanciato_giovani() {
 fn calculate_x2_test_1() {
     let campionamento = create_massive_campionamento_ciacci();
 
-    let comunita = ComunitaNISECI {
-        #[expect(deprecated)]
-        fonte: Some("hey".to_string()),
-        #[expect(deprecated)]
-        numero_protocollo: None,
-        #[expect(deprecated)]
-        tipo: TipoComunitaNISECI::Dm260_2010,
-    };
+    let comunita = ComunitaNISECI::new(
+        TipoComunitaNISECI::Dm260_2010,
+        Some("hey".to_string()),
+        None,
+    );
 
     let anagrafica = AnagraficaNISECI::new_raw_unchecked(
         comunita,
@@ -175,14 +172,11 @@ fn calculate_x2_test_1() {
 
     let campionamento = create_massive_campionamento_ciacci_2();
 
-    let comunita = ComunitaNISECI {
-        #[expect(deprecated)]
-        fonte: Some("hey".to_string()),
-        #[expect(deprecated)]
-        numero_protocollo: None,
-        #[expect(deprecated)]
-        tipo: TipoComunitaNISECI::Dm260_2010,
-    };
+    let comunita = ComunitaNISECI::new(
+        TipoComunitaNISECI::Dm260_2010,
+        Some("hey".to_string()),
+        None,
+    );
 
     let anagrafica = AnagraficaNISECI::new_raw_unchecked(
         comunita,

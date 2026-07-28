@@ -6,7 +6,7 @@
   - Visibility changes:
     - `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
     - `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
-    - `SpecieNISECI`, `ValoriIntermediSpecieNISECI`, `ValoriIntermediNISECI`, `ClassiEtaSpecieNISECI`, `InfoPopolazioniNISECI`, `InfoPopolazioniAlieneNISECI`, `ClassiEtaAlieniNISECI`, `EsemplariPerCattura` fields
+    - `SpecieNISECI`, `ValoriIntermediSpecieNISECI`, `ValoriIntermediNISECI`, `ClassiEtaSpecieNISECI`, `InfoPopolazioniNISECI`, `InfoPopolazioniAlieneNISECI`, `ClassiEtaAlieniNISECI`, `EsemplariPerCattura`, `AlieniIndigeni`, `ComunitaNISECI` fields
     - `SpecieNISECI::new_dummy_specie()`
     - `csv::parser` module
     - `csv::deser::{niseci,hfbi}::VeryItalianRecordCsv*` structs

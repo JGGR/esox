@@ -460,9 +460,7 @@ impl CampionamentoNISECI {
 
     pub fn get_numero_pesci_alieni_e_indigeni(&self, r: &RiferimentoNISECI) -> AlieniIndigeni {
         let mut alieni_indigeni = AlieniIndigeni {
-            #[expect(deprecated)]
             alieni: 0,
-            #[expect(deprecated)]
             indigeni: 0,
         };
 
@@ -478,15 +476,9 @@ impl CampionamentoNISECI {
             let tipo_autoctono = specie.tipo_autoctono();
             let tipo_alloctono = specie.tipo_alloctono();
             if tipo_alloctono > 0 && tipo_alloctono <= 3 {
-                #[expect(deprecated)]
-                {
-                    alieni_indigeni.alieni += 1;
-                }
+                alieni_indigeni.alieni += 1;
             } else if tipo_autoctono == 1 || tipo_autoctono == 2 {
-                #[expect(deprecated)]
-                {
-                    alieni_indigeni.indigeni += 1;
-                }
+                alieni_indigeni.indigeni += 1;
             }
         }
 
@@ -532,21 +524,17 @@ impl<'a> IntoIterator for &'a CampionamentoNISECI {
 }
 
 pub struct AlieniIndigeni {
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.alieni() instead")]
-    pub alieni: u32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.indigeni() instead")]
-    pub indigeni: u32,
+    alieni: u32,
+    indigeni: u32,
 }
 
 impl AlieniIndigeni {
     #[inline(always)]
     pub fn alieni(&self) -> u32 {
-        #[expect(deprecated)]
         self.alieni
     }
     #[inline(always)]
     pub fn indigeni(&self) -> u32 {
-        #[expect(deprecated)]
         self.indigeni
     }
 }
@@ -591,12 +579,9 @@ impl TryFrom<i32> for TipoComunitaNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ComunitaNISECI {
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo()")]
-    pub tipo: TipoComunitaNISECI,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.fonte()")]
-    pub fonte: Option<String>,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.num_protocollo()")]
-    pub numero_protocollo: Option<String>,
+    tipo: TipoComunitaNISECI,
+    fonte: Option<String>,
+    numero_protocollo: Option<String>,
 }
 
 impl fmt::Display for ComunitaNISECI {
@@ -647,27 +632,21 @@ impl ComunitaNISECI {
         num_protocollo: Option<String>,
     ) -> Self {
         Self {
-            #[expect(deprecated)]
             tipo,
-            #[expect(deprecated)]
             fonte,
-            #[expect(deprecated)]
             numero_protocollo: num_protocollo,
         }
     }
     #[inline(always)]
     pub fn tipo(&self) -> TipoComunitaNISECI {
-        #[expect(deprecated)]
         self.tipo
     }
     #[inline(always)]
     pub fn fonte(&self) -> Option<&str> {
-        #[expect(deprecated)]
         self.fonte.as_deref()
     }
     #[inline(always)]
     pub fn num_protocollo(&self) -> Option<&str> {
-        #[expect(deprecated)]
         self.numero_protocollo.as_deref()
     }
 }
