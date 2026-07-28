@@ -18,7 +18,7 @@
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{
     AnagraficaHFBI, CampionamentoHFBI, HabitatHFBI, RecordHFBI, StagioneHFBI,
-    TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI_MAP,
+    TipoLagunaCostieraHFBI, RIFERIMENTO_HFBI,
 };
 use crate::domain::location::Location;
 use crate::domain::posf32::PositiveF32;
@@ -81,7 +81,7 @@ pub(crate) fn parse_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
             continue;
         }
         let codice_specie = r.codice_specie();
-        let opt_matched_specie = RIFERIMENTO_HFBI_MAP.get(&codice_specie);
+        let opt_matched_specie = RIFERIMENTO_HFBI.get(&codice_specie);
         let matched_specie;
         if let Some(specie) = opt_matched_specie {
             matched_specie = specie;
