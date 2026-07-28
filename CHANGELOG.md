@@ -6,6 +6,7 @@
   - Visibility changes:
     - `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
     - `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
+    - `SpecieNISECI` fields
     - `csv::parser` module
     - `csv::deser::{niseci,hfbi}::VeryItalianRecordCsv*` structs
     - `csv::RecordCsv*` traits, `csv::TipoRecordCsv`

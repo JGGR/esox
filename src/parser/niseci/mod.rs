@@ -242,24 +242,23 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
 
         let specie_id = id.clone();
 
-        #[expect(deprecated)]
-        let specie_rec = SpecieNISECI {
-            id: specie_id,
-            nome,
+        let specie_rec = SpecieNISECI::new(
+            &specie_id,
+            &nome,
             tipo_autoctono,
             tipo_alloctono,
             specie_attesa,
-            cl_soglia1: r.cl_soglia1(), // in cm
-            cl_soglia2: r.cl_soglia2(), // in cm
-            cl_soglia3: r.cl_soglia3(), // in cm
-            cl_soglia4: r.cl_soglia4(), // in cm
-            ad_juv_soglia1: r.ad_juv_soglia1(),
-            ad_juv_soglia2: r.ad_juv_soglia2(),
-            ad_juv_soglia3: r.ad_juv_soglia3(),
-            ad_juv_soglia4: r.ad_juv_soglia4(),
-            dens_soglia1: r.dens_soglia1(),
-            dens_soglia2: r.dens_soglia2(),
-        };
+            r.cl_soglia1(), // in cm
+            r.cl_soglia2(), // in cm
+            r.cl_soglia3(), // in cm
+            r.cl_soglia4(), // in cm
+            r.ad_juv_soglia1(),
+            r.ad_juv_soglia2(),
+            r.ad_juv_soglia3(),
+            r.ad_juv_soglia4(),
+            r.dens_soglia1(),
+            r.dens_soglia2(),
+        );
         interner.intern(specie_rec);
     }
 

@@ -42,44 +42,21 @@ pub mod lessclone;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpecieNISECI {
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.id() instead")]
-    pub id: String,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.nome() instead")]
-    pub nome: String,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_autoctono() instead")]
-    pub tipo_autoctono: u8,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_alloctono() instead")]
-    pub tipo_alloctono: u8,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.specie_attesa() instead")]
-    pub specie_attesa: bool,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_1() instead")]
-    pub cl_soglia1: u32, // in mm
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_2() instead")]
-    pub cl_soglia2: u32, // in mm
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_3() instead")]
-    pub cl_soglia3: u32, // in mm
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_4() instead")]
-    pub cl_soglia4: u32, // in mm
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_1() instead"
-    )]
-    pub ad_juv_soglia1: f32,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_2() instead"
-    )]
-    pub ad_juv_soglia2: f32,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_3() instead"
-    )]
-    pub ad_juv_soglia3: f32,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_4() instead"
-    )]
-    pub ad_juv_soglia4: f32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.dens_soglia_1() instead")]
-    pub dens_soglia1: f32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.dens_soglia_2() instead")]
-    pub dens_soglia2: f32,
+    id: String,
+    nome: String,
+    tipo_autoctono: u8,
+    tipo_alloctono: u8,
+    specie_attesa: bool,
+    cl_soglia1: u32, // in mm
+    cl_soglia2: u32, // in mm
+    cl_soglia3: u32, // in mm
+    cl_soglia4: u32, // in mm
+    ad_juv_soglia1: f32,
+    ad_juv_soglia2: f32,
+    ad_juv_soglia3: f32,
+    ad_juv_soglia4: f32,
+    dens_soglia1: f32,
+    dens_soglia2: f32,
 }
 
 impl fmt::Display for SpecieNISECI {
@@ -101,7 +78,6 @@ impl fmt::Display for SpecieNISECI {
 }
 
 impl SpecieNISECI {
-    #[cfg(test)]
     pub(crate) fn new(
         id: &str,
         nome: &str,
@@ -119,7 +95,6 @@ impl SpecieNISECI {
         dens_soglia_1: f32,
         dens_soglia_2: f32,
     ) -> Self {
-        #[expect(deprecated)]
         SpecieNISECI {
             id: id.to_string(),
             nome: nome.to_string(),
@@ -140,7 +115,6 @@ impl SpecieNISECI {
     }
     #[deprecated(note = "v0.2 will drop visibility. Consider using SpecieNISECI::new() instead")]
     pub fn new_dummy_specie() -> SpecieNISECI {
-        #[expect(deprecated)]
         SpecieNISECI {
             id: "0".to_string(),
             nome: "dummy".to_string(),
@@ -162,91 +136,70 @@ impl SpecieNISECI {
 
     #[inline(always)]
     pub(crate) fn id(&self) -> &str {
-        #[expect(deprecated)]
         &self.id
     }
     pub(crate) fn nome(&self) -> &str {
-        #[expect(deprecated)]
         &self.nome
     }
     #[inline(always)]
     pub(crate) fn specie_attesa(&self) -> bool {
-        #[expect(deprecated)]
         self.specie_attesa
     }
     #[inline(always)]
     pub(crate) fn tipo_autoctono(&self) -> u8 {
-        #[expect(deprecated)]
         self.tipo_autoctono
     }
     #[inline(always)]
     pub(crate) fn tipo_alloctono(&self) -> u8 {
-        #[expect(deprecated)]
         self.tipo_alloctono
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_1(&self) -> u32 {
-        #[expect(deprecated)]
         self.cl_soglia1
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_2(&self) -> u32 {
-        #[expect(deprecated)]
         self.cl_soglia2
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_3(&self) -> u32 {
-        #[expect(deprecated)]
         self.cl_soglia3
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_4(&self) -> u32 {
-        #[expect(deprecated)]
         self.cl_soglia4
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_1(&self) -> f32 {
-        #[expect(deprecated)]
         self.ad_juv_soglia1
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_2(&self) -> f32 {
-        #[expect(deprecated)]
         self.ad_juv_soglia2
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_3(&self) -> f32 {
-        #[expect(deprecated)]
         self.ad_juv_soglia3
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_4(&self) -> f32 {
-        #[expect(deprecated)]
         self.ad_juv_soglia4
     }
     #[inline(always)]
     pub(crate) fn dens_soglia_1(&self) -> f32 {
-        #[expect(deprecated)]
         self.dens_soglia1
     }
     #[cfg(test)]
     pub(crate) fn set_dens_soglia_1(&mut self, val: f32) {
-        #[expect(deprecated)]
-        {
-            self.dens_soglia1 = val;
-        }
+        self.dens_soglia1 = val;
     }
     #[inline(always)]
     pub(crate) fn dens_soglia_2(&self) -> f32 {
-        #[expect(deprecated)]
         self.dens_soglia2
     }
     #[cfg(test)]
     pub(crate) fn set_dens_soglia_2(&mut self, val: f32) {
-        #[expect(deprecated)]
-        {
-            self.dens_soglia2 = val;
-        }
+        self.dens_soglia2 = val;
     }
 }
 
