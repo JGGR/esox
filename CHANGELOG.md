@@ -17,7 +17,7 @@
   - Type changes:
     - `domain::hfbi::RIFERIMENTO_HFBI`: `LazyLock<Vec<SpecieHFBI>>` -> `LazyLock<RiferimentoHFBI>`
   - Drop `lessclone` feature, now default behaviour
-- Drop `'static` bound on `csv::deser` methods
+- Drop `'static` bound on `csv::{deser,load}` methods
 - Drop implicit logging on check functions
   - Usercode can use `csv::stanis::giorgio::format_csv_errors` explicitly instead
 - Drop internal transitional methods

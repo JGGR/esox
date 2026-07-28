@@ -61,7 +61,7 @@ pub fn load_csv_campionamento_hfbi_from_reader<R, T>(
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
     R: Read,
-    T: RecordCampionamentoHFBI + RecordCsv + 'static,
+    T: RecordCampionamentoHFBI + RecordCsv,
 {
     load_csv_campionamento_hfbi_from_reader_conf::<R, T>(
         reader,
@@ -77,7 +77,7 @@ pub fn load_csv_campionamento_hfbi_from_reader_conf<R, T>(
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
     R: Read,
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI,
 {
     let normalizing_reader = NormalizerReader::new(reader);
     let csv_records =
@@ -91,7 +91,7 @@ pub fn load_csv_campionamento_hfbi_from_path<T>(
     has_headers: bool,
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
-    T: RecordCampionamentoHFBI + RecordCsv + 'static,
+    T: RecordCampionamentoHFBI + RecordCsv,
 {
     load_csv_campionamento_hfbi_from_path_conf::<T>(
         path,
@@ -106,7 +106,7 @@ pub fn load_csv_campionamento_hfbi_from_path_conf<T>(
     config: CsvConfig,
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI,
 {
     let file =
         File::open(path).map_err(|e| CampionamentoHFBIError::Csv(vec![csv::Error::from(e)]))?;
@@ -181,7 +181,7 @@ pub fn load_csv_anagrafica_hfbi_from_reader<R, T>(
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
     R: Read,
-    T: RecordAnagraficaHFBI + RecordCsv + 'static,
+    T: RecordAnagraficaHFBI + RecordCsv,
 {
     load_csv_anagrafica_hfbi_from_reader_conf::<R, T>(
         reader,
@@ -197,7 +197,7 @@ pub fn load_csv_anagrafica_hfbi_from_reader_conf<R, T>(
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
     R: Read,
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -212,7 +212,7 @@ pub fn load_csv_anagrafica_hfbi_from_path<T>(
     has_headers: bool,
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
-    T: RecordAnagraficaHFBI + RecordCsv + 'static,
+    T: RecordAnagraficaHFBI + RecordCsv,
 {
     load_csv_anagrafica_hfbi_from_path_conf::<T>(
         path,
@@ -227,7 +227,7 @@ pub fn load_csv_anagrafica_hfbi_from_path_conf<T>(
     config: CsvConfig,
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI,
 {
     let file = File::open(path).map_err(|e| AnagraficaHFBIError::Csv(vec![csv::Error::from(e)]))?;
 
