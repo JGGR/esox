@@ -69,7 +69,7 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
 pub fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI,
 {
     let iter = rdr.deserialize();
     parse_serialized_records(iter)
@@ -80,7 +80,7 @@ pub fn check_campionamento_hfbi_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoHFBI + RecordCsv + 'static,
+    T: RecordCampionamentoHFBI + RecordCsv,
 {
     private_check_campionamento_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
@@ -95,7 +95,7 @@ pub fn check_campionamento_hfbi_reader_conf<R: Read, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI,
 {
     private_check_campionamento_hfbi_reader_conf::<R, DefaultByteLimit, T>(reader, config)
 }
@@ -105,7 +105,7 @@ fn private_check_campionamento_hfbi_reader_conf<R: Read, BL: ByteLimit, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI,
 {
     let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
     with_limited_reader(
@@ -128,7 +128,7 @@ pub fn check_campionamento_hfbi_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoHFBI + RecordCsv + 'static,
+    T: RecordCampionamentoHFBI + RecordCsv,
 {
     check_campionamento_hfbi_path_conf::<T>(
         path,
@@ -143,7 +143,7 @@ pub fn check_campionamento_hfbi_path_conf<T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
@@ -248,7 +248,7 @@ pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaHFBI + RecordCsv + 'static,
+    T: RecordAnagraficaHFBI + RecordCsv,
 {
     private_check_anagrafica_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
@@ -263,7 +263,7 @@ pub fn check_anagrafica_hfbi_reader_conf<R: Read, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI,
 {
     private_check_anagrafica_hfbi_reader_conf::<R, DefaultByteLimit, T>(reader, config)
 }
@@ -273,7 +273,7 @@ fn private_check_anagrafica_hfbi_reader_conf<R: Read, BL: ByteLimit, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI,
 {
     let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
     with_limited_reader(
@@ -296,7 +296,7 @@ pub fn check_anagrafica_hfbi_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaHFBI + RecordCsv + 'static,
+    T: RecordAnagraficaHFBI + RecordCsv,
 {
     check_anagrafica_hfbi_path_conf::<T>(
         path,
@@ -311,7 +311,7 @@ pub fn check_anagrafica_hfbi_path_conf<T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());

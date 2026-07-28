@@ -141,7 +141,7 @@ pub fn check_riferimento_niseci_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordRiferimentoNISECI + RecordCsv + 'static,
+    T: RecordRiferimentoNISECI + RecordCsv,
 {
     let config = CsvConfig::default()
         .with_delimiter(T::D::DELIMITER)
@@ -154,7 +154,7 @@ pub fn check_riferimento_niseci_reader_conf<R: Read, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI,
 {
     private_check_riferimento_niseci_reader::<R, DefaultByteLimit, T>(reader, config)
 }
@@ -164,7 +164,7 @@ fn private_check_riferimento_niseci_reader<R: Read, BL: ByteLimit, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI,
 {
     let normalizing_reader = NormalizerReader::new(reader);
     with_limited_reader(
@@ -187,7 +187,7 @@ pub fn check_riferimento_niseci_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordRiferimentoNISECI + RecordCsv + 'static,
+    T: RecordRiferimentoNISECI + RecordCsv,
 {
     check_riferimento_niseci_path_conf::<T>(
         path,
@@ -202,7 +202,7 @@ pub fn check_riferimento_niseci_path_conf<T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordRiferimentoNISECI + 'static,
+    T: RecordRiferimentoNISECI,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
@@ -269,7 +269,7 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
 pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
-    T: RecordCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI,
 {
     let iter = rdr.deserialize();
     parse_serialized_records(iter)
@@ -280,7 +280,7 @@ pub fn check_campionamento_niseci_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoNISECI + RecordCsv + 'static,
+    T: RecordCampionamentoNISECI + RecordCsv,
 {
     private_check_campionamento_niseci_reader_conf::<R, DefaultByteLimit, T>(
         reader,
@@ -295,7 +295,7 @@ pub fn check_campionamento_niseci_reader_conf<R: Read, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI,
 {
     private_check_campionamento_niseci_reader_conf::<R, DefaultByteLimit, T>(reader, config)
 }
@@ -305,7 +305,7 @@ fn private_check_campionamento_niseci_reader_conf<R: Read, BL: ByteLimit, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI,
 {
     let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
     with_limited_reader(
@@ -328,7 +328,7 @@ pub fn check_campionamento_niseci_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoNISECI + RecordCsv + 'static,
+    T: RecordCampionamentoNISECI + RecordCsv,
 {
     check_campionamento_niseci_path_conf::<T>(
         path,
@@ -343,7 +343,7 @@ pub fn check_campionamento_niseci_path_conf<T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordCampionamentoNISECI + 'static,
+    T: RecordCampionamentoNISECI,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
@@ -464,7 +464,7 @@ pub fn check_anagrafica_niseci_reader<R: Read, T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaNISECI + RecordCsv + 'static,
+    T: RecordAnagraficaNISECI + RecordCsv,
 {
     private_check_anagrafica_niseci_reader_conf::<R, DefaultByteLimit, T>(
         reader,
@@ -479,7 +479,7 @@ pub fn check_anagrafica_niseci_reader_conf<R: Read, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI,
 {
     private_check_anagrafica_niseci_reader_conf::<R, DefaultByteLimit, T>(reader, config)
 }
@@ -489,7 +489,7 @@ fn private_check_anagrafica_niseci_reader_conf<R: Read, BL: ByteLimit, T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI,
 {
     let normalizing_reader = NormalizerReader::new(reader).take(BL::MAX_BYTES);
     with_limited_reader(
@@ -512,7 +512,7 @@ pub fn check_anagrafica_niseci_path<T>(
     has_headers: bool,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaNISECI + RecordCsv + 'static,
+    T: RecordAnagraficaNISECI + RecordCsv,
 {
     check_anagrafica_niseci_path_conf::<T>(
         path,
@@ -527,7 +527,7 @@ pub fn check_anagrafica_niseci_path_conf<T>(
     config: CsvConfig,
 ) -> Result<Vec<T>, Vec<csv::Error>>
 where
-    T: RecordAnagraficaNISECI + 'static,
+    T: RecordAnagraficaNISECI,
 {
     if !check_path_is_file_ends_with_csv(&path) {
         eprintln!("Il file {} non è un .csv", path.display());
