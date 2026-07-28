@@ -11,6 +11,7 @@
     - `csv::RecordCsv*` traits, `csv::TipoRecordCsv`
     - `parser::validate_serialized_records`
     - `csv::deser::{process_csv_errors, translate_error_message}`
+    - `CampionamentoHFBI::check_record`
   - Type changes:
     - `domain::hfbi::RIFERIMENTO_HFBI`: `LazyLock<Vec<SpecieHFBI>>` -> `LazyLock<RiferimentoHFBI>`
 
