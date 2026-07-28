@@ -113,8 +113,7 @@ impl SpecieNISECI {
             dens_soglia2: dens_soglia_2,
         }
     }
-    #[deprecated(note = "v0.2 will drop visibility. Consider using SpecieNISECI::new() instead")]
-    pub fn new_dummy_specie() -> SpecieNISECI {
+    pub(crate) fn new_dummy_specie() -> SpecieNISECI {
         SpecieNISECI {
             id: "0".to_string(),
             nome: "dummy".to_string(),

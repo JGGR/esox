@@ -7,6 +7,7 @@
     - `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
     - `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
     - `SpecieNISECI` fields
+    - `SpecieNISECI::new_dummy_specie()`
     - `csv::parser` module
     - `csv::deser::{niseci,hfbi}::VeryItalianRecordCsv*` structs
     - `csv::RecordCsv*` traits, `csv::TipoRecordCsv`
