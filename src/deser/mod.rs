@@ -26,6 +26,7 @@
 
 pub(crate) mod limits;
 
+use crate::domain::niseci::{OrigineSpecieNISECI, SpecieNISECI};
 use std::fmt;
 
 #[derive(Copy, Clone)]
@@ -236,6 +237,67 @@ impl fmt::Display for PlainRecordRiferimentoNISECI {
               self.dens_soglia1, self.dens_soglia2
         );
         write!(f, "{}", string_representation)
+    }
+}
+
+impl RecordRiferimentoNISECI for SpecieNISECI {
+    fn nome_comune(&self) -> String {
+        self.nome_impl().to_string()
+    }
+    fn nome_latino(&self) -> String {
+        self.nome_impl().to_string()
+    }
+    fn codice_specie(&self) -> String {
+        self.id_impl().to_string()
+    }
+    fn origine(&self) -> String {
+        match self.origine_impl() {
+            OrigineSpecieNISECI::Autoctono(_) => "AUT".to_string(),
+            OrigineSpecieNISECI::Alloctono(_) => "ALL".to_string(),
+        }
+    }
+    fn tipo_autoctono(&self) -> u32 {
+        self.tipo_autoctono_impl().into()
+    }
+    fn allo_nocivita(&self) -> u32 {
+        self.tipo_alloctono_impl().into()
+    }
+    fn specie_attesa(&self) -> u32 {
+        if self.specie_attesa_impl() {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    fn cl_soglia1(&self) -> u32 {
+        self.cl_soglia_1_impl()
+    }
+    fn cl_soglia2(&self) -> u32 {
+        self.cl_soglia_2_impl()
+    }
+    fn cl_soglia3(&self) -> u32 {
+        self.cl_soglia_3_impl()
+    }
+    fn cl_soglia4(&self) -> u32 {
+        self.cl_soglia_4_impl()
+    }
+    fn ad_juv_soglia1(&self) -> f32 {
+        self.ad_juv_soglia_1_impl()
+    }
+    fn ad_juv_soglia2(&self) -> f32 {
+        self.ad_juv_soglia_2_impl()
+    }
+    fn ad_juv_soglia3(&self) -> f32 {
+        self.ad_juv_soglia_3_impl()
+    }
+    fn ad_juv_soglia4(&self) -> f32 {
+        self.ad_juv_soglia_4_impl()
+    }
+    fn dens_soglia1(&self) -> f32 {
+        self.dens_soglia_1_impl()
+    }
+    fn dens_soglia2(&self) -> f32 {
+        self.dens_soglia_2_impl()
     }
 }
 

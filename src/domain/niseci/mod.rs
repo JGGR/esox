@@ -115,77 +115,142 @@ impl SpecieNISECI {
     }
 
     #[inline(always)]
-    pub(crate) fn id(&self) -> &str {
+    pub(crate) fn id_impl(&self) -> &str {
         &self.id
     }
-    pub(crate) fn nome(&self) -> &str {
+    #[inline(always)]
+    pub(crate) fn id(&self) -> &str {
+        &self.id_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn nome_impl(&self) -> &str {
         &self.nome
     }
     #[inline(always)]
-    pub(crate) fn specie_attesa(&self) -> bool {
+    pub(crate) fn nome(&self) -> &str {
+        &self.nome_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn specie_attesa_impl(&self) -> bool {
         self.specie_attesa
     }
     #[inline(always)]
-    pub(crate) fn origine(&self) -> OrigineSpecieNISECI {
+    pub(crate) fn specie_attesa(&self) -> bool {
+        self.specie_attesa_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn origine_impl(&self) -> OrigineSpecieNISECI {
         self.origine
     }
     #[inline(always)]
-    pub(crate) fn tipo_autoctono(&self) -> u8 {
+    pub(crate) fn origine(&self) -> OrigineSpecieNISECI {
+        self.origine_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn tipo_autoctono_impl(&self) -> u8 {
         match self.origine() {
             OrigineSpecieNISECI::Autoctono(val) => val,
             OrigineSpecieNISECI::Alloctono(_) => 0,
         }
     }
     #[inline(always)]
-    pub(crate) fn tipo_alloctono(&self) -> u8 {
+    pub(crate) fn tipo_autoctono(&self) -> u8 {
+        self.tipo_autoctono_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn tipo_alloctono_impl(&self) -> u8 {
         match self.origine() {
             OrigineSpecieNISECI::Autoctono(_) => 0,
             OrigineSpecieNISECI::Alloctono(val) => val,
         }
     }
     #[inline(always)]
-    pub(crate) fn cl_soglia_1(&self) -> u32 {
+    pub(crate) fn tipo_alloctono(&self) -> u8 {
+        self.tipo_alloctono_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_1_impl(&self) -> u32 {
         self.cl_soglia1
     }
     #[inline(always)]
-    pub(crate) fn cl_soglia_2(&self) -> u32 {
+    pub(crate) fn cl_soglia_1(&self) -> u32 {
+        self.cl_soglia_1_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_2_impl(&self) -> u32 {
         self.cl_soglia2
     }
     #[inline(always)]
-    pub(crate) fn cl_soglia_3(&self) -> u32 {
+    pub(crate) fn cl_soglia_2(&self) -> u32 {
+        self.cl_soglia_2_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_3_impl(&self) -> u32 {
         self.cl_soglia3
     }
     #[inline(always)]
-    pub(crate) fn cl_soglia_4(&self) -> u32 {
+    pub(crate) fn cl_soglia_3(&self) -> u32 {
+        self.cl_soglia_3_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn cl_soglia_4_impl(&self) -> u32 {
         self.cl_soglia4
     }
     #[inline(always)]
-    pub(crate) fn ad_juv_soglia_1(&self) -> f32 {
+    pub(crate) fn cl_soglia_4(&self) -> u32 {
+        self.cl_soglia_4_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_1_impl(&self) -> f32 {
         self.ad_juv_soglia1
     }
     #[inline(always)]
-    pub(crate) fn ad_juv_soglia_2(&self) -> f32 {
+    pub(crate) fn ad_juv_soglia_1(&self) -> f32 {
+        self.ad_juv_soglia_1_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_2_impl(&self) -> f32 {
         self.ad_juv_soglia2
     }
     #[inline(always)]
-    pub(crate) fn ad_juv_soglia_3(&self) -> f32 {
+    pub(crate) fn ad_juv_soglia_2(&self) -> f32 {
+        self.ad_juv_soglia_2_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_3_impl(&self) -> f32 {
         self.ad_juv_soglia3
     }
     #[inline(always)]
-    pub(crate) fn ad_juv_soglia_4(&self) -> f32 {
+    pub(crate) fn ad_juv_soglia_3(&self) -> f32 {
+        self.ad_juv_soglia_3_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn ad_juv_soglia_4_impl(&self) -> f32 {
         self.ad_juv_soglia4
     }
     #[inline(always)]
-    pub(crate) fn dens_soglia_1(&self) -> f32 {
+    pub(crate) fn ad_juv_soglia_4(&self) -> f32 {
+        self.ad_juv_soglia_4_impl()
+    }
+    #[inline(always)]
+    pub(crate) fn dens_soglia_1_impl(&self) -> f32 {
         self.dens_soglia1
+    }
+    #[inline(always)]
+    pub(crate) fn dens_soglia_1(&self) -> f32 {
+        self.dens_soglia_1_impl()
     }
     #[cfg(test)]
     pub(crate) fn set_dens_soglia_1(&mut self, val: f32) {
         self.dens_soglia1 = val;
     }
     #[inline(always)]
-    pub(crate) fn dens_soglia_2(&self) -> f32 {
+    pub(crate) fn dens_soglia_2_impl(&self) -> f32 {
         self.dens_soglia2
+    }
+    #[inline(always)]
+    pub(crate) fn dens_soglia_2(&self) -> f32 {
+        self.dens_soglia_2_impl()
     }
     #[cfg(test)]
     pub(crate) fn set_dens_soglia_2(&mut self, val: f32) {
