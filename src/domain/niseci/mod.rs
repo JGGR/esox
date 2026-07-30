@@ -36,14 +36,18 @@ use crate::capacity::{Capacity, DefaultCapacity};
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
                                                       // in test builds
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum OrigineSpecieNISECI {
+    Autoctono(u8),
+    Alloctono(u8),
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpecieNISECI {
     id: String,
     nome: String,
-    tipo_autoctono: u8,
-    tipo_alloctono: u8,
+    origine: OrigineSpecieNISECI,
     specie_attesa: bool,
     cl_soglia1: u32, // in mm
     cl_soglia2: u32, // in mm
@@ -79,8 +83,7 @@ impl SpecieNISECI {
     pub(crate) fn new(
         id: &str,
         nome: &str,
-        tipo_autoctono: u8,
-        tipo_alloctono: u8,
+        origine: OrigineSpecieNISECI,
         specie_attesa: bool,
         cl_soglia_1: u32,
         cl_soglia_2: u32,
@@ -96,8 +99,7 @@ impl SpecieNISECI {
         SpecieNISECI {
             id: id.to_string(),
             nome: nome.to_string(),
-            tipo_autoctono,
-            tipo_alloctono,
+            origine,
             specie_attesa,
             cl_soglia1: cl_soglia_1,
             cl_soglia2: cl_soglia_2,
@@ -124,12 +126,22 @@ impl SpecieNISECI {
         self.specie_attesa
     }
     #[inline(always)]
+    pub(crate) fn origine(&self) -> OrigineSpecieNISECI {
+        self.origine
+    }
+    #[inline(always)]
     pub(crate) fn tipo_autoctono(&self) -> u8 {
-        self.tipo_autoctono
+        match self.origine() {
+            OrigineSpecieNISECI::Autoctono(val) => val,
+            OrigineSpecieNISECI::Alloctono(_) => 0,
+        }
     }
     #[inline(always)]
     pub(crate) fn tipo_alloctono(&self) -> u8 {
-        self.tipo_alloctono
+        match self.origine() {
+            OrigineSpecieNISECI::Autoctono(_) => 0,
+            OrigineSpecieNISECI::Alloctono(val) => val,
+        }
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_1(&self) -> u32 {

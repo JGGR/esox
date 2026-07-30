@@ -42,7 +42,7 @@ use crate::csv::{
     ANAGRAFICA_HFBI_HEADER, ANAGRAFICA_NISECI_HEADER, CAMPIONAMENTO_HFBI_HEADER,
     CAMPIONAMENTO_NISECI_HEADER, RIFERIMENTO_NISECI_HEADER,
 };
-use crate::domain::niseci::{RiferimentoNISECI, SpecieNISECI};
+use crate::domain::niseci::{OrigineSpecieNISECI, RiferimentoNISECI, SpecieNISECI};
 use crate::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
 use crate::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
@@ -220,8 +220,7 @@ fn test_valid_recordcsv_campionamento_niseci() {
     let specie_1 = SpecieNISECI::new(
         "1234",
         "Cervus elaphus",
-        1,
-        0,
+        OrigineSpecieNISECI::Autoctono(1),
         true,
         0, // in cm
         0, // in cm

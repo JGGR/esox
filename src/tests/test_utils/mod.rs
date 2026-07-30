@@ -20,7 +20,7 @@ use crate::domain::{
     location::Location,
     niseci::{
         AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdSpecieNISECI, IdroEcoRegioneNISECI,
-        RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
+        OrigineSpecieNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
     },
 };
 
@@ -83,8 +83,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::CiaccioCiaccensis as u32).to_string(),
             "Ciaccio ciaccensis",
-            2,
-            0,
+            OrigineSpecieNISECI::Autoctono(2),
             true,
             1,
             2,
@@ -103,8 +102,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::CiaccioSbribbrensis as u32).to_string(),
             "Ciaccio sbribbrensis",
-            2,
-            0,
+            OrigineSpecieNISECI::Autoctono(2),
             true,
             1,
             2,
@@ -123,8 +121,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::CiaccioCozzensis as u32).to_string(),
             "Ciaccio cozzensis",
-            2,
-            0,
+            OrigineSpecieNISECI::Autoctono(2),
             true,
             1,
             2,
@@ -143,8 +140,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::NormusSempliciottum as u32).to_string(),
             "Normus sempliciottum",
-            1,
-            0,
+            OrigineSpecieNISECI::Autoctono(1),
             true,
             1,
             2,
@@ -163,8 +159,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::NormusQualunquis as u32).to_string(),
             "Normus qualunquis",
-            1,
-            0,
+            OrigineSpecieNISECI::Autoctono(1),
             true,
             1,
             2,
@@ -183,8 +178,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::DisturbusInfognatus as u32).to_string(),
             "Disturbus infognatus",
-            0,
-            1,
+            OrigineSpecieNISECI::Alloctono(1),
             true,
             1,
             2,
@@ -203,8 +197,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::DisturbusSotterfugius as u32).to_string(),
             "Disturbus sotterfugius",
-            0,
-            1,
+            OrigineSpecieNISECI::Alloctono(1),
             true,
             1,
             2,
@@ -223,8 +216,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::SorprendoSorprendentes as u32).to_string(),
             "Sorprendo sorprendentes",
-            0,
-            1,
+            OrigineSpecieNISECI::Alloctono(1),
             false,
             1,
             2,
@@ -243,8 +235,7 @@ pub fn create_dummy_specie_niseci_set() -> DummySetSpecieNISECI {
         SpecieNISECI::new(
             &(IdDummySetSpecieNISECI::SorprendoImprovvisus as u32).to_string(),
             "Sorprendo improvvisus",
-            2,
-            0,
+            OrigineSpecieNISECI::Autoctono(2),
             false,
             1,
             2,
@@ -955,8 +946,7 @@ pub fn get_ciaccio() -> SpecieNISECI {
     SpecieNISECI::new(
         &(DummyIds::Ciaccio as u32).to_string(),
         "Ciaccio ciaccensis",
-        2,
-        0,
+        OrigineSpecieNISECI::Autoctono(2),
         true,
         3,
         6,
@@ -976,8 +966,7 @@ pub fn get_trocchio() -> SpecieNISECI {
     SpecieNISECI::new(
         &(DummyIds::Trocchio as u32).to_string(),
         "Trocchio trocchiensis",
-        0,
-        1,
+        OrigineSpecieNISECI::Alloctono(1),
         false,
         3,
         6,
@@ -997,8 +986,7 @@ pub fn get_bronzo() -> SpecieNISECI {
     SpecieNISECI::new(
         &(DummyIds::Bronzo as u32).to_string(),
         "Bronzo bronzensis",
-        0,
-        2,
+        OrigineSpecieNISECI::Alloctono(2),
         false,
         3,
         6,
@@ -1018,8 +1006,7 @@ pub fn get_tappo() -> SpecieNISECI {
     SpecieNISECI::new(
         &(DummyIds::Tappo as u32).to_string(),
         "Tappo sugheribus",
-        0,
-        3,
+        OrigineSpecieNISECI::Alloctono(3),
         false,
         3,
         6,

@@ -19,7 +19,8 @@ use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRife
 use crate::domain::location::Location;
 use crate::domain::niseci::{
     AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
-    InternerSpecieNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
+    InternerSpecieNISECI, OrigineSpecieNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI,
+    TipoComunitaNISECI,
 };
 use crate::domain::posf32::PositiveF32;
 use crate::parser::parse_date;
@@ -138,10 +139,12 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
                                                    // "atteso"?
         let tipo_autoctono: u8;
         let tipo_alloctono: u8;
+        let origine;
         if origine_autoctono {
             match r.tipo_autoctono() {
                 1 | 2 => {
                     tipo_autoctono = r.tipo_autoctono() as u8;
+                    origine = OrigineSpecieNISECI::Autoctono(tipo_autoctono);
                 }
                 _ => {
                     let err = RecordRiferimentoNISECIError::ValoreInvalido {
@@ -154,12 +157,11 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
                     continue;
                 }
             }
-            tipo_alloctono = 0;
         } else {
-            tipo_autoctono = 0;
             match r.allo_nocivita() {
                 0..=3 => {
                     tipo_alloctono = r.allo_nocivita() as u8;
+                    origine = OrigineSpecieNISECI::Alloctono(tipo_alloctono);
                 }
                 _ => {
                     let err = RecordRiferimentoNISECIError::ValoreInvalido {
@@ -241,8 +243,7 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
         let specie_rec = SpecieNISECI::new(
             &specie_id,
             &nome,
-            tipo_autoctono,
-            tipo_alloctono,
+            origine,
             specie_attesa,
             r.cl_soglia1(), // in cm
             r.cl_soglia2(), // in cm
