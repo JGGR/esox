@@ -43,7 +43,7 @@
 //!
 //! ### Convenience API
 //!
-//! `csv::load` provides a single-step interface that combines
+//! [`csv::load`] provides a single-step interface that combines
 //! deserialization and parsing ([`csv::deser`] + [`parser`]),
 //! returning validated domain models directly from raw CSV input.
 //!
