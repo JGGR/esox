@@ -154,6 +154,8 @@ impl Delimiter for SemicolonDelimiter {
 /// ```
 pub trait RecordCsv {
     type D: Delimiter;
+
+    const DELIMITER: u8 = <Self::D as Delimiter>::DELIMITER;
 }
 
 /// Internal helper used by PlainRecord structs to autoimpl RecordCsv

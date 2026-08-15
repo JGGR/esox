@@ -18,7 +18,7 @@ use crate::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf,
     PlainRecordCsvAnagraficaHFBI, PlainRecordCsvCampionamentoHFBI,
 };
-use crate::csv::deser::{CsvConfig, Delimiter, NormalizerReader, RecordCsv};
+use crate::csv::deser::{CsvConfig, NormalizerReader, RecordCsv};
 use crate::csv::load::InputFormat;
 use crate::csv::stanis::hfbi::{
     VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
@@ -66,7 +66,7 @@ where
     load_csv_campionamento_hfbi_from_reader_conf::<R, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -96,7 +96,7 @@ where
     load_csv_campionamento_hfbi_from_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -186,7 +186,7 @@ where
     load_csv_anagrafica_hfbi_from_reader_conf::<R, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -217,7 +217,7 @@ where
     load_csv_anagrafica_hfbi_from_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }

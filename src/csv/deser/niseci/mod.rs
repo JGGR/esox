@@ -16,8 +16,7 @@
 */
 
 use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, Delimiter, NormalizerReader,
-    RecordCsv,
+    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader, RecordCsv,
 };
 
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
@@ -144,7 +143,7 @@ where
     T: RecordRiferimentoNISECI + RecordCsv,
 {
     let config = CsvConfig::default()
-        .with_delimiter(T::D::DELIMITER)
+        .with_delimiter(T::DELIMITER)
         .with_headers(has_headers);
     private_check_riferimento_niseci_reader::<R, DefaultByteLimit, T>(reader, config)
 }
@@ -192,7 +191,7 @@ where
     check_riferimento_niseci_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -285,7 +284,7 @@ where
     private_check_campionamento_niseci_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -333,7 +332,7 @@ where
     check_campionamento_niseci_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -469,7 +468,7 @@ where
     private_check_anagrafica_niseci_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -517,7 +516,7 @@ where
     check_anagrafica_niseci_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }

@@ -15,8 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use crate::csv::deser::{
-    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, Delimiter, NormalizerReader,
-    RecordCsv,
+    check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader, RecordCsv,
 };
 
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
@@ -85,7 +84,7 @@ where
     private_check_campionamento_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -133,7 +132,7 @@ where
     check_campionamento_hfbi_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -253,7 +252,7 @@ where
     private_check_anagrafica_hfbi_reader_conf::<R, DefaultByteLimit, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -301,7 +300,7 @@ where
     check_anagrafica_hfbi_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(T::D::DELIMITER)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
