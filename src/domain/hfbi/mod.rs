@@ -684,7 +684,7 @@ impl CampionamentoHFBI {
         sorted
     }
     pub fn sort_by_peso_desc(&mut self) {
-        self.campionamento.sort_by(|a, b| b.peso.total_cmp(&a.peso));
+        self.campionamento.sort_by_peso_desc();
     }
     pub fn sorted_by_peso_desc(&self) -> impl Iterator<Item = &RecordHFBI> {
         let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
