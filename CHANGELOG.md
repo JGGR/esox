@@ -28,6 +28,8 @@
 - Drop implicit logging on check functions
   - Usercode can use `csv::stanis::giorgio::format_csv_errors` explicitly instead
 - Drop internal transitional methods
+- Bump `serde` to `1.0.229`
+- Bump `serde_json` to `1.0.151`
 
 ## [0.1.7] - 2026-07-17
 
