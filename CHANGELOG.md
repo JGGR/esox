@@ -1,5 +1,9 @@
 ## [0.2.0] - 2026-09-03
 
+### Added
+
+- Make `capacity` module public
+
 ### Changed
 
 - BREAKING:

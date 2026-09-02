@@ -15,21 +15,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-pub(crate) trait Capacity {
+pub trait Capacity {
     const VALUE: usize;
 }
 
-#[expect(dead_code)]
-struct Small;
-#[expect(dead_code)]
-struct Medium;
-#[derive(Default)]
-pub(crate) struct DefaultCapacity;
-#[expect(dead_code)]
-struct Custom<const N: usize>;
+pub struct Small;
+pub struct Medium;
+pub struct DefaultCapacity;
+pub struct Custom<const N: usize>;
 
 const SMALL_CAP: usize = 100;
-#[expect(dead_code)]
 const MEDIUM_CAP: usize = 1000;
 
 impl Capacity for Small {

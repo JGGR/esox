@@ -96,7 +96,7 @@
 //! let (hfbi, intermediates) = calculate_hfbi(&campionamento, &anagrafica).unwrap();
 //!```
 
-pub(crate) mod capacity;
+pub mod capacity;
 pub mod csv;
 pub mod deser;
 pub mod domain;
