@@ -109,7 +109,7 @@ pub fn calculate_niseci(
         let submetriche_map_x3 = crit.get_ref_submetriche_map();
         for (key, val) in submetriche_map_x3 {
             let classi_eta = val.get_ref_classi_eta();
-            let specie = key.clone();
+            let specie = *key;
             let densita_stimata = -1.0; //TODO: check if this is correct
             let subvalue_a = val.get_criterio_a();
             let subvalue_b = val.get_criterio_b();
@@ -199,7 +199,7 @@ fn get_valori_intermedi_specie(
     for (key, val) in submetriche_map.iter() {
         let criteri_x2_a = val.get_metriche_x2_a();
         let classi_eta = val.get_ref_classi_eta();
-        let specie = key.clone();
+        let specie = *key;
         let densita_stimata = val.get_ref_metriche_x2_b().get_densita_stimata();
         let quantita_stimata = val.get_ref_metriche_x2_b().get_quantita_stimata();
         let x2_b = val.get_ref_metriche_x2_b().get_x2_b();

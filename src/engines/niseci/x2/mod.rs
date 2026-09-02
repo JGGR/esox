@@ -328,7 +328,7 @@ fn calculate_sommatoria_x2_a<C: Capacity>(
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
-                        .and_then(|c| Some(entry.insert(c)));
+                        .map(|c| entry.insert(c));
                 }
             };
         }
@@ -402,7 +402,7 @@ fn calculate_sommatoria_x2_a_per_alloctone<C: Capacity>(
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
-                        .and_then(|c| Some(entry.insert(c)));
+                        .map(|c| entry.insert(c));
                 }
             };
         }

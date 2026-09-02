@@ -275,7 +275,7 @@ fn calculate_classi_eta_alieni(
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
-                        .and_then(|c| Some(entry.insert(c)));
+                        .map(|c| entry.insert(c));
                 }
             };
         } else if specie.tipo_alloctono() == 2 {
@@ -286,7 +286,7 @@ fn calculate_classi_eta_alieni(
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
-                        .and_then(|c| Some(entry.insert(c)));
+                        .map(|c| entry.insert(c));
                 }
             };
         } else if specie.tipo_alloctono() == 3 {
@@ -297,7 +297,7 @@ fn calculate_classi_eta_alieni(
                 }
                 Entry::Vacant(entry) => {
                     ClassiEtaSpecieNISECI::new_cl_prevalorizzata(cattura, r)
-                        .and_then(|c| Some(entry.insert(c)));
+                        .map(|c| entry.insert(c));
                 }
             };
         }

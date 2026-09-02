@@ -562,13 +562,11 @@ pub fn parse_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
                 errors.push(err);
             }
         }
-        TipoComunitaNISECI::AffinataDalMase => {
-            if r.numero_protocollo().is_empty() {
-                let err = RecordAnagraficaNISECIError::ValoreInvalido {
-                    msg: format!("Numero protocollo troppo corto: {}", r.numero_protocollo()),
-                };
-                errors.push(err);
-            }
+        TipoComunitaNISECI::AffinataDalMase if r.numero_protocollo().is_empty() => {
+            let err = RecordAnagraficaNISECIError::ValoreInvalido {
+                msg: format!("Numero protocollo troppo corto: {}", r.numero_protocollo()),
+            };
+            errors.push(err);
         }
         _ => {}
     }
