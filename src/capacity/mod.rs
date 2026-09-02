@@ -14,23 +14,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! Capacity trait, for used only by:
+//! - [`esox::domain::niseci::ClassiEtaAlieniNISECI::new_with_capacity`]
+//! - Some methods in [`esox::engines::niseci::x2`]
 
-#[cfg_attr(not(feature = "lessclone"), expect(dead_code))]
-pub(crate) trait Capacity {
+pub trait Capacity {
     const VALUE: usize;
 }
 
-#[cfg_attr(feature = "lessclone", expect(dead_code))]
-struct Small;
-#[cfg_attr(feature = "lessclone", expect(dead_code))]
-struct Medium;
-#[derive(Default)]
-pub(crate) struct DefaultCapacity;
-#[expect(dead_code)]
-struct Custom<const N: usize>;
+pub struct Small;
+pub struct Medium;
+pub struct DefaultCapacity;
+pub struct Custom<const N: usize>;
 
 const SMALL_CAP: usize = 100;
-#[cfg_attr(feature = "lessclone", expect(dead_code))]
 const MEDIUM_CAP: usize = 1000;
 
 impl Capacity for Small {

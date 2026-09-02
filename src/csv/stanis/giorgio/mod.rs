@@ -22,9 +22,8 @@
 mod tests;
 
 use crate::csv::deser::utils::diagnostic::{
-    csv_error_handler as generic_csv_error_handler, format_csv_error as generic_format_csv_error,
-    CsvDiagnosticFormatter, CsvDiagnosticLayout, CsvDiagnosticLocalization, CsvFieldResolver,
-    CsvPositionFormatter,
+    format_csv_error as generic_format_csv_error, CsvDiagnosticFormatter, CsvDiagnosticLayout,
+    CsvDiagnosticLocalization, CsvFieldResolver, CsvPositionFormatter,
 };
 use crate::csv::stanis::field_name;
 use crate::deser::TipoRecord;
@@ -186,17 +185,6 @@ impl ItalianDiagnosticFormatter {
             layout: ItalianCsvDiagnosticLayout,
         }
     }
-}
-
-/// Transitional private helper, used in csv::deser::{niseci,hfbi} as the closure argument for
-/// validate_serialized_records(), to print italian error messages.
-/// v0.2 will drop this implicit logging, hence this method will not be needed anymore.
-pub(crate) fn csv_error_handler(record: TipoRecord) -> impl Fn(&Vec<csv::Error>) {
-    generic_csv_error_handler(
-        ItalianDiagnosticFormatter::new(),
-        "Errori incontrati durante l'elaborazione csv".to_string(),
-        record,
-    )
 }
 
 pub fn format_csv_error(error: &csv::Error, record: TipoRecord) -> String {

@@ -32,7 +32,7 @@
 //! - Converts raw CSV into typed intermediate structs
 //! - Validates CSV structure and field types (e.g. integer fields must be valid numbers)
 //!
-//! 2. CSV parsing and validation: ([`csv::parser`]) (from next version: [`parser`])
+//! 2. Intermediate structs parsing and validation (`parser`)
 //!
 //! - Converts the intermediate CSV structs into [`domain`] models
 //! - Enforces domain rules (e.g. value ranges, invariants)
@@ -43,8 +43,8 @@
 //!
 //! ### Convenience API
 //!
-//! `csv::load` provides a single-step interface that combines
-//! deserialization and parsing ([`csv::deser`] + [`csv::parser`]),
+//! [`csv::load`] provides a single-step interface that combines
+//! deserialization and parsing ([`csv::deser`] + [`parser`]),
 //! returning validated domain models directly from raw CSV input.
 //!
 //! ### Input format
@@ -65,10 +65,7 @@
 //! use std::io::Cursor;
 //! use esox::csv::load::InputFormat;
 //! use esox::csv::load::niseci::*;
-//! #[cfg(not(feature = "lessclone"))]
 //! use esox::engines::niseci::full::calculate_niseci;
-//! #[cfg(feature = "lessclone")]
-//! use esox::engines::niseci::full::lessclone::calculate_niseci;
 //! const RIFERIMENTO_DATA: &[u8] =
 //! include_bytes!("../templates/riferimento_niseci.csv");
 //!
@@ -99,7 +96,7 @@
 //! let (hfbi, intermediates) = calculate_hfbi(&campionamento, &anagrafica).unwrap();
 //!```
 
-pub(crate) mod capacity;
+pub mod capacity;
 pub mod csv;
 pub mod deser;
 pub mod domain;

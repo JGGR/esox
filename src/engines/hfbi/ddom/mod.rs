@@ -50,7 +50,7 @@ fn calc_s90_b90(
 
     let mut n_specie_90: u32 = 0;
     let mut biomassa_tmp: f32 = 0.0;
-    for cattura in campionamento.sorted_by_peso_desc() {
+    for cattura in campionamento {
         biomassa_tmp += cattura.peso;
         n_specie_90 += 1;
         if biomassa_tmp > biomassa_90 {
@@ -229,10 +229,10 @@ mod ddom_private_tests {
     fn test_ddom_standard_case() {
         let anagrafica = create_test_anagrafica(10.0, 10.0); // area = 100
         let campione = CampionamentoHFBI::new(vec![
-            create_dummy_record(100.0),
             create_dummy_record(50.0),
             create_dummy_record(30.0),
-            create_dummy_record(20.0), // 90% threshold (180) is crossed here
+            create_dummy_record(20.0),
+            create_dummy_record(100.0), // We rely on new() sorting the CampionamentoHFBI instance
         ]);
         // From calc_s90_b90:
         // biomassa_tot = 200, biomassa_90 = 180.

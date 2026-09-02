@@ -17,14 +17,11 @@
 
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use crate::domain::location::Location;
-#[cfg(feature = "lessclone")]
-use crate::domain::niseci::lessclone::{CampionamentoNISECI, RecordNISECI};
 use crate::domain::niseci::{
-    AnagraficaNISECI, AreaNISECI, ComunitaNISECI, IdroEcoRegioneNISECI, InternerSpecieNISECI,
-    RiferimentoNISECI, SpecieNISECI, TipoComunitaNISECI,
+    AnagraficaNISECI, AreaNISECI, CampionamentoNISECI, ComunitaNISECI, IdroEcoRegioneNISECI,
+    InternerSpecieNISECI, OrigineSpecieNISECI, RecordNISECI, RiferimentoNISECI, SpecieNISECI,
+    TipoComunitaNISECI,
 };
-#[cfg(not(feature = "lessclone"))]
-use crate::domain::niseci::{CampionamentoNISECI, RecordNISECI};
 use crate::domain::posf32::PositiveF32;
 use crate::parser::parse_date;
 use chrono::format::ParseErrorKind;
@@ -142,10 +139,12 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
                                                    // "atteso"?
         let tipo_autoctono: u8;
         let tipo_alloctono: u8;
+        let origine;
         if origine_autoctono {
             match r.tipo_autoctono() {
                 1 | 2 => {
                     tipo_autoctono = r.tipo_autoctono() as u8;
+                    origine = OrigineSpecieNISECI::Autoctono(tipo_autoctono);
                 }
                 _ => {
                     let err = RecordRiferimentoNISECIError::ValoreInvalido {
@@ -158,12 +157,11 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
                     continue;
                 }
             }
-            tipo_alloctono = 0;
         } else {
-            tipo_autoctono = 0;
             match r.allo_nocivita() {
                 0..=3 => {
                     tipo_alloctono = r.allo_nocivita() as u8;
+                    origine = OrigineSpecieNISECI::Alloctono(tipo_alloctono);
                 }
                 _ => {
                     let err = RecordRiferimentoNISECIError::ValoreInvalido {
@@ -242,25 +240,23 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
 
         let specie_id = id.clone();
 
-        #[expect(deprecated)]
-        let specie_rec = SpecieNISECI {
-            id: specie_id,
-            nome,
-            tipo_autoctono,
-            tipo_alloctono,
+        let specie_rec = SpecieNISECI::new(
+            &specie_id,
+            &nome,
+            origine,
             specie_attesa,
-            cl_soglia1: r.cl_soglia1(), // in cm
-            cl_soglia2: r.cl_soglia2(), // in cm
-            cl_soglia3: r.cl_soglia3(), // in cm
-            cl_soglia4: r.cl_soglia4(), // in cm
-            ad_juv_soglia1: r.ad_juv_soglia1(),
-            ad_juv_soglia2: r.ad_juv_soglia2(),
-            ad_juv_soglia3: r.ad_juv_soglia3(),
-            ad_juv_soglia4: r.ad_juv_soglia4(),
-            dens_soglia1: r.dens_soglia1(),
-            dens_soglia2: r.dens_soglia2(),
-        };
-        interner.intern(&id, specie_rec);
+            r.cl_soglia1(), // in cm
+            r.cl_soglia2(), // in cm
+            r.cl_soglia3(), // in cm
+            r.cl_soglia4(), // in cm
+            r.ad_juv_soglia1(),
+            r.ad_juv_soglia2(),
+            r.ad_juv_soglia3(),
+            r.ad_juv_soglia4(),
+            r.dens_soglia1(),
+            r.dens_soglia2(),
+        );
+        interner.intern(specie_rec);
     }
 
     RiferimentoNISECIParseResult(RiferimentoNISECI::new_from_map(interner), errors)
@@ -362,7 +358,6 @@ pub(crate) fn parse_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
             continue;
         }
 
-        #[cfg(feature = "lessclone")]
         let matched_specie = riferimento_specie
             .get_inner_id(matched_specie.id())
             .expect("Riferimento should contain this id");
@@ -567,13 +562,11 @@ pub fn parse_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
                 errors.push(err);
             }
         }
-        TipoComunitaNISECI::AffinataDalMase => {
-            if r.numero_protocollo().is_empty() {
-                let err = RecordAnagraficaNISECIError::ValoreInvalido {
-                    msg: format!("Numero protocollo troppo corto: {}", r.numero_protocollo()),
-                };
-                errors.push(err);
-            }
+        TipoComunitaNISECI::AffinataDalMase if r.numero_protocollo().is_empty() => {
+            let err = RecordAnagraficaNISECIError::ValoreInvalido {
+                msg: format!("Numero protocollo troppo corto: {}", r.numero_protocollo()),
+            };
+            errors.push(err);
         }
         _ => {}
     }
@@ -629,14 +622,7 @@ pub fn parse_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     }
 
     let res = AnagraficaNISECI::new(
-        ComunitaNISECI {
-            #[expect(deprecated)]
-            tipo: tipo_comunita,
-            #[expect(deprecated)]
-            fonte: Some(r.fonte()),
-            #[expect(deprecated)]
-            numero_protocollo: Some(r.numero_protocollo()),
-        },
+        ComunitaNISECI::new(tipo_comunita, Some(r.fonte()), Some(r.numero_protocollo())),
         r.codice_stazione(),
         r.data(), // Formato gg/mm/aaaa
         area,
@@ -653,10 +639,7 @@ pub fn parse_records_anagrafica_niseci<T: RecordAnagraficaNISECI>(
     Ok(res)
 }
 
-/// v0.2 will have this method public
-/// Internal transitional API for migrating:
-///   - returning RiferimentoNISECI for success over Vec<SpecieNISECI>
-pub(crate) fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
+pub fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
 ) -> Result<RiferimentoNISECI, Vec<RecordRiferimentoNISECIError>> {
     let (rif, errors) = parse_records_riferimento_niseci(records).into_parts();
@@ -690,12 +673,7 @@ pub(crate) fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     }
 }
 
-/// v0.2 will have this method public
-/// Internal transitional API for migrating:
-///   - borrow over riferimento_specie
-///   - taking &RiferimentoNISECI over &Vec<SpecieNISECI>
-///   - returning CampionamentoNISECI for success over Vec<RecordNISECI>
-pub(crate) fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
+pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: &RiferimentoNISECI,
 ) -> Result<CampionamentoNISECI, Vec<RecordCampionamentoNISECIError>> {

@@ -22,7 +22,7 @@
 use hashbrown::{hash_map::RawEntryMut as HBRawEntryMut, HashMap as HBHashMap};
 use serde::{Deserialize, Serialize};
 use std::collections::hash_map::Entry;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::vec::Vec;
 
@@ -31,55 +31,34 @@ use super::location::Location;
 #[cfg(feature = "experimental")]
 use super::posf32::deserialize_positive_f32;
 use super::posf32::{PositiveF32, PositiveF32Error};
+use crate::capacity::{Capacity, DefaultCapacity};
 
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
                                                       // in test builds
-
-#[cfg(feature = "lessclone")]
-pub mod lessclone;
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum OrigineSpecieNISECI {
+    Autoctono(u8),
+    Alloctono(u8),
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpecieNISECI {
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.id() instead")]
-    pub id: String,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.nome() instead")]
-    pub nome: String,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_autoctono() instead")]
-    pub tipo_autoctono: u8,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_alloctono() instead")]
-    pub tipo_alloctono: u8,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.specie_attesa() instead")]
-    pub specie_attesa: bool,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_1() instead")]
-    pub cl_soglia1: u32, // in mm
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_2() instead")]
-    pub cl_soglia2: u32, // in mm
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_3() instead")]
-    pub cl_soglia3: u32, // in mm
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_soglia_4() instead")]
-    pub cl_soglia4: u32, // in mm
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_1() instead"
-    )]
-    pub ad_juv_soglia1: f32,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_2() instead"
-    )]
-    pub ad_juv_soglia2: f32,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_3() instead"
-    )]
-    pub ad_juv_soglia3: f32,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.ad_juv_soglia_4() instead"
-    )]
-    pub ad_juv_soglia4: f32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.dens_soglia_1() instead")]
-    pub dens_soglia1: f32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.dens_soglia_2() instead")]
-    pub dens_soglia2: f32,
+    id: String,
+    nome: String,
+    origine: OrigineSpecieNISECI,
+    specie_attesa: bool,
+    cl_soglia1: u32, // in mm
+    cl_soglia2: u32, // in mm
+    cl_soglia3: u32, // in mm
+    cl_soglia4: u32, // in mm
+    ad_juv_soglia1: f32,
+    ad_juv_soglia2: f32,
+    ad_juv_soglia3: f32,
+    ad_juv_soglia4: f32,
+    dens_soglia1: f32,
+    dens_soglia2: f32,
 }
 
 impl fmt::Display for SpecieNISECI {
@@ -101,12 +80,10 @@ impl fmt::Display for SpecieNISECI {
 }
 
 impl SpecieNISECI {
-    #[cfg(test)]
     pub(crate) fn new(
         id: &str,
         nome: &str,
-        tipo_autoctono: u8,
-        tipo_alloctono: u8,
+        origine: OrigineSpecieNISECI,
         specie_attesa: bool,
         cl_soglia_1: u32,
         cl_soglia_2: u32,
@@ -119,12 +96,10 @@ impl SpecieNISECI {
         dens_soglia_1: f32,
         dens_soglia_2: f32,
     ) -> Self {
-        #[expect(deprecated)]
         SpecieNISECI {
             id: id.to_string(),
             nome: nome.to_string(),
-            tipo_autoctono,
-            tipo_alloctono,
+            origine,
             specie_attesa,
             cl_soglia1: cl_soglia_1,
             cl_soglia2: cl_soglia_2,
@@ -138,115 +113,83 @@ impl SpecieNISECI {
             dens_soglia2: dens_soglia_2,
         }
     }
-    #[deprecated(note = "v0.2 will drop visibility. Consider using SpecieNISECI::new() instead")]
-    pub fn new_dummy_specie() -> SpecieNISECI {
-        #[expect(deprecated)]
-        SpecieNISECI {
-            id: "0".to_string(),
-            nome: "dummy".to_string(),
-            tipo_autoctono: 0,
-            tipo_alloctono: 0,
-            specie_attesa: true,
-            cl_soglia1: 1, // in mm
-            cl_soglia2: 2, // in mm
-            cl_soglia3: 3, // in mm
-            cl_soglia4: 4,
-            ad_juv_soglia1: 0.1,
-            ad_juv_soglia2: 0.2,
-            ad_juv_soglia3: 0.3,
-            ad_juv_soglia4: 0.4,
-            dens_soglia1: 0.5,
-            dens_soglia2: 0.9,
-        }
-    }
 
     #[inline(always)]
     pub(crate) fn id(&self) -> &str {
-        #[expect(deprecated)]
         &self.id
     }
     pub(crate) fn nome(&self) -> &str {
-        #[expect(deprecated)]
         &self.nome
     }
     #[inline(always)]
     pub(crate) fn specie_attesa(&self) -> bool {
-        #[expect(deprecated)]
         self.specie_attesa
     }
     #[inline(always)]
+    pub(crate) fn origine(&self) -> OrigineSpecieNISECI {
+        self.origine
+    }
+    #[inline(always)]
     pub(crate) fn tipo_autoctono(&self) -> u8 {
-        #[expect(deprecated)]
-        self.tipo_autoctono
+        match self.origine() {
+            OrigineSpecieNISECI::Autoctono(val) => val,
+            OrigineSpecieNISECI::Alloctono(_) => 0,
+        }
     }
     #[inline(always)]
     pub(crate) fn tipo_alloctono(&self) -> u8 {
-        #[expect(deprecated)]
-        self.tipo_alloctono
+        match self.origine() {
+            OrigineSpecieNISECI::Autoctono(_) => 0,
+            OrigineSpecieNISECI::Alloctono(val) => val,
+        }
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_1(&self) -> u32 {
-        #[expect(deprecated)]
         self.cl_soglia1
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_2(&self) -> u32 {
-        #[expect(deprecated)]
         self.cl_soglia2
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_3(&self) -> u32 {
-        #[expect(deprecated)]
         self.cl_soglia3
     }
     #[inline(always)]
     pub(crate) fn cl_soglia_4(&self) -> u32 {
-        #[expect(deprecated)]
         self.cl_soglia4
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_1(&self) -> f32 {
-        #[expect(deprecated)]
         self.ad_juv_soglia1
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_2(&self) -> f32 {
-        #[expect(deprecated)]
         self.ad_juv_soglia2
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_3(&self) -> f32 {
-        #[expect(deprecated)]
         self.ad_juv_soglia3
     }
     #[inline(always)]
     pub(crate) fn ad_juv_soglia_4(&self) -> f32 {
-        #[expect(deprecated)]
         self.ad_juv_soglia4
     }
     #[inline(always)]
     pub(crate) fn dens_soglia_1(&self) -> f32 {
-        #[expect(deprecated)]
         self.dens_soglia1
     }
     #[cfg(test)]
     pub(crate) fn set_dens_soglia_1(&mut self, val: f32) {
-        #[expect(deprecated)]
-        {
-            self.dens_soglia1 = val;
-        }
+        self.dens_soglia1 = val;
     }
     #[inline(always)]
     pub(crate) fn dens_soglia_2(&self) -> f32 {
-        #[expect(deprecated)]
         self.dens_soglia2
     }
     #[cfg(test)]
     pub(crate) fn set_dens_soglia_2(&mut self, val: f32) {
-        #[expect(deprecated)]
-        {
-            self.dens_soglia2 = val;
-        }
+        self.dens_soglia2 = val;
     }
 }
 
@@ -325,15 +268,15 @@ impl InternerSpecieNISECI {
     /// Holds invariant: the underlying map is holding the set of present entries.
     /// Do not modify if you don't want to break stuff.
     #[inline(always)]
-    pub(crate) fn intern(&mut self, s: &str, val: SpecieNISECI) -> IdSpecieNISECI {
-        match self.map.raw_entry_mut().from_key(s) {
+    pub(crate) fn intern(&mut self, val: SpecieNISECI) -> IdSpecieNISECI {
+        match self.map.raw_entry_mut().from_key(val.id()) {
             HBRawEntryMut::Occupied(entry) => *entry.get(),
 
             HBRawEntryMut::Vacant(entry) => {
                 let id = self.next_id;
                 self.next_id += 1;
 
-                entry.insert(s.to_owned(), id);
+                entry.insert(val.id().to_owned(), id);
                 self.store.insert(id, val);
 
                 id
@@ -346,7 +289,7 @@ impl From<Vec<SpecieNISECI>> for InternerSpecieNISECI {
     fn from(val: Vec<SpecieNISECI>) -> Self {
         let mut res = Self::new();
         for v in val {
-            res.intern(&v.id().to_string(), v);
+            res.intern(v);
         }
         res
     }
@@ -356,13 +299,6 @@ impl From<Vec<SpecieNISECI>> for InternerSpecieNISECI {
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct RiferimentoNISECI {
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, RiferimentoNISECI::new() to construct"
-    )]
-    pub elenco_specie: Vec<SpecieNISECI>,
-    // TODO: in v0.2, we can:
-    // - drop the elenco_specie field
-    // - avoiding cloning all SpecieNISECI on new(), the map will move them in
     map_ids: InternerSpecieNISECI,
 }
 
@@ -380,31 +316,13 @@ impl fmt::Display for RiferimentoNISECI {
 impl RiferimentoNISECI {
     pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
         let mut interner = InternerSpecieNISECI::new();
-        for rec in &elenco_specie {
-            // TODO: in v0.2, we can:
-            // - drop the elenco_specie field
-            // - avoiding cloning all SpecieNISECI on new()
-            interner.intern(rec.id(), rec.clone());
+        for rec in elenco_specie {
+            interner.intern(rec);
         }
-        #[expect(deprecated)]
-        Self {
-            elenco_specie,
-            map_ids: interner,
-        }
+        Self { map_ids: interner }
     }
     pub(crate) fn new_from_map(map_ids: InternerSpecieNISECI) -> Self {
-        // TODO: in v0.2, we can:
-        // - drop the elenco_specie field
-        // - avoiding cloning all SpecieNISECI on new()
-        let mut elenco_specie = Vec::new();
-        for s in map_ids.store.values.iter() {
-            elenco_specie.push(s.clone());
-        }
-        #[expect(deprecated)]
-        Self {
-            elenco_specie,
-            map_ids,
-        }
+        Self { map_ids }
     }
     #[inline(always)]
     pub fn contains_id(&self, id: &str) -> bool {
@@ -454,7 +372,7 @@ impl<'a> IntoIterator for &'a RiferimentoNISECI {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RecordNISECI {
-    specie: SpecieNISECI,
+    id: IdSpecieNISECI,
     passaggio_cattura: u8,
     lunghezza: u32,
     /// in millimetri
@@ -464,15 +382,15 @@ pub struct RecordNISECI {
 impl fmt::Display for RecordNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_representation = format!("RecordNISECI: {{ specie: {{{}}}, passaggio_cattura {{{}}}, lunghezza: {{{}}}, peso: {{{}}}",
-                self.specie(), self.passaggio_cattura(), self.lunghezza(), self.peso());
+                self.id(), self.passaggio_cattura(), self.lunghezza(), self.peso());
         write!(f, "{}", string_representation)
     }
 }
 
 impl RecordNISECI {
-    pub fn new(specie: &SpecieNISECI, passaggio_cattura: u8, lunghezza: u32, peso: f32) -> Self {
+    pub fn new(id: IdSpecieNISECI, passaggio_cattura: u8, lunghezza: u32, peso: f32) -> Self {
         Self {
-            specie: specie.clone(),
+            id,
             passaggio_cattura,
             lunghezza,
             peso,
@@ -491,80 +409,28 @@ impl RecordNISECI {
         self.peso
     }
     #[inline(always)]
-    pub(crate) fn specie(&self) -> &SpecieNISECI {
-        &self.specie
+    pub(crate) fn id(&self) -> IdSpecieNISECI {
+        self.id
     }
     #[inline(always)]
-    pub(crate) fn id(&self) -> &str {
-        self.specie.id()
+    pub fn dens_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_1())
     }
     #[inline(always)]
-    pub(crate) fn tipo_autoctono(&self) -> u8 {
-        self.specie.tipo_autoctono()
-    }
-    #[inline(always)]
-    pub(crate) fn tipo_alloctono(&self) -> u8 {
-        self.specie.tipo_alloctono()
-    }
-    #[inline(always)]
-    pub(crate) fn specie_attesa(&self) -> bool {
-        self.specie.specie_attesa()
-    }
-    #[inline(always)]
-    pub(crate) fn cl_soglia_1(&self) -> u32 {
-        self.specie.cl_soglia_1()
-    }
-    #[inline(always)]
-    pub(crate) fn cl_soglia_2(&self) -> u32 {
-        self.specie.cl_soglia_2()
-    }
-    #[inline(always)]
-    pub(crate) fn cl_soglia_3(&self) -> u32 {
-        self.specie.cl_soglia_3()
-    }
-    #[inline(always)]
-    pub(crate) fn cl_soglia_4(&self) -> u32 {
-        self.specie.cl_soglia_4()
-    }
-    #[inline(always)]
-    pub(crate) fn ad_juv_soglia_1(&self) -> f32 {
-        self.specie.ad_juv_soglia_1()
-    }
-    #[inline(always)]
-    pub(crate) fn ad_juv_soglia_2(&self) -> f32 {
-        self.specie.ad_juv_soglia_2()
-    }
-    #[inline(always)]
-    pub(crate) fn ad_juv_soglia_3(&self) -> f32 {
-        self.specie.ad_juv_soglia_3()
-    }
-    #[inline(always)]
-    pub(crate) fn ad_juv_soglia_4(&self) -> f32 {
-        self.specie.ad_juv_soglia_4()
-    }
-    #[inline(always)]
-    pub fn dens_soglia_1(&self) -> f32 {
-        self.specie.dens_soglia_1()
-    }
-    #[inline(always)]
-    pub fn dens_soglia_2(&self) -> f32 {
-        self.specie.dens_soglia_2()
+    pub fn dens_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_2())
     }
 }
 
 #[derive(Clone, Serialize)]
-#[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.into() for owned conversion, &self for borrowed iteration, CampionamentoNISECI::new() to construct"
-    )]
-    pub campionamento: Vec<RecordNISECI>,
+    campionamento: Vec<RecordNISECI>,
 }
 
 impl fmt::Display for CampionamentoNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut string_representation = "CampionaNISECI: {".to_string();
+        let mut string_representation = "CampionamentoNISECI: {".to_string();
         for r in self {
             string_representation = format!("{string_representation}\n  {{{r}}},");
         }
@@ -601,58 +467,61 @@ impl CampionamentoNISECI {
     }
 
     pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
-        #[expect(deprecated)]
         Self { campionamento }
     }
 
-    pub fn get_numero_pesci_alieni_e_indigeni(&self) -> AlieniIndigeni {
+    pub fn get_numero_pesci_alieni_e_indigeni(&self, r: &RiferimentoNISECI) -> AlieniIndigeni {
         let mut alieni_indigeni = AlieniIndigeni {
-            #[expect(deprecated)]
             alieni: 0,
-            #[expect(deprecated)]
             indigeni: 0,
         };
 
         for pesce in self {
-            if pesce.tipo_alloctono() > 0 && pesce.tipo_alloctono() <= 3 {
-                #[expect(deprecated)]
-                {
-                    alieni_indigeni.alieni += 1;
-                }
-            } else if pesce.tipo_autoctono() == 1 || pesce.tipo_autoctono() == 2 {
-                #[expect(deprecated)]
-                {
-                    alieni_indigeni.indigeni += 1;
-                }
+            debug_assert!(
+                r.contains_plain_id(pesce.id()),
+                "Riferimento did not contain id {}",
+                pesce.id()
+            );
+            let specie = r
+                .get_ref_by_plain_id(pesce.id())
+                .expect("Riferimento should contain this id");
+            let tipo_autoctono = specie.tipo_autoctono();
+            let tipo_alloctono = specie.tipo_alloctono();
+            if tipo_alloctono > 0 && tipo_alloctono <= 3 {
+                alieni_indigeni.alieni += 1;
+            } else if tipo_autoctono == 1 || tipo_autoctono == 2 {
+                alieni_indigeni.indigeni += 1;
             }
         }
 
         alieni_indigeni
     }
 
-    pub fn get_tot_specie_autoctone_attese(&self) -> usize {
-        let mut map: HashMap<String, bool> = HashMap::new();
+    pub fn get_tot_specie_autoctone_attese(&self, r: &RiferimentoNISECI) -> usize {
+        let mut set = HashSet::new();
 
         for cattura in self {
-            if cattura.specie_attesa()
-                && (cattura.tipo_autoctono() == 1 || cattura.tipo_autoctono() == 2)
+            debug_assert!(
+                r.contains_plain_id(cattura.id()),
+                "Riferimento did not contain id {}",
+                cattura.id()
+            );
+            let specie = r
+                .get_ref_by_plain_id(cattura.id())
+                .expect("Riferimento should contain this id");
+            if specie.specie_attesa()
+                && (specie.tipo_autoctono() == 1 || specie.tipo_autoctono() == 2)
             {
-                match map.entry(cattura.id().to_string()) {
-                    Entry::Occupied(_) => {}
-                    Entry::Vacant(entry) => {
-                        entry.insert(true);
-                    }
-                };
+                set.insert(cattura.id());
             }
         }
 
-        map.len()
+        set.len()
     }
 }
 
 impl From<CampionamentoNISECI> for Vec<RecordNISECI> {
     fn from(val: CampionamentoNISECI) -> Self {
-        #[expect(deprecated)]
         val.campionamento
     }
 }
@@ -662,27 +531,22 @@ impl<'a> IntoIterator for &'a CampionamentoNISECI {
     type IntoIter = std::slice::Iter<'a, RecordNISECI>;
 
     fn into_iter(self) -> Self::IntoIter {
-        #[expect(deprecated)]
         self.campionamento.iter()
     }
 }
 
 pub struct AlieniIndigeni {
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.alieni() instead")]
-    pub alieni: u32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.indigeni() instead")]
-    pub indigeni: u32,
+    alieni: u32,
+    indigeni: u32,
 }
 
 impl AlieniIndigeni {
     #[inline(always)]
     pub fn alieni(&self) -> u32 {
-        #[expect(deprecated)]
         self.alieni
     }
     #[inline(always)]
     pub fn indigeni(&self) -> u32 {
-        #[expect(deprecated)]
         self.indigeni
     }
 }
@@ -727,12 +591,9 @@ impl TryFrom<i32> for TipoComunitaNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ComunitaNISECI {
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo()")]
-    pub tipo: TipoComunitaNISECI,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.fonte()")]
-    pub fonte: Option<String>,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.num_protocollo()")]
-    pub numero_protocollo: Option<String>,
+    tipo: TipoComunitaNISECI,
+    fonte: Option<String>,
+    numero_protocollo: Option<String>,
 }
 
 impl fmt::Display for ComunitaNISECI {
@@ -783,27 +644,21 @@ impl ComunitaNISECI {
         num_protocollo: Option<String>,
     ) -> Self {
         Self {
-            #[expect(deprecated)]
             tipo,
-            #[expect(deprecated)]
             fonte,
-            #[expect(deprecated)]
             numero_protocollo: num_protocollo,
         }
     }
     #[inline(always)]
     pub fn tipo(&self) -> TipoComunitaNISECI {
-        #[expect(deprecated)]
         self.tipo
     }
     #[inline(always)]
     pub fn fonte(&self) -> Option<&str> {
-        #[expect(deprecated)]
         self.fonte.as_deref()
     }
     #[inline(always)]
     pub fn num_protocollo(&self) -> Option<&str> {
-        #[expect(deprecated)]
         self.numero_protocollo.as_deref()
     }
 }
@@ -863,16 +718,10 @@ pub struct AnagraficaNISECI {
     pub bacino_appartenenza: String,
     pub idro_eco_regione: IdroEcoRegioneNISECI,
     pub posizione: Location,
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.get_lunghezza_media(), self.set_lunghezza_media(), AnagraficaNISECI::new() to construct"
-    )]
     #[serde(deserialize_with = "deserialize_positive_f32")]
-    pub lunghezza_media_stazione: f32,
-    #[deprecated(
-        note = "v0.2 will change visibility.\nConsider using self.get_larghezza_media(), self.set_larghezza_media(), AnagraficaNISECI::new() to construct"
-    )]
+    lunghezza_media_stazione: f32,
     #[serde(deserialize_with = "deserialize_positive_f32")]
-    pub larghezza_media_stazione: f32,
+    larghezza_media_stazione: f32,
 }
 
 impl AnagraficaNISECI {
@@ -898,14 +747,11 @@ impl AnagraficaNISECI {
             bacino_appartenenza,
             idro_eco_regione,
             posizione,
-            #[expect(deprecated)]
             lunghezza_media_stazione: *lunghezza_media_stazione,
-            #[expect(deprecated)]
             larghezza_media_stazione: *larghezza_media_stazione,
         }
     }
     pub fn get_lunghezza_media(&self) -> f32 {
-        #[expect(deprecated)]
         self.lunghezza_media_stazione
     }
     pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
@@ -915,14 +761,10 @@ impl AnagraficaNISECI {
         if val <= 0.0 {
             return Err(PositiveF32Error::NotPositive);
         }
-        #[expect(deprecated)]
-        {
-            self.lunghezza_media_stazione = val;
-        }
+        self.lunghezza_media_stazione = val;
         Ok(())
     }
     pub fn get_larghezza_media(&self) -> f32 {
-        #[expect(deprecated)]
         self.larghezza_media_stazione
     }
     pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
@@ -932,10 +774,7 @@ impl AnagraficaNISECI {
         if val <= 0.0 {
             return Err(PositiveF32Error::NotPositive);
         }
-        #[expect(deprecated)]
-        {
-            self.larghezza_media_stazione = val;
-        }
+        self.larghezza_media_stazione = val;
         Ok(())
     }
 }
@@ -1069,20 +908,13 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValoriIntermediSpecieNISECI {
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.densita_stimata()")]
-    pub densita_stimata: f32,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.quantita_stimata()")]
-    pub quantita_stimata: u32,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.classi_eta()")]
-    pub classi_eta: ClassiEtaSpecieNISECI,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.rapporto_ad_juv()")]
-    pub rapporto_ad_juv: Option<f32>,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_a_a()")]
-    pub x2_a_a: u8,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_a_b()")]
-    pub x2_a_b: u8,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_b()")]
-    pub x2_b: f32,
+    densita_stimata: f32,
+    quantita_stimata: u32,
+    classi_eta: ClassiEtaSpecieNISECI,
+    rapporto_ad_juv: Option<f32>,
+    x2_a_a: u8,
+    x2_a_b: u8,
+    x2_b: f32,
 }
 
 impl fmt::Display for ValoriIntermediSpecieNISECI {
@@ -1108,39 +940,52 @@ impl fmt::Display for ValoriIntermediSpecieNISECI {
 }
 
 impl ValoriIntermediSpecieNISECI {
+    pub(crate) fn new(
+        classi_eta: ClassiEtaSpecieNISECI,
+        densita_stimata: f32,
+        quantita_stimata: u32,
+        rapporto_ad_juv: Option<f32>,
+        x2_a_a: u8,
+        x2_a_b: u8,
+        x2_b: f32,
+    ) -> Self {
+        Self {
+            densita_stimata,
+            quantita_stimata,
+            classi_eta,
+            rapporto_ad_juv,
+            x2_a_a,
+            x2_a_b,
+            x2_b,
+        }
+    }
+
     #[inline(always)]
     pub fn densita_stimata(&self) -> f32 {
-        #[expect(deprecated)]
         self.densita_stimata
     }
     #[inline(always)]
     pub fn quantita_stimata(&self) -> u32 {
-        #[expect(deprecated)]
         self.quantita_stimata
     }
     #[inline(always)]
-    pub(crate) fn classi_eta(&self) -> &ClassiEtaSpecieNISECI {
-        #[expect(deprecated)]
+    pub fn classi_eta(&self) -> &ClassiEtaSpecieNISECI {
         &self.classi_eta
     }
     #[inline(always)]
-    pub(crate) fn rapporto_ad_juv(&self) -> Option<f32> {
-        #[expect(deprecated)]
+    pub fn rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
     #[inline(always)]
     pub fn x2_a_a(&self) -> u8 {
-        #[expect(deprecated)]
         self.x2_a_a
     }
     #[inline(always)]
     pub fn x2_a_b(&self) -> u8 {
-        #[expect(deprecated)]
         self.x2_a_b
     }
     #[inline(always)]
     pub fn x2_b(&self) -> f32 {
-        #[expect(deprecated)]
         self.x2_b
     }
 }
@@ -1148,22 +993,14 @@ impl ValoriIntermediSpecieNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValoriIntermediNISECI {
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x1()")]
-    pub x1: f32,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2()")]
-    pub x2: Option<f32>,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x3()")]
-    pub x3: f32,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.specie_specifici()")]
-    pub specie_specifici: HashMap<String, ValoriIntermediSpecieNISECI>,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_a()")]
-    pub x2_a: f32,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x2_b()")]
-    pub x2_b: f32,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x3_a()")]
-    pub x3_a: Option<f32>,
-    #[deprecated(note = "v0.2 will change visibility.\nConsider using self.x3_b()")]
-    pub x3_b: Option<f32>,
+    x1: f32,
+    x2: Option<f32>,
+    x3: f32,
+    specie_specifici: HashMap<IdSpecieNISECI, ValoriIntermediSpecieNISECI>,
+    x2_a: f32,
+    x2_b: f32,
+    x3_a: Option<f32>,
+    x3_b: Option<f32>,
 }
 
 impl fmt::Display for ValoriIntermediNISECI {
@@ -1192,121 +1029,58 @@ impl fmt::Display for ValoriIntermediNISECI {
 }
 
 impl ValoriIntermediNISECI {
+    pub(crate) fn new(
+        x1: f32,
+        x2: Option<f32>,
+        x3: f32,
+        specie_specifici: HashMap<IdSpecieNISECI, ValoriIntermediSpecieNISECI>,
+        x2_a: f32,
+        x2_b: f32,
+        x3_a: Option<f32>,
+        x3_b: Option<f32>,
+    ) -> Self {
+        Self {
+            x1,
+            x2,
+            x3,
+            specie_specifici,
+            x2_a,
+            x2_b,
+            x3_a,
+            x3_b,
+        }
+    }
     #[inline(always)]
-    pub(crate) fn x1(&self) -> f32 {
-        #[expect(deprecated)]
+    pub fn x1(&self) -> f32 {
         self.x1
     }
     #[inline(always)]
-    pub(crate) fn x2(&self) -> Option<f32> {
-        #[expect(deprecated)]
+    pub fn x2(&self) -> Option<f32> {
         self.x2
     }
     #[inline(always)]
-    pub(crate) fn x3(&self) -> f32 {
-        #[expect(deprecated)]
+    pub fn x3(&self) -> f32 {
         self.x3
     }
     #[inline(always)]
-    pub(crate) fn x2_a(&self) -> f32 {
-        #[expect(deprecated)]
+    pub fn x2_a(&self) -> f32 {
         self.x2_a
     }
     #[inline(always)]
-    pub(crate) fn x2_b(&self) -> f32 {
-        #[expect(deprecated)]
+    pub fn x2_b(&self) -> f32 {
         self.x2_b
     }
     #[inline(always)]
-    pub(crate) fn x3_a(&self) -> Option<f32> {
-        #[expect(deprecated)]
+    pub fn x3_a(&self) -> Option<f32> {
         self.x3_a
     }
     #[inline(always)]
-    pub(crate) fn x3_b(&self) -> Option<f32> {
-        #[expect(deprecated)]
+    pub fn x3_b(&self) -> Option<f32> {
         self.x3_b
     }
     #[inline(always)]
-    pub(crate) fn specie_specifici(&self) -> &HashMap<String, ValoriIntermediSpecieNISECI> {
-        #[expect(deprecated)]
+    pub fn specie_specifici(&self) -> &HashMap<IdSpecieNISECI, ValoriIntermediSpecieNISECI> {
         &self.specie_specifici
-    }
-    #[deprecated(note = "v0.2 will drop visibility")]
-    pub fn log(&self) {
-        //TODO: a proper format? we count on the embedded newlines to leverage the
-        //chopping on newlines from add_console_message()
-        println!("Valori intermedi: {{{self}}}");
-    }
-
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.to_csv_joined() instead")]
-    pub fn to_csv(&self, comma_csv_delimiter: bool) -> String {
-        let mut string_representation = if comma_csv_delimiter {
-            "specie, nome latino, tipo autoctono, tipo alloctono, specie attesa, cl1, cl2, cl3, cl4, cl5, densita stimata, quantita stimata, x2b, rapporto ad/juv, x2a_a, x2a_b".to_string()
-        } else {
-            "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
-        };
-        for (key_id, v) in self.specie_specifici().iter() {
-            let rapporto_ad_juv_str = match v.rapporto_ad_juv() {
-                Some(v) => {
-                    if comma_csv_delimiter {
-                        format!("{v}")
-                    } else {
-                        v.comma().to_string()
-                    }
-                }
-                None => "NC".to_string(),
-            };
-            let specie_attesa_str = if v.classi_eta().specie_attesa() {
-                "SI"
-            } else {
-                "NO"
-            };
-            string_representation = if comma_csv_delimiter {
-                format!(
-                    "{}\n{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
-                    string_representation,
-                    key_id,
-                    v.classi_eta().nome(),
-                    v.classi_eta().tipo_autoctono(),
-                    v.classi_eta().tipo_alloctono(),
-                    specie_attesa_str,
-                    v.classi_eta().cl_1(),
-                    v.classi_eta().cl_2(),
-                    v.classi_eta().cl_3(),
-                    v.classi_eta().cl_4(),
-                    v.classi_eta().cl_5(),
-                    v.densita_stimata(),
-                    v.quantita_stimata(),
-                    v.x2_b(),
-                    rapporto_ad_juv_str,
-                    v.x2_a_a(),
-                    v.x2_a_b()
-                )
-            } else {
-                format!(
-                    "{}\n{}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
-                    string_representation,
-                    key_id,
-                    v.classi_eta().nome(),
-                    v.classi_eta().tipo_autoctono(),
-                    v.classi_eta().tipo_alloctono(),
-                    specie_attesa_str,
-                    v.classi_eta().cl_1(),
-                    v.classi_eta().cl_2(),
-                    v.classi_eta().cl_3(),
-                    v.classi_eta().cl_4(),
-                    v.classi_eta().cl_5(),
-                    v.densita_stimata().comma(),
-                    v.quantita_stimata(),
-                    v.x2_b(),
-                    rapporto_ad_juv_str,
-                    v.x2_a_a(),
-                    v.x2_a_b()
-                )
-            }
-        }
-        string_representation
     }
     pub fn to_csv_joined(
         &self,
@@ -1318,8 +1092,8 @@ impl ValoriIntermediNISECI {
         } else {
             "specie; nome latino; tipo autoctono; tipo alloctono; specie attesa; cl1; cl2; cl3; cl4; cl5; densita stimata; quantita stimata; x2b; rapporto ad/juv; x2a_a; x2a_b".to_string()
         };
-        for (key_id, v) in self.specie_specifici().iter() {
-            let specie_ref = match riferimento.get_ref_by_id(key_id) {
+        for (id, v) in self.specie_specifici().iter() {
+            let specie_ref = match riferimento.get_ref_by_plain_id(*id) {
                 Some(s) => s,
                 None => {
                     string_representation = format!(
@@ -1329,6 +1103,7 @@ impl ValoriIntermediNISECI {
                     return string_representation;
                 }
             };
+            let key_id = specie_ref.id();
             let rapporto_ad_juv_str = match v.rapporto_ad_juv() {
                 Some(v) => {
                     if comma_csv_delimiter {
@@ -1583,48 +1358,54 @@ impl MetricheX2A {
     }
 }
 
+/// enum che aiuta a valorizzare ClassiEtaSpecieNISECI
+/// (vedi update_classi_eta)
+pub enum ClassiEta {
+    CL1,
+    CL2,
+    CL3,
+    CL4,
+    CL5,
+}
+
+impl ClassiEta {
+    pub fn find_classe_eta(record: &RecordNISECI, r: &RiferimentoNISECI) -> ClassiEta {
+        let specie = r
+            .get_ref_by_plain_id(record.id())
+            .expect("Riferimento should contain this id");
+        if record.lunghezza() < specie.cl_soglia_1() {
+            ClassiEta::CL1
+        } else if record.lunghezza() < specie.cl_soglia_2() {
+            ClassiEta::CL2
+        } else if record.lunghezza() < specie.cl_soglia_3() {
+            ClassiEta::CL3
+        } else if record.lunghezza() < specie.cl_soglia_4() {
+            ClassiEta::CL4
+        } else {
+            ClassiEta::CL5
+        }
+    }
+}
+
 /// le classi eta contengono il numero di esemplari trovati
 /// nel campionamento per ogni specie catturata
 /// suddivisi nelle loro classi di eta (in base alla lunghezza)
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ClassiEtaSpecieNISECI {
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.id(), self.nome(), self.ad_juv_soglia_N() instead"
-    )]
-    pub specie: SpecieNISECI,
-    tipo_autoctono: u8,
-    tipo_alloctono: u8,
-    specie_attesa: bool,
-    ad_juv_soglia_1: f32,
-    ad_juv_soglia_2: f32,
-    ad_juv_soglia_3: f32,
-    ad_juv_soglia_4: f32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_1() instead")]
-    pub cl1: u32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_2() instead")]
-    pub cl2: u32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_3() instead")]
-    pub cl3: u32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_4() instead")]
-    pub cl4: u32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.cl_5() instead")]
-    pub cl5: u32,
+    id: IdSpecieNISECI,
+    cl1: u32,
+    cl2: u32,
+    cl3: u32,
+    cl4: u32,
+    cl5: u32,
 }
 
 impl fmt::Display for ClassiEtaSpecieNISECI {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let specie_attesa_str = match self.specie_attesa() {
-            true => "SI".to_string(),
-            false => "NO".to_string(),
-        };
         let string_representation = format!(
-            "{}; {}; {}; {}; {}; {}; {}; {}; {}; {}",
+            "{}; {}; {}; {}; {}; {}",
             self.id(),
-            self.nome(),
-            self.tipo_autoctono(),
-            self.tipo_alloctono(),
-            specie_attesa_str,
             self.cl_1(),
             self.cl_2(),
             self.cl_3(),
@@ -1635,156 +1416,109 @@ impl fmt::Display for ClassiEtaSpecieNISECI {
     }
 }
 
-impl Default for ClassiEtaSpecieNISECI {
-    fn default() -> Self {
-        #[expect(deprecated)]
-        Self::new()
-    }
-}
-
 impl ClassiEtaSpecieNISECI {
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using ClassiEtaSpecieNISECI::new_cl_prevalorizzata instead"
-    )]
-    pub fn new() -> ClassiEtaSpecieNISECI {
-        ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: SpecieNISECI::new_dummy_specie(),
-            tipo_autoctono: 0,
-            tipo_alloctono: 0,
-            specie_attesa: true,
-            ad_juv_soglia_1: 0.1,
-            ad_juv_soglia_2: 0.2,
-            ad_juv_soglia_3: 0.3,
-            ad_juv_soglia_4: 0.4,
-            #[expect(deprecated)]
+    pub(crate) fn new_empty() -> Self {
+        Self {
+            id: 420,
             cl1: 0,
-            #[expect(deprecated)]
             cl2: 0,
-            #[expect(deprecated)]
             cl3: 0,
-            #[expect(deprecated)]
             cl4: 0,
-            #[expect(deprecated)]
             cl5: 0,
         }
     }
-
-    pub fn new_cl_prevalorizzata(record: &RecordNISECI) -> ClassiEtaSpecieNISECI {
+    pub fn new_cl_prevalorizzata(
+        record: &RecordNISECI,
+        r: &RiferimentoNISECI,
+    ) -> Option<ClassiEtaSpecieNISECI> {
         let mut classe = ClassiEtaSpecieNISECI {
-            #[expect(deprecated)]
-            specie: record.specie.clone(),
-            specie_attesa: record.specie_attesa(),
-            tipo_autoctono: record.tipo_autoctono(),
-            tipo_alloctono: record.tipo_alloctono(),
-            ad_juv_soglia_1: record.ad_juv_soglia_1(),
-            ad_juv_soglia_2: record.ad_juv_soglia_2(),
-            ad_juv_soglia_3: record.ad_juv_soglia_3(),
-            ad_juv_soglia_4: record.ad_juv_soglia_4(),
-            #[expect(deprecated)]
+            id: record.id(),
             cl1: 0,
-            #[expect(deprecated)]
             cl2: 0,
-            #[expect(deprecated)]
             cl3: 0,
-            #[expect(deprecated)]
             cl4: 0,
-            #[expect(deprecated)]
             cl5: 0,
         };
-        classe.update_classi_eta(record);
-        classe
+        classe.update_classi_eta(record, r);
+        Some(classe)
     }
 
-    pub fn update_classi_eta(&mut self, record: &RecordNISECI) {
-        match ClassiEta::find_classe_eta(record) {
-            #[expect(deprecated)]
+    pub fn update_classi_eta(&mut self, record: &RecordNISECI, r: &RiferimentoNISECI) {
+        match ClassiEta::find_classe_eta(record, r) {
             ClassiEta::CL1 => self.cl1 += 1,
-            #[expect(deprecated)]
             ClassiEta::CL2 => self.cl2 += 1,
-            #[expect(deprecated)]
             ClassiEta::CL3 => self.cl3 += 1,
-            #[expect(deprecated)]
             ClassiEta::CL4 => self.cl4 += 1,
-            #[expect(deprecated)]
             ClassiEta::CL5 => self.cl5 += 1,
         }
     }
 
     #[inline(always)]
-    pub(crate) fn cl_1(&self) -> u32 {
-        #[expect(deprecated)]
+    pub fn cl_1(&self) -> u32 {
         self.cl1
     }
     #[inline(always)]
-    pub(crate) fn cl_2(&self) -> u32 {
-        #[expect(deprecated)]
+    pub fn cl_2(&self) -> u32 {
         self.cl2
     }
     #[inline(always)]
-    pub(crate) fn cl_3(&self) -> u32 {
-        #[expect(deprecated)]
+    pub fn cl_3(&self) -> u32 {
         self.cl3
     }
     #[inline(always)]
-    pub(crate) fn cl_4(&self) -> u32 {
-        #[expect(deprecated)]
+    pub fn cl_4(&self) -> u32 {
         self.cl4
     }
     #[inline(always)]
-    pub(crate) fn cl_5(&self) -> u32 {
-        #[expect(deprecated)]
+    pub fn cl_5(&self) -> u32 {
         self.cl5
     }
 
     #[inline(always)]
-    pub(crate) fn id(&self) -> &str {
-        #[expect(deprecated)]
-        &self.specie.id
-    }
-
-    pub fn nome(&self) -> &str {
-        #[expect(deprecated)]
-        &self.specie.nome
+    pub fn id(&self) -> IdSpecieNISECI {
+        self.id
     }
 
     #[inline(always)]
-    pub fn specie_attesa(&self) -> bool {
-        self.specie_attesa
+    pub fn specie_attesa(&self, r: &RiferimentoNISECI) -> Option<bool> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.specie_attesa())
     }
 
     #[inline(always)]
-    pub(crate) fn tipo_autoctono(&self) -> u8 {
-        self.tipo_autoctono
+    pub fn tipo_autoctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_autoctono())
     }
 
     #[inline(always)]
-    pub(crate) fn tipo_alloctono(&self) -> u8 {
-        self.tipo_alloctono
+    pub fn tipo_alloctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_alloctono())
     }
 
     #[inline(always)]
-    pub fn ad_juv_soglia_1(&self) -> f32 {
-        self.ad_juv_soglia_1
+    pub fn ad_juv_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_1())
     }
 
     #[inline(always)]
-    pub fn ad_juv_soglia_2(&self) -> f32 {
-        self.ad_juv_soglia_2
+    pub fn ad_juv_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_2())
     }
 
     #[inline(always)]
-    pub fn ad_juv_soglia_3(&self) -> f32 {
-        self.ad_juv_soglia_3
+    pub fn ad_juv_soglia_3(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_3())
     }
 
     #[inline(always)]
-    pub fn ad_juv_soglia_4(&self) -> f32 {
-        self.ad_juv_soglia_4
+    pub fn ad_juv_soglia_4(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id())
+            .map(|s| s.ad_juv_soglia_4())
     }
 
     fn get_how_many_classes(&self) -> usize {
-        #[expect(deprecated)]
         [self.cl1, self.cl2, self.cl3, self.cl4, self.cl5]
             .into_iter()
             .filter(|&value| value > 0)
@@ -1802,34 +1536,37 @@ impl ClassiEtaSpecieNISECI {
         3
     }
 
-    pub fn get_x2_a_criterio_b(&self) -> (u8, Option<f32>) {
-        #[expect(deprecated)]
+    pub fn get_x2_a_criterio_b(&self, r: &RiferimentoNISECI) -> Option<(u8, Option<f32>)> {
         if (self.cl2 + self.cl3) == 0 {
-            return (3, None);
+            return Some((3, None));
         }
 
-        #[expect(deprecated)]
         let ad_juv = (self.cl4 + self.cl5) as f32 / (self.cl2 + self.cl3) as f32;
-        if ad_juv < self.ad_juv_soglia_1() {
-            return (3, Some(ad_juv));
+        if ad_juv < self.ad_juv_soglia_1(r)? {
+            return Some((3, Some(ad_juv)));
         }
-        if ad_juv <= self.ad_juv_soglia_2() {
-            return (2, Some(ad_juv));
+        if ad_juv <= self.ad_juv_soglia_2(r)? {
+            return Some((2, Some(ad_juv)));
         }
-        if ad_juv <= self.ad_juv_soglia_3() {
-            return (1, Some(ad_juv));
+        if ad_juv <= self.ad_juv_soglia_3(r)? {
+            return Some((1, Some(ad_juv)));
         }
-        if ad_juv <= self.ad_juv_soglia_4() {
-            return (2, Some(ad_juv));
+        if ad_juv <= self.ad_juv_soglia_4(r)? {
+            return Some((2, Some(ad_juv)));
         }
-        (3, Some(ad_juv))
+        Some((3, Some(ad_juv)))
     }
 
     /// questa fn viene usata sia per x2_a che per x3
     /// i suoi test sono esattamente quelli per calculate_x2_a
-    pub fn calculate_struttura_popolazione(&self) -> Result<(f32, MetricheX2A), String> {
+    pub fn calculate_struttura_popolazione(
+        &self,
+        r: &RiferimentoNISECI,
+    ) -> Result<(f32, MetricheX2A), String> {
         let criterio_a: u8 = self.get_x2_a_criterio_a();
-        let (criterio_b, ad_juv): (u8, Option<f32>) = self.get_x2_a_criterio_b();
+        let (criterio_b, ad_juv): (u8, Option<f32>) = self.get_x2_a_criterio_b(r).ok_or(
+            format!("id: {} not present in RiferimentoNISECI", self.id()),
+        )?;
 
         if criterio_a == 1 && criterio_b == 3 {
             return Ok((
@@ -1868,32 +1605,6 @@ impl ClassiEtaSpecieNISECI {
     }
 }
 
-/// enum che aiuta a valorizzare ClassiEtaSpecieNISECI
-/// (vedi update_classi_eta)
-pub enum ClassiEta {
-    CL1,
-    CL2,
-    CL3,
-    CL4,
-    CL5,
-}
-
-impl ClassiEta {
-    pub fn find_classe_eta(record: &RecordNISECI) -> ClassiEta {
-        if record.lunghezza() < record.cl_soglia_1() {
-            ClassiEta::CL1
-        } else if record.lunghezza() < record.cl_soglia_2() {
-            ClassiEta::CL2
-        } else if record.lunghezza() < record.cl_soglia_3() {
-            ClassiEta::CL3
-        } else if record.lunghezza() < record.cl_soglia_4() {
-            ClassiEta::CL4
-        } else {
-            ClassiEta::CL5
-        }
-    }
-}
-
 pub struct InfoIntermediePopolazioniNISECI {
     criterio_a: u8,
     criterio_b: u8,
@@ -1925,26 +1636,12 @@ impl InfoIntermediePopolazioniNISECI {
 
 /// struct che aiuta nel calcolo di x3
 pub struct InfoPopolazioniNISECI {
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.popolazione_piu_strutt() instead"
-    )]
-    pub popolazione_piu_strutt: f32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.species_strutt() instead")]
-    pub species_strutt: u32,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.species_mediamente_strutt() instead"
-    )]
-    pub species_mediamente_strutt: u32,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.species_destrutt() instead"
-    )]
-    pub species_destrutt: u32,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tot_species() instead")]
-    pub tot_species: usize,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.intermediates_map() instead"
-    )]
-    pub intermediates_map: HashMap<String, InfoIntermediePopolazioniNISECI>,
+    pub(crate) popolazione_piu_strutt: f32,
+    pub(crate) species_strutt: u32,
+    pub(crate) species_mediamente_strutt: u32,
+    pub(crate) species_destrutt: u32,
+    pub(crate) tot_species: usize,
+    intermediates_map: HashMap<IdSpecieNISECI, InfoIntermediePopolazioniNISECI>,
 }
 
 impl Default for InfoPopolazioniNISECI {
@@ -1956,102 +1653,75 @@ impl Default for InfoPopolazioniNISECI {
 impl InfoPopolazioniNISECI {
     pub fn new() -> InfoPopolazioniNISECI {
         InfoPopolazioniNISECI {
-            #[expect(deprecated)]
             popolazione_piu_strutt: 0.0,
-            #[expect(deprecated)]
             species_strutt: 0,
-            #[expect(deprecated)]
             species_mediamente_strutt: 0,
-            #[expect(deprecated)]
             species_destrutt: 0,
-            #[expect(deprecated)]
             tot_species: 0,
-            #[expect(deprecated)]
             intermediates_map: HashMap::new(),
         }
     }
 
     #[inline(always)]
     pub fn popolazione_piu_strutt(&self) -> f32 {
-        #[expect(deprecated)]
         self.popolazione_piu_strutt
     }
 
     #[inline(always)]
     pub fn species_strutt(&self) -> u32 {
-        #[expect(deprecated)]
         self.species_strutt
     }
 
     #[inline(always)]
     pub fn species_mediamente_strutt(&self) -> u32 {
-        #[expect(deprecated)]
         self.species_mediamente_strutt
     }
 
     #[inline(always)]
     pub fn species_destrutt(&self) -> u32 {
-        #[expect(deprecated)]
         self.species_destrutt
     }
 
     #[inline(always)]
     pub fn tot_species(&self) -> usize {
-        #[expect(deprecated)]
         self.tot_species
     }
 
     #[inline(always)]
-    pub(crate) fn intermediates_map(&self) -> &HashMap<String, InfoIntermediePopolazioniNISECI> {
-        #[expect(deprecated)]
+    pub fn intermediates_map(&self) -> &HashMap<IdSpecieNISECI, InfoIntermediePopolazioniNISECI> {
         &self.intermediates_map
     }
 
     pub fn get_info_pop(
-        map: &HashMap<String, ClassiEtaSpecieNISECI>,
+        map: &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
+        r: &RiferimentoNISECI,
     ) -> Result<InfoPopolazioniNISECI, Vec<String>> {
         let mut errors: Vec<String> = Vec::with_capacity(map.len()); // prenoto ora e poi restringo dopo
 
         let mut info_pop = InfoPopolazioniNISECI::new();
-        #[expect(deprecated)]
-        {
-            info_pop.tot_species = map.len();
-        }
+        info_pop.tot_species = map.len();
         let epsilon: f32 = 1e-6;
         for classe in map.values() {
-            match classe.calculate_struttura_popolazione() {
+            match classe.calculate_struttura_popolazione(r) {
                 Ok((popolazione, criteri_x2_a)) => {
                     if info_pop.popolazione_piu_strutt() < popolazione {
-                        #[expect(deprecated)]
-                        {
-                            info_pop.popolazione_piu_strutt = popolazione;
-                        }
+                        info_pop.popolazione_piu_strutt = popolazione;
                     }
                     if (popolazione - 1.0).abs() < epsilon {
-                        #[expect(deprecated)]
-                        {
-                            info_pop.species_strutt += 1;
-                        }
+                        info_pop.species_strutt += 1;
                     }
                     if (popolazione - 0.5).abs() < epsilon {
-                        #[expect(deprecated)]
-                        {
-                            info_pop.species_mediamente_strutt += 1;
-                        }
+                        info_pop.species_mediamente_strutt += 1;
                     }
                     if popolazione.abs() < epsilon {
-                        #[expect(deprecated)]
-                        {
-                            info_pop.species_destrutt += 1;
-                        }
+                        info_pop.species_destrutt += 1;
                     }
                     let criterio_a = criteri_x2_a.get_criterio_a();
                     let criterio_b = criteri_x2_a.get_criterio_b();
                     let rapporto_ad_juv = criteri_x2_a.get_rapporto_ad_juv();
 
-                    #[expect(deprecated)]
                     info_pop.intermediates_map.insert(
-                        classe.id().to_string(),
+                        classe.id(),
                         InfoIntermediePopolazioniNISECI::new(
                             criterio_a,
                             criterio_b,
@@ -2077,87 +1747,61 @@ impl InfoPopolazioniNISECI {
 /// a calcolare x3
 /// per ogni tipo di alloctono abbiamo una InfoPopolazioniNISECI
 pub struct InfoPopolazioniAlieneNISECI {
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_1() instead")]
-    pub tipo_1: InfoPopolazioniNISECI,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_2() instead")]
-    pub tipo_2: InfoPopolazioniNISECI,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tipo_3() instead")]
-    pub tipo_3: InfoPopolazioniNISECI,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.tot_specie_aliene() instead"
-    )]
-    pub tot_specie_aliene: usize,
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using self.tot_specie_autoctone() instead"
-    )]
-    pub tot_specie_autoctone: usize,
+    pub(crate) tipo_1: InfoPopolazioniNISECI,
+    pub(crate) tipo_2: InfoPopolazioniNISECI,
+    pub(crate) tipo_3: InfoPopolazioniNISECI,
+    pub(crate) tot_specie_aliene: usize,
+    pub(crate) tot_specie_autoctone: usize,
 }
 
 impl InfoPopolazioniAlieneNISECI {
     #[cfg(test)]
     pub fn new() -> InfoPopolazioniAlieneNISECI {
         InfoPopolazioniAlieneNISECI {
-            #[expect(deprecated)]
             tipo_1: InfoPopolazioniNISECI::new(),
-            #[expect(deprecated)]
             tipo_2: InfoPopolazioniNISECI::new(),
-            #[expect(deprecated)]
             tipo_3: InfoPopolazioniNISECI::new(),
-            #[expect(deprecated)]
             tot_specie_aliene: 0,
-            #[expect(deprecated)]
             tot_specie_autoctone: 0,
         }
     }
 
     #[inline(always)]
-    pub(crate) fn tipo_1(&self) -> &InfoPopolazioniNISECI {
-        #[expect(deprecated)]
+    pub fn tipo_1(&self) -> &InfoPopolazioniNISECI {
         &self.tipo_1
     }
     #[inline(always)]
-    pub(crate) fn tipo_2(&self) -> &InfoPopolazioniNISECI {
-        #[expect(deprecated)]
+    pub fn tipo_2(&self) -> &InfoPopolazioniNISECI {
         &self.tipo_2
     }
     #[inline(always)]
-    pub(crate) fn tipo_3(&self) -> &InfoPopolazioniNISECI {
-        #[expect(deprecated)]
+    pub fn tipo_3(&self) -> &InfoPopolazioniNISECI {
         &self.tipo_3
     }
 
     #[inline(always)]
-    pub(crate) fn tot_specie_aliene(&self) -> usize {
-        #[expect(deprecated)]
+    pub fn tot_specie_aliene(&self) -> usize {
         self.tot_specie_aliene
     }
 
     #[inline(always)]
-    pub(crate) fn tot_specie_autoctone(&self) -> usize {
-        #[expect(deprecated)]
+    pub fn tot_specie_autoctone(&self) -> usize {
         self.tot_specie_autoctone
     }
 
     pub fn get_info_pop_aliene(
         classi_eta: &ClassiEtaAlieniNISECI,
+        r: &RiferimentoNISECI,
     ) -> Result<InfoPopolazioniAlieneNISECI, Vec<String>> {
-        #[expect(deprecated)]
-        let tipo_1 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1)?;
-        #[expect(deprecated)]
-        let tipo_2 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_2)?;
-        #[expect(deprecated)]
-        let tipo_3 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3)?;
+        let tipo_1 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_1, r)?;
+        let tipo_2 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_2, r)?;
+        let tipo_3 = InfoPopolazioniNISECI::get_info_pop(&classi_eta.map_tipo_3, r)?;
 
         let info_pop_aliene = InfoPopolazioniAlieneNISECI {
-            #[expect(deprecated)]
             tipo_1,
-            #[expect(deprecated)]
             tipo_2,
-            #[expect(deprecated)]
             tipo_3,
-            #[expect(deprecated)]
             tot_specie_aliene: classi_eta.tot_specie_aliene,
-            #[expect(deprecated)]
             tot_specie_autoctone: classi_eta.tot_specie_autoctone,
         };
 
@@ -2165,36 +1809,25 @@ impl InfoPopolazioniAlieneNISECI {
     }
 
     pub fn get_species_mediamente_strutt(&self) -> u32 {
-        #[expect(deprecated)]
-        {
-            self.tipo_1.species_mediamente_strutt()
-                + self.tipo_2.species_mediamente_strutt()
-                + self.tipo_3.species_mediamente_strutt()
-        }
+        self.tipo_1.species_mediamente_strutt()
+            + self.tipo_2.species_mediamente_strutt()
+            + self.tipo_3.species_mediamente_strutt()
     }
     pub fn get_species_destrutt(&self) -> u32 {
-        #[expect(deprecated)]
-        {
-            self.tipo_1.species_destrutt()
-                + self.tipo_2.species_destrutt()
-                + self.tipo_3.species_destrutt()
-        }
+        self.tipo_1.species_destrutt()
+            + self.tipo_2.species_destrutt()
+            + self.tipo_3.species_destrutt()
     }
 }
 
 /// struct che aiuta nel calcolo x3
 /// ci aiuta a suddividere le specie aliene in base alla tipologia
 pub struct ClassiEtaAlieniNISECI {
-    #[deprecated(note = "v0.2 will drop visibility.")]
-    pub map_tipo_1: HashMap<String, ClassiEtaSpecieNISECI>,
-    #[deprecated(note = "v0.2 will drop visibility.")]
-    pub map_tipo_2: HashMap<String, ClassiEtaSpecieNISECI>,
-    #[deprecated(note = "v0.2 will drop visibility.")]
-    pub map_tipo_3: HashMap<String, ClassiEtaSpecieNISECI>,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tot_specie_aliene()")]
-    pub tot_specie_aliene: usize,
-    #[deprecated(note = "v0.2 will drop visibility. Consider using self.tot_specie_autoctone()")]
-    pub tot_specie_autoctone: usize,
+    pub(crate) map_tipo_1: HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
+    pub(crate) map_tipo_2: HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
+    pub(crate) map_tipo_3: HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
+    tot_specie_aliene: usize,
+    tot_specie_autoctone: usize,
 }
 
 impl Default for ClassiEtaAlieniNISECI {
@@ -2205,26 +1838,44 @@ impl Default for ClassiEtaAlieniNISECI {
 
 impl ClassiEtaAlieniNISECI {
     pub fn new() -> ClassiEtaAlieniNISECI {
+        Self::new_with_capacity::<DefaultCapacity>()
+    }
+    pub(crate) fn new_with_capacity<C: Capacity>() -> ClassiEtaAlieniNISECI {
         ClassiEtaAlieniNISECI {
-            #[expect(deprecated)]
-            map_tipo_1: HashMap::with_capacity(10),
-            #[expect(deprecated)]
-            map_tipo_2: HashMap::with_capacity(10),
-            #[expect(deprecated)]
-            map_tipo_3: HashMap::with_capacity(10),
-            #[expect(deprecated)]
+            map_tipo_1: HashMap::with_capacity(C::VALUE),
+            map_tipo_2: HashMap::with_capacity(C::VALUE),
+            map_tipo_3: HashMap::with_capacity(C::VALUE),
             tot_specie_aliene: 0,
-            #[expect(deprecated)]
             tot_specie_autoctone: 0,
         }
     }
+    #[inline(always)]
+    pub fn map_tipo_1(&self) -> &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> {
+        &self.map_tipo_1
+    }
+    #[inline(always)]
+    pub fn map_tipo_2(&self) -> &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> {
+        &self.map_tipo_2
+    }
+    #[inline(always)]
+    pub fn map_tipo_3(&self) -> &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> {
+        &self.map_tipo_3
+    }
+    #[inline(always)]
     pub fn tot_specie_aliene(&self) -> usize {
-        #[expect(deprecated)]
         self.tot_specie_aliene
     }
+    #[inline(always)]
+    pub fn set_tot_specie_aliene(&mut self, val: usize) {
+        self.tot_specie_aliene = val;
+    }
+    #[inline(always)]
     pub fn tot_specie_autoctone(&self) -> usize {
-        #[expect(deprecated)]
         self.tot_specie_autoctone
+    }
+    #[inline(always)]
+    pub fn set_tot_specie_autoctone(&mut self, val: usize) {
+        self.tot_specie_autoctone = val;
     }
 }
 
@@ -2233,58 +1884,36 @@ impl ClassiEtaAlieniNISECI {
 /// il numero di esemplari trovati
 /// suddivisi in base al numero di passaggio
 pub struct EsemplariPerCattura {
-    #[deprecated(note = "v0.2 will drop visibility")]
-    pub specie: SpecieNISECI,
-    #[deprecated(note = "v0.2 will drop visibility")]
-    pub mappa: HashMap<u8, u32>, // la key è il numero del passaggio
-    dens_soglia_1: f32,
-    dens_soglia_2: f32,
+    id: IdSpecieNISECI,
+    mappa: HashMap<u8, u32>, // la key è il numero del passaggio
 }
 
 impl EsemplariPerCattura {
     #[inline(always)]
-    pub(crate) fn id(&self) -> &str {
-        #[expect(deprecated)]
-        self.specie.id()
+    pub fn id(&self) -> IdSpecieNISECI {
+        self.id
     }
     #[inline(always)]
-    pub(crate) fn dens_soglia_1(&self) -> f32 {
-        self.dens_soglia_1
+    pub fn mappa(&self) -> &HashMap<u8, u32> {
+        &self.mappa
     }
     #[inline(always)]
-    pub(crate) fn dens_soglia_2(&self) -> f32 {
-        self.dens_soglia_2
+    pub fn dens_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_1())
+    }
+    #[inline(always)]
+    pub fn dens_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
+        r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_2())
     }
 
-    pub(crate) fn new(specie: &SpecieNISECI) -> Self {
+    pub fn new(id: IdSpecieNISECI) -> Self {
         EsemplariPerCattura {
-            #[expect(deprecated)]
-            specie: specie.clone(),
-            #[expect(deprecated)]
+            id,
             mappa: HashMap::new(),
-            dens_soglia_1: specie.dens_soglia_1(),
-            dens_soglia_2: specie.dens_soglia_2(),
-        }
-    }
-    #[deprecated(
-        note = "v0.2 will drop visibility. Consider using EsemplariPerCattura::new().fill_passaggio() instead"
-    )]
-    pub fn new_prevalorized(numero_passaggio: u8, specie: &SpecieNISECI) -> EsemplariPerCattura {
-        let mut mappa: HashMap<u8, u32> = HashMap::new();
-        mappa.insert(numero_passaggio, 1);
-
-        EsemplariPerCattura {
-            #[expect(deprecated)]
-            specie: specie.clone(),
-            #[expect(deprecated)]
-            mappa,
-            dens_soglia_1: specie.dens_soglia_1(),
-            dens_soglia_2: specie.dens_soglia_2(),
         }
     }
 
     pub fn fill_passaggio(&mut self, numero_passaggio: u8) {
-        #[expect(deprecated)]
         match self.mappa.entry(numero_passaggio) {
             Entry::Occupied(occupied) => {
                 let numero_esemplari = occupied.get() + 1;
@@ -2357,10 +1986,8 @@ impl From<(f32, &AreaNISECI)> for StatoEcologicoNISECI {
 mod domain_niseci_private_tests {
     use super::*;
 
-    #[cfg(feature = "lessclone")]
     #[cfg(test)]
     impl RiferimentoNISECI {
-        #[cfg(feature = "lessclone")]
         #[cfg(test)]
         pub(crate) fn push(&mut self, value: SpecieNISECI) -> IdSpecieNISECI {
             eprintln!("Pushing specie {} in riferimento", value.id());
@@ -2370,7 +1997,7 @@ mod domain_niseci_private_tests {
                     value.id(),
                     value.nome()
                 );
-                self.map_ids.intern(value.id(), value.clone())
+                self.map_ids.intern(value)
             } else {
                 let inner_id = self
                     .get_inner_id(value.id())
@@ -2385,28 +2012,11 @@ mod domain_niseci_private_tests {
         }
     }
 
-    #[cfg(not(feature = "lessclone"))]
-    #[cfg(test)]
-    impl CampionamentoNISECI {
-        #[cfg(not(feature = "lessclone"))]
-        #[cfg(test)]
-        pub(crate) fn push(&mut self, value: RecordNISECI) {
-            #[expect(deprecated)]
-            self.campionamento.push(value);
-        }
-        #[cfg(not(feature = "lessclone"))]
-        #[cfg(test)]
-        pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
-            #[expect(deprecated)]
-            &mut self.campionamento
-        }
-    }
-
     #[cfg(test)]
     impl ClassiEtaSpecieNISECI {
         #[cfg(test)]
         pub(crate) fn new_custom(
-            specie: &SpecieNISECI,
+            id: IdSpecieNISECI,
             cl1: u32,
             cl2: u32,
             cl3: u32,
@@ -2414,28 +2024,27 @@ mod domain_niseci_private_tests {
             cl5: u32,
         ) -> Self {
             Self {
-                #[expect(deprecated)]
-                specie: specie.clone(),
-                tipo_autoctono: specie.tipo_autoctono(),
-                tipo_alloctono: specie.tipo_alloctono(),
-                specie_attesa: specie.specie_attesa(),
-                ad_juv_soglia_1: specie.ad_juv_soglia_1(),
-                ad_juv_soglia_2: specie.ad_juv_soglia_2(),
-                ad_juv_soglia_3: specie.ad_juv_soglia_3(),
-                ad_juv_soglia_4: specie.ad_juv_soglia_4(),
-                #[expect(deprecated)]
+                id,
                 cl1,
-                #[expect(deprecated)]
                 cl2,
-                #[expect(deprecated)]
                 cl3,
-                #[expect(deprecated)]
                 cl4,
-                #[expect(deprecated)]
                 cl5,
             }
         }
     }
+    #[cfg(test)]
+    impl CampionamentoNISECI {
+        #[cfg(test)]
+        pub(crate) fn push(&mut self, value: RecordNISECI) {
+            self.campionamento.push(value);
+        }
+        #[cfg(test)]
+        pub(crate) fn as_mut_vec(&mut self) -> &mut Vec<RecordNISECI> {
+            &mut self.campionamento
+        }
+    }
+
     #[cfg(test)]
     impl AnagraficaNISECI {
         /// Test helper to build unchecked instances
@@ -2461,27 +2070,19 @@ mod domain_niseci_private_tests {
                 bacino_appartenenza,
                 idro_eco_regione,
                 posizione,
-                #[expect(deprecated)]
                 lunghezza_media_stazione,
-                #[expect(deprecated)]
                 larghezza_media_stazione,
             }
         }
         /// Test helper to mutate lunghezza with no checks
         #[cfg(test)]
         pub(crate) fn set_lunghezza_unchecked(&mut self, val: f32) {
-            #[expect(deprecated)]
-            {
-                self.lunghezza_media_stazione = val;
-            }
+            self.lunghezza_media_stazione = val;
         }
         /// Test helper to mutate larghezza with no checks
         #[cfg(test)]
         pub(crate) fn set_larghezza_unchecked(&mut self, val: f32) {
-            #[expect(deprecated)]
-            {
-                self.larghezza_media_stazione = val;
-            }
+            self.larghezza_media_stazione = val;
         }
     }
 }

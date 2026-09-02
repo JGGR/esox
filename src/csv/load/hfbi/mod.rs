@@ -18,7 +18,7 @@ use crate::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf,
     PlainRecordCsvAnagraficaHFBI, PlainRecordCsvCampionamentoHFBI,
 };
-use crate::csv::deser::{CsvConfig, NormalizerReader};
+use crate::csv::deser::{CsvConfig, NormalizerReader, RecordCsv};
 use crate::csv::load::InputFormat;
 use crate::csv::stanis::hfbi::{
     VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
@@ -29,7 +29,6 @@ use crate::parser::hfbi::{
     check_records_anagrafica_hfbi, check_records_campionamento_hfbi, RecordAnagraficaHFBIError,
     RecordCampionamentoHFBIError,
 };
-use std::any::TypeId;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
@@ -56,29 +55,18 @@ impl fmt::Display for CampionamentoHFBIError {
 
 impl std::error::Error for CampionamentoHFBIError {}
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::hfbi::load_csv_campionamento_hfbi_from_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_campionamento_hfbi_from_reader<R, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
     R: Read,
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + RecordCsv,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCampionamentoHFBI>() => b';',
-        _ => b',',
-    };
-
     load_csv_campionamento_hfbi_from_reader_conf::<R, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -89,7 +77,7 @@ pub fn load_csv_campionamento_hfbi_from_reader_conf<R, T>(
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
     R: Read,
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI,
 {
     let normalizing_reader = NormalizerReader::new(reader);
     let csv_records =
@@ -98,28 +86,17 @@ where
     check_records_campionamento_hfbi(csv_records).map_err(CampionamentoHFBIError::Value)
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::hfbi::load_csv_campionamento_hfbi_from_path_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_campionamento_hfbi_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI + RecordCsv,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordCampionamentoHFBI>() => b';',
-        _ => b',',
-    };
-
     load_csv_campionamento_hfbi_from_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -129,7 +106,7 @@ pub fn load_csv_campionamento_hfbi_from_path_conf<T>(
     config: CsvConfig,
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
 where
-    T: RecordCampionamentoHFBI + 'static,
+    T: RecordCampionamentoHFBI,
 {
     let file =
         File::open(path).map_err(|e| CampionamentoHFBIError::Csv(vec![csv::Error::from(e)]))?;
@@ -198,29 +175,18 @@ impl fmt::Display for AnagraficaHFBIError {
 
 impl std::error::Error for AnagraficaHFBIError {}
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::hfbi::load_csv_anagrafica_hfbi_from_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_anagrafica_hfbi_from_reader<R, T>(
     reader: R,
     has_headers: bool,
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
     R: Read,
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + RecordCsv,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordAnagraficaHFBI>() => b';',
-        _ => b',',
-    };
-
     load_csv_anagrafica_hfbi_from_reader_conf::<R, T>(
         reader,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -231,7 +197,7 @@ pub fn load_csv_anagrafica_hfbi_from_reader_conf<R, T>(
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
     R: Read,
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI,
 {
     let normalizing_reader = NormalizerReader::new(reader);
 
@@ -241,28 +207,17 @@ where
     check_records_anagrafica_hfbi(csv_records).map_err(AnagraficaHFBIError::Value)
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::load::hfbi::load_csv_anagrafica_hfbi_from_path_conf() if you need runtime delimiter selection instead"
-)]
 pub fn load_csv_anagrafica_hfbi_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI + RecordCsv,
 {
-    let type_id = TypeId::of::<T>(); // Get the TypeId of T at runtime
-
-    // Match on the TypeId to determine the actual type of T
-    let delimiter = match type_id {
-        id if id == TypeId::of::<VeryItalianRecordAnagraficaHFBI>() => b';',
-        _ => b',',
-    };
-
     load_csv_anagrafica_hfbi_from_path_conf::<T>(
         path,
         CsvConfig::default()
-            .with_delimiter(delimiter)
+            .with_delimiter(T::DELIMITER)
             .with_headers(has_headers),
     )
 }
@@ -272,7 +227,7 @@ pub fn load_csv_anagrafica_hfbi_from_path_conf<T>(
     config: CsvConfig,
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
 where
-    T: RecordAnagraficaHFBI + 'static,
+    T: RecordAnagraficaHFBI,
 {
     let file = File::open(path).map_err(|e| AnagraficaHFBIError::Csv(vec![csv::Error::from(e)]))?;
 

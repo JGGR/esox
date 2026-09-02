@@ -16,42 +16,24 @@
 */
 
 use crate::{
-    domain::niseci::{CampionamentoNISECI, RecordNISECI, SpecieNISECI},
+    domain::niseci::{CampionamentoNISECI, RecordNISECI},
     engines::niseci::linear_regression::Point,
 };
 
 #[test]
 fn test_calcolo_pesci_per_passaggio() {
-    let specie_1 = SpecieNISECI::new(
-        "1234",
-        "Cervus elaphus",
-        1,
-        0,
-        true,
-        1,
-        2,
-        3,
-        4,
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        1.0,
-        2.0,
-    );
-
     let record_1 = RecordNISECI::new(
-        &specie_1, 1, 100,   // in millimetri
+        0, 1, 100,   // in millimetri
         100.0, // in grammi
     );
 
     let record_2 = RecordNISECI::new(
-        &specie_1, 2, 100,   // in millimetri
+        0, 2, 100,   // in millimetri
         100.0, // in grammi
     );
 
     let record_3 = RecordNISECI::new(
-        &specie_1, 3, 100,   // in millimetri
+        0, 3, 100,   // in millimetri
         100.0, // in grammi
     );
 

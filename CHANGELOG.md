@@ -1,3 +1,36 @@
+## [0.2.0] - 2026-09-03
+
+### Added
+
+- Make `capacity` module public
+
+### Changed
+
+- BREAKING:
+  - Visibility changes:
+    - `RiferimentoNISECI`, `CampionamentoNISECI`, `CampionamentoHFBI` fields
+    - `AnagraficaNISECI`, `AnagraficaHFBI` length/width fields
+    - `SpecieNISECI`, `ValoriIntermediSpecieNISECI`, `ValoriIntermediNISECI`, `ClassiEtaSpecieNISECI`, `InfoPopolazioniNISECI`, `InfoPopolazioniAlieneNISECI`, `ClassiEtaAlieniNISECI`, `EsemplariPerCattura`, `AlieniIndigeni`, `ComunitaNISECI` fields
+    - `SpecieNISECI::new_dummy_specie()`
+    - `csv::parser` module
+    - `csv::deser::{niseci,hfbi}::VeryItalianRecordCsv*` structs
+    - `csv::RecordCsv*` traits, `csv::TipoRecordCsv`
+    - `parser::validate_serialized_records`
+    - `csv::deser::{process_csv_errors, translate_error_message}`
+    - `CampionamentoHFBI::check_record`
+  - Type changes:
+    - `domain::hfbi::RIFERIMENTO_HFBI`: `LazyLock<Vec<SpecieHFBI>>` -> `LazyLock<RiferimentoHFBI>`
+  - Drop `lessclone` feature, now default behaviour
+  - Logic changes:
+    - `engines::hfbi::ddom::calc_ddom`: avoid explicit sort of `CampionamentoHFBI`
+  - Coalesce `SpecieNISECI` origin fields
+- Drop `'static` bound on `csv::{deser,load}` methods
+- Drop implicit logging on check functions
+  - Usercode can use `csv::stanis::giorgio::format_csv_errors` explicitly instead
+- Drop internal transitional methods
+- Bump `serde` to `1.0.229`
+- Bump `serde_json` to `1.0.151`
+
 ## [0.1.7] - 2026-07-17
 
 ### Changed

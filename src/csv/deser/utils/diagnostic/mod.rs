@@ -326,33 +326,6 @@ where
     }
 }
 
-/// Transitional private helper, used in csv::deser::{niseci,hfbi} as the closure argument for
-/// validate_serialized_records(), to print italian error messages.
-/// v0.2 will drop this implicit logging, hence this method will not be needed anymore.
-pub(crate) fn csv_error_handler<L, P, Fld, Lay>(
-    formatter: CsvDiagnosticFormatter<L, P, Fld, Lay>,
-    header: String,
-    record: TipoRecord,
-) -> impl Fn(&Vec<csv::Error>)
-where
-    L: CsvDiagnosticLocalization,
-    P: CsvPositionFormatter,
-    Fld: CsvFieldResolver,
-    Lay: CsvDiagnosticLayout,
-{
-    move |errors: &Vec<csv::Error>| {
-        let diagnostics = normalize(errors);
-
-        eprintln!("{header} {{");
-
-        for d in diagnostics {
-            eprintln!("  {}", formatter.format(&d, record));
-        }
-
-        eprintln!("}}");
-    }
-}
-
 pub fn format_csv_error<L, P, Fld, Lay>(
     formatter: CsvDiagnosticFormatter<L, P, Fld, Lay>,
     error: &csv::Error,
