@@ -30,46 +30,56 @@ pub fn calculate_mmi(
         None => return Err(String::from("Errore condizioni di riferimento non trovate")),
     };
 
-    let bbent: f32 = calc_bbent(campionamento, anagrafica)?;
-    let bn: f32 = calc_bn(campionamento);
-    let dbent: f32 = calc_dbent(campionamento, anagrafica)?;
-    let ddom: f32 = calc_ddom(campionamento, anagrafica)?;
-    let dhzp: f32 = calc_dhzp(campionamento, anagrafica)?;
-    let dmig: f32 = calc_dmig(campionamento, anagrafica)?;
-    let rqe_bbent = bbent / condizioni_riferimento.bbent;
-    let rqe_bn = bn / condizioni_riferimento.bn;
-    let rqe_dbent = dbent / condizioni_riferimento.dbent;
-    let rqe_ddom = ddom / condizioni_riferimento.ddom;
-    let rqe_dhzp = dhzp / condizioni_riferimento.dhzp;
-    let rqe_dmig = dmig / condizioni_riferimento.dmig;
-    let weighted_rqe_bbent = W_BBENT * rqe_bbent;
-    let weighted_rqe_bn = W_BN * rqe_bn;
-    let weighted_rqe_dbent = W_DBENT * rqe_dbent;
-    let weighted_rqe_ddom = W_DDOM * rqe_ddom;
-    let weighted_rqe_dhzp = W_DHZP * rqe_dhzp;
-    let weighted_rqe_dmig = W_DMIG * rqe_dmig;
+    std::thread::scope(|s| {
+        let h_bbent = s.spawn(|| calc_bbent(campionamento, anagrafica));
+        let h_bn = s.spawn(|| calc_bn(campionamento));
+        let h_dbent = s.spawn(|| calc_dbent(campionamento, anagrafica));
+        let h_ddom = s.spawn(|| calc_ddom(campionamento, anagrafica));
+        let h_dhzp = s.spawn(|| calc_dhzp(campionamento, anagrafica));
+        let h_dmig = s.spawn(|| calc_dmig(campionamento, anagrafica));
 
-    let weighted_rqe_sum = weighted_rqe_ddom
-        + weighted_rqe_bn
-        + weighted_rqe_dmig
-        + weighted_rqe_bbent
-        + weighted_rqe_dbent
-        + weighted_rqe_dhzp;
-    let weight_sum = W_DDOM + W_BN + W_DMIG + W_BBENT + W_DBENT + W_DHZP;
+        let bbent: f32 = h_bbent.join().unwrap()?;
+        let bn: f32 = h_bn.join().unwrap();
+        let dbent: f32 = h_dbent.join().unwrap()?;
+        let ddom: f32 = h_ddom.join().unwrap()?;
+        let dhzp: f32 = h_dhzp.join().unwrap()?;
+        let dmig: f32 = h_dmig.join().unwrap()?;
 
-    let mmi = weighted_rqe_sum / weight_sum;
-    let rounded_mmi = (1000.0 * mmi).round() / 1000.0;
+        let rqe_bbent = bbent / condizioni_riferimento.bbent;
+        let rqe_bn = bn / condizioni_riferimento.bn;
+        let rqe_dbent = dbent / condizioni_riferimento.dbent;
+        let rqe_ddom = ddom / condizioni_riferimento.ddom;
+        let rqe_dhzp = dhzp / condizioni_riferimento.dhzp;
+        let rqe_dmig = dmig / condizioni_riferimento.dmig;
+        let weighted_rqe_bbent = W_BBENT * rqe_bbent;
+        let weighted_rqe_bn = W_BN * rqe_bn;
+        let weighted_rqe_dbent = W_DBENT * rqe_dbent;
+        let weighted_rqe_ddom = W_DDOM * rqe_ddom;
+        let weighted_rqe_dhzp = W_DHZP * rqe_dhzp;
+        let weighted_rqe_dmig = W_DMIG * rqe_dmig;
 
-    let intermediates = ValoriIntermediHFBI {
-        bbent,
-        bn,
-        dbent,
-        ddom,
-        dhzp,
-        dmig,
-        mmi: rounded_mmi,
-    };
-    Ok(intermediates)
+        let weighted_rqe_sum = weighted_rqe_ddom
+            + weighted_rqe_bn
+            + weighted_rqe_dmig
+            + weighted_rqe_bbent
+            + weighted_rqe_dbent
+            + weighted_rqe_dhzp;
+        let weight_sum = W_DDOM + W_BN + W_DMIG + W_BBENT + W_DBENT + W_DHZP;
+
+        let mmi = weighted_rqe_sum / weight_sum;
+        let rounded_mmi = (1000.0 * mmi).round() / 1000.0;
+
+        let intermediates = ValoriIntermediHFBI {
+            bbent,
+            bn,
+            dbent,
+            ddom,
+            dhzp,
+            dmig,
+            mmi: rounded_mmi,
+        };
+        Ok(intermediates)
+    })
 }
 
 /// This calculation is order-dependent due to [`calc_mmi`] being order-dependent.

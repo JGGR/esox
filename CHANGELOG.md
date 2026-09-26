@@ -1,3 +1,11 @@
+## [0.2.1] - Unreleased
+
+### Added
+
+- Use `std::thread::scope` in:
+  - `engines::niseci::full::calculate_niseci`
+  - `engines::hfbi::full::calculate_hfbi`
+
 ## [0.2.0] - 2026-09-03
 
 ### Added
