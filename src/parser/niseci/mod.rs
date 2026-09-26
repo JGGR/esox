@@ -644,6 +644,7 @@ pub fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
 ) -> Result<RiferimentoNISECI, Vec<RecordRiferimentoNISECIError>> {
     let (rif, errors) = parse_records_riferimento_niseci(records).into_parts();
 
+    /*
     println!(
         "Riferimento NISECI: Numero record validi: {}",
         rif.into_iter().collect::<Vec<_>>().len()
@@ -652,6 +653,7 @@ pub fn check_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
         "Riferimento NISECI: Numero record non validi: {}",
         errors.len()
     );
+    */
 
     if !errors.is_empty() {
         eprintln!("Errori incontrati durante l'elaborazione dei record per riferimento NISECI: {{");
@@ -680,6 +682,7 @@ pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
     let (camp, errors) =
         parse_records_campionamento_niseci(records, riferimento_specie).into_parts();
 
+    /*
     println!(
         "Campionamento NISECI: Numero record validi: {}",
         camp.into_iter().collect::<Vec<_>>().len()
@@ -688,6 +691,7 @@ pub fn check_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
         "Campionamento NISECI: Numero record non validi: {}",
         errors.len()
     );
+    */
 
     if !errors.is_empty() {
         eprintln!(

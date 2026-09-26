@@ -6,6 +6,10 @@
   - `engines::niseci::full::calculate_niseci`
   - `engines::hfbi::full::calculate_hfbi`
 
+### Changed
+
+- Drop `println` inside `parser::{hfbi,niseci}` `check` methods
+
 ## [0.2.0] - 2026-09-03
 
 ### Added
