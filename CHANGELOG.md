@@ -1,3 +1,9 @@
+## [0.2.1] - Unreleased
+
+### Changed
+
+- Drop `println` inside `parser::{hfbi,niseci}` `check` methods
+
 ## [0.2.0] - 2026-09-03
 
 ### Added

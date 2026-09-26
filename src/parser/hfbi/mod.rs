@@ -358,6 +358,7 @@ pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
 ) -> Result<CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>> {
     let (camp, errors) = parse_records_campionamento_hfbi(records).into_parts();
 
+    /*
     println!(
         "Campionamento HFBI: Numero record validi: {}",
         camp.into_iter().collect::<Vec<_>>().len()
@@ -366,6 +367,7 @@ pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
         "Campionamento HFBI: Numero record non validi: {}",
         errors.len()
     );
+    */
 
     if !errors.is_empty() {
         eprintln!("Errori incontrati durante l'elaborazione dei record per campionamento HFBI: {{");
