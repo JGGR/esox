@@ -14,6 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! This module provides support for single step load of CSV data for HFBI:
+//! - [`crate::csv::deser::hfbi`] + [`crate::parser::hfbi`]
+
 use crate::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf,
     PlainRecordCsvAnagraficaHFBI, PlainRecordCsvCampionamentoHFBI,
@@ -34,6 +38,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+/// Encodes the possible errors returned by HFBI capture set CSV deser and parse steps.
 #[derive(Debug)]
 pub enum CampionamentoHFBIError {
     Csv(Vec<csv::Error>),
@@ -55,6 +60,7 @@ impl fmt::Display for CampionamentoHFBIError {
 
 impl std::error::Error for CampionamentoHFBIError {}
 
+/// Load capture set CSV from a [`Read`].
 pub fn load_csv_campionamento_hfbi_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -71,6 +77,8 @@ where
     )
 }
 
+/// Load capture set CSV from a [`Read`].
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_campionamento_hfbi_from_reader_conf<R, T>(
     reader: R,
     config: CsvConfig,
@@ -86,6 +94,7 @@ where
     check_records_campionamento_hfbi(csv_records).map_err(CampionamentoHFBIError::Value)
 }
 
+/// Load capture set CSV from a [`AsRef`]<[`Path`]>.
 pub fn load_csv_campionamento_hfbi_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -101,6 +110,8 @@ where
     )
 }
 
+/// Load capture set CSV from a [`AsRef`]<[`Path`]>.
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_campionamento_hfbi_from_path_conf<T>(
     path: impl AsRef<Path>,
     config: CsvConfig,
@@ -114,6 +125,8 @@ where
     load_csv_campionamento_hfbi_from_reader_conf::<_, T>(file, config)
 }
 
+/// Load capture set CSV from a [`Read`].
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_campionamento_hfbi_from_reader<R>(
     reader: R,
     has_headers: bool,
@@ -143,6 +156,8 @@ where
     }
 }
 
+/// Load capture set CSV from a [`AsRef`]<[`Path`]>.
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_campionamento_hfbi_from_path(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -154,6 +169,7 @@ pub fn load_campionamento_hfbi_from_path(
     load_campionamento_hfbi_from_reader::<_>(file, has_headers, format)
 }
 
+/// Encodes the possible errors returned by HFBI additional info CSV deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaHFBIError {
     Csv(Vec<csv::Error>),
@@ -175,6 +191,7 @@ impl fmt::Display for AnagraficaHFBIError {
 
 impl std::error::Error for AnagraficaHFBIError {}
 
+/// Load additional info CSV from a [`Read`].
 pub fn load_csv_anagrafica_hfbi_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -191,6 +208,8 @@ where
     )
 }
 
+/// Load additional info CSV from a [`Read`].
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_anagrafica_hfbi_from_reader_conf<R, T>(
     reader: R,
     config: CsvConfig,
@@ -207,6 +226,7 @@ where
     check_records_anagrafica_hfbi(csv_records).map_err(AnagraficaHFBIError::Value)
 }
 
+/// Load additional info CSV from a [`AsRef`]<[`Path`]>.
 pub fn load_csv_anagrafica_hfbi_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -222,6 +242,8 @@ where
     )
 }
 
+/// Load additional info CSV from a [`AsRef`]<[`Path`]>.
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_anagrafica_hfbi_from_path_conf<T>(
     path: impl AsRef<Path>,
     config: CsvConfig,
@@ -234,6 +256,8 @@ where
     load_csv_anagrafica_hfbi_from_reader_conf::<_, T>(file, config)
 }
 
+/// Load additional info CSV from a [`Read`].
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_anagrafica_hfbi_from_reader<R>(
     reader: R,
     has_headers: bool,
@@ -263,6 +287,8 @@ where
     }
 }
 
+/// Load additional info CSV from a [`AsRef`]<[`Path`]>.
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_anagrafica_hfbi_from_path(
     path: impl AsRef<Path>,
     has_headers: bool,

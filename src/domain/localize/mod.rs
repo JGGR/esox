@@ -14,6 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! Convenience interface for formatting f32 with comma as decimal delimiter.
+
 pub(crate) trait CommaFormat {
     fn comma(self) -> String;
 }

@@ -14,6 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! JSON deserialization routines for HFBI.
+//! Output is meant to be consumed by [`esox::parser::hfbi`] routines.
+
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{
     check_serialized_records, parse_serialized_records, RecordAnagraficaHFBI,

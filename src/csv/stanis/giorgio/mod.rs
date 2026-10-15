@@ -17,6 +17,7 @@
 //! Dedicated diagnostic formatting module for semicolon delimited CSV.
 //!
 //! This module provides support for italian formatting of csv diagnostics.
+//! Implements the interface from [`crate::csv::deser::utils::diagnostic`].
 
 #[cfg(test)]
 mod tests;

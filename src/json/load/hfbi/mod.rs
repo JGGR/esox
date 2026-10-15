@@ -14,6 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! This module provides support for single step load of JSON data for HFBI:
+//! - [`crate::json::deser::hfbi`] + [`crate::parser::hfbi`]
+
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 use crate::json::deser::hfbi::{check_anagrafica_hfbi_reader, check_campionamento_hfbi_reader};

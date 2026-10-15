@@ -15,6 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Defines the two available indexes, NISECI and HFBI.
+
 use std::fmt;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]

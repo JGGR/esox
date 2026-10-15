@@ -14,6 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! Convenience interface for type-encoding constraints over native `f32`.
+
 #[cfg(feature = "experimental")]
 use serde::{de, Deserialize, Deserializer};
 use std::fmt;

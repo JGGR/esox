@@ -15,6 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! CSV deserialization routines for NISECI.
+//! Output is meant to be consumed by [`crate::parser::niseci`] routines.
+
 use crate::csv::deser::{
     check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader, RecordCsv,
 };
@@ -29,6 +32,7 @@ use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
 
+/// Default implementation of CSV records for [`crate::deser::RecordRiferimentoNISECI`].
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
@@ -215,6 +219,7 @@ where
     private_check_riferimento_niseci_reader::<File, DefaultByteLimit, T>(file, config)
 }
 
+/// Default implementation of CSV records for [`crate::deser::RecordCampionamentoNISECI`].
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
@@ -356,6 +361,7 @@ where
     private_check_campionamento_niseci_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }
 
+/// Default implementation of CSV records for [`crate::deser::RecordAnagraficaNISECI`].
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]

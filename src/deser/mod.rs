@@ -28,6 +28,7 @@ pub(crate) mod limits;
 
 use std::fmt;
 
+/// Denotes record kinds.
 #[derive(Copy, Clone)]
 pub enum TipoRecord {
     RiferimentoNISECI,
@@ -149,6 +150,7 @@ where
     }
 }
 
+/// Default implementation of [`RecordRiferimentoNISECI`].
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordRiferimentoNISECI {
@@ -239,6 +241,7 @@ impl fmt::Display for PlainRecordRiferimentoNISECI {
     }
 }
 
+/// Default implementation of [`RecordCampionamentoNISECI`].
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordCampionamentoNISECI {
@@ -282,6 +285,7 @@ impl fmt::Display for PlainRecordCampionamentoNISECI {
     }
 }
 
+/// Default implementation of [`RecordAnagraficaNISECI`].
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordAnagraficaNISECI {
@@ -368,6 +372,7 @@ impl fmt::Display for PlainRecordAnagraficaNISECI {
     }
 }
 
+/// Default implementation of [`RecordCampionamentoHFBI`].
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordCampionamentoHFBI {
@@ -398,6 +403,7 @@ impl fmt::Display for PlainRecordCampionamentoHFBI {
     }
 }
 
+/// Default implementation of [`RecordAnagraficaHFBI`].
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordAnagraficaHFBI {

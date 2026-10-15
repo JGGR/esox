@@ -14,11 +14,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! Provides custom CSV types for italian-encoded CSV for NISECI.
+
 use crate::csv::deser::{RecordCsv, SemicolonDelimiter};
 use crate::csv::stanis::deserialize_comma_f32;
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use std::fmt;
 
+/// Alternative italian-format implementation of CSV records for
+/// [`crate::deser::RecordCampionamentoHFBI`].
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
@@ -56,6 +61,8 @@ impl fmt::Display for VeryItalianRecordCampionamentoHFBI {
     }
 }
 
+/// Alternative italian-format implementation of CSV records for
+/// [`crate::deser::RecordAnagraficaHFBI`].
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]

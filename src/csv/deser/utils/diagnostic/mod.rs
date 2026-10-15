@@ -15,12 +15,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Types for custom formatting of CSV errors.
+//! The [`ww`] module provides a default english implementation of the provided interface.
+
 pub mod ww;
 
 use crate::deser::TipoRecord;
 use csv::Position;
 use std::num::IntErrorKind;
 
+/// Defines the different possible CSV errors.
 pub enum CsvDiagnostic {
     Deserialize {
         pos: Option<Position>,
@@ -46,6 +50,7 @@ pub enum CsvDiagnostic {
     },
 }
 
+/// Defines a CSV deserialization diagnostics.
 pub struct DeserDiagnostic {
     kind: DeserDiagnosticKind,
 }
@@ -62,6 +67,7 @@ impl From<DeserDiagnosticKind> for DeserDiagnostic {
     }
 }
 
+/// Defines a CSV deserialization diagnostics kind.
 pub enum DeserDiagnosticKind {
     UnexpectedEndOfRow,
     Message(String),
@@ -69,6 +75,7 @@ pub enum DeserDiagnosticKind {
     Parse { diagnostic: ParseDiagnostic },
 }
 
+/// Defines a CSV parsing diagnostics.
 pub struct ParseDiagnostic {
     kind: ParseDiagnosticKind,
 }
@@ -85,6 +92,7 @@ impl From<ParseDiagnosticKind> for ParseDiagnostic {
     }
 }
 
+/// Defines a CSV parsing diagnostics kind.
 pub enum ParseDiagnosticKind {
     Utf8(String),
     Bool(String),
@@ -92,6 +100,7 @@ pub enum ParseDiagnosticKind {
     Float(String),
 }
 
+/// Defines a CSV int parsing diagnostics.
 pub struct ParseIntDiagnostic {
     kind: ParseIntDiagnosticKind,
 }
@@ -108,6 +117,7 @@ impl From<ParseIntDiagnosticKind> for ParseIntDiagnostic {
     }
 }
 
+/// Defines a CSV int parsing diagnostics kind.
 pub enum ParseIntDiagnosticKind {
     Empty(String),
     InvalidDigit(String),
@@ -207,6 +217,7 @@ pub fn normalize_one(error: &csv::Error) -> CsvDiagnostic {
     }
 }
 
+/// CSV diagnostics localization interface.
 pub trait CsvDiagnosticLocalization {
     fn io_error(&self) -> &'static str;
     fn utf8_error(&self) -> &'static str;
@@ -220,10 +231,12 @@ pub trait CsvDiagnosticLocalization {
     fn unknown(&self) -> &'static str;
 }
 
+/// Formatter interface for position of CSV diagnostic.
 pub trait CsvPositionFormatter {
     fn format(&self, pos: Option<&csv::Position>) -> String;
 }
 
+/// Field name resolver interface for CSV diagnostic.
 pub trait CsvFieldResolver {
     fn resolve(&self, record: TipoRecord, idx: usize) -> String;
 }
@@ -240,6 +253,7 @@ pub trait CsvDiagnosticLayout {
     fn unknown(&self, base: &str, pos: &str, detail: &str) -> String;
 }
 
+/// Formatter interface for CSV diagnostic.
 pub struct CsvDiagnosticFormatter<L, P, F, T> {
     pub loc: L,
     pub pos: P,

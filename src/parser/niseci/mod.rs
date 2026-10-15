@@ -15,6 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Parsing module for NISECI intermediate structs.
+//!
+//! This module provides support for:
+//!
+//! - Validation of the intermediate structs
+//! - Enforcement of [`crate::domain::niseci`] invariants
+
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use crate::domain::location::Location;
 use crate::domain::niseci::{
@@ -27,6 +34,7 @@ use crate::parser::parse_date;
 use chrono::format::ParseErrorKind;
 use std::fmt;
 
+/// Encodes the errors kinds returned by NISECI reference CSV parse step.
 #[derive(Debug)]
 pub enum RecordRiferimentoNISECIError {
     ValoreInvalido { msg: String }, //TODO: add position?
@@ -262,6 +270,7 @@ pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     RiferimentoNISECIParseResult(RiferimentoNISECI::new_from_map(interner), errors)
 }
 
+/// Encodes the errors kinds returned by NISECI capture set CSV parse step.
 #[derive(Debug)]
 pub enum RecordCampionamentoNISECIError {
     ValoreInvalido { msg: String }, //TODO: add position?
@@ -373,6 +382,7 @@ pub(crate) fn parse_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
     CampionamentoNISECIParseResult(CampionamentoNISECI::new(campioni), errors)
 }
 
+/// Encodes the errors kinds returned by NISECI additional info CSV parse step.
 #[derive(Debug)]
 pub enum RecordAnagraficaNISECIError {
     ValoreInvalido { msg: String }, //TODO: add position?

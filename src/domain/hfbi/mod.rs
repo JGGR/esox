@@ -15,6 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Types for modeling the domain of HFBI index computation.
+//! See:
+//! - [`RiferimentoHFBI`]
+//! - [`CampionamentoHFBI`]
+//! - [`AnagraficaHFBI`]
+//! - [`RisultatoHFBI`]
+
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 use std::{collections::HashMap, fmt};

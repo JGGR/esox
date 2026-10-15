@@ -15,6 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Computation module of NISECI x1 metric.
+//!
+//! Routines and types for computing `x1` for [`crate::domain::niseci::ValoriIntermediNISECI`].
+
 use crate::domain::niseci::{CampionamentoNISECI, IdSpecieNISECI, RiferimentoNISECI};
 use std::collections::HashSet;
 

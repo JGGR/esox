@@ -15,6 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Parsing module for HFBI intermediate structs.
+//!
+//! This module provides support for:
+//!
+//! - Validation of the intermediate structs
+//! - Enforcement of [`crate::domain::hfbi`] invariants
+
 use crate::deser::{RecordAnagraficaHFBI, RecordCampionamentoHFBI};
 use crate::domain::hfbi::{
     AnagraficaHFBI, CampionamentoHFBI, HabitatHFBI, RecordHFBI, StagioneHFBI,
@@ -26,6 +33,7 @@ use crate::parser::parse_date;
 use chrono::format::ParseErrorKind;
 use std::fmt;
 
+/// Encodes the errors kinds returned by HFBI capture set info CSV parse step.
 #[derive(Debug)]
 pub enum RecordCampionamentoHFBIError {
     ValoreInvalido { msg: String }, //TODO: add position?
@@ -127,6 +135,7 @@ pub(crate) fn parse_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     CampionamentoHFBIParseResult(CampionamentoHFBI::new(campioni), errors)
 }
 
+/// Encodes the errors kinds returned by HFBI additional info info CSV parse step.
 #[derive(Debug)]
 pub enum RecordAnagraficaHFBIError {
     ValoreInvalido { msg: String }, //TODO: add position?

@@ -15,6 +15,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! NISECI computation module.
+//!
+//! Routines and types for computing the index from [`crate::domain::niseci`] structs.
+//!
+//! The main methods are:
+//! - [`calculate_niseci`]
+//! - [`calculate_rqe_niseci`]
+//! - [`calculate_stato_ecologico_niseci`]
+
 use crate::domain::niseci::{
     AnagraficaNISECI, AreaNISECI, IdSpecieNISECI, RiferimentoNISECI, StatoEcologicoNISECI,
 };
@@ -32,6 +41,7 @@ use crate::engines::niseci::x3::calculate_x3;
 const RQE_NISECI_MAGIC_ADDEND: f32 = std::f32::consts::FRAC_2_SQRT_PI;
 const RQE_NISECI_MAGIC_QUOTIENT: f32 = 1.0603;
 
+/// Main method for NISECI calculation.
 pub fn calculate_niseci(
     campionamento: &CampionamentoNISECI,
     riferimento: &RiferimentoNISECI,
@@ -170,6 +180,7 @@ pub fn calculate_niseci(
     }
 }
 
+/// RQE calculation method.
 pub fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
     let rqe =
         niseci.map(|val| (val.log(10.0) + RQE_NISECI_MAGIC_ADDEND) / RQE_NISECI_MAGIC_QUOTIENT);
@@ -181,6 +192,7 @@ pub fn calculate_rqe_niseci(niseci: Option<f32>) -> Option<f32> {
     }
 }
 
+/// Ecological state calculation method.
 pub fn calculate_stato_ecologico_niseci(
     niseci: Option<f32>,
     area: &AreaNISECI,
