@@ -1,3 +1,9 @@
+## [0.3.0] - Unreleased
+
+### Changed
+
+- Update `engines::niseci::full::calculate_niseci` to return `Vec<NISECICalcError`
+
 ## [0.2.4] - 2026-10-24
 
 ### Changed
