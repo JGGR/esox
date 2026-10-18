@@ -19,4 +19,5 @@
 //! This module provides support for single step load + calc:
 //! - [`crate::csv::load`] + [`crate::engines`]
 
+pub mod hfbi;
 pub mod niseci;

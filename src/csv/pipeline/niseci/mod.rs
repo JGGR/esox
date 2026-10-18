@@ -17,8 +17,8 @@
 //! Full NISECI pipeline module.
 //!
 //! Builds and calculates a NISECI index from CSV inputs.
-//!
-//! # Examples
+
+//! ## Example usage
 //!
 //! ```rust
 //! use std::path::Path;
