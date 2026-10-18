@@ -1,5 +1,9 @@
 ## [0.3.0] - Unreleased
 
+### Added
+
+- Add `csv::pipeline` module (WIP)
+
 ### Changed
 
 - Update `engines::niseci::full::calculate_niseci` to return `Vec<NISECICalcError`
