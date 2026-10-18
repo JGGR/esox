@@ -44,7 +44,7 @@ use crate::csv::deser::niseci::{
     PlainRecordCsvCampionamentoNISECI, PlainRecordCsvRiferimentoNISECI,
 };
 use crate::csv::deser::{CsvConfig, NormalizerReader, RecordCsv};
-use crate::csv::load::InputFormat;
+use crate::csv::load::{CsvInput, CsvLoadConfig, InputFormat};
 use crate::csv::stanis::niseci::{
     VeryItalianRecordAnagraficaNISECI, VeryItalianRecordCampionamentoNISECI,
     VeryItalianRecordRiferimentoNISECI,
@@ -193,6 +193,33 @@ pub fn load_riferimento_niseci_from_path(
     load_riferimento_niseci_from_reader::<_>(file, has_headers, format)
 }
 
+pub fn load_riferimento<'a, R, T>(
+    source: CsvInput<'a, R>,
+    config: CsvLoadConfig,
+) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
+where
+    R: Read,
+    T: RecordRiferimentoNISECI,
+{
+    match config {
+        CsvLoadConfig::Format {
+            has_headers,
+            format,
+        } => match source {
+            CsvInput::Reader(reader) => {
+                load_riferimento_niseci_from_reader(reader, has_headers, format)
+            }
+            CsvInput::Path(path) => load_riferimento_niseci_from_path(path, has_headers, format),
+        },
+        CsvLoadConfig::Csv(config) => match source {
+            CsvInput::Reader(reader) => {
+                load_csv_riferimento_niseci_from_reader_conf::<_, T>(reader, config)
+            }
+            CsvInput::Path(path) => load_csv_riferimento_niseci_from_path_conf::<T>(path, config),
+        },
+    }
+}
+
 /// Encodes the possible errors returned by NISECI capture set CSV deser and parse steps.
 #[derive(Debug)]
 pub enum CampionamentoNISECIError {
@@ -337,6 +364,38 @@ pub fn load_campionamento_niseci_from_path(
     load_campionamento_niseci_from_reader::<_>(file, has_headers, riferimento, format)
 }
 
+pub fn load_campionamento<'a, R, T>(
+    riferimento: &RiferimentoNISECI,
+    source: CsvInput<'a, R>,
+    config: CsvLoadConfig,
+) -> Result<CampionamentoNISECI, CampionamentoNISECIError>
+where
+    R: Read,
+    T: RecordCampionamentoNISECI,
+{
+    match config {
+        CsvLoadConfig::Format {
+            has_headers,
+            format,
+        } => match source {
+            CsvInput::Reader(reader) => {
+                load_campionamento_niseci_from_reader(reader, has_headers, riferimento, format)
+            }
+            CsvInput::Path(path) => {
+                load_campionamento_niseci_from_path(path, has_headers, riferimento, format)
+            }
+        },
+        CsvLoadConfig::Csv(config) => match source {
+            CsvInput::Reader(reader) => {
+                load_csv_campionamento_niseci_from_reader_conf::<_, T>(reader, config, riferimento)
+            }
+            CsvInput::Path(path) => {
+                load_csv_campionamento_niseci_from_path_conf::<T>(path, config, riferimento)
+            }
+        },
+    }
+}
+
 /// Encodes the possible errors returned by NISECI additional info CSV deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaNISECIError {
@@ -467,4 +526,31 @@ pub fn load_anagrafica_niseci_from_path(
         File::open(path).map_err(|e| AnagraficaNISECIError::Csv(vec![csv::Error::from(e)]))?;
 
     load_anagrafica_niseci_from_reader::<_>(file, has_headers, format)
+}
+
+pub fn load_anagrafica<'a, R, T>(
+    source: CsvInput<'a, R>,
+    config: CsvLoadConfig,
+) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
+where
+    R: Read,
+    T: RecordAnagraficaNISECI,
+{
+    match config {
+        CsvLoadConfig::Format {
+            has_headers,
+            format,
+        } => match source {
+            CsvInput::Reader(reader) => {
+                load_anagrafica_niseci_from_reader(reader, has_headers, format)
+            }
+            CsvInput::Path(path) => load_anagrafica_niseci_from_path(path, has_headers, format),
+        },
+        CsvLoadConfig::Csv(config) => match source {
+            CsvInput::Reader(reader) => {
+                load_csv_anagrafica_niseci_from_reader_conf::<_, T>(reader, config)
+            }
+            CsvInput::Path(path) => load_csv_anagrafica_niseci_from_path_conf::<T>(path, config),
+        },
+    }
 }

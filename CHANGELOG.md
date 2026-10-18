@@ -2,6 +2,7 @@
 
 ### Added
 
+- Add `csv::load::niseci{load_riferimento, load_campionamento, load_anagrafica}`
 - Add `csv::pipeline` module (WIP)
 
 ### Changed
