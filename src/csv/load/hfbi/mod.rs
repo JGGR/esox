@@ -38,7 +38,7 @@ use crate::csv::deser::hfbi::{
     PlainRecordCsvAnagraficaHFBI, PlainRecordCsvCampionamentoHFBI,
 };
 use crate::csv::deser::{CsvConfig, NormalizerReader, RecordCsv};
-use crate::csv::load::InputFormat;
+use crate::csv::load::{CsvInput, CsvLoadConfig, InputFormat};
 use crate::csv::stanis::hfbi::{
     VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
 };
@@ -184,6 +184,33 @@ pub fn load_campionamento_hfbi_from_path(
     load_campionamento_hfbi_from_reader::<_>(file, has_headers, format)
 }
 
+pub fn load_campionamento<'a, R, T>(
+    source: CsvInput<'a, R>,
+    config: &CsvLoadConfig,
+) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
+where
+    R: Read,
+    T: RecordCampionamentoHFBI,
+{
+    match config {
+        CsvLoadConfig::Format {
+            has_headers,
+            format,
+        } => match source {
+            CsvInput::Reader(reader) => {
+                load_campionamento_hfbi_from_reader(reader, *has_headers, *format)
+            }
+            CsvInput::Path(path) => load_campionamento_hfbi_from_path(path, *has_headers, *format),
+        },
+        CsvLoadConfig::Csv(config) => match source {
+            CsvInput::Reader(reader) => {
+                load_csv_campionamento_hfbi_from_reader_conf::<_, T>(reader, *config)
+            }
+            CsvInput::Path(path) => load_csv_campionamento_hfbi_from_path_conf::<T>(path, *config),
+        },
+    }
+}
+
 /// Encodes the possible errors returned by HFBI additional info CSV deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaHFBIError {
@@ -312,4 +339,31 @@ pub fn load_anagrafica_hfbi_from_path(
     let file = File::open(path).map_err(|e| AnagraficaHFBIError::Csv(vec![csv::Error::from(e)]))?;
 
     load_anagrafica_hfbi_from_reader::<_>(file, has_headers, format)
+}
+
+pub fn load_anagrafica<'a, R, T>(
+    source: CsvInput<'a, R>,
+    config: &CsvLoadConfig,
+) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
+where
+    R: Read,
+    T: RecordAnagraficaHFBI,
+{
+    match config {
+        CsvLoadConfig::Format {
+            has_headers,
+            format,
+        } => match source {
+            CsvInput::Reader(reader) => {
+                load_anagrafica_hfbi_from_reader(reader, *has_headers, *format)
+            }
+            CsvInput::Path(path) => load_anagrafica_hfbi_from_path(path, *has_headers, *format),
+        },
+        CsvLoadConfig::Csv(config) => match source {
+            CsvInput::Reader(reader) => {
+                load_csv_anagrafica_hfbi_from_reader_conf::<_, T>(reader, *config)
+            }
+            CsvInput::Path(path) => load_csv_anagrafica_hfbi_from_path_conf::<T>(path, *config),
+        },
+    }
 }
