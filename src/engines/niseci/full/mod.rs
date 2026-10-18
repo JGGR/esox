@@ -37,16 +37,52 @@ use crate::engines::niseci::x1::calculate_x1;
 use crate::engines::niseci::x2::calculate_x2;
 use crate::engines::niseci::x2::calculate_x2_per_alloctone;
 use crate::engines::niseci::x3::calculate_x3;
+use std::fmt;
 
 const RQE_NISECI_MAGIC_ADDEND: f32 = std::f32::consts::FRAC_2_SQRT_PI;
 const RQE_NISECI_MAGIC_QUOTIENT: f32 = 1.0603;
+
+/// Encodes the errors kinds returned by NISECI reference CSV parse step.
+#[derive(Debug)]
+pub enum NISECICalcError {
+    X1 { msg: String },
+    X2 { msg: String },
+    X2NonAttese { msg: String },
+    X2Alloctone { msg: String },
+    X3 { msg: String },
+}
+
+impl fmt::Display for NISECICalcError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match self {
+            NISECICalcError::X1 { msg } => {
+                format!("Errore X1 NISECI: {}", msg)
+            }
+            NISECICalcError::X2 { msg } => {
+                format!("Errore X2 NISECI: {}", msg)
+            }
+            NISECICalcError::X2NonAttese { msg } => {
+                format!("Errore X2 non attese NISECI: {}", msg)
+            }
+            NISECICalcError::X2Alloctone { msg } => {
+                format!("Errore X2 alloctone NISECI: {}", msg)
+            }
+            NISECICalcError::X3 { msg } => {
+                format!("Errore X3 NISECI: {}", msg)
+            }
+        };
+        write!(f, "{}", string_representation)
+    }
+}
+
+impl std::error::Error for NISECICalcError {}
 
 /// Main method for NISECI calculation.
 pub fn calculate_niseci(
     campionamento: &CampionamentoNISECI,
     riferimento: &RiferimentoNISECI,
     anagrafica: &AnagraficaNISECI,
-) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
+) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<NISECICalcError>> {
     let mut errors = Vec::new();
     let x1 = calculate_x1(campionamento, riferimento);
 
@@ -55,7 +91,9 @@ pub fn calculate_niseci(
         Ok(_) => {}
         Err(x2_errors) => {
             for e in x2_errors {
-                errors.push(format!("Errore durante calcolo x2: {}", e));
+                errors.push(NISECICalcError::X2 {
+                    msg: format!("Errore durante calcolo x2: {}", e),
+                });
             }
             return Err(errors);
         }
@@ -68,7 +106,9 @@ pub fn calculate_niseci(
         Ok(_) => {}
         Err(x2_non_attese_errors) => {
             for e in x2_non_attese_errors {
-                errors.push(format!("Errore durante calcolo x2_non_attese: {}", e));
+                errors.push(NISECICalcError::X2NonAttese {
+                    msg: format!("Errore durante calcolo x2_non_attese: {}", e),
+                });
             }
             return Err(errors);
         }
@@ -83,7 +123,9 @@ pub fn calculate_niseci(
         Ok(_) => {}
         Err(x2_per_alloctone_errors) => {
             for e in x2_per_alloctone_errors {
-                errors.push(format!("Errore durante calcolo x2_per_alloctone: {}", e));
+                errors.push(NISECICalcError::X2Alloctone {
+                    msg: format!("Errore durante calcolo x2_per_alloctone: {}", e),
+                });
             }
             return Err(errors);
         }
@@ -108,7 +150,9 @@ pub fn calculate_niseci(
         Ok(_) => {}
         Err(x3_errors) => {
             for e in x3_errors {
-                errors.push(format!("Errore durante calcolo x3: {}", e));
+                errors.push(NISECICalcError::X3 {
+                    msg: format!("Errore durante calcolo x3: {}", e),
+                });
             }
             return Err(errors);
         }
@@ -141,17 +185,17 @@ pub fn calculate_niseci(
         }
     }
 
-    let mut x1_x2_errors = Vec::new();
     if x1 < 0.0 {
-        x1_x2_errors.push(format!("Errore risultato x1: valore negativo: {}", x1));
+        return Err(vec![NISECICalcError::X1 {
+            msg: format!("Errore risultato x1: valore negativo: {}", x1),
+        }]);
     }
     if let Some(val) = x2 {
         if val < 0.0 {
-            x1_x2_errors.push(format!("Errore risultato x2: valore negativo: {}", val));
+            return Err(vec![NISECICalcError::X2 {
+                msg: format!("Errore risultato x2: valore negativo: {:?}", x2),
+            }]);
         }
-    }
-    if !x1_x2_errors.is_empty() {
-        return Err(x1_x2_errors);
     }
 
     let intermediates = ValoriIntermediNISECI::new(
