@@ -8,6 +8,7 @@
 ### Changed
 
 - Update `engines::niseci::full::calculate_niseci` to return `Vec<NISECICalcError`
+- Update `engines::hfbi::full::calculate_hfbi` to return `HFBICalcError`
 
 ## [0.2.4] - 2026-10-24
 
