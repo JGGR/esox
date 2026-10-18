@@ -26,7 +26,7 @@ use crate::csv::stanis::hfbi::{
     VeryItalianRecordAnagraficaHFBI, VeryItalianRecordCampionamentoHFBI,
 };
 use crate::domain::hfbi::ValoriIntermediHFBI;
-use crate::engines::hfbi::full::calculate_hfbi;
+use crate::engines::hfbi::full::{calculate_hfbi, HFBICalcError};
 use crate::parser::hfbi::{check_records_anagrafica_hfbi, check_records_campionamento_hfbi};
 use crate::tests::test_utils::{ANAGRAFICA_HFBI_TEMPLATE_DATA, CAMPIONAMENTO_HFBI_TEMPLATE_DATA};
 use std::io::Cursor;
@@ -89,7 +89,7 @@ fn calc_templates_with_area(
     format: InputFormat,
     x: f32,
     y: f32,
-) -> Result<(f32, ValoriIntermediHFBI), String> {
+) -> Result<(f32, ValoriIntermediHFBI), HFBICalcError> {
     let campionamento_reader = Cursor::new(CAMPIONAMENTO_HFBI_TEMPLATE_DATA);
     let campionamento =
         load_campionamento_hfbi_from_reader(campionamento_reader, has_headers, format)

@@ -31,6 +31,7 @@ use crate::engines::hfbi::{
     bbent::calc_bbent, bn::calc_bn, dbent::calc_dbent, ddom::calc_ddom, dhzp::calc_dhzp,
     dmig::calc_dmig,
 };
+use std::fmt;
 
 // WEIGHTS
 const W_DDOM: f32 = 1.0;
@@ -44,23 +45,65 @@ const W_DHZP: f32 = 0.84;
 const HFBI_T: f32 = -0.167;
 const HFBI_S: f32 = 0.150;
 
+/// Encodes the errors kinds returned by HFBI CSV calc step.
+#[derive(Debug)]
+pub enum HFBICalcError {
+    Bbent(String),
+    Dbent(String),
+    Ddom(String),
+    Dhzp(String),
+    Dmig(String),
+    Mmi(String),
+}
+
+impl fmt::Display for HFBICalcError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_representation = match self {
+            HFBICalcError::Bbent(msg) => {
+                format!("Errore bbent hfbi: {}", msg)
+            }
+            HFBICalcError::Dbent(msg) => {
+                format!("Errore dbent hfbi: {}", msg)
+            }
+            HFBICalcError::Ddom(msg) => {
+                format!("Errore ddom hfbi: {}", msg)
+            }
+            HFBICalcError::Dhzp(msg) => {
+                format!("Errore dhzp hfbi: {}", msg)
+            }
+            HFBICalcError::Dmig(msg) => {
+                format!("Errore dmig hfbi: {}", msg)
+            }
+            HFBICalcError::Mmi(msg) => {
+                format!("Errore mmi hfbi: {}", msg)
+            }
+        };
+        write!(f, "{}", string_representation)
+    }
+}
+
 /// This calculation is order-dependent due to [`crate::engines::hfbi::ddom::calc_ddom`] being order-dependent.
 /// Proper ordering of `campionamento` is by descending `peso` ([`crate::domain::hfbi::RecordHFBI`].peso).
 pub fn calculate_mmi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
-) -> Result<ValoriIntermediHFBI, String> {
+) -> Result<ValoriIntermediHFBI, HFBICalcError> {
     let condizioni_riferimento = match CondizioniRiferimentoHFBI::get_cond_riferimento(anagrafica) {
         Some(cond) => cond,
-        None => return Err(String::from("Errore condizioni di riferimento non trovate")),
+        None => {
+            return Err(HFBICalcError::Mmi(
+                "Errore condizioni di riferimento non trovate".to_string(),
+            ))
+        }
     };
 
-    let bbent: f32 = calc_bbent(campionamento, anagrafica)?;
+    //let width_checked = PositiveF32::new(width).map_err(|e| e.to_string())?;
+    let bbent: f32 = calc_bbent(campionamento, anagrafica).map_err(|e| HFBICalcError::Bbent(e))?;
     let bn: f32 = calc_bn(campionamento);
-    let dbent: f32 = calc_dbent(campionamento, anagrafica)?;
-    let ddom: f32 = calc_ddom(campionamento, anagrafica)?;
-    let dhzp: f32 = calc_dhzp(campionamento, anagrafica)?;
-    let dmig: f32 = calc_dmig(campionamento, anagrafica)?;
+    let dbent: f32 = calc_dbent(campionamento, anagrafica).map_err(|e| HFBICalcError::Dbent(e))?;
+    let ddom: f32 = calc_ddom(campionamento, anagrafica).map_err(|e| HFBICalcError::Ddom(e))?;
+    let dhzp: f32 = calc_dhzp(campionamento, anagrafica).map_err(|e| HFBICalcError::Dhzp(e))?;
+    let dmig: f32 = calc_dmig(campionamento, anagrafica).map_err(|e| HFBICalcError::Dmig(e))?;
     let rqe_bbent = bbent / condizioni_riferimento.bbent;
     let rqe_bn = bn / condizioni_riferimento.bn;
     let rqe_dbent = dbent / condizioni_riferimento.dbent;
@@ -104,7 +147,7 @@ pub fn calculate_mmi(
 pub fn calculate_hfbi(
     campionamento: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,
-) -> Result<(f32, ValoriIntermediHFBI), String> {
+) -> Result<(f32, ValoriIntermediHFBI), HFBICalcError> {
     match calculate_mmi(campionamento, anagrafica) {
         Ok(intermediates) => {
             let hfbi = (intermediates.mmi + HFBI_T) / HFBI_S;
