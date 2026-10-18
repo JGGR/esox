@@ -31,7 +31,7 @@ use crate::csv::stanis::niseci::{
     VeryItalianRecordAnagraficaNISECI, VeryItalianRecordCampionamentoNISECI,
     VeryItalianRecordRiferimentoNISECI,
 };
-use crate::engines::niseci::full::calculate_niseci;
+use crate::engines::niseci::full::{calculate_niseci, NISECICalcError};
 use crate::parser::niseci::{
     check_records_anagrafica_niseci, check_records_campionamento_niseci,
     check_records_riferimento_niseci,
@@ -143,7 +143,7 @@ fn calc_templates_with_area(
     format: InputFormat,
     x: f32,
     y: f32,
-) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<String>> {
+) -> Result<(Option<f32>, ValoriIntermediNISECI), Vec<NISECICalcError>> {
     let riferimento_reader = Cursor::new(RIFERIMENTO_NISECI_TEMPLATE_DATA);
     let riferimento = load_riferimento_niseci_from_reader(riferimento_reader, has_headers, format)
         .expect("Failed loading template RiferimentoNISECI");

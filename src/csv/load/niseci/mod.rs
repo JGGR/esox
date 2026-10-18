@@ -195,7 +195,7 @@ pub fn load_riferimento_niseci_from_path(
 
 pub fn load_riferimento<'a, R, T>(
     source: CsvInput<'a, R>,
-    config: CsvLoadConfig,
+    config: &CsvLoadConfig,
 ) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
 where
     R: Read,
@@ -207,15 +207,15 @@ where
             format,
         } => match source {
             CsvInput::Reader(reader) => {
-                load_riferimento_niseci_from_reader(reader, has_headers, format)
+                load_riferimento_niseci_from_reader(reader, *has_headers, *format)
             }
-            CsvInput::Path(path) => load_riferimento_niseci_from_path(path, has_headers, format),
+            CsvInput::Path(path) => load_riferimento_niseci_from_path(path, *has_headers, *format),
         },
         CsvLoadConfig::Csv(config) => match source {
             CsvInput::Reader(reader) => {
-                load_csv_riferimento_niseci_from_reader_conf::<_, T>(reader, config)
+                load_csv_riferimento_niseci_from_reader_conf::<_, T>(reader, *config)
             }
-            CsvInput::Path(path) => load_csv_riferimento_niseci_from_path_conf::<T>(path, config),
+            CsvInput::Path(path) => load_csv_riferimento_niseci_from_path_conf::<T>(path, *config),
         },
     }
 }
@@ -367,7 +367,7 @@ pub fn load_campionamento_niseci_from_path(
 pub fn load_campionamento<'a, R, T>(
     riferimento: &RiferimentoNISECI,
     source: CsvInput<'a, R>,
-    config: CsvLoadConfig,
+    config: &CsvLoadConfig,
 ) -> Result<CampionamentoNISECI, CampionamentoNISECIError>
 where
     R: Read,
@@ -379,18 +379,18 @@ where
             format,
         } => match source {
             CsvInput::Reader(reader) => {
-                load_campionamento_niseci_from_reader(reader, has_headers, riferimento, format)
+                load_campionamento_niseci_from_reader(reader, *has_headers, riferimento, *format)
             }
             CsvInput::Path(path) => {
-                load_campionamento_niseci_from_path(path, has_headers, riferimento, format)
+                load_campionamento_niseci_from_path(path, *has_headers, riferimento, *format)
             }
         },
         CsvLoadConfig::Csv(config) => match source {
             CsvInput::Reader(reader) => {
-                load_csv_campionamento_niseci_from_reader_conf::<_, T>(reader, config, riferimento)
+                load_csv_campionamento_niseci_from_reader_conf::<_, T>(reader, *config, riferimento)
             }
             CsvInput::Path(path) => {
-                load_csv_campionamento_niseci_from_path_conf::<T>(path, config, riferimento)
+                load_csv_campionamento_niseci_from_path_conf::<T>(path, *config, riferimento)
             }
         },
     }
@@ -530,7 +530,7 @@ pub fn load_anagrafica_niseci_from_path(
 
 pub fn load_anagrafica<'a, R, T>(
     source: CsvInput<'a, R>,
-    config: CsvLoadConfig,
+    config: &CsvLoadConfig,
 ) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
 where
     R: Read,
@@ -542,15 +542,15 @@ where
             format,
         } => match source {
             CsvInput::Reader(reader) => {
-                load_anagrafica_niseci_from_reader(reader, has_headers, format)
+                load_anagrafica_niseci_from_reader(reader, *has_headers, *format)
             }
-            CsvInput::Path(path) => load_anagrafica_niseci_from_path(path, has_headers, format),
+            CsvInput::Path(path) => load_anagrafica_niseci_from_path(path, *has_headers, *format),
         },
         CsvLoadConfig::Csv(config) => match source {
             CsvInput::Reader(reader) => {
-                load_csv_anagrafica_niseci_from_reader_conf::<_, T>(reader, config)
+                load_csv_anagrafica_niseci_from_reader_conf::<_, T>(reader, *config)
             }
-            CsvInput::Path(path) => load_csv_anagrafica_niseci_from_path_conf::<T>(path, config),
+            CsvInput::Path(path) => load_csv_anagrafica_niseci_from_path_conf::<T>(path, *config),
         },
     }
 }
