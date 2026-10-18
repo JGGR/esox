@@ -22,6 +22,8 @@
 pub mod hfbi;
 pub mod niseci;
 
+use std::path::Path;
+
 /// Denotes the kind of CSV input for a given file:
 /// - Standard uses `,` field delimiter and `.` decimal delimiter
 /// - Alternative uses `;` field delimiter and `,` decimal delimiter
@@ -33,4 +35,19 @@ pub enum InputFormat {
     Standard,
     /// Alternative format compatible with italian locale CSV.
     Alternative,
+}
+
+pub enum CsvInput<'a, R> {
+    Reader(R),
+    Path(&'a Path),
+}
+
+use crate::csv::deser::CsvConfig;
+
+pub enum CsvLoadConfig {
+    Format {
+        has_headers: bool,
+        format: InputFormat,
+    },
+    Csv(CsvConfig),
 }
