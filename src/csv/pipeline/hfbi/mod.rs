@@ -25,18 +25,21 @@
 //! use std::io::{Cursor, Read};
 //! use std::fs::File;
 //! use esox::csv::pipeline::hfbi::{HFBIBuilder, HFBIError};
+//! use esox::csv::stanis::hfbi::{VeryItalianRecordCampionamentoHFBI,
+//! VeryItalianRecordAnagraficaHFBI};
 //! use esox::csv::load::CsvLoadConfig;
 //! use esox::csv::load::InputFormat;
+//! use esox::csv::deser::CsvConfig;
 //! use esox::domain::hfbi::RisultatoHFBI;
 //! const CAMPIONAMENTO_DATA: &[u8] =
 //! include_bytes!("../../../../templates/campionamento_hfbi.csv");
 //!
-//! const CONFIG: CsvLoadConfig = CsvLoadConfig::Format {
-//!     has_headers: true,
-//!     format: InputFormat::Alternative,
-//! };
+//! let config: CsvLoadConfig = CsvLoadConfig::Csv (
+//!     CsvConfig::default()
+//! );
 //!
-//! let risultato: Result<RisultatoHFBI, HFBIError> = HFBIBuilder::<Cursor<&[u8]>, File>::new(CONFIG)
+//! let risultato: Result<RisultatoHFBI, HFBIError> =
+//! HFBIBuilder::<Cursor<&[u8]>, File>::with_records::<VeryItalianRecordCampionamentoHFBI, VeryItalianRecordAnagraficaHFBI>(config)
 //!     .campionamento_reader(Cursor::new(CAMPIONAMENTO_DATA))
 //!     .anagrafica_path(Path::new("./templates/anagrafica_hfbi.csv"))
 //!     .process();
@@ -153,12 +156,12 @@ impl<'a, RC: Read, RA: Read, TCamp: RecordCampionamentoHFBI, TAnag: RecordAnagra
             _records: std::marker::PhantomData::<(TCamp, TAnag)>,
         }
     }
-    pub fn with_records<TC, TA>(config: CsvLoadConfig) -> HFBIBuilder<'a, TC, TA>
+    pub fn with_records<TC, TA>(config: CsvLoadConfig) -> HFBIBuilder<'a, RC, RA, TC, TA>
     where
         TC: RecordCampionamentoHFBI,
         TA: RecordAnagraficaHFBI,
     {
-        HFBIBuilder::<TC, TA> {
+        HFBIBuilder::<RC, RA, TC, TA> {
             campionamento: None,
             anagrafica: None,
             config,

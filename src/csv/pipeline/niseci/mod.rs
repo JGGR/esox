@@ -183,13 +183,15 @@ impl<
             _records: std::marker::PhantomData::<(TRif, TCamp, TAnag)>,
         }
     }
-    pub fn with_records<TR, TC, TA>(config: CsvLoadConfig) -> NISECIBuilder<'a, TR, TC, TA>
+    pub fn with_records<TR, TC, TA>(
+        config: CsvLoadConfig,
+    ) -> NISECIBuilder<'a, RR, RC, RA, TR, TC, TA>
     where
         TR: RecordRiferimentoNISECI,
         TC: RecordCampionamentoNISECI,
         TA: RecordAnagraficaNISECI,
     {
-        NISECIBuilder::<TR, TC, TA> {
+        NISECIBuilder::<RR, RC, RA, TR, TC, TA> {
             riferimento: None,
             campionamento: None,
             anagrafica: None,
