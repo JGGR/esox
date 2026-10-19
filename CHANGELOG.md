@@ -1,3 +1,10 @@
+## [0.2.1] - 2026-10-19
+
+### Changed
+
+- Drop `println` inside `parser::{hfbi,niseci}` `check` methods
+- Bump `serde_json` to `1.0.154`
+
 ## [0.2.0] - 2026-09-03
 
 ### Added

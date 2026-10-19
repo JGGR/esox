@@ -15,6 +15,22 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Deserialization module for JSON to intermediate structs.
+//!
+//! Provides support for:
+//!
+//! - Converting raw JSON data into typed intermediate structs
+//! - Validating raw JSON data structure and field types
+//!   - Eg. Integer fields must not be `"foo"`)
+//!
+//! To validate intermediate structs into [`crate::domain`] structs, see:
+//!
+//! - [`crate::parser`]
+//!
+//! To do deser and parse steps at once (go from raw JSON to domain structs) see:
+//!
+//! - [`crate::json::load`]
+
 pub mod hfbi;
 pub mod niseci;
 

@@ -15,6 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Provides a default english im
+//! Default english implementation of the [`crate::csv::deser::utils::diagnostic`] interface.
+
 use crate::csv::deser::utils::diagnostic::{
     format_csv_error as generic_format_csv_error, CsvDiagnosticFormatter, CsvDiagnosticLayout,
     CsvDiagnosticLocalization, CsvFieldResolver, CsvPositionFormatter,

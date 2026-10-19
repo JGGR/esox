@@ -15,6 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Computation module of NISECI x3 metric.
+//!
+//! Routines and types for computing `x3` for [`crate::domain::niseci::ValoriIntermediNISECI`].
+
 use crate::domain::niseci::{
     CampionamentoNISECI, ClassiEtaAlieniNISECI, ClassiEtaSpecieNISECI, InfoPopolazioniAlieneNISECI,
 };

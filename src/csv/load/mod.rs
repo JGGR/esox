@@ -17,7 +17,7 @@
 //! CSV loading module.
 //!
 //! This module provides support for single step load of CSV data:
-//! - [`crate::csv::deser`] + [`crate::csv::parser`]
+//! - [`crate::csv::deser`] + [`crate::parser`]
 
 pub mod hfbi;
 pub mod niseci;

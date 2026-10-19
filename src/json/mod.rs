@@ -15,5 +15,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! JSON deserialization and validation module.
+//!
+//! Provides support for:
+//!
+//! - Deserialization and fields type check of raw JSON data into typed intermediate structs
+//!   - [`deser`]
+//! - Single-step load ([`deser`] + [`crate::parser`])
+//!   - [`load`]
+
 pub mod deser;
 pub mod load;

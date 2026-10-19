@@ -15,6 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! This module provides support for single step load of JSON data for NISECI:
+//! - [`crate::json::deser::niseci`] + [`crate::parser::niseci`]
+
 use crate::deser::{RecordAnagraficaNISECI, RecordCampionamentoNISECI, RecordRiferimentoNISECI};
 use crate::domain::niseci::CampionamentoNISECI;
 use crate::domain::niseci::{AnagraficaNISECI, RiferimentoNISECI};

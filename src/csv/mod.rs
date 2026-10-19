@@ -21,11 +21,9 @@
 //! - Deserialization and fields type check of raw CSV data into typed intermediate structs
 //! - Generic diagnostic formatting for [`csv::Error`]
 //!   - [`deser`]
-//! - Validation of intermediate structs into [`crate::domain`] structs (deprecated)
-//!   - [`parser`]
 //! - Semicolon input format and italian diagnostic formatting for [`csv::Error`]
 //!   - [`stanis`]
-//! - Single-step load ([`deser`] + [`parse`])
+//! - Single-step load ([`deser`] + [`crate::parser`])
 //!   - [`load`]
 
 pub mod deser;

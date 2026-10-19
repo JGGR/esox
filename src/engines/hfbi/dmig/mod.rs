@@ -15,6 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Computation module of HFBI dmig metric.
+//!
+//! Routines and types for computing `dmig` for [`crate::domain::hfbi::ValoriIntermediHFBI`].
+
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 use crate::domain::posf32::PositiveF32;
 use std::collections::HashSet;

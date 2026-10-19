@@ -15,6 +15,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Defines capture location for a dataset.
+//! See:
+//! - [`crate::domain::niseci::CampionamentoNISECI`]
+//! - [`crate::domain::hfbi::CampionamentoHFBI`]
+
 use serde::{Deserialize, Serialize};
 use std::fmt;
 

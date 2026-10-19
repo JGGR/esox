@@ -15,6 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! This module provides support for single step load of CSV data for NISECI:
+//! - [`crate::csv::deser::niseci`] + [`crate::parser::niseci`]
+
 use crate::csv::deser::niseci::{
     check_anagrafica_niseci_reader_conf, check_campionamento_niseci_reader_conf,
     check_riferimento_niseci_reader_conf, PlainRecordCsvAnagraficaNISECI,
@@ -39,6 +42,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+/// Encodes the possible errors returned by NISECI reference CSV deser and parse steps.
 #[derive(Debug)]
 pub enum RiferimentoNISECIError {
     Csv(Vec<csv::Error>),
@@ -60,6 +64,7 @@ impl fmt::Display for RiferimentoNISECIError {
 
 impl std::error::Error for RiferimentoNISECIError {}
 
+/// Load reference CSV from a [`Read`].
 pub fn load_csv_riferimento_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -76,6 +81,8 @@ where
     )
 }
 
+/// Load reference CSV from a [`Read`].
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_riferimento_niseci_from_reader_conf<R, T>(
     reader: R,
     config: CsvConfig,
@@ -91,6 +98,7 @@ where
     check_records_riferimento_niseci(csv_records).map_err(RiferimentoNISECIError::Value)
 }
 
+/// Load reference CSV from a [`AsRef`]<[`Path`]>.
 pub fn load_csv_riferimento_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -106,6 +114,8 @@ where
     )
 }
 
+/// Load reference CSV from a [`AsRef`]<[`Path`]>.
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_riferimento_niseci_from_path_conf<T>(
     path: impl AsRef<Path>,
     config: CsvConfig,
@@ -119,6 +129,8 @@ where
     load_csv_riferimento_niseci_from_reader_conf::<_, T>(file, config)
 }
 
+/// Load reference CSV from a [`Read`].
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_riferimento_niseci_from_reader<R>(
     reader: R,
     has_headers: bool,
@@ -148,6 +160,8 @@ where
     }
 }
 
+/// Load reference CSV from a [`AsRef`]<[`Path`]>.
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_riferimento_niseci_from_path(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -159,6 +173,7 @@ pub fn load_riferimento_niseci_from_path(
     load_riferimento_niseci_from_reader::<_>(file, has_headers, format)
 }
 
+/// Encodes the possible errors returned by NISECI capture set CSV deser and parse steps.
 #[derive(Debug)]
 pub enum CampionamentoNISECIError {
     Csv(Vec<csv::Error>),
@@ -180,6 +195,7 @@ impl fmt::Display for CampionamentoNISECIError {
 
 impl std::error::Error for CampionamentoNISECIError {}
 
+/// Load capture set CSV from a [`Read`].
 pub fn load_csv_campionamento_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -198,6 +214,8 @@ where
     )
 }
 
+/// Load capture set CSV from a [`Read`].
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_campionamento_niseci_from_reader_conf<R, T>(
     reader: R,
     config: CsvConfig,
@@ -218,6 +236,7 @@ where
         .map_err(CampionamentoNISECIError::Value)
 }
 
+/// Load capture set CSV from a [`AsRef`]<[`Path`]>.
 pub fn load_csv_campionamento_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -235,6 +254,8 @@ where
     )
 }
 
+/// Load capture set CSV from a [`AsRef`]<[`Path`]>.
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_campionamento_niseci_from_path_conf<T>(
     path: impl AsRef<Path>,
     config: CsvConfig,
@@ -248,6 +269,8 @@ where
     load_csv_campionamento_niseci_from_reader_conf::<_, T>(file, config, riferimento)
 }
 
+/// Load capture set CSV from a [`Read`].
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_campionamento_niseci_from_reader<R>(
     reader: R,
     has_headers: bool,
@@ -280,6 +303,8 @@ where
     }
 }
 
+/// Load capture set CSV from a [`AsRef`]<[`Path`]>.
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_campionamento_niseci_from_path(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -292,6 +317,7 @@ pub fn load_campionamento_niseci_from_path(
     load_campionamento_niseci_from_reader::<_>(file, has_headers, riferimento, format)
 }
 
+/// Encodes the possible errors returned by NISECI additional info CSV deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaNISECIError {
     Csv(Vec<csv::Error>),
@@ -313,6 +339,7 @@ impl fmt::Display for AnagraficaNISECIError {
 
 impl std::error::Error for AnagraficaNISECIError {}
 
+/// Load additional info CSV from a [`Read`].
 pub fn load_csv_anagrafica_niseci_from_reader<R, T>(
     reader: R,
     has_headers: bool,
@@ -329,6 +356,8 @@ where
     )
 }
 
+/// Load additional info CSV from a [`Read`].
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_anagrafica_niseci_from_reader_conf<R, T>(
     reader: R,
     config: CsvConfig,
@@ -345,6 +374,7 @@ where
     check_records_anagrafica_niseci(csv_records).map_err(AnagraficaNISECIError::Value)
 }
 
+/// Load additional info CSV from a [`AsRef`]<[`Path`]>.
 pub fn load_csv_anagrafica_niseci_from_path<T>(
     path: impl AsRef<Path>,
     has_headers: bool,
@@ -360,6 +390,8 @@ where
     )
 }
 
+/// Load additional info CSV from a [`AsRef`]<[`Path`]>.
+/// Allows passing a custom CSV delimiter.
 pub fn load_csv_anagrafica_niseci_from_path_conf<T>(
     path: impl AsRef<Path>,
     config: CsvConfig,
@@ -373,6 +405,8 @@ where
     load_csv_anagrafica_niseci_from_reader_conf::<_, T>(file, config)
 }
 
+/// Load additional info CSV from a [`Read`].
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_anagrafica_niseci_from_reader<R>(
     reader: R,
     has_headers: bool,
@@ -402,6 +436,8 @@ where
     }
 }
 
+/// Load additional info CSV from a [`AsRef`]<[`Path`]>.
+/// Uses [`InputFormat`] to select a CSV delimiter.
 pub fn load_anagrafica_niseci_from_path(
     path: impl AsRef<Path>,
     has_headers: bool,

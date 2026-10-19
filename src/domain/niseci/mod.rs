@@ -15,6 +15,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Types for modeling the domain of NISECI index computation.
+//! See:
+//! - [`RiferimentoNISECI`]
+//! - [`CampionamentoNISECI`]
+//! - [`AnagraficaNISECI`]
+//! - [`RisultatoNISECI`]
+
 /// We use [`hashbrown::HashMap`] only for [`InternerSpecieNISECI`].
 /// This is because [`std::collections::hash_map::RawEntryMut`] is not stable yet.
 /// See [`esox::domain::niseci::InternerSpecieNISECI::intern`].
@@ -42,6 +49,8 @@ pub enum OrigineSpecieNISECI {
     Alloctono(u8),
 }
 
+/// Defines one valid species.
+/// Used by [`RiferimentoNISECI`] and [`CampionamentoNISECI`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpecieNISECI {
@@ -295,6 +304,7 @@ impl From<Vec<SpecieNISECI>> for InternerSpecieNISECI {
     }
 }
 
+/// Defines one valid expected set of [`SpecieNISECI]`.
 #[derive(Clone, Serialize)]
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
@@ -369,6 +379,8 @@ impl<'a> IntoIterator for &'a RiferimentoNISECI {
     }
 }
 
+/// Defines one valid capture record species.
+/// Used by [`CampionamentoNISECI`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RecordNISECI {
@@ -422,6 +434,7 @@ impl RecordNISECI {
     }
 }
 
+/// Defines one valid capture set of [`RecordNISECI]`.
 #[derive(Clone, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {
@@ -706,6 +719,8 @@ pub struct AnagraficaNISECIDraft {
     pub larghezza_media_stazione: String,
 }
 
+/// Defines one valid additional info set.
+/// Used by [`crate::engines::niseci::full`].
 #[derive(Clone, Serialize)]
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
@@ -1167,6 +1182,8 @@ impl ValoriIntermediNISECI {
     }
 }
 
+/// Defines result of NISECI calc.
+/// Returned by [`crate::engines::niseci::full`].
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RisultatoNISECI {
@@ -1358,8 +1375,9 @@ impl MetricheX2A {
     }
 }
 
-/// enum che aiuta a valorizzare ClassiEtaSpecieNISECI
-/// (vedi update_classi_eta)
+/// Utility enum that helps initialise [`ClassiEtaSpecieNISECI`].
+/// See:
+/// - [`ClassiEtaSpecieNISECI::update_classi_eta`]
 pub enum ClassiEta {
     CL1,
     CL2,
@@ -1387,9 +1405,9 @@ impl ClassiEta {
     }
 }
 
-/// le classi eta contengono il numero di esemplari trovati
-/// nel campionamento per ogni specie catturata
-/// suddivisi nelle loro classi di eta (in base alla lunghezza)
+/// Contains number of specimens found in a capture set:
+/// - for each species captured
+/// - split in their age class (according to length)
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ClassiEtaSpecieNISECI {
@@ -1557,8 +1575,8 @@ impl ClassiEtaSpecieNISECI {
         Some((3, Some(ad_juv)))
     }
 
-    /// questa fn viene usata sia per x2_a che per x3
-    /// i suoi test sono esattamente quelli per calculate_x2_a
+    /// Used for both `x2_a` and `x3`.
+    // Its tests are the same as `crate::engines::niseci::x2::calculate_x2_a`.
     pub fn calculate_struttura_popolazione(
         &self,
         r: &RiferimentoNISECI,
@@ -1634,7 +1652,7 @@ impl InfoIntermediePopolazioniNISECI {
     }
 }
 
-/// struct che aiuta nel calcolo di x3
+/// Utility struct that helps in [`crate::engines::niseci::x3`].
 pub struct InfoPopolazioniNISECI {
     pub(crate) popolazione_piu_strutt: f32,
     pub(crate) species_strutt: u32,
@@ -1742,10 +1760,9 @@ impl InfoPopolazioniNISECI {
     }
 }
 
-/// struct che aiuta nel calcolo di x3
-/// una volta valorizzata avremmo tutte le informazioni utili
-/// a calcolare x3
-/// per ogni tipo di alloctono abbiamo una InfoPopolazioniNISECI
+/// Utility struct that helps in [`crate::engines::niseci::x3`].
+/// Once initialised we have all data needed to calc `x3`.
+/// For each allochthonous specimen we have a [`InfoPopolazioniNISECI`].
 pub struct InfoPopolazioniAlieneNISECI {
     pub(crate) tipo_1: InfoPopolazioniNISECI,
     pub(crate) tipo_2: InfoPopolazioniNISECI,
@@ -1820,8 +1837,8 @@ impl InfoPopolazioniAlieneNISECI {
     }
 }
 
-/// struct che aiuta nel calcolo x3
-/// ci aiuta a suddividere le specie aliene in base alla tipologia
+/// Utility struct that helps in [`crate::engines::niseci::x3`].
+/// Splits alien species according to their type.
 pub struct ClassiEtaAlieniNISECI {
     pub(crate) map_tipo_1: HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
     pub(crate) map_tipo_2: HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
@@ -1879,10 +1896,8 @@ impl ClassiEtaAlieniNISECI {
     }
 }
 
-/// struct che quando valorizzata
-/// esprime, data una SpecieNISECI,
-/// il numero di esemplari trovati
-/// suddivisi in base al numero di passaggio
+/// Utility struct that stores, for a given [`SpecieNISECI`], the number of
+/// specimens found split by their capture step.
 pub struct EsemplariPerCattura {
     id: IdSpecieNISECI,
     mappa: HashMap<u8, u32>, // la key è il numero del passaggio
@@ -1926,8 +1941,9 @@ impl EsemplariPerCattura {
     }
 }
 
-/// enum per il risultato finale di un calcolo niseci
-/// (vedi calculate_stato_ecologico)
+/// Enum for the final result of a NISECI calc
+/// See:
+/// - [`crate::engines::niseci::full::calculate_stato_ecologico_niseci`]
 pub enum StatoEcologicoNISECI {
     Elevato,
     Buono,

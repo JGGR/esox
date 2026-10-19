@@ -15,6 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Computation module of HFBI bn metric.
+//!
+//! Routines and types for computing `bn` for [`crate::domain::hfbi::ValoriIntermediHFBI`].
+
 use crate::domain::hfbi::CampionamentoHFBI;
 
 pub fn calc_bn(campione: &CampionamentoHFBI) -> f32 {

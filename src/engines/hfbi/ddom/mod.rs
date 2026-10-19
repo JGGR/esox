@@ -15,6 +15,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Computation module of HFBI ddom metric.
+//!
+//! Routines and types for computing `ddom` for [`crate::domain::hfbi::ValoriIntermediHFBI`].
+//!
+//! This calculation is order-dependent.
+//! Proper ordering of [`crate::domain::hfbi::CampionamentoHFBI`] is by descending
+//! [`crate::domain::hfbi::RecordHFBI::peso`]. 
+
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 use crate::domain::posf32::PositiveF32;
 

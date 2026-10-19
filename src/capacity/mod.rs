@@ -14,9 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-//! Capacity trait, for used only by:
-//! - [`esox::domain::niseci::ClassiEtaAlieniNISECI::new_with_capacity`]
-//! - Some methods in [`esox::engines::niseci::x2`]
+//! Capacity trait, work-in-progress.
+//! Used only by:
+//! - [`crate::domain::niseci::ClassiEtaAlieniNISECI::new_with_capacity`]
+//! - Some methods in [`crate::engines::niseci::x2`]
 
 pub trait Capacity {
     const VALUE: usize;

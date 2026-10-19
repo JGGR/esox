@@ -14,6 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! Computation module of NISECI x2 metric.
+//!
+//! Routines and types for computing `x2` for [`crate::domain::niseci::ValoriIntermediNISECI`].
+
 use std::collections::{hash_map::Entry, HashMap, HashSet};
 
 use crate::capacity::{Capacity, DefaultCapacity};

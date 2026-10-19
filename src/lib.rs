@@ -32,7 +32,7 @@
 //! - Converts raw CSV into typed intermediate structs
 //! - Validates CSV structure and field types (e.g. integer fields must be valid numbers)
 //!
-//! 2. Intermediate structs parsing and validation (`parser`)
+//! 2. Intermediate structs parsing and validation ([`parser`])
 //!
 //! - Converts the intermediate CSV structs into [`domain`] models
 //! - Enforces domain rules (e.g. value ranges, invariants)

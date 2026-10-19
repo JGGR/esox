@@ -65,6 +65,7 @@ impl<R: Read> Read for NormalizerReader<R> {
     }
 }
 
+/// Holds data for configuration of CSV parsing.
 #[derive(Debug, Clone, Copy)]
 pub struct CsvConfig {
     delimiter: u8,

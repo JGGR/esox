@@ -14,6 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! CSV deserialization routines for HFBI.
+//! Output is meant to be consumed by [`crate::parser::hfbi`] routines.
+
 use crate::csv::deser::{
     check_path_is_file_ends_with_csv, CsvConfig, DefaultRecordCsv, NormalizerReader, RecordCsv,
 };
@@ -28,6 +32,7 @@ use std::fs::File;
 use std::io::{Error, Read};
 use std::path::PathBuf;
 
+/// Default implementation of CSV records for [`crate::deser::RecordCampionamentoHFBI`].
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
@@ -156,6 +161,7 @@ where
     private_check_campionamento_hfbi_reader_conf::<File, DefaultByteLimit, T>(file, config)
 }
 
+/// Default implementation of CSV records for [`crate::deser::RecordAnagraficaHFBI`].
 /// Currently allows unknown fields; will switch to
 /// `#[serde(deny_unknown_fields)]` in a future release.
 #[derive(Debug, serde::Deserialize)]
