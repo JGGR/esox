@@ -32,6 +32,7 @@ use super::posf32::deserialize_positive_f32;
 use super::posf32::{PositiveF32, PositiveF32Error};
 use crate::domain::location::Location;
 
+/// Denotes ecological group for a [`SpecieHFBI`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum GruppoEcoHFBI {
@@ -55,6 +56,7 @@ impl fmt::Display for GruppoEcoHFBI {
     }
 }
 
+/// Denotes trophic group for a [`SpecieHFBI`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct GruppoTrofHFBI {
@@ -83,6 +85,8 @@ impl fmt::Display for GruppoTrofHFBI {
     }
 }
 
+/// Defines one valid species.
+/// Used by [`CampionamentoHFBI`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpecieHFBI {
@@ -625,6 +629,8 @@ define_riferimento_hfbi! {
 
 pub(crate) static RIFERIMENTO_HFBI: LazyLock<RiferimentoHFBI> = LazyLock::new(RiferimentoHFBI::new);
 
+/// Defines one valid capture record species.
+/// Used by [`CampionamentoHFBI`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RecordHFBI {
@@ -643,9 +649,9 @@ impl fmt::Display for RecordHFBI {
     }
 }
 
+/// Defines one valid capture set of [`RecordHFBI`].
 /// Since calculations of HFBI rely on iteration order, this type must enforce
 /// the internal invariant that records are sorted by descending `peso`.
-/// v0.2 will change visibility of internals to avoid improper construction / mutation.
 #[derive(Clone, Serialize)]
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
@@ -736,6 +742,7 @@ where
     Ok(v)
 }
 
+/// Denotes kind of lagoon for [`AnagraficaHFBI`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum TipoLagunaCostieraHFBI {
@@ -768,6 +775,7 @@ impl TryFrom<i32> for TipoLagunaCostieraHFBI {
     }
 }
 
+/// Denotes season for [`AnagraficaHFBI`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum StagioneHFBI {
@@ -797,6 +805,7 @@ impl TryFrom<i32> for StagioneHFBI {
     }
 }
 
+/// Denotes habitat for [`AnagraficaHFBI`].
 #[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum HabitatHFBI {
@@ -826,6 +835,7 @@ impl TryFrom<i32> for HabitatHFBI {
     }
 }
 
+/// Utility struct for form-like tentative definition of [`AnagraficaHFBI`].
 #[derive(Clone)]
 pub struct AnagraficaHFBIDraft {
     pub codice_stazione: String,
@@ -839,6 +849,8 @@ pub struct AnagraficaHFBIDraft {
     pub larghezza_media_transetto: String,
 }
 
+/// Defines one valid additional info set.
+/// Used by [`crate::engines::hfbi::full`].
 #[derive(Clone, Serialize)]
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
@@ -927,6 +939,7 @@ impl fmt::Display for AnagraficaHFBI {
     }
 }
 
+/// Intermediate values for HFBI calc.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValoriIntermediHFBI {
@@ -979,6 +992,8 @@ impl ValoriIntermediHFBI {
     }
 }
 
+/// Defines result of HFBI calc.
+/// Returned by [`crate::engines::hfbi::full`].
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RisultatoHFBI {
@@ -1051,6 +1066,7 @@ impl RisultatoHFBI {
     }
 }
 
+/// Utility struct used in [`AnagraficaHFBI::get_conf_riferimento_key`].
 #[derive(Hash, PartialEq, Eq)]
 pub struct CondizioniRiferimentoKeyHFBI {
     pub tipo_laguna: TipoLagunaCostieraHFBI,
@@ -1058,6 +1074,7 @@ pub struct CondizioniRiferimentoKeyHFBI {
     pub habitat_vegetato: HabitatHFBI,
 }
 
+/// Utility struct used in [`engines::hfbi::full`].
 #[derive(Clone)]
 pub struct CondizioniRiferimentoHFBI {
     pub bn: f32,
@@ -1267,8 +1284,9 @@ static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: LazyLock<
     ])
 });
 
-/// enum per il risultato finale di un calcolo hfbi
-/// (vedi calculate_stato_ecologico)
+/// Enum for the final result of a HFBI calc
+/// See:
+/// - [`crate::engines::hfbi::full::calculate_stato_ecologico_hfbi`]
 pub enum StatoEcologicoHFBI {
     Eccellente,
     Buono,
@@ -1290,9 +1308,13 @@ impl fmt::Display for StatoEcologicoHFBI {
     }
 }
 
+/// Threshold for excellent HFBI ecological status.
 const STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE: f32 = 0.94;
+/// Threshold for good HFBI ecological status.
 const STATO_ECOLOGICO_HFBI_SOGLIA_BUONO: f32 = 0.55;
+/// Threshold for sufficient HFBI ecological status.
 const STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE: f32 = 0.33;
+/// Threshold for poop HFBI ecological status.
 const STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO: f32 = 0.11;
 
 impl From<f32> for StatoEcologicoHFBI {

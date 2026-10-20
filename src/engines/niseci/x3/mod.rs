@@ -26,6 +26,7 @@ use crate::domain::niseci::{IdSpecieNISECI, RiferimentoNISECI};
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
+/// Intermediate species-specific values of `x3A` and `x3B` for NISECI calc.
 #[derive(Clone)]
 pub struct SubmetricheX3 {
     classi_eta: ClassiEtaSpecieNISECI,
@@ -66,6 +67,7 @@ impl SubmetricheX3 {
     }
 }
 
+/// Intermediate values of `x3` for NISECI calc.
 pub struct MetricheX3 {
     criterio_a: f32,
     criterio_b: f32,
@@ -98,6 +100,7 @@ impl MetricheX3 {
     }
 }
 
+/// Compute `x3` for [`crate::domain::niseci::ValoriIntermediNISECI`].
 pub fn calculate_x3(
     c: &CampionamentoNISECI,
     r: &RiferimentoNISECI,

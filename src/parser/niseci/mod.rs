@@ -98,11 +98,7 @@ fn check_soglie_ad_juv<T: RecordRiferimentoNISECI>(r: &T) -> bool {
     false
 }
 
-/// v0.2 will have this method public
-/// Internal transitional API for migrating:
-///   - returning RiferimentoNISECIParseResult instead of tuple
-///     - success field (.0) used to be Vec<SpecieNISECI>
-pub(crate) fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
+pub fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
     records: Vec<T>,
 ) -> RiferimentoNISECIParseResult {
     let mut errors = Vec::new();
@@ -309,13 +305,7 @@ impl CampionamentoNISECIParseResult {
     }
 }
 
-/// v0.2 will have this method public
-/// Internal transitional API for migrating:
-///   - borrow over riferimento_specie
-///   - taking &RiferimentoNISECI over &Vec<SpecieNISECI>
-///   - returning CampionamentoNISECIParseResult instead of tuple
-///     - success field (.0) used to be Vec<RecordNISECI>
-pub(crate) fn parse_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
+pub fn parse_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
     records: Vec<T>,
     riferimento_specie: &RiferimentoNISECI,
 ) -> CampionamentoNISECIParseResult {

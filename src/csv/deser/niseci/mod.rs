@@ -127,9 +127,6 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_riferimento_niseci_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -267,9 +264,6 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_campionamento_niseci_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -452,9 +446,6 @@ impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     }
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::niseci::check_anagrafica_niseci_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,

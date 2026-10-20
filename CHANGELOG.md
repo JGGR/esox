@@ -1,3 +1,13 @@
+## [0.2.2] - Unreleased
+
+### Added
+
+- Expose some `parser` utility methods
+
+### Changed
+
+- More docs
+
 ## [0.2.1] - 2026-10-19
 
 ### Changed

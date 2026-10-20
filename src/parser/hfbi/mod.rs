@@ -69,11 +69,7 @@ impl CampionamentoHFBIParseResult {
     }
 }
 
-/// v0.2 will have this method public
-/// Internal transitional API for migrating:
-///   - returning CampionamentoHFBIParseResult instead of tuple
-///     - success field (.0) used to be Vec<RecordHFBI>
-pub(crate) fn parse_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
+pub fn parse_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
 ) -> CampionamentoHFBIParseResult {
     let mut campioni = Vec::new();

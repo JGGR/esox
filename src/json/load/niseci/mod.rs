@@ -36,6 +36,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+/// Encodes the possible errors returned by NISECI reference JSON deser and parse steps.
 #[derive(Debug)]
 pub enum RiferimentoNISECIError {
     Io(std::io::Error),
@@ -75,6 +76,7 @@ impl fmt::Display for RiferimentoNISECIError {
 
 impl std::error::Error for RiferimentoNISECIError {}
 
+/// Load reference JSON from a [`Read`].
 pub fn load_json_riferimento_niseci_from_reader<R, T>(
     reader: R,
 ) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
@@ -86,6 +88,7 @@ where
     check_records_riferimento_niseci(json_records).map_err(RiferimentoNISECIError::Value)
 }
 
+/// Load reference JSON from a [`AsRef`]<[`Path`]>.
 pub fn load_json_riferimento_niseci_from_path<T>(
     path: impl AsRef<Path>,
 ) -> Result<RiferimentoNISECI, RiferimentoNISECIError>
@@ -97,6 +100,7 @@ where
     load_json_riferimento_niseci_from_reader::<_, T>(file)
 }
 
+/// Encodes the possible errors returned by NISECI capture set JSON deser and parse steps.
 #[derive(Debug)]
 pub enum CampionamentoNISECIError {
     Io(std::io::Error),
@@ -136,6 +140,7 @@ impl fmt::Display for CampionamentoNISECIError {
 
 impl std::error::Error for CampionamentoNISECIError {}
 
+/// Load capture set JSON from a [`Read`].
 pub fn load_json_campionamento_niseci_from_reader<R, T>(
     reader: R,
     riferimento: &RiferimentoNISECI,
@@ -150,6 +155,7 @@ where
         .map_err(CampionamentoNISECIError::Value)
 }
 
+/// Load capture set JSON from a [`AsRef`]<[`Path`]>.
 pub fn load_json_campionamento_niseci_from_path<T>(
     path: impl AsRef<Path>,
     riferimento: &RiferimentoNISECI,
@@ -161,6 +167,7 @@ where
     load_json_campionamento_niseci_from_reader::<_, T>(file, riferimento)
 }
 
+/// Encodes the possible errors returned by NISECI additional info JSON deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaNISECIError {
     Io(std::io::Error),
@@ -200,6 +207,7 @@ impl fmt::Display for AnagraficaNISECIError {
 
 impl std::error::Error for AnagraficaNISECIError {}
 
+/// Load additional info JSON from a [`Read`].
 pub fn load_json_anagrafica_niseci_from_reader<R, T>(
     reader: R,
 ) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
@@ -211,6 +219,7 @@ where
     check_records_anagrafica_niseci(json_records).map_err(AnagraficaNISECIError::Value)
 }
 
+/// Load additional info JSON from a [`AsRef`]<[`Path`]>.
 pub fn load_json_anagrafica_niseci_from_path<T>(
     path: impl AsRef<Path>,
 ) -> Result<AnagraficaNISECI, AnagraficaNISECIError>
