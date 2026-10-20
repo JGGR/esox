@@ -21,11 +21,12 @@
 //!
 //! This calculation is order-dependent.
 //! Proper ordering of [`crate::domain::hfbi::CampionamentoHFBI`] is by descending
-//! [`crate::domain::hfbi::RecordHFBI::peso`]. 
+//! [`crate::domain::hfbi::RecordHFBI::peso`].
 
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI};
 use crate::domain::posf32::PositiveF32;
 
+/// Compute `ddom` for [`crate::domain::hfbi::ValoriIntermediHFBI`].
 /// This calculation is order-dependent due to calc_s90_b90() being order-dependent.
 /// Proper ordering of `campionamento` is by descending `peso` (RecordHFBI.peso).
 pub fn calc_ddom(

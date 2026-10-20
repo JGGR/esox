@@ -22,6 +22,7 @@
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 use crate::domain::posf32::PositiveF32;
 
+/// Compute `dhzp` for [`crate::domain::hfbi::ValoriIntermediHFBI`].
 pub fn calc_dhzp(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
     let mut shzp = 0.0;
     let bhzp = calc_bhzp(campione, anagrafica)?;

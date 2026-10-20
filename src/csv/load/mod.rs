@@ -22,6 +22,10 @@
 pub mod hfbi;
 pub mod niseci;
 
+/// Denotes the kind of CSV input for a given file:
+/// - Standard uses `,` field delimiter and `.` decimal delimiter
+/// - Alternative uses `;` field delimiter and `,` decimal delimiter
+/// Used in [`crate::csv::load`] methods that don't accept custom definition of delimiters.
 #[derive(Copy, Clone, Default)]
 pub enum InputFormat {
     #[default]

@@ -29,6 +29,7 @@ use crate::domain::niseci::{CampionamentoNISECI, ClassiEtaSpecieNISECI, Esemplar
 use crate::domain::posf32::PositiveF32;
 use crate::engines::niseci::linear_regression::{calculate_quantita_with_regression, Point};
 
+/// Intermediate species-specific values of `x2A` and `x2B` for NISECI calc.
 #[derive(Clone)]
 pub struct SubmetricheX2 {
     metriche_x2_a: MetricheX2A,
@@ -62,6 +63,7 @@ impl SubmetricheX2 {
     }
 }
 
+/// Intermediate values of `x2` for NISECI calc.
 pub struct MetricheX2 {
     criterio_a: f32,
     criterio_b: f32,
@@ -94,6 +96,7 @@ impl MetricheX2 {
     }
 }
 
+/// Intermediate species-specific values of `x2B` for NISECI calc.
 #[derive(Clone)]
 pub struct MetricheX2B {
     id_specie: IdSpecieNISECI,
@@ -134,6 +137,7 @@ impl MetricheX2B {
     }
 }
 
+/// Compute `x2` for [`crate::domain::niseci::ValoriIntermediNISECI`].
 pub fn calculate_x2(
     campionamento: &CampionamentoNISECI,
     anagrafica: &AnagraficaNISECI,
@@ -198,6 +202,7 @@ pub fn calculate_x2(
     calculate_x2_absolute(metriche_x2, x2_a, x2_b, &set_specie_campionate)
 }
 
+/// Compute `x2` for allochtonous specie for [`crate::domain::niseci::ValoriIntermediNISECI`].
 pub fn calculate_x2_per_alloctone(
     campionamento: &CampionamentoNISECI,
     riferimento: &RiferimentoNISECI,

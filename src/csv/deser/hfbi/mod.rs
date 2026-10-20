@@ -67,9 +67,6 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     }
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_campionamento_hfbi_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -236,9 +233,6 @@ impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
     }
 }
 
-#[deprecated(
-    note = "v0.2 will change signature to add a RecordCsv bound on T.\nConsider adding impl RecordCsv to your custom types.\nExisting provided types will receive it automatically. Consider using crate::csv::deser::hfbi::check_anagrafica_hfbi_reader_conf() if you need runtime delimiter selection instead"
-)]
 pub fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,

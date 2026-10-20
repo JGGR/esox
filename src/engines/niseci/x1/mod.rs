@@ -22,6 +22,7 @@
 use crate::domain::niseci::{CampionamentoNISECI, IdSpecieNISECI, RiferimentoNISECI};
 use std::collections::HashSet;
 
+/// Compute `x1` for [`crate::domain::niseci::ValoriIntermediNISECI`].
 pub fn calculate_x1(campionamento: &CampionamentoNISECI, riferimento: &RiferimentoNISECI) -> f32 {
     // n_i è il numero di specie autoctone di maggiore importanza ecologico-funzionale campionate
     // n_a è il numero di altre specie autoctone campionate

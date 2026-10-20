@@ -22,6 +22,7 @@
 use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 use crate::domain::posf32::PositiveF32;
 
+/// Compute `bbent` for [`crate::domain::hfbi::ValoriIntermediHFBI`].
 pub fn calc_bbent(
     campione: &CampionamentoHFBI,
     anagrafica: &AnagraficaHFBI,

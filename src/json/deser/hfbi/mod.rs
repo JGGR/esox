@@ -16,7 +16,7 @@
 */
 
 //! JSON deserialization routines for HFBI.
-//! Output is meant to be consumed by [`esox::parser::hfbi`] routines.
+//! Output is meant to be consumed by [`crate::parser::hfbi`] routines.
 
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{

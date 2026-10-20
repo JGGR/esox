@@ -38,6 +38,7 @@ pub enum TipoRecord {
     AnagraficaHFBI,
 }
 
+/// Defines expected methods for a deserialized reference set record of NISECI.
 pub trait RecordRiferimentoNISECI: serde::de::DeserializeOwned {
     fn nome_comune(&self) -> String;
     fn nome_latino(&self) -> String;
@@ -58,6 +59,7 @@ pub trait RecordRiferimentoNISECI: serde::de::DeserializeOwned {
     fn dens_soglia2(&self) -> f32;
 }
 
+/// Defines expected methods for a deserialized capture set record of NISECI.
 pub trait RecordCampionamentoNISECI: serde::de::DeserializeOwned {
     fn data(&self) -> String;
     fn stazione(&self) -> String;
@@ -67,6 +69,7 @@ pub trait RecordCampionamentoNISECI: serde::de::DeserializeOwned {
     fn peso(&self) -> f32;
 }
 
+/// Defines expected methods for a deserialized additional info record of NISECI.
 pub trait RecordAnagraficaNISECI: serde::de::DeserializeOwned {
     fn codice_stazione(&self) -> String;
     fn corpo_idrico(&self) -> String;
@@ -83,12 +86,14 @@ pub trait RecordAnagraficaNISECI: serde::de::DeserializeOwned {
     fn nome_bacino(&self) -> String;
 }
 
+/// Defines expected methods for a deserialized capture set record of HFBI.
 pub trait RecordCampionamentoHFBI: serde::de::DeserializeOwned {
     fn codice_specie(&self) -> String;
     fn numero_individui(&self) -> u32;
     fn peso(&self) -> f32;
 }
 
+/// Defines expected methods for a deserialized additional info record of HFBI.
 pub trait RecordAnagraficaHFBI: serde::de::DeserializeOwned {
     fn codice_stazione(&self) -> String;
     fn corpo_idrico(&self) -> String;

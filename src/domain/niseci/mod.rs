@@ -43,6 +43,8 @@ use crate::capacity::{Capacity, DefaultCapacity};
 #[cfg(test)]
 use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_every_passage() only
                                                       // in test builds
+
+/// Denotes the origin of a [`SpecieNISECI`].
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum OrigineSpecieNISECI {
     Autoctono(u8),
@@ -304,7 +306,7 @@ impl From<Vec<SpecieNISECI>> for InternerSpecieNISECI {
     }
 }
 
-/// Defines one valid expected set of [`SpecieNISECI]`.
+/// Defines one valid expected set of [`SpecieNISECI`].
 #[derive(Clone, Serialize)]
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
@@ -434,7 +436,7 @@ impl RecordNISECI {
     }
 }
 
-/// Defines one valid capture set of [`RecordNISECI]`.
+/// Defines one valid capture set of [`RecordNISECI`].
 #[derive(Clone, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {
@@ -548,6 +550,8 @@ impl<'a> IntoIterator for &'a CampionamentoNISECI {
     }
 }
 
+/// Utility struct for keeping track of population composition in
+/// [`CampionamentoNISECI::get_numero_pesci_alieni_e_indigeni`].
 pub struct AlieniIndigeni {
     alieni: u32,
     indigeni: u32,
@@ -564,6 +568,7 @@ impl AlieniIndigeni {
     }
 }
 
+/// Denotes the kind of [`ComunitaNISECI`].
 #[derive(Copy, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum TipoComunitaNISECI {
@@ -601,6 +606,7 @@ impl TryFrom<i32> for TipoComunitaNISECI {
     }
 }
 
+/// Denotes community info for [`AnagraficaNISECI`].
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ComunitaNISECI {
@@ -676,6 +682,7 @@ impl ComunitaNISECI {
     }
 }
 
+/// Denotes area for [`AnagraficaNISECI`].
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum AreaNISECI {
@@ -705,6 +712,7 @@ impl TryFrom<i32> for AreaNISECI {
     }
 }
 
+/// Utility struct for form-like tentative definition of [`AnagraficaNISECI`].
 #[derive(Clone)]
 pub struct AnagraficaNISECIDraft {
     pub comunita: ComunitaNISECI,
@@ -801,7 +809,7 @@ impl fmt::Display for AnagraficaNISECI {
         write!(f, "{}", string_representation)
     }
 }
-
+/// Denotes classified region for [`AnagraficaNISECI`].
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum IdroEcoRegioneNISECI {
@@ -920,6 +928,7 @@ impl TryFrom<i32> for IdroEcoRegioneNISECI {
     }
 }
 
+/// Intermediate species-specific values for NISECI calc.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValoriIntermediSpecieNISECI {
@@ -1005,6 +1014,7 @@ impl ValoriIntermediSpecieNISECI {
     }
 }
 
+/// Intermediate values for NISECI calc.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValoriIntermediNISECI {
@@ -1330,6 +1340,7 @@ impl RisultatoNISECI {
     }
 }
 
+/// Intermediate values of `x2A_b` for NISECI calc.
 #[derive(Clone, Copy)]
 pub struct MetricheX2aB {
     criterio_b: u8,
@@ -1351,6 +1362,7 @@ impl MetricheX2aB {
     }
 }
 
+/// Intermediate values of `x2A` for NISECI calc.
 #[derive(Clone, Copy)]
 pub struct MetricheX2A {
     criterio_a: u8,
@@ -1623,6 +1635,7 @@ impl ClassiEtaSpecieNISECI {
     }
 }
 
+/// Intermediate species-specific `x3` values for NISECI calc.
 pub struct InfoIntermediePopolazioniNISECI {
     criterio_a: u8,
     criterio_b: u8,
@@ -1965,10 +1978,15 @@ impl fmt::Display for StatoEcologicoNISECI {
     }
 }
 
+/// Threshold for excellent NISECI ecological status.
 const STATO_ECOLOGICO_NISECI_SOGLIA_ELEVATO: f32 = 0.8;
+/// Threshold for good NISECI ecological status for alpine areas.
 const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_ALPINA: f32 = 0.52;
+/// Threshold for good NISECI ecological status for mediterranean areas.
 const STATO_ECOLOGICO_NISECI_SOGLIA_BUONO_AREA_MEDITERRANEA: f32 = 0.6;
+/// Threshold for moderate NISECI ecological status for alpine areas.
 const STATO_ECOLOGICO_NISECI_SOGLIA_MODERATO: f32 = 0.4;
+/// Threshold for poor NISECI ecological status for alpine areas.
 const STATO_ECOLOGICO_NISECI_SOGLIA_SCADENTE: f32 = 0.2;
 
 impl From<(f32, &AreaNISECI)> for StatoEcologicoNISECI {

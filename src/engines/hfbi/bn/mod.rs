@@ -21,6 +21,7 @@
 
 use crate::domain::hfbi::CampionamentoHFBI;
 
+/// Compute `bn` for [`crate::domain::hfbi::ValoriIntermediHFBI`].
 pub fn calc_bn(campione: &CampionamentoHFBI) -> f32 {
     let mut b = 0.0;
     let mut n = 0.0;

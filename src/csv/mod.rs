@@ -32,6 +32,7 @@ pub mod stanis;
 
 // This must be kept aligned with RecordCsvRiferimentoNISECI definition.
 // TODO: get this stuff with some macro?
+/// Defines header fields for [`RecordRiferimentoNISECI`].
 pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [
     "nomeComune",
     "nomeLatino",
@@ -51,15 +52,18 @@ pub const RIFERIMENTO_NISECI_HEADER_FIELDS: [&str; 17] = [
     "densSoglia1",
     "densSoglia2",
 ];
+/// Defines header field types for [`RecordRiferimentoNISECI`].
 pub const RIFERIMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 17] = [
     "String", "String", "String", "String", "u32", "u32", "u32", "u32", "u32", "u32", "u32", "f32",
     "f32", "f32", "f32", "f32", "f32",
 ];
+/// Defines CSV header for [`RecordRiferimentoNISECI`], using the alternative format.
 pub const RIFERIMENTO_NISECI_HEADER: &str = "\
 nomeComune;nomeLatino;codiceSpecie;origine;tipoAutoctono;alloNocivita;specieAttesa;clSoglia1;clSoglia2;clSoglia3;clSoglia4;adJuvSoglia1;adJuvSoglia2;adJuvSoglia3;adJuvSoglia4;densSoglia1;densSoglia2";
 
 // This must be kept aligned with RecordCsvCampionamentoNISECI definition.
 // TODO: get this stuff with some macro?
+/// Defines header fields for [`RecordCampionamentoNISECI`].
 pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [
     "data",
     "stazione",
@@ -68,13 +72,16 @@ pub const CAMPIONAMENTO_NISECI_HEADER_FIELDS: [&str; 6] = [
     "lunghezza",
     "peso",
 ];
+/// Defines header field types for [`RecordCampionamentoNISECI`].
 pub const CAMPIONAMENTO_NISECI_HEADER_FIELD_TYPES: [&str; 6] =
     ["String", "String", "u32", "String", "u32", "f32"];
+/// Defines CSV header for [`RecordCampionamentoNISECI`], using the alternative format.
 pub const CAMPIONAMENTO_NISECI_HEADER: &str = "\
 data;stazione;numPassaggio;codiceSpecie;lunghezza;peso";
 
 // This must be kept aligned with RecordCsvAnagraficaNISECI definition.
 // TODO: get this stuff with some macro?
+/// Defines header fields for [`RecordAnagraficaNISECI`].
 pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
     "codiceStazione",
     "corpoIdrico",
@@ -90,22 +97,28 @@ pub const ANAGRAFICA_NISECI_HEADER_FIELDS: [&str; 13] = [
     "areaAlpina",
     "nomeBacino",
 ];
+/// Defines header field types for [`RecordAnagraficaNISECI`].
 pub const ANAGRAFICA_NISECI_HEADER_FIELD_TYPES: [&str; 13] = [
     "String", "String", "String", "String", "String", "f32", "f32", "u32", "String", "String",
     "u32", "u32", "String",
 ];
+/// Defines CSV header for [`RecordAnagraficaNISECI`], using the alternative format.
 pub const ANAGRAFICA_NISECI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;tipoComunita;fonte;numeroProtocollo;idroEcoRegione;areaAlpina;nomeBacino";
 
 // This must be kept aligned with RecordCsvCampionamentoHFBI definition.
 // TODO: get this stuff with some macro?
+/// Defines header fields for [`RecordCampionamentoHFBI`].
 pub const CAMPIONAMENTO_HFBI_HEADER_FIELDS: [&str; 3] = ["codiceSpecie", "numeroIndividui", "peso"];
+/// Defines header field types for [`RecordCampionamentoHFBI`].
 pub const CAMPIONAMENTO_HFBI_HEADER_FIELD_TYPES: [&str; 3] = ["String", "u32", "f32"];
+/// Defines CSV header for [`RecordCampionamentoHFBI`], using the alternative format.
 pub const CAMPIONAMENTO_HFBI_HEADER: &str = "\
 codiceSpecie;numeroIndividui;peso";
 
 // This must be kept aligned with RecordCsvAnagraficaHFBI definition.
 // TODO: get this stuff with some macro?
+/// Defines header fields for [`RecordAnagraficaHFBI`].
 pub const ANAGRAFICA_HFBI_HEADER_FIELDS: [&str; 10] = [
     "codiceStazione",
     "corpoIdrico",
@@ -118,8 +131,10 @@ pub const ANAGRAFICA_HFBI_HEADER_FIELDS: [&str; 10] = [
     "habitat",
     "tipoLaguna",
 ];
+/// Defines header field types for [`RecordAnagraficaHFBI`].
 pub const ANAGRAFICA_HFBI_HEADER_FIELD_TYPES: [&str; 10] = [
     "String", "String", "String", "String", "String", "f32", "f32", "u32", "u32", "u32",
 ];
+/// Defines CSV header for [`RecordAnagraficaHFBI`], using the alternative format.
 pub const ANAGRAFICA_HFBI_HEADER: &str = "\
 codiceStazione;corpoIdrico;regione;provincia;data;lunghezzaStazione;larghezzaStazione;stagione;habitat;tipoLaguna";

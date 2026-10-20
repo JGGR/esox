@@ -14,6 +14,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+//! JSON loading module.
+//!
+//! This module provides support for single step load of JSON data:
+//! - [`crate::json::deser`] + [`crate::parser`]
 
 pub mod hfbi;
 pub mod niseci;

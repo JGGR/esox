@@ -23,6 +23,7 @@ use crate::domain::hfbi::{AnagraficaHFBI, CampionamentoHFBI, GruppoEcoHFBI};
 use crate::domain::posf32::PositiveF32;
 use std::collections::HashSet;
 
+/// Compute `dmig` for [`crate::domain::hfbi::ValoriIntermediHFBI`].
 pub fn calc_dmig(campione: &CampionamentoHFBI, anagrafica: &AnagraficaHFBI) -> Result<f32, String> {
     let bmig = calc_bmig(campione, anagrafica)?;
 
