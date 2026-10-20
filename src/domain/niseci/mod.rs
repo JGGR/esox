@@ -434,7 +434,7 @@ impl RecordNISECI {
     }
 }
 
-/// Defines one valid capture set of [`RecordNISECI]`.
+/// Defines one valid capture set of [`RecordNISECI`].
 #[derive(Clone, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CampionamentoNISECI {

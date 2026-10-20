@@ -16,7 +16,7 @@
 */
 
 //! JSON deserialization routines for NISECI.
-//! Output is meant to be consumed by [`esox::parser::niseci`] routines.
+//! Output is meant to be consumed by [`crate::parser::niseci`] routines.
 
 use crate::deser::limits::{with_limited_reader, ByteLimit, DefaultByteLimit};
 use crate::deser::{

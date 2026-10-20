@@ -96,6 +96,8 @@
 //! let (hfbi, intermediates) = calculate_hfbi(&campionamento, &anagrafica).unwrap();
 //!```
 
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
 pub mod capacity;
 pub mod csv;
 pub mod deser;
