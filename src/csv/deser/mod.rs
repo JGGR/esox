@@ -82,19 +82,24 @@ impl Default for CsvConfig {
 }
 
 impl CsvConfig {
+    /// Construct a new instance.
     pub fn new() -> Self {
         Self::default()
     }
+    /// Getter for delimiter.
     pub fn delimiter(&self) -> u8 {
         self.delimiter
     }
+    /// Getter for wether the file has a CSV header.
     pub fn has_headers(&self) -> bool {
         self.has_headers
     }
+    /// Setter for delimiter.
     pub fn with_delimiter(mut self, delimiter: u8) -> Self {
         self.delimiter = delimiter;
         self
     }
+    /// Setter for wether the file has a CSV header.
     pub fn with_headers(mut self, has_headers: bool) -> Self {
         self.has_headers = has_headers;
         self
@@ -172,6 +177,10 @@ impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaNISECI {}
 impl DefaultRecordCsv for crate::deser::PlainRecordCampionamentoHFBI {}
 impl DefaultRecordCsv for crate::deser::PlainRecordAnagraficaHFBI {}
 
+/// Utility function for checking that a [`Path`]:
+/// - Exists
+/// - Is a file
+/// - Has a `.csv` or `.CSV` extension
 pub fn check_path_is_file_ends_with_csv(path: &Path) -> bool {
     if !path.exists() {
         eprintln!("Error: Passed path does not exist");

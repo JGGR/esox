@@ -29,8 +29,11 @@ use std::fmt;
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCampionamentoHFBI {
+    /// Species id.
     pub codice_specie: String,
+    /// Number of individuals.
     pub numero_individui: u32,
+    /// Weight.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub peso: f32,
 }
@@ -68,17 +71,27 @@ impl fmt::Display for VeryItalianRecordCampionamentoHFBI {
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordAnagraficaHFBI {
+    /// Station code.
     pub codice_stazione: String,
+    /// Water body.
     pub corpo_idrico: String,
+    /// Region.
     pub regione: String,
+    /// Province.
     pub provincia: String,
+    /// Formatted date string.
     pub data: String,
+    /// Length of transet.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub lunghezza_stazione: f32,
+    /// Width of transet.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub larghezza_stazione: f32,
+    /// Season, relates to [`crate::domain::hfbi::StagioneHFBI`].
     pub stagione: u32,
+    /// Habitat, relates to [`crate::domain::hfbi::HabitatHFBI`].
     pub habitat: u32,
+    /// Lagoon type.
     pub tipo_laguna: u32,
 }
 

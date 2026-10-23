@@ -28,27 +28,44 @@ use std::fmt;
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordRiferimentoNISECI {
+    /// Common name.
     pub nome_comune: String,
+    /// Latin name.
     pub nome_latino: String,
+    /// Species id.
     pub codice_specie: String,
+    /// Origin (one of `"AUT"` or `"ALL"`).
     pub origine: String,
+    /// Autochthonous type.
     pub tipo_autoctono: u32,
+    /// Allochthonous type.
     pub allo_nocivita: u32,
+    /// Expected species flag.
     pub specie_attesa: u32,
+    /// Threshold for class 1 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     pub cl_soglia1: u32, // in mm
+    /// Threshold for class 2 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     pub cl_soglia2: u32, // in mm
+    /// Threshold for class 3 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     pub cl_soglia3: u32, // in mm
+    /// Threshold for class 4 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     pub cl_soglia4: u32, // in mm
+    /// Threshold for `ad_juv_soglia_1`.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia1: f32,
+    /// Threshold for `ad_juv_soglia_2`.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia2: f32,
+    /// Threshold for `ad_juv_soglia_3`.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia3: f32,
+    /// Threshold for `ad_juv_soglia_4`.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub ad_juv_soglia4: f32,
+    /// Threshold for `dens_soglia_1`.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub dens_soglia1: f32,
+    /// Threshold for `dens_soglia_2`.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub dens_soglia2: f32,
 }
@@ -131,11 +148,17 @@ impl fmt::Display for VeryItalianRecordRiferimentoNISECI {
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordCampionamentoNISECI {
+    /// Formatted date string.
     pub data: String,
+    /// Station code.
     pub stazione: String,
+    /// Passage number.
     pub num_passaggio: u32,
+    /// Species id.
     pub codice_specie: String,
+    /// Length of record.
     pub lunghezza: u32,
+    /// Weight of record.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub peso: f32,
 }
@@ -183,20 +206,33 @@ impl fmt::Display for VeryItalianRecordCampionamentoNISECI {
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VeryItalianRecordAnagraficaNISECI {
+    /// Station code.
     pub codice_stazione: String,
+    /// Water body.
     pub corpo_idrico: String,
+    /// Region.
     pub regione: String,
+    /// Province.
     pub provincia: String,
+    /// Formatted date string.
     pub data: String,
+    /// Station length.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub lunghezza_stazione: f32,
+    /// Station width.
     #[serde(deserialize_with = "deserialize_comma_f32")]
     pub larghezza_stazione: f32,
+    /// Community kind, relates to [`crate::domain::niseci::TipoComunitaNISECI`].
     pub tipo_comunita: u32,
+    /// Source.
     pub fonte: String,
+    /// Protocol number.
     pub numero_protocollo: String,
+    /// Hydro-eco region.
     pub idro_eco_regione: u32,
+    /// Alpine area flag, relates to [`crate::domain::niseci::AreaNISECI`].
     pub area_alpina: u32,
+    /// Water basin.
     pub nome_bacino: String,
 }
 

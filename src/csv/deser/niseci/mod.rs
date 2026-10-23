@@ -38,22 +38,39 @@ use std::path::PathBuf;
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvRiferimentoNISECI {
+    /// Common name.
     pub nome_comune: String,
+    /// Latin name.
     pub nome_latino: String,
+    /// Species id.
     pub codice_specie: String,
+    /// Origin (one of `"AUT"` or `"ALL"`).
     pub origine: String,
+    /// Autochthonous type.
     pub tipo_autoctono: u32,
+    /// Allochthonous type.
     pub allo_nocivita: u32,
+    /// Expected species flag.
     pub specie_attesa: u32,
+    /// Threshold for class 1 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     pub cl_soglia1: u32, // in mm
+    /// Threshold for class 2 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     pub cl_soglia2: u32, // in mm
+    /// Threshold for class 3 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     pub cl_soglia3: u32, // in mm
+    /// Threshold for class 4 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     pub cl_soglia4: u32, // in mm
+    /// Threshold for `ad_juv_soglia_1`.
     pub ad_juv_soglia1: f32,
+    /// Threshold for `ad_juv_soglia_2`.
     pub ad_juv_soglia2: f32,
+    /// Threshold for `ad_juv_soglia_3`.
     pub ad_juv_soglia3: f32,
+    /// Threshold for `ad_juv_soglia_4`.
     pub ad_juv_soglia4: f32,
+    /// Threshold for `dens_soglia_1`.
     pub dens_soglia1: f32,
+    /// Threshold for `dens_soglia_2`.
     pub dens_soglia2: f32,
 }
 
@@ -127,6 +144,9 @@ impl fmt::Display for PlainRecordCsvRiferimentoNISECI {
     }
 }
 
+/// Generic parsing of [`crate::deser::RecordRiferimentoNISECI`], returning a
+/// tuple of vecs for values and errors.
+/// If you don't care about partial successes, use [`check_riferimento_niseci_reader`].
 pub fn parse_csv_riferimento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -136,6 +156,8 @@ where
     parse_serialized_records(iter)
 }
 
+/// Generic parsing of [`crate::deser::RecordRiferimentoNISECI`].
+/// If you care about partial successes, use [`parse_csv_riferimento_niseci`].
 pub fn check_riferimento_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -149,6 +171,9 @@ where
     private_check_riferimento_niseci_reader::<R, DefaultByteLimit, T>(reader, config)
 }
 
+/// Generic parsing of [`crate::deser::RecordRiferimentoNISECI`].
+/// Uses [`crate::csv::deser::CsvConfig`].
+/// If you care about partial successes, use [`parse_csv_riferimento_niseci`].
 pub fn check_riferimento_niseci_reader_conf<R: Read, T>(
     reader: R,
     config: CsvConfig,
@@ -182,6 +207,7 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordRiferimentoNISECI`] from [`PathBuf`].
 pub fn check_riferimento_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
@@ -197,6 +223,8 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordRiferimentoNISECI`] from [`PathBuf`].
+/// Uses [`crate::csv::deser::CsvConfig`].
 pub fn check_riferimento_niseci_path_conf<T>(
     path: PathBuf,
     config: CsvConfig,
@@ -222,11 +250,17 @@ where
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvCampionamentoNISECI {
+    /// Formatted date string.
     pub data: String,
+    /// Station code.
     pub stazione: String,
+    /// Passage number.
     pub num_passaggio: u32,
+    /// Species id.
     pub codice_specie: String,
+    /// Length of record.
     pub lunghezza: u32,
+    /// Weight of record.
     pub peso: f32,
 }
 
@@ -264,6 +298,9 @@ impl fmt::Display for PlainRecordCsvCampionamentoNISECI {
     }
 }
 
+/// Generic parsing of [`crate::deser::RecordCampionamentoNISECI`], returning a
+/// tuple of vecs for values and errors.
+/// If you don't care about partial successes, use [`check_campionamento_niseci_reader`].
 pub fn parse_csv_campionamento_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -273,6 +310,8 @@ where
     parse_serialized_records(iter)
 }
 
+/// Generic parsing of [`crate::deser::RecordCampionamentoNISECI`].
+/// If you care about partial successes, use [`parse_csv_campionamento_niseci`].
 pub fn check_campionamento_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -288,6 +327,9 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordCampionamentoNISECI`].
+/// Uses [`crate::csv::deser::CsvConfig`].
+/// If you care about partial successes, use [`parse_csv_campionamento_niseci`].
 pub fn check_campionamento_niseci_reader_conf<R: Read, T>(
     reader: R,
     config: CsvConfig,
@@ -321,6 +363,7 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordRiferimentoNISECI`] from [`PathBuf`].
 pub fn check_campionamento_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
@@ -336,6 +379,8 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordRiferimentoNISECI`] from [`PathBuf`].
+/// Uses [`crate::csv::deser::CsvConfig`].
 pub fn check_campionamento_niseci_path_conf<T>(
     path: PathBuf,
     config: CsvConfig,
@@ -361,18 +406,31 @@ where
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvAnagraficaNISECI {
+    /// Station code.
     pub codice_stazione: String,
+    /// Water body.
     pub corpo_idrico: String,
+    /// Region.
     pub regione: String,
+    /// Province.
     pub provincia: String,
+    /// Formatted date string.
     pub data: String,
+    /// Station length.
     pub lunghezza_stazione: f32,
+    /// Station width.
     pub larghezza_stazione: f32,
+    /// Community kind, relates to [`crate::domain::niseci::TipoComunitaNISECI`].
     pub tipo_comunita: u32,
+    /// Source.
     pub fonte: String,
+    /// Protocol number.
     pub numero_protocollo: String,
+    /// Hydro-eco region.
     pub idro_eco_regione: u32,
+    /// Alpine area flag, relates to [`crate::domain::niseci::AreaNISECI`].
     pub area_alpina: u32,
+    /// Water basin.
     pub nome_bacino: String,
 }
 
@@ -446,6 +504,9 @@ impl fmt::Display for PlainRecordCsvAnagraficaNISECI {
     }
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaNISECI`], returning a
+/// tuple of vecs for values and errors.
+/// If you don't care about partial successes, use [`check_anagrafica_niseci_reader`].
 pub fn parse_csv_anagrafica_niseci<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -455,6 +516,8 @@ where
     parse_serialized_records(iter)
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaNISECI`].
+/// If you care about partial successes, use [`parse_csv_anagrafica_niseci`].
 pub fn check_anagrafica_niseci_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -470,6 +533,9 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaNISECI`].
+/// Uses [`crate::csv::deser::CsvConfig`].
+/// If you care about partial successes, use [`parse_csv_anagrafica_niseci`].
 pub fn check_anagrafica_niseci_reader_conf<R: Read, T>(
     reader: R,
     config: CsvConfig,
@@ -503,6 +569,7 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaNISECI`] from [`PathBuf`].
 pub fn check_anagrafica_niseci_path<T>(
     path: PathBuf,
     has_headers: bool,
@@ -518,6 +585,8 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaNISECI`] from [`PathBuf`].
+/// Uses [`crate::csv::deser::CsvConfig`].
 pub fn check_anagrafica_niseci_path_conf<T>(
     path: PathBuf,
     config: CsvConfig,
