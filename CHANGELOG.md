@@ -1,3 +1,9 @@
+## [0.2.5] - Unreleased
+
+### Changed
+
+- More docs
+
 ## [0.2.4] - 2026-10-24
 
 ### Changed

@@ -23,6 +23,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+/// Capture location for a dataset.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Location {
     /// Denotes region.

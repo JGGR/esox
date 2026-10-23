@@ -31,10 +31,15 @@ use std::fmt;
 /// Denotes record kinds.
 #[derive(Copy, Clone)]
 pub enum TipoRecord {
+    /// Record for [`crate::domain::niseci::RiferimentoNISECI`].
     RiferimentoNISECI,
+    /// Record for [`crate::domain::niseci::CampionamentoNISECI`].
     CampionamentoNISECI,
+    /// Record for [`crate::domain::niseci::AnagraficaNISECI`].
     AnagraficaNISECI,
+    /// Record for [`crate::domain::niseci::CampionamentoHFBI].
     CampionamentoHFBI,
+    /// Record for [`crate::domain::niseci::AnagraficaHFBI`].
     AnagraficaHFBI,
 }
 

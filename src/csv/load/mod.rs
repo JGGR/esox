@@ -28,7 +28,9 @@ pub mod niseci;
 /// Used in [`crate::csv::load`] methods that don't accept custom definition of delimiters.
 #[derive(Copy, Clone, Default)]
 pub enum InputFormat {
+    /// Default format.
     #[default]
     Standard,
+    /// Alternative format compatible with italian locale CSV.
     Alternative,
 }

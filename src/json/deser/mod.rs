@@ -34,15 +34,23 @@
 pub mod hfbi;
 pub mod niseci;
 
+/// Denotes the kind of error JSON dispatch can return.
+/// Dispatching here refers to handling JSON input either as bulk array or as stream.
 pub enum JsonDispatchError {
+    /// I/O error.
     Io(std::io::Error),
+    /// JSON array error.
     JsonArray(serde_json::Error),
 }
 
+/// Denotes the kind of error JSON deserialization can return.
 #[derive(Debug)]
 pub enum JsonDeserError {
+    /// I/O error.
     Io(std::io::Error),
+    /// JSON errors.
     Json(Vec<serde_json::Error>),
+    /// JSON array error.
     JsonArray(serde_json::Error),
 }
 
@@ -55,10 +63,15 @@ impl From<JsonDispatchError> for JsonDeserError {
     }
 }
 
+/// Denotes the kind of error JSON file path checking can return.
 pub enum JsonPathCheckError {
+    /// I/O error.
     Io(std::io::Error),
+    /// Deserialization I/O error.
     DeserIo(std::io::Error),
+    /// JSON errors.
     Json(Vec<serde_json::Error>),
+    /// JSON array error.
     JsonArray(serde_json::Error),
 }
 

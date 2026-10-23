@@ -47,7 +47,9 @@ use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_ev
 /// Denotes the origin of a [`SpecieNISECI`].
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum OrigineSpecieNISECI {
+    /// Autochthonous origin.
     Autoctono(u8),
+    /// Allochthonous origin.
     Alloctono(u8),
 }
 
@@ -597,9 +599,13 @@ impl AlieniIndigeni {
 #[derive(Copy, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum TipoComunitaNISECI {
+    /// Made by the operator.
     Redatta,
+    /// Found in reference sources.
     Recuperata,
+    /// DM 260/2010.
     Dm260_2010,
+    /// Finetuned by Mase.
     AffinataDalMase,
 }
 
@@ -715,7 +721,9 @@ impl ComunitaNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum AreaNISECI {
+    /// Alpine area.
     Alpina,
+    /// Mediterranean area.
     Mediterranea,
 }
 
@@ -866,26 +874,47 @@ impl fmt::Display for AnagraficaNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum IdroEcoRegioneNISECI {
+    /// Western Alps.
     AlpiOccidentali,
+    /// Prealps-Dolomites.
     PrealpiDolomiti,
+    /// Center-eastern Alps.
     AlpiCentroOrientali,
+    /// Southern Alps.
     AlpiMeridionali,
+    /// Monferrato.
     Monferrato,
+    /// Po Valley.
     PianuraPadana,
+    /// Karst.
     Carso,
+    /// Piedmontese Apennines.
     AppenninoPiemontese,
+    /// Mediterranean Alps.
     AlpiMediterranee,
+    /// Northern Apennines.
     AppenninoSettentrionale,
+    /// Tuscany.
     Toscana,
+    /// Adriatic Coast.
     CostaAdriatica,
+    /// Central Apennines.
     AppenninoCentrale,
+    /// Rome-Viterbo.
     RomaViterbese,
+    /// Southern Lazio.
     BassoLazio,
+    /// Vesuvius.
     Vesuvio,
+    /// Basilicata-Tavoliere.
     BasilicataTavoliere,
+    /// Karstic Apulia.
     PugliaCarsica,
+    /// Southern Apennines.
     AppenninoMeridionale,
+    /// Sicily.
     Sicilia,
+    /// Sardinia.
     Sardegna,
 }
 
@@ -1480,10 +1509,15 @@ impl MetricheX2A {
 /// See:
 /// - [`ClassiEtaSpecieNISECI::update_classi_eta`]
 pub enum ClassiEta {
+    /// Class 1.
     CL1,
+    /// Class 2.
     CL2,
+    /// Class 3.
     CL3,
+    /// Class 4.
     CL4,
+    /// Class 5.
     CL5,
 }
 
@@ -2083,6 +2117,7 @@ impl EsemplariPerCattura {
         }
     }
 
+    /// Fill the passed passage index.
     pub fn fill_passaggio(&mut self, numero_passaggio: u8) {
         match self.mappa.entry(numero_passaggio) {
             Entry::Occupied(occupied) => {
@@ -2100,10 +2135,15 @@ impl EsemplariPerCattura {
 /// See:
 /// - [`crate::engines::niseci::full::calculate_stato_ecologico_niseci`]
 pub enum StatoEcologicoNISECI {
+    /// Excellent.
     Elevato,
+    /// Good.
     Buono,
+    /// Moderate.
     Moderato,
+    /// Poor.
     Scadente,
+    /// Bad.
     Cattivo,
 }
 

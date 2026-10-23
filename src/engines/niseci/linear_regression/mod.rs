@@ -15,23 +15,32 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Computation module of NISECI linear regression.
+
 use core::f32;
 
+/// Helper struct for paired values.
 #[derive(Debug, PartialEq)]
 pub struct Point<T> {
+    /// First value in the pair.
     pub x: T,
+    /// Second value in the pair.
     pub y: T,
 }
 
 impl<T> Point<T> {
+    /// Construct a new instance.
     pub fn new(x: T, y: T) -> Point<T> {
         Point { x, y }
     }
 }
 
+/// Encodes the possible errors returned by linear regression.
 #[derive(Debug)]
 pub enum LinearRegressionError {
+    /// Error for when the values involved are all equal.
     SameValues,
+    /// Error for empty input.
     EmptyInput,
 }
 
@@ -55,6 +64,7 @@ fn gradient_descent(m_now: f32, b_now: f32, points: &[Point<f32>], step: f32) ->
     (m, b)
 }
 
+/// Perform gradient descent for with a step of `0.001` and `10000` iterations.
 pub fn gradient_descent_iterate(
     points: &[Point<i32>],
 ) -> Result<(f32, f32), LinearRegressionError> {
@@ -80,6 +90,7 @@ pub fn gradient_descent_iterate(
     Ok((m_final, b_final))
 }
 
+/// Routine for estimating quantity, used by [`crate::engines::niseci::x2`].
 pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Result<u32, String> {
     // trova m e b della retta
     let (m, b) = match gradient_descent_iterate(campionamenti) {
@@ -102,7 +113,7 @@ pub fn calculate_quantita_with_regression(campionamenti: &[Point<i32>]) -> Resul
         return Ok(get_sum(campionamenti));
     }
 
-    // l'incorcio della retta con l'asse x ci da la quantita stimata
+    // l'incrocio della retta con l'asse x ci da la quantita stimata
     let quantita_stimata = (-(b / m)) as i32;
     if quantita_stimata < 0 {
         return Err(format!("quantita stimata negativa {}", quantita_stimata));

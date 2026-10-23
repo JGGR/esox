@@ -36,6 +36,7 @@ pub struct SubmetricheX3 {
 }
 
 impl SubmetricheX3 {
+    /// Construct a new instance.
     pub fn new(
         classi_eta: ClassiEtaSpecieNISECI,
         rapporto_ad_juv: Option<f32>,
@@ -49,18 +50,22 @@ impl SubmetricheX3 {
             criterio_b,
         }
     }
+    /// Getter for [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     #[inline(always)]
     pub fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
         &self.classi_eta
     }
+    /// Getter for `rapporto_ad_juv`.
     #[inline(always)]
     pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
+    /// Getter for `criterio_a`.
     #[inline(always)]
     pub fn get_criterio_a(&self) -> u8 {
         self.criterio_a
     }
+    /// Getter for `criterio_b`.
     #[inline(always)]
     pub fn get_criterio_b(&self) -> u8 {
         self.criterio_b
@@ -75,6 +80,7 @@ pub struct MetricheX3 {
 }
 
 impl MetricheX3 {
+    /// Construct a new instance.
     pub fn new(
         criterio_a: f32,
         criterio_b: f32,
@@ -86,14 +92,17 @@ impl MetricheX3 {
             submetriche_map,
         }
     }
+    /// Getter for `criterio_a`.
     #[inline(always)]
     pub fn get_criterio_a(&self) -> f32 {
         self.criterio_a
     }
+    /// Getter for `criterio_b`.
     #[inline(always)]
     pub fn get_criterio_b(&self) -> f32 {
         self.criterio_b
     }
+    /// Getter for [`SubmetricheX3`] map.
     #[inline(always)]
     pub fn get_ref_submetriche_map(&self) -> &HashMap<IdSpecieNISECI, SubmetricheX3> {
         &self.submetriche_map

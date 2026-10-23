@@ -65,7 +65,9 @@ use std::path::Path;
 /// Encodes the possible errors returned by NISECI reference CSV deser and parse steps.
 #[derive(Debug)]
 pub enum RiferimentoNISECIError {
+    /// CSV errors.
     Csv(Vec<csv::Error>),
+    /// Value check errors.
     Value(Vec<RecordRiferimentoNISECIError>),
 }
 
@@ -196,7 +198,9 @@ pub fn load_riferimento_niseci_from_path(
 /// Encodes the possible errors returned by NISECI capture set CSV deser and parse steps.
 #[derive(Debug)]
 pub enum CampionamentoNISECIError {
+    /// CSV errors.
     Csv(Vec<csv::Error>),
+    /// Value check errors.
     Value(Vec<RecordCampionamentoNISECIError>),
 }
 
@@ -340,7 +344,9 @@ pub fn load_campionamento_niseci_from_path(
 /// Encodes the possible errors returned by NISECI additional info CSV deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaNISECIError {
+    /// CSV errors.
     Csv(Vec<csv::Error>),
+    /// Value check errors.
     Value(Vec<RecordAnagraficaNISECIError>),
 }
 

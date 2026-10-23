@@ -26,26 +26,43 @@ use std::num::IntErrorKind;
 
 /// Defines the different possible CSV errors.
 pub enum CsvDiagnostic {
+    /// Deserialize error.
     Deserialize {
+        /// Error position in input source.
         pos: Option<Position>,
+        /// Field index in input source.
         field: Option<usize>,
+        /// Kind of diagnostic.
         diagnostic: DeserDiagnostic,
     },
+    /// I/O error.
     Io {
+        /// Error position in input source.
         pos: Option<Position>,
+        /// Error message.
         message: String,
     },
+    /// UTF-8 error.
     Utf8 {
+        /// Error position in input source.
         pos: Option<Position>,
+        /// Error message.
         message: String,
     },
+    /// Unequal record length error.
     UnequalLengths {
+        /// Error position in input source.
         pos: Option<Position>,
+        /// Expected number of fields.
         expected: u64,
+        /// Found number of fields.
         found: u64,
     },
+    /// Unknown error.
     Unknown {
+        /// Error position in input source.
         pos: Option<Position>,
+        /// Error message.
         message: String,
     },
 }
@@ -56,6 +73,7 @@ pub struct DeserDiagnostic {
 }
 
 impl DeserDiagnostic {
+    /// Getter for [`DeserDiagnosticKind`].
     pub fn kind(&self) -> &DeserDiagnosticKind {
         &self.kind
     }
@@ -69,10 +87,17 @@ impl From<DeserDiagnosticKind> for DeserDiagnostic {
 
 /// Defines a CSV deserialization diagnostics kind.
 pub enum DeserDiagnosticKind {
+    /// Unexpected end of row, missing fields.
     UnexpectedEndOfRow,
+    /// Custom message.
     Message(String),
+    /// Unsupported error.
     Unsupported(String),
-    Parse { diagnostic: ParseDiagnostic },
+    /// Parse error.
+    Parse {
+        /// The actual diagnostic.
+        diagnostic: ParseDiagnostic,
+    },
 }
 
 /// Defines a CSV parsing diagnostics.
@@ -81,6 +106,7 @@ pub struct ParseDiagnostic {
 }
 
 impl ParseDiagnostic {
+    /// Getter for [`ParseDiagnosticKind`].
     pub fn kind(&self) -> &ParseDiagnosticKind {
         &self.kind
     }
@@ -94,9 +120,16 @@ impl From<ParseDiagnosticKind> for ParseDiagnostic {
 
 /// Defines a CSV parsing diagnostics kind.
 pub enum ParseDiagnosticKind {
+    /// UTF-8 parse error.
     Utf8(String),
+    /// Bool parse error.
     Bool(String),
-    Int { diagnostic: ParseIntDiagnostic },
+    /// Int parse error.
+    Int {
+        /// The actual diagnostic.
+        diagnostic: ParseIntDiagnostic,
+    },
+    /// Float parse error.
     Float(String),
 }
 
@@ -106,6 +139,7 @@ pub struct ParseIntDiagnostic {
 }
 
 impl ParseIntDiagnostic {
+    /// Getter for [`ParseIntDiagnosticKind`].
     pub fn kind(&self) -> &ParseIntDiagnosticKind {
         &self.kind
     }
@@ -119,18 +153,26 @@ impl From<ParseIntDiagnosticKind> for ParseIntDiagnostic {
 
 /// Defines a CSV int parsing diagnostics kind.
 pub enum ParseIntDiagnosticKind {
+    /// Empty input error.
     Empty(String),
+    /// Invalid digit error.
     InvalidDigit(String),
+    /// Positive overflow error.
     PosOverflow(String),
+    /// Negative overflow error.
     NegOverflow(String),
+    /// Zero error.
     Zero(String),
+    /// Unknown error.
     Unknown(String),
 }
 
+/// Convert a slice of [`csv::Error`] into a [`Vec<CsvDiagnostic`].
 pub fn normalize(errors: &[csv::Error]) -> Vec<CsvDiagnostic> {
     errors.iter().map(normalize_one).collect()
 }
 
+/// Convert a [`csv::Error`] into a [`CsvDiagnostic`].
 pub fn normalize_one(error: &csv::Error) -> CsvDiagnostic {
     match error.kind() {
         csv::ErrorKind::Deserialize { pos, err } => {
@@ -219,45 +261,68 @@ pub fn normalize_one(error: &csv::Error) -> CsvDiagnostic {
 
 /// CSV diagnostics localization interface.
 pub trait CsvDiagnosticLocalization {
+    /// Localized string for I/O error.
     fn io_error(&self) -> &'static str;
+    /// Localized string for UTF-8 error.
     fn utf8_error(&self) -> &'static str;
+    /// Localized string for unexpected EOF error.
     fn unexpected_eof(&self) -> &'static str;
+    /// Localized string for generic parse error.
     fn parse_generic_error(&self) -> &'static str;
+    /// Localized string for UTF-8 parse error.
     fn parse_utf8_error(&self) -> &'static str;
+    /// Localized string for bool parse error.
     fn parse_bool_error(&self) -> &'static str;
+    /// Localized string for float parse error.
     fn parse_float_error(&self) -> &'static str;
+    /// Localized string for int parse error.
     fn parse_int_error(&self) -> &'static str;
+    /// Localized string for unsupported error.
     fn unsupported(&self) -> &'static str;
+    /// Localized string for unknown error.
     fn unknown(&self) -> &'static str;
 }
 
 /// Formatter interface for position of CSV diagnostic.
 pub trait CsvPositionFormatter {
+    /// Produce a formatted string for a given [`csv::Position`].
     fn format(&self, pos: Option<&csv::Position>) -> String;
 }
 
 /// Field name resolver interface for CSV diagnostic.
 pub trait CsvFieldResolver {
+    /// Produce the field name for a given [`crate::deser::TipoRecord`]
+    /// and a field index.
     fn resolve(&self, record: TipoRecord, idx: usize) -> String;
 }
 
+/// Formatter interface for layout of CSV diagnostic.
 pub trait CsvDiagnosticLayout {
+    /// Produce a formatted string for a deserialize CSV diagnostic.
     fn deserialize(&self, base: &str, pos: &str, field: &str, detail: &str) -> String;
 
+    /// Produce a formatted string for an unequal lengths CSV diagnostic.
     fn unequal_lengths(&self, pos: &str, expected: u64, found: u64) -> String;
 
+    /// Produce a formatted string for an I/O CSV diagnostic.
     fn io(&self, base: &str, pos: &str, detail: &str) -> String;
 
+    /// Produce a formatted string for an UTF-8 CSV diagnostic.
     fn utf8(&self, base: &str, pos: &str, detail: &str) -> String;
 
+    /// Produce a formatted string for an unknown CSV diagnostic.
     fn unknown(&self, base: &str, pos: &str, detail: &str) -> String;
 }
 
 /// Formatter interface for CSV diagnostic.
 pub struct CsvDiagnosticFormatter<L, P, F, T> {
+    /// Localizer for CSV diagnostic.
     pub loc: L,
+    /// Localizer for diagnostic source position.
     pub pos: P,
+    /// Localizer for diagnostic field position.
     pub field: F,
+    /// Localizer for diagnostic layout.
     pub layout: T,
 }
 
@@ -268,6 +333,8 @@ where
     F: CsvFieldResolver,
     T: CsvDiagnosticLayout,
 {
+    /// Produce a formatted string for a given [`CsvDiagnostic`] and its
+    /// relative [`crate::deser::TipoRecord`].
     pub fn format(&self, err: &CsvDiagnostic, record: TipoRecord) -> String {
         let pos = self.pos.format(match err {
             CsvDiagnostic::Deserialize { pos, .. } => pos.as_ref(),
@@ -340,6 +407,8 @@ where
     }
 }
 
+/// Produce a formatted string for a given [`csv::Error`] and its relative
+/// [`crate::deser::TipoRecord`], using a [`CsvDiagnosticFormatter`].
 pub fn format_csv_error<L, P, Fld, Lay>(
     formatter: CsvDiagnosticFormatter<L, P, Fld, Lay>,
     error: &csv::Error,
@@ -355,6 +424,8 @@ where
     formatter.format(&d, record)
 }
 
+/// Produce a formatted string for a given slice of [`csv::Error`] and its relative
+/// [`crate::deser::TipoRecord`], using a [`CsvDiagnosticFormatter`].
 pub fn format_csv_errors<L, P, Fld, Lay>(
     formatter: CsvDiagnosticFormatter<L, P, Fld, Lay>,
     errors: &[csv::Error],

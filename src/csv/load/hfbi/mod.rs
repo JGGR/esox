@@ -56,7 +56,9 @@ use std::path::Path;
 /// Encodes the possible errors returned by HFBI capture set CSV deser and parse steps.
 #[derive(Debug)]
 pub enum CampionamentoHFBIError {
+    /// CSV errors.
     Csv(Vec<csv::Error>),
+    /// Value check errors.
     Value(Vec<RecordCampionamentoHFBIError>),
 }
 
@@ -187,7 +189,9 @@ pub fn load_campionamento_hfbi_from_path(
 /// Encodes the possible errors returned by HFBI additional info CSV deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaHFBIError {
+    /// CSV errors.
     Csv(Vec<csv::Error>),
+    /// Value check errors.
     Value(Vec<RecordAnagraficaHFBIError>),
 }
 
