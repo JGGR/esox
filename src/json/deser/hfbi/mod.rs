@@ -28,6 +28,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+/// Generic JSON deserialization of [`crate::deser::RecordCampionamentoHFBI`].
 pub fn parse_json_campionamento_hfbi<R, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     R: std::io::Read,
@@ -52,6 +53,7 @@ where
     )
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordCampionamentoHFBI`].
 pub fn check_campionamento_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     T: RecordCampionamentoHFBI,
@@ -72,6 +74,7 @@ where
     )
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordCampionamentoHFBI`] from [`AsRef`]<[`Path`]>.
 pub fn check_campionamento_hfbi_path<T>(
     path: impl AsRef<Path>,
 ) -> Result<Vec<T>, JsonPathCheckError>
@@ -82,6 +85,7 @@ where
     check_campionamento_hfbi_reader(file).map_err(Into::into)
 }
 
+/// Generic JSON deserialization of [`crate::deser::RecordAnagraficaHFBI`].
 pub fn parse_json_anagrafica_hfbi<R, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     R: std::io::Read,
@@ -106,6 +110,7 @@ where
     )
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordAnagraficaHFBI`].
 pub fn check_anagrafica_hfbi_reader<R: Read, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     T: RecordAnagraficaHFBI,
@@ -126,6 +131,7 @@ where
     )
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordAnagraficaHFBI`] from [`AsRef`]<[`Path`]>.
 pub fn check_anagrafica_hfbi_path<T>(path: impl AsRef<Path>) -> Result<Vec<T>, JsonPathCheckError>
 where
     T: RecordAnagraficaHFBI,

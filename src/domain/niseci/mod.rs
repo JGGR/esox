@@ -47,7 +47,9 @@ use crate::engines::niseci::linear_regression::Point; // Needed by fishes_for_ev
 /// Denotes the origin of a [`SpecieNISECI`].
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum OrigineSpecieNISECI {
+    /// Autochthonous origin.
     Autoctono(u8),
+    /// Allochthonous origin.
     Alloctono(u8),
 }
 
@@ -597,9 +599,13 @@ impl AlieniIndigeni {
 #[derive(Copy, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum TipoComunitaNISECI {
+    /// Made by the operator.
     Redatta,
+    /// Found in reference sources.
     Recuperata,
+    /// DM 260/2010.
     Dm260_2010,
+    /// Finetuned by Mase.
     AffinataDalMase,
 }
 
@@ -715,7 +721,9 @@ impl ComunitaNISECI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum AreaNISECI {
+    /// Alpine area.
     Alpina,
+    /// Mediterranean area.
     Mediterranea,
 }
 

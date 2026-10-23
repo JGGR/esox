@@ -28,6 +28,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+/// Generic JSON deserialization of [`crate::deser::RecordRiferimentoNISECI`].
 pub fn parse_json_riferimento_niseci<R, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     R: std::io::Read,
@@ -52,6 +53,7 @@ where
     )
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordRiferimentoNISECI`].
 pub fn check_riferimento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     T: RecordRiferimentoNISECI,
@@ -72,6 +74,7 @@ where
     )
 }
 
+/// Generic JSON deserialization of [`crate::deser::RecordCampionamentoNISECI`].
 pub fn parse_json_campionamento_niseci<R, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     R: std::io::Read,
@@ -96,6 +99,7 @@ where
     )
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordCampionamentoNISECI`].
 pub fn check_campionamento_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     T: RecordCampionamentoNISECI,
@@ -116,6 +120,7 @@ where
     )
 }
 
+/// Generic JSON deserialization of [`crate::deser::RecordAnagraficaNISECI`].
 pub fn parse_json_anagrafica_niseci<R, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     R: std::io::Read,
@@ -140,6 +145,7 @@ where
     )
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordAnagraficaNISECI`].
 pub fn check_anagrafica_niseci_reader<R: Read, T>(reader: R) -> Result<Vec<T>, JsonDeserError>
 where
     T: RecordAnagraficaNISECI,
@@ -160,6 +166,7 @@ where
     )
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordRiferimentoNISECI`] from [`AsRef`]<[`Path`]>.
 pub fn check_riferimento_niseci_path<T>(
     path: impl AsRef<Path>,
 ) -> Result<Vec<T>, JsonPathCheckError>
@@ -170,6 +177,7 @@ where
     check_riferimento_niseci_reader(file).map_err(Into::into)
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordCampionamentoNISECI`] from [`AsRef`]<[`Path`]>.
 pub fn check_campionamento_niseci_path<T>(
     path: impl AsRef<Path>,
 ) -> Result<Vec<T>, JsonPathCheckError>
@@ -180,6 +188,7 @@ where
     check_campionamento_niseci_reader(file).map_err(Into::into)
 }
 
+/// Generic JSON parsing of [`crate::deser::RecordAnagraficaNISECI`] from [`AsRef`]<[`Path`]>.
 pub fn check_anagrafica_niseci_path<T>(path: impl AsRef<Path>) -> Result<Vec<T>, JsonPathCheckError>
 where
     T: RecordAnagraficaNISECI,

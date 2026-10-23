@@ -31,11 +31,16 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+/// Encodes the possible errors returned by HFBI capture set JSON deser and parse steps.
 #[derive(Debug)]
 pub enum CampionamentoHFBIError {
+    /// I/O error.
     Io(std::io::Error),
+    /// JSON errors.
     Json(Vec<serde_json::Error>),
+    /// JSON array error.
     JsonArray(serde_json::Error),
+    /// Value check errors.
     Value(Vec<RecordCampionamentoHFBIError>),
 }
 
@@ -70,6 +75,7 @@ impl fmt::Display for CampionamentoHFBIError {
 
 impl std::error::Error for CampionamentoHFBIError {}
 
+/// Load capture set JSON from a [`Read`].
 pub fn load_json_campionamento_hfbi_from_reader<R, T>(
     reader: R,
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
@@ -81,6 +87,7 @@ where
     check_records_campionamento_hfbi(json_records).map_err(CampionamentoHFBIError::Value)
 }
 
+/// Load capture set JSON from a [`AsRef`]<[`Path`]>.
 pub fn load_json_campionamento_hfbi_from_path<T>(
     path: impl AsRef<Path>,
 ) -> Result<CampionamentoHFBI, CampionamentoHFBIError>
@@ -92,11 +99,16 @@ where
     load_json_campionamento_hfbi_from_reader::<_, T>(file)
 }
 
+/// Encodes the possible errors returned by HFBI additional info JSON deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaHFBIError {
+    /// I/O error.
     Io(std::io::Error),
+    /// JSON errors.
     Json(Vec<serde_json::Error>),
+    /// JSON array error.
     JsonArray(serde_json::Error),
+    /// Value check errors.
     Value(Vec<RecordAnagraficaHFBIError>),
 }
 
@@ -131,6 +143,7 @@ impl fmt::Display for AnagraficaHFBIError {
 
 impl std::error::Error for AnagraficaHFBIError {}
 
+/// Load additional info JSON from a [`Read`].
 pub fn load_json_anagrafica_hfbi_from_reader<R, T>(
     reader: R,
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>
@@ -142,6 +155,7 @@ where
     check_records_anagrafica_hfbi(json_records).map_err(AnagraficaHFBIError::Value)
 }
 
+/// Load additional info JSON from a [`AsRef`]<[`Path`]>.
 pub fn load_json_anagrafica_hfbi_from_path<T>(
     path: impl AsRef<Path>,
 ) -> Result<AnagraficaHFBI, AnagraficaHFBIError>

@@ -15,4 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Utility types and routines CSV deserialization.
+//! Module [`diagnostic`] provides support for custom formatting of CSV errors.
+
 pub mod diagnostic;
