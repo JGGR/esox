@@ -25,7 +25,10 @@ use std::fmt;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Location {
+    /// Denotes region.
+    /// Could be an enum instead, but project specs required a free text field.
     pub regione: String,
+    /// Denotes province.
     pub provincia: String,
 }
 

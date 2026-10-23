@@ -17,6 +17,21 @@
 
 //! This module provides support for single step load of CSV data for HFBI:
 //! - [`crate::csv::deser::hfbi`] + [`crate::parser::hfbi`]
+//! ## Example usage
+//!
+//!```rust
+//! use std::io::Cursor;
+//! use esox::csv::load::InputFormat;
+//! use esox::csv::load::hfbi::*;
+//! const ANAGRAFICA_DATA: &[u8] =
+//! include_bytes!("../../../../templates/anagrafica_hfbi.csv");
+//!
+//! let has_headers = true;
+//! let format = InputFormat::Alternative;
+//! let campionamento = load_campionamento_hfbi_from_path("./templates/campionamento_hfbi.csv", has_headers, format).unwrap();
+//! let anagrafica_reader = Cursor::new(ANAGRAFICA_DATA);
+//! let anagrafica = load_anagrafica_hfbi_from_reader(anagrafica_reader, has_headers, format).unwrap();
+//!```
 
 use crate::csv::deser::hfbi::{
     check_anagrafica_hfbi_reader_conf, check_campionamento_hfbi_reader_conf,

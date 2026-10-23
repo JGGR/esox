@@ -1,6 +1,6 @@
 [package]
 name = "esox"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 description = "Library for NISECI and HFBI calc"
 license = "GPL-3.0-only"
@@ -34,3 +34,7 @@ harness = false
 [[bench]]
 name = "hfbi"
 harness = false
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

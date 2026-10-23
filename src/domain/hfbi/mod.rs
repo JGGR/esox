@@ -60,12 +60,19 @@ impl fmt::Display for GruppoEcoHFBI {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct GruppoTrofHFBI {
+    /// Share of microbentivores.
     pub microbentivori: f32,
+    /// Share of macrobentivores.
     pub macrobentivori: f32,
+    /// Share of hyperbentivores.
     pub iperbentivori: f32,
+    /// Share of herbivores.
     pub erbivori: f32,
+    /// Share of detritivores.
     pub detritivori: f32,
+    /// Share of planktivores.
     pub planctivori: f32,
+    /// Share of omnivores.
     pub onnivori: f32,
 }
 
@@ -90,10 +97,15 @@ impl fmt::Display for GruppoTrofHFBI {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpecieHFBI {
+    /// Common name.
     pub nome_comune: String,
+    /// Species code. Must be an unique identifier.
     pub codice_specie: String,
+    /// Autochthonous flag.
     pub autoctono: bool,
+    /// [`GruppoEcoHFBI`] of this species.
     pub gruppo_eco: GruppoEcoHFBI,
+    /// [`GruppoTrofHFBI`] of this species.
     pub gruppo_trofico: GruppoTrofHFBI,
 }
 
@@ -175,6 +187,8 @@ macro_rules! define_riferimento_hfbi {
             }
         }
 
+        /// Reference set of [`SpecieHFBI`].
+        /// Future versions could support the ability to parse and use a custom set.
         pub struct RiferimentoHFBI {
             map_ids: InternerSpecieHFBI,
         }
@@ -634,9 +648,12 @@ pub(crate) static RIFERIMENTO_HFBI: LazyLock<RiferimentoHFBI> = LazyLock::new(Ri
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RecordHFBI {
+    /// [`SpecieHFBI`] for this record.
     pub specie: SpecieHFBI,
+    /// Number of individuals for this record.
     pub numero_individui: u32, // in millimetri
-    pub peso: f32,             // in grammi
+    /// Weight for this record.
+    pub peso: f32, // in grammi
 }
 
 impl fmt::Display for RecordHFBI {
@@ -691,14 +708,19 @@ impl SortedRecordsHFBI for Vec<&RecordHFBI> {
 }
 
 impl CampionamentoHFBI {
+    /// Construct a new instance.
+    /// Should sort the [`RecordHFBI`] by descending `peso` to comply with
+    /// [`crate::engines::hfbi::ddom::calc_ddom`] expectations.
     pub fn new(campionamento: Vec<RecordHFBI>) -> Self {
         let mut sorted = Self { campionamento };
         sorted.campionamento.sort_by_peso_desc();
         sorted
     }
+    /// Sorts the [`RecordHFBI`] by descending `peso`.
     pub fn sort_by_peso_desc(&mut self) {
         self.campionamento.sort_by_peso_desc();
     }
+    /// Iterates the capture set of [`RecordHFBI`] by descending `peso`.
     pub fn sorted_by_peso_desc(&self) -> impl Iterator<Item = &RecordHFBI> {
         let mut v: Vec<&RecordHFBI> = self.campionamento.iter().collect();
 
@@ -838,14 +860,23 @@ impl TryFrom<i32> for HabitatHFBI {
 /// Utility struct for form-like tentative definition of [`AnagraficaHFBI`].
 #[derive(Clone)]
 pub struct AnagraficaHFBIDraft {
+    /// Station code for this object.
     pub codice_stazione: String,
+    /// Water body for this object.
     pub corpo_idrico: String,
+    /// [`crate::domain::location::Location`] for this object.
     pub posizione: Location,
+    /// Formatted date string for this object.
     pub date_string: String, // Formato gg/mm/aaaa
+    /// [`TipoLagunaCostieraHFBI`] for this object.
     pub tipo_laguna: TipoLagunaCostieraHFBI,
+    /// [`StagioneHFBI`] for this object.
     pub stagione: StagioneHFBI,
+    /// [`HabitatHFBI`] for this object.
     pub habitat_vegetato: HabitatHFBI,
+    /// Transept length for this object.
     pub lunghezza_media_transetto: String,
+    /// Transept width for this object.
     pub larghezza_media_transetto: String,
 }
 
@@ -855,12 +886,19 @@ pub struct AnagraficaHFBIDraft {
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct AnagraficaHFBI {
+    /// Station code for this object.
     pub codice_stazione: String,
+    /// Water body for this object.
     pub corpo_idrico: String,
+    /// [`crate::domain::location::Location`] for this object.
     pub posizione: Location,
+    /// Formatted date string for this object.
     pub date_string: String, // Formato gg/mm/aaaa
+    /// [`TipoLagunaCostieraHFBI`] for this object.
     pub tipo_laguna: TipoLagunaCostieraHFBI,
+    /// [`StagioneHFBI`] for this object.
     pub stagione: StagioneHFBI,
+    /// [`HabitatHFBI`] for this object.
     pub habitat_vegetato: HabitatHFBI,
     #[serde(deserialize_with = "deserialize_positive_f32")]
     lunghezza_media_transetto: f32,
@@ -869,6 +907,7 @@ pub struct AnagraficaHFBI {
 }
 
 impl AnagraficaHFBI {
+    /// Construct a new instance.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         codice_stazione: String,
@@ -893,10 +932,12 @@ impl AnagraficaHFBI {
             larghezza_media_transetto: *larghezza_media_transetto,
         }
     }
+    /// Getter for transept length.
     pub fn get_lunghezza_media(&self) -> f32 {
         self.lunghezza_media_transetto
     }
 
+    /// Setter for transept length. Checks for >0 and finite input.
     pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
         if !val.is_finite() {
             return Err(PositiveF32Error::NotFinite);
@@ -907,10 +948,12 @@ impl AnagraficaHFBI {
         self.lunghezza_media_transetto = val;
         Ok(())
     }
+    /// Getter for transept width.
     pub fn get_larghezza_media(&self) -> f32 {
         self.larghezza_media_transetto
     }
 
+    /// Setter for transept width. Checks for >0 and finite input.
     pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
         if !val.is_finite() {
             return Err(PositiveF32Error::NotFinite);
@@ -922,6 +965,7 @@ impl AnagraficaHFBI {
         Ok(())
     }
 
+    /// Getter for [`CondizioniRiferimentoKeyHFBI`].
     pub fn get_cond_riferimento_key(&self) -> CondizioniRiferimentoKeyHFBI {
         CondizioniRiferimentoKeyHFBI {
             tipo_laguna: self.tipo_laguna.clone(),
@@ -943,12 +987,26 @@ impl fmt::Display for AnagraficaHFBI {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValoriIntermediHFBI {
+    /// `bbent` value.
+    /// Calculated by [`crate::engines::hfbi::bbent`].
     pub bbent: f32,
+    /// `bn` value.
+    /// Calculated by [`crate::engines::hfbi::bn`].
     pub bn: f32,
+    /// `dbent` value.
+    /// Calculated by [`crate::engines::hfbi::dbent`].
     pub dbent: f32,
+    /// `ddom` value.
+    /// Calculated by [`crate::engines::hfbi::ddom`].
     pub ddom: f32,
+    /// `dhzp` value.
+    /// Calculated by [`crate::engines::hfbi::dhzp`].
     pub dhzp: f32,
+    /// `dmig` value.
+    /// Calculated by [`crate::engines::hfbi::dmig`].
     pub dmig: f32,
+    /// `mmi` value.
+    /// Calculated by [`crate::engines::hfbi::full`].
     pub mmi: f32,
 }
 
@@ -965,12 +1023,14 @@ impl fmt::Display for ValoriIntermediHFBI {
 }
 
 impl ValoriIntermediHFBI {
+    /// Debug routine to log to stdout.
     pub fn log(&self) {
         //TODO: a proper format? we count on the embedded newlines to leverage the
         //chopping on newlines from add_console_message()
         println!("Valori intermedi: {{{self}}}");
     }
 
+    /// Produces formatted csv for intermediate values.
     pub fn to_csv(&self, comma_csv_delimiter: bool) -> String {
         let string_representation = if comma_csv_delimiter {
             format!(
@@ -1016,18 +1076,22 @@ impl fmt::Display for RisultatoHFBI {
 }
 
 impl RisultatoHFBI {
+    /// Construct a new instance.
     pub fn new(valore: Option<f32>, intermediates: ValoriIntermediHFBI) -> Self {
         Self {
             valore,
             intermediates,
         }
     }
+    /// Getter for HFBI value.
     pub fn get_valore(&self) -> Option<f32> {
         self.valore
     }
+    /// Getter for [`ValoriIntermediHFBI`].
     pub fn get_intermediates(&self) -> ValoriIntermediHFBI {
         self.intermediates.clone()
     }
+    /// Produces formatted csv for result values by joining with [`AnagraficaHFBI`].
     pub fn to_csv(&self, anagrafica: &AnagraficaHFBI, comma_csv_delimiter: bool) -> String {
         let hfbi = match self.get_valore() {
             Some(v) => v,
@@ -1069,8 +1133,11 @@ impl RisultatoHFBI {
 /// Utility struct used in [`AnagraficaHFBI::get_conf_riferimento_key`].
 #[derive(Hash, PartialEq, Eq)]
 pub struct CondizioniRiferimentoKeyHFBI {
+    /// [`TipoLagunaCostieraHFBI`] for this key.
     pub tipo_laguna: TipoLagunaCostieraHFBI,
+    /// [`StagioneHFBI`] for this key.
     pub stagione: StagioneHFBI,
+    /// [`HabitatHFBI`] for this key.
     pub habitat_vegetato: HabitatHFBI,
 }
 
@@ -1086,6 +1153,7 @@ pub struct CondizioniRiferimentoHFBI {
 }
 
 impl CondizioniRiferimentoHFBI {
+    /// Get corresponding [`CondizioniRiferimentoHFBI`] from [`AnagraficaHFBI`].
     pub fn get_cond_riferimento(
         anagrafica: &AnagraficaHFBI,
     ) -> Option<&'static CondizioniRiferimentoHFBI> {

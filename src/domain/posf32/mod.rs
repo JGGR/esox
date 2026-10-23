@@ -22,6 +22,7 @@ use serde::{de, Deserialize, Deserializer};
 use std::fmt;
 use std::ops::Deref;
 
+/// Possible error kinds when parsing a `f32` to [`PositiveF32`].
 #[derive(Debug)]
 pub enum PositiveF32Error {
     NotFinite,
@@ -39,11 +40,14 @@ impl fmt::Display for PositiveF32Error {
 
 impl std::error::Error for PositiveF32Error {}
 
+/// Newtype for a >0 and finite `f32`.
 #[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
 pub struct PositiveF32(f32);
 
 impl PositiveF32 {
+    /// Construct a new instance.
+    /// Validates input as >0 and finite.
     pub fn new(value: f32) -> Result<Self, PositiveF32Error> {
         if !value.is_finite() {
             return Err(PositiveF32Error::NotFinite);
