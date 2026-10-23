@@ -19,10 +19,13 @@
 
 use std::fmt;
 
+/// Denotes which index we're working with.
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum Indice {
+    /// Produced by [`crates::engines::niseci`].
     #[default]
     Niseci,
+    /// Produced by [`crates::engines::hfbi`].
     Hfbi,
 }
 

@@ -326,6 +326,8 @@ impl fmt::Display for RiferimentoNISECI {
 }
 
 impl RiferimentoNISECI {
+    /// Construct a new instance from some set.
+    /// Does not validate the input (e.g. disallowing duplicate entries).
     pub fn new(elenco_specie: Vec<SpecieNISECI>) -> Self {
         let mut interner = InternerSpecieNISECI::new();
         for rec in elenco_specie {
@@ -336,27 +338,34 @@ impl RiferimentoNISECI {
     pub(crate) fn new_from_map(map_ids: InternerSpecieNISECI) -> Self {
         Self { map_ids }
     }
+    /// Check if a species id is present.
     #[inline(always)]
     pub fn contains_id(&self, id: &str) -> bool {
         self.map_ids.contains_id(id)
     }
+    /// Check if a species integer id is present.
     #[inline(always)]
     pub fn contains_plain_id(&self, id: IdSpecieNISECI) -> bool {
         self.map_ids.contains_plain_id(id)
     }
+    /// Get a reference [`SpecieNISECI`] by id.
     #[inline(always)]
     pub fn get_ref_by_id(&self, id: &str) -> Option<&SpecieNISECI> {
         self.map_ids.get(id)
     }
+    /// Get a reference [`SpecieNISECI`] by integer id.
     #[inline(always)]
     pub fn get_ref_by_plain_id(&self, id: IdSpecieNISECI) -> Option<&SpecieNISECI> {
         self.map_ids.get_by_id(id)
     }
+    /// Convert id to corresponding integer id.
     #[inline(always)]
     pub fn get_inner_id(&self, id: &str) -> Option<IdSpecieNISECI> {
         self.map_ids.get_by_str_id(id)
     }
 
+    /// Produces formatted csv for intermediate values by joining the species
+    /// by id with [`ValoriIntermediNISECI`].
     pub fn to_csv_intermediates_joined(
         &self,
         intermediates: &ValoriIntermediNISECI,
@@ -402,6 +411,9 @@ impl fmt::Display for RecordNISECI {
 }
 
 impl RecordNISECI {
+    /// Create a new instance. Since the ids must be in sync, direct creation
+    /// of this object is discouraged.
+    /// Usage of [`crate::deser::RecordRiferimentoNISECI`] parsing is recommended.
     pub fn new(id: IdSpecieNISECI, passaggio_cattura: u8, lunghezza: u32, peso: f32) -> Self {
         Self {
             id,
@@ -410,26 +422,32 @@ impl RecordNISECI {
             peso,
         }
     }
+    /// Getter for `passaggio_cattura`.
     #[inline(always)]
     pub fn passaggio_cattura(&self) -> u8 {
         self.passaggio_cattura
     }
+    /// Getter for `lunghezza`.
     #[inline(always)]
     pub fn lunghezza(&self) -> u32 {
         self.lunghezza
     }
+    /// Getter for `peso`.
     #[inline(always)]
     pub fn peso(&self) -> f32 {
         self.peso
     }
+    /// Getter for integer id.
     #[inline(always)]
     pub(crate) fn id(&self) -> IdSpecieNISECI {
         self.id
     }
+    /// Getter for `dens_soglia_1`.
     #[inline(always)]
     pub fn dens_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_1())
     }
+    /// Getter for `dens_soglia_2`.
     #[inline(always)]
     pub fn dens_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_2())
@@ -481,10 +499,14 @@ impl CampionamentoNISECI {
         pass_sum
     }
 
+    /// Construct a new instance from some set.
+    /// Does not validate the input (e.g. species missing from the related
+    /// [`RiferimentoNISECI`].
     pub fn new(campionamento: Vec<RecordNISECI>) -> Self {
         Self { campionamento }
     }
 
+    /// Get [`AlieniIndigeni`] by joining with [`RiferimentoNISECI`].
     pub fn get_numero_pesci_alieni_e_indigeni(&self, r: &RiferimentoNISECI) -> AlieniIndigeni {
         let mut alieni_indigeni = AlieniIndigeni {
             alieni: 0,
@@ -512,6 +534,7 @@ impl CampionamentoNISECI {
         alieni_indigeni
     }
 
+    /// Get number of expected autochthonous species by joining with [`RiferimentoNISECI`].
     pub fn get_tot_specie_autoctone_attese(&self, r: &RiferimentoNISECI) -> usize {
         let mut set = HashSet::new();
 
@@ -558,10 +581,12 @@ pub struct AlieniIndigeni {
 }
 
 impl AlieniIndigeni {
+    /// Get number of alien species.
     #[inline(always)]
     pub fn alieni(&self) -> u32 {
         self.alieni
     }
+    /// Get number of indigenous species.
     #[inline(always)]
     pub fn indigeni(&self) -> u32 {
         self.indigeni
@@ -657,6 +682,7 @@ impl fmt::Display for ComunitaNISECI {
 }
 
 impl ComunitaNISECI {
+    /// Create a new instance.
     pub fn new(
         tipo: TipoComunitaNISECI,
         fonte: Option<String>,
@@ -668,14 +694,17 @@ impl ComunitaNISECI {
             numero_protocollo: num_protocollo,
         }
     }
+    /// Getter for [`TipoComunitaNISECI`].
     #[inline(always)]
     pub fn tipo(&self) -> TipoComunitaNISECI {
         self.tipo
     }
+    /// Getter for `fonte`.
     #[inline(always)]
     pub fn fonte(&self) -> Option<&str> {
         self.fonte.as_deref()
     }
+    /// Getter for `num_protocollo`.
     #[inline(always)]
     pub fn num_protocollo(&self) -> Option<&str> {
         self.numero_protocollo.as_deref()
@@ -715,15 +744,25 @@ impl TryFrom<i32> for AreaNISECI {
 /// Utility struct for form-like tentative definition of [`AnagraficaNISECI`].
 #[derive(Clone)]
 pub struct AnagraficaNISECIDraft {
+    /// [`ComunitaNISECI`] for this object.
     pub comunita: ComunitaNISECI,
+    /// Station code for this object.
     pub codice_stazione: String,
+    /// Formatted date string for this object.
     pub date_string: String, // Formato gg/mm/aaaa
+    /// [`AreaNISECI`] for this object.
     pub area: AreaNISECI,
+    /// Water body for this object.
     pub corpo_idrico: String,
+    /// Water basin for this object.
     pub bacino_appartenenza: String,
+    /// [`IdroEcoRegioneNISECI`] for this object.
     pub idro_eco_regione: IdroEcoRegioneNISECI,
+    /// [`crate::domain::location::Location`] for this object.
     pub posizione: Location,
+    /// Station length for this object.
     pub lunghezza_media_stazione: String,
+    /// Station width for this object.
     pub larghezza_media_stazione: String,
 }
 
@@ -733,13 +772,21 @@ pub struct AnagraficaNISECIDraft {
 #[cfg_attr(feature = "experimental", derive(Deserialize))]
 #[serde(deny_unknown_fields)]
 pub struct AnagraficaNISECI {
+    /// [`ComunitaNISECI`] for this object.
     pub comunita: ComunitaNISECI,
+    /// Station code for this object.
     pub codice_stazione: String,
+    /// Formatted date string for this object.
     pub date_string: String, // Formato gg/mm/aaaa
+    /// [`AreaNISECI`] for this object.
     pub area: AreaNISECI,
+    /// Water body for this object.
     pub corpo_idrico: String,
+    /// Water basin for this object.
     pub bacino_appartenenza: String,
+    /// [`IdroEcoRegioneNISECI`] for this object.
     pub idro_eco_regione: IdroEcoRegioneNISECI,
+    /// [`crate::domain::location::Location`] for this object.
     pub posizione: Location,
     #[serde(deserialize_with = "deserialize_positive_f32")]
     lunghezza_media_stazione: f32,
@@ -748,6 +795,8 @@ pub struct AnagraficaNISECI {
 }
 
 impl AnagraficaNISECI {
+    /// Create a new instance.
+    /// Does not validate the input (e.g. checking date string).
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         comunita: ComunitaNISECI,
@@ -774,9 +823,11 @@ impl AnagraficaNISECI {
             larghezza_media_stazione: *larghezza_media_stazione,
         }
     }
+    /// Getter for station length.
     pub fn get_lunghezza_media(&self) -> f32 {
         self.lunghezza_media_stazione
     }
+    /// Setter for station length. Checks for >0 and finite input.
     pub fn set_lunghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
         if !val.is_finite() {
             return Err(PositiveF32Error::NotFinite);
@@ -787,9 +838,11 @@ impl AnagraficaNISECI {
         self.lunghezza_media_stazione = val;
         Ok(())
     }
+    /// Getter for station width.
     pub fn get_larghezza_media(&self) -> f32 {
         self.larghezza_media_stazione
     }
+    /// Setter for station width. Checks for >0 and finite input.
     pub fn set_larghezza_media(&mut self, val: f32) -> Result<(), PositiveF32Error> {
         if !val.is_finite() {
             return Err(PositiveF32Error::NotFinite);
@@ -984,30 +1037,37 @@ impl ValoriIntermediSpecieNISECI {
         }
     }
 
+    /// Getter for `densita_stimata`.
     #[inline(always)]
     pub fn densita_stimata(&self) -> f32 {
         self.densita_stimata
     }
+    /// Getter for `quantita_stimata`.
     #[inline(always)]
     pub fn quantita_stimata(&self) -> u32 {
         self.quantita_stimata
     }
+    /// Getter for [`ClassiEtaSpecieNISECI`].
     #[inline(always)]
     pub fn classi_eta(&self) -> &ClassiEtaSpecieNISECI {
         &self.classi_eta
     }
+    /// Getter for `rapporto_ad_juv`.
     #[inline(always)]
     pub fn rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
+    /// Getter for `x2_a_a`.
     #[inline(always)]
     pub fn x2_a_a(&self) -> u8 {
         self.x2_a_a
     }
+    /// Getter for `x2_a_b`.
     #[inline(always)]
     pub fn x2_a_b(&self) -> u8 {
         self.x2_a_b
     }
+    /// Getter for `x2_b`.
     #[inline(always)]
     pub fn x2_b(&self) -> f32 {
         self.x2_b
@@ -1075,38 +1135,48 @@ impl ValoriIntermediNISECI {
             x3_b,
         }
     }
+    /// Getter for `x1`.
     #[inline(always)]
     pub fn x1(&self) -> f32 {
         self.x1
     }
+    /// Getter for `x2`.
     #[inline(always)]
     pub fn x2(&self) -> Option<f32> {
         self.x2
     }
+    /// Getter for `x3`.
     #[inline(always)]
     pub fn x3(&self) -> f32 {
         self.x3
     }
+    /// Getter for `x2_a`.
     #[inline(always)]
     pub fn x2_a(&self) -> f32 {
         self.x2_a
     }
+    /// Getter for `x2_b`.
     #[inline(always)]
     pub fn x2_b(&self) -> f32 {
         self.x2_b
     }
+    /// Getter for `x3_a`.
     #[inline(always)]
     pub fn x3_a(&self) -> Option<f32> {
         self.x3_a
     }
+    /// Getter for `x3_b`.
     #[inline(always)]
     pub fn x3_b(&self) -> Option<f32> {
         self.x3_b
     }
+    /// Getter for species-specific [`ValoriIntermediSpecieNISECI`].
     #[inline(always)]
     pub fn specie_specifici(&self) -> &HashMap<IdSpecieNISECI, ValoriIntermediSpecieNISECI> {
         &self.specie_specifici
     }
+    /// Produces formatted csv for species-specific intermediate values by joining the species
+    /// by id with [`RiferimentoNISECI`].
     pub fn to_csv_joined(
         &self,
         riferimento: &RiferimentoNISECI,
@@ -1218,6 +1288,9 @@ impl fmt::Display for RisultatoNISECI {
 }
 
 impl RisultatoNISECI {
+    /// Construct a new instance from the result of
+    /// [`crate::engines::niseci::full`].
+    /// Next version will provide direct construction from the engines.
     pub fn new(
         valore: Option<f32>,
         rqe: Option<f32>,
@@ -1229,28 +1302,37 @@ impl RisultatoNISECI {
             valori_intermedi,
         }
     }
+    /// Getter for NISECI value.
     pub fn get_valore(&self) -> Option<f32> {
         self.valore
     }
+    /// Getter for NISECI RQE value.
     pub fn get_rqe(&self) -> Option<f32> {
         self.rqe
     }
+    /// Getter for `x1` value.
     pub fn get_x1(&self) -> f32 {
         self.valori_intermedi.x1()
     }
+    /// Getter for `x2` value.
     pub fn get_x2(&self) -> Option<f32> {
         self.valori_intermedi.x2()
     }
+    /// Getter for `x3` value.
     pub fn get_x3(&self) -> f32 {
         self.valori_intermedi.x3()
     }
+    /// Getter for `x3_a` value.
     pub fn get_x3_a(&self) -> Option<f32> {
         self.valori_intermedi.x3_a()
     }
+    /// Getter for `x3_b` value.
     pub fn get_x3_b(&self) -> Option<f32> {
         self.valori_intermedi.x3_b()
     }
 
+    /// Produces formatted csv for result values by joining with
+    /// [`AnagraficaNISECI`].
     pub fn to_csv(&self, anagrafica: &AnagraficaNISECI, comma_csv_delimiter: bool) -> String {
         let niseci = self.get_valore();
         let niseci_str = match niseci {
@@ -1348,15 +1430,18 @@ pub struct MetricheX2aB {
 }
 
 impl MetricheX2aB {
+    /// Construct a new instance.
     pub fn new(criterio_b: u8, rapporto_ad_juv: Option<f32>) -> Self {
         Self {
             criterio_b,
             rapporto_ad_juv,
         }
     }
+    /// Getter for `criterio_b`.
     pub fn get_criterio_b(&self) -> u8 {
         self.criterio_b
     }
+    /// Getter for `rapporto_ad_juv`.
     pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
@@ -1370,18 +1455,22 @@ pub struct MetricheX2A {
 }
 
 impl MetricheX2A {
+    /// Construct a new instance.
     pub fn new(criterio_a: u8, criteri_x2a_b: MetricheX2aB) -> Self {
         Self {
             criterio_a,
             criteri_x2a_b,
         }
     }
+    /// Getter for `criterio_a`.
     pub fn get_criterio_a(&self) -> u8 {
         self.criterio_a
     }
+    /// Getter for `criterio_b`.
     pub fn get_criterio_b(&self) -> u8 {
         self.criteri_x2a_b.get_criterio_b()
     }
+    /// Getter for `rapporto_ad_juv`.
     pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.criteri_x2a_b.get_rapporto_ad_juv()
     }
@@ -1399,6 +1488,8 @@ pub enum ClassiEta {
 }
 
 impl ClassiEta {
+    /// Get a [`ClassiEta`] for a given [`RecordNISECI`] by joining with [`RiferimentoNISECI`].
+    /// Currently panics if the species is not present.
     pub fn find_classe_eta(record: &RecordNISECI, r: &RiferimentoNISECI) -> ClassiEta {
         let specie = r
             .get_ref_by_plain_id(record.id())
@@ -1457,6 +1548,8 @@ impl ClassiEtaSpecieNISECI {
             cl5: 0,
         }
     }
+    /// Construct a new instance from a [`RecordNISECI`] and the corresponding
+    /// [`RiferimentoNISECI`].
     pub fn new_cl_prevalorizzata(
         record: &RecordNISECI,
         r: &RiferimentoNISECI,
@@ -1473,6 +1566,7 @@ impl ClassiEtaSpecieNISECI {
         Some(classe)
     }
 
+    /// Update count of classes.
     pub fn update_classi_eta(&mut self, record: &RecordNISECI, r: &RiferimentoNISECI) {
         match ClassiEta::find_classe_eta(record, r) {
             ClassiEta::CL1 => self.cl1 += 1,
@@ -1483,65 +1577,78 @@ impl ClassiEtaSpecieNISECI {
         }
     }
 
+    /// Getter for `cl1`.
     #[inline(always)]
     pub fn cl_1(&self) -> u32 {
         self.cl1
     }
+    /// Getter for `cl2`.
     #[inline(always)]
     pub fn cl_2(&self) -> u32 {
         self.cl2
     }
+    /// Getter for `cl3`.
     #[inline(always)]
     pub fn cl_3(&self) -> u32 {
         self.cl3
     }
+    /// Getter for `cl4`.
     #[inline(always)]
     pub fn cl_4(&self) -> u32 {
         self.cl4
     }
+    /// Getter for `cl5`.
     #[inline(always)]
     pub fn cl_5(&self) -> u32 {
         self.cl5
     }
 
+    /// Getter for integer id.
     #[inline(always)]
     pub fn id(&self) -> IdSpecieNISECI {
         self.id
     }
 
+    /// Getter for expected species flag.
     #[inline(always)]
     pub fn specie_attesa(&self, r: &RiferimentoNISECI) -> Option<bool> {
         r.get_ref_by_plain_id(self.id()).map(|s| s.specie_attesa())
     }
 
+    /// Getter for autochthonous type.
     #[inline(always)]
     pub fn tipo_autoctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
         r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_autoctono())
     }
 
+    /// Getter for allochthonous type.
     #[inline(always)]
     pub fn tipo_alloctono(&self, r: &RiferimentoNISECI) -> Option<u8> {
         r.get_ref_by_plain_id(self.id()).map(|s| s.tipo_alloctono())
     }
 
+    /// Getter for `ad_juv_soglia_1`.
     #[inline(always)]
     pub fn ad_juv_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id())
             .map(|s| s.ad_juv_soglia_1())
     }
 
+    /// Getter for `ad_juv_soglia_2`.
     #[inline(always)]
     pub fn ad_juv_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id())
             .map(|s| s.ad_juv_soglia_2())
     }
 
+    /// Getter for `ad_juv_soglia_3`.
     #[inline(always)]
     pub fn ad_juv_soglia_3(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id())
             .map(|s| s.ad_juv_soglia_3())
     }
 
+    /// Getter for `ad_juv_soglia_4`.
     #[inline(always)]
     pub fn ad_juv_soglia_4(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id())
@@ -1555,6 +1662,7 @@ impl ClassiEtaSpecieNISECI {
             .count()
     }
 
+    /// Getter for `x2_a` `criterio_a`.
     pub fn get_x2_a_criterio_a(&self) -> u8 {
         let count = self.get_how_many_classes();
         if count >= 4 {
@@ -1566,6 +1674,7 @@ impl ClassiEtaSpecieNISECI {
         3
     }
 
+    /// Getter for `x2_a` `criterio_b`.
     pub fn get_x2_a_criterio_b(&self, r: &RiferimentoNISECI) -> Option<(u8, Option<f32>)> {
         if (self.cl2 + self.cl3) == 0 {
             return Some((3, None));
@@ -1643,6 +1752,7 @@ pub struct InfoIntermediePopolazioniNISECI {
 }
 
 impl InfoIntermediePopolazioniNISECI {
+    /// Construct a new instance.
     pub fn new(
         criterio_a: u8,
         criterio_b: u8,
@@ -1654,12 +1764,15 @@ impl InfoIntermediePopolazioniNISECI {
             rapporto_ad_juv,
         }
     }
+    /// Getter for `criterio_a`.
     pub fn get_criterio_a(&self) -> u8 {
         self.criterio_a
     }
+    /// Getter for `criterio_b`.
     pub fn get_criterio_b(&self) -> u8 {
         self.criterio_b
     }
+    /// Getter for `rapporto_ad_juv`.
     pub fn get_rapporto_ad_juv(&self) -> Option<f32> {
         self.rapporto_ad_juv
     }
@@ -1682,6 +1795,7 @@ impl Default for InfoPopolazioniNISECI {
 }
 
 impl InfoPopolazioniNISECI {
+    /// Construct a new instance.
     pub fn new() -> InfoPopolazioniNISECI {
         InfoPopolazioniNISECI {
             popolazione_piu_strutt: 0.0,
@@ -1693,36 +1807,43 @@ impl InfoPopolazioniNISECI {
         }
     }
 
+    /// Getter for `popolazione_piu_strutt`.
     #[inline(always)]
     pub fn popolazione_piu_strutt(&self) -> f32 {
         self.popolazione_piu_strutt
     }
 
+    /// Getter for `species_strutt`.
     #[inline(always)]
     pub fn species_strutt(&self) -> u32 {
         self.species_strutt
     }
 
+    /// Getter for `species_mediamente_strutt`.
     #[inline(always)]
     pub fn species_mediamente_strutt(&self) -> u32 {
         self.species_mediamente_strutt
     }
 
+    /// Getter for `species_destrutt`.
     #[inline(always)]
     pub fn species_destrutt(&self) -> u32 {
         self.species_destrutt
     }
 
+    /// Getter for `tot_species`.
     #[inline(always)]
     pub fn tot_species(&self) -> usize {
         self.tot_species
     }
 
+    /// Getter for [`InfoIntermediPopolazioniNISECI`] map.
     #[inline(always)]
     pub fn intermediates_map(&self) -> &HashMap<IdSpecieNISECI, InfoIntermediePopolazioniNISECI> {
         &self.intermediates_map
     }
 
+    /// Getter for [`InfoPopolazioniNISECI`] from [`ClassiEtaSpecieNISECI`] map.
     pub fn get_info_pop(
         map: &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI>,
         r: &RiferimentoNISECI,
@@ -1796,29 +1917,35 @@ impl InfoPopolazioniAlieneNISECI {
         }
     }
 
+    /// Getter for `tipo_1` [`InfoPopolazioniNISECI`].
     #[inline(always)]
     pub fn tipo_1(&self) -> &InfoPopolazioniNISECI {
         &self.tipo_1
     }
+    /// Getter for `tipo_2` [`InfoPopolazioniNISECI`].
     #[inline(always)]
     pub fn tipo_2(&self) -> &InfoPopolazioniNISECI {
         &self.tipo_2
     }
+    /// Getter for `tipo_3` [`InfoPopolazioniNISECI`].
     #[inline(always)]
     pub fn tipo_3(&self) -> &InfoPopolazioniNISECI {
         &self.tipo_3
     }
 
+    /// Getter for `tot_specie_aliene`.
     #[inline(always)]
     pub fn tot_specie_aliene(&self) -> usize {
         self.tot_specie_aliene
     }
 
+    /// Getter for `tot_specie_autoctone`.
     #[inline(always)]
     pub fn tot_specie_autoctone(&self) -> usize {
         self.tot_specie_autoctone
     }
 
+    /// Getter for [`InfoPopolazioniAlieneNISECI`] from [`ClassiEtaAlieniNISECI`].
     pub fn get_info_pop_aliene(
         classi_eta: &ClassiEtaAlieniNISECI,
         r: &RiferimentoNISECI,
@@ -1838,11 +1965,13 @@ impl InfoPopolazioniAlieneNISECI {
         Ok(info_pop_aliene)
     }
 
+    /// Getter for `species_mediamente_strutt`.
     pub fn get_species_mediamente_strutt(&self) -> u32 {
         self.tipo_1.species_mediamente_strutt()
             + self.tipo_2.species_mediamente_strutt()
             + self.tipo_3.species_mediamente_strutt()
     }
+    /// Getter for `species_destrutt`.
     pub fn get_species_destrutt(&self) -> u32 {
         self.tipo_1.species_destrutt()
             + self.tipo_2.species_destrutt()
@@ -1867,6 +1996,7 @@ impl Default for ClassiEtaAlieniNISECI {
 }
 
 impl ClassiEtaAlieniNISECI {
+    /// Construct a new instance.
     pub fn new() -> ClassiEtaAlieniNISECI {
         Self::new_with_capacity::<DefaultCapacity>()
     }
@@ -1879,30 +2009,37 @@ impl ClassiEtaAlieniNISECI {
             tot_specie_autoctone: 0,
         }
     }
+    /// Getter for `tipo_1` [`ClassiEtaSpecieNISECI`] map.
     #[inline(always)]
     pub fn map_tipo_1(&self) -> &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> {
         &self.map_tipo_1
     }
+    /// Getter for `tipo_2` [`ClassiEtaSpecieNISECI`] map.
     #[inline(always)]
     pub fn map_tipo_2(&self) -> &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> {
         &self.map_tipo_2
     }
+    /// Getter for `tipo_3` [`ClassiEtaSpecieNISECI`] map.
     #[inline(always)]
     pub fn map_tipo_3(&self) -> &HashMap<IdSpecieNISECI, ClassiEtaSpecieNISECI> {
         &self.map_tipo_3
     }
+    /// Getter for `tot_specie_aliene`].
     #[inline(always)]
     pub fn tot_specie_aliene(&self) -> usize {
         self.tot_specie_aliene
     }
+    /// Setter for `tot_specie_aliene`].
     #[inline(always)]
     pub fn set_tot_specie_aliene(&mut self, val: usize) {
         self.tot_specie_aliene = val;
     }
+    /// Getter for `tot_specie_autoctone`].
     #[inline(always)]
     pub fn tot_specie_autoctone(&self) -> usize {
         self.tot_specie_autoctone
     }
+    /// Setter for `tot_specie_autoctone`].
     #[inline(always)]
     pub fn set_tot_specie_autoctone(&mut self, val: usize) {
         self.tot_specie_autoctone = val;
@@ -1917,23 +2054,28 @@ pub struct EsemplariPerCattura {
 }
 
 impl EsemplariPerCattura {
+    /// Getter for integer id.
     #[inline(always)]
     pub fn id(&self) -> IdSpecieNISECI {
         self.id
     }
+    /// Getter for passage number / number of specimens map.
     #[inline(always)]
     pub fn mappa(&self) -> &HashMap<u8, u32> {
         &self.mappa
     }
+    /// Getter for `dens_soglia_1`.
     #[inline(always)]
     pub fn dens_soglia_1(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_1())
     }
+    /// Getter for `dens_soglia_2`.
     #[inline(always)]
     pub fn dens_soglia_2(&self, r: &RiferimentoNISECI) -> Option<f32> {
         r.get_ref_by_plain_id(self.id()).map(|s| s.dens_soglia_2())
     }
 
+    /// Construct a new instance.
     pub fn new(id: IdSpecieNISECI) -> Self {
         EsemplariPerCattura {
             id,
