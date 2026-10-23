@@ -40,73 +40,124 @@ pub enum TipoRecord {
 
 /// Defines expected methods for a deserialized reference set record of NISECI.
 pub trait RecordRiferimentoNISECI: serde::de::DeserializeOwned {
+    /// Getter for common name.
     fn nome_comune(&self) -> String;
+    /// Getter for latin name.
     fn nome_latino(&self) -> String;
+    /// Getter for species id.
     fn codice_specie(&self) -> String;
+    /// Getter for origin (one of `"AUT"` and `"ALL"`).
     fn origine(&self) -> String;
+    /// Getter for autochthonous type.
     fn tipo_autoctono(&self) -> u32;
+    /// Getter for allochthonous type.
     fn allo_nocivita(&self) -> u32;
+    /// Getter for expected species flag.
     fn specie_attesa(&self) -> u32;
+    /// Getter for threshold for class 1 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     fn cl_soglia1(&self) -> u32;
+    /// Getter for threshold for class 2 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     fn cl_soglia2(&self) -> u32;
+    /// Getter for threshold for class 3 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     fn cl_soglia3(&self) -> u32;
+    /// Getter for threshold for class 4 of [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     fn cl_soglia4(&self) -> u32;
+    /// Getter for threshold for `ad_juv_soglia_1`.
     fn ad_juv_soglia1(&self) -> f32;
+    /// Getter for threshold for `ad_juv_soglia_2`.
     fn ad_juv_soglia2(&self) -> f32;
+    /// Getter for threshold for `ad_juv_soglia_3`.
     fn ad_juv_soglia3(&self) -> f32;
+    /// Getter for threshold for `ad_juv_soglia_4`.
     fn ad_juv_soglia4(&self) -> f32;
+    /// Getter for threshold for `dens_soglia_1`.
     fn dens_soglia1(&self) -> f32;
+    /// Getter for threshold for `dens_soglia_2`.
     fn dens_soglia2(&self) -> f32;
 }
 
 /// Defines expected methods for a deserialized capture set record of NISECI.
 pub trait RecordCampionamentoNISECI: serde::de::DeserializeOwned {
+    /// Getter for formatted date string.
     fn data(&self) -> String;
+    /// Getter for station name.
     fn stazione(&self) -> String;
+    /// Getter for passage number.
     fn num_passaggio(&self) -> u32;
+    /// Getter for species id.
     fn codice_specie(&self) -> String;
+    /// Getter for length of record.
     fn lunghezza(&self) -> u32;
+    /// Getter for weight of record.
     fn peso(&self) -> f32;
 }
 
 /// Defines expected methods for a deserialized additional info record of NISECI.
 pub trait RecordAnagraficaNISECI: serde::de::DeserializeOwned {
+    /// Getter for station code.
     fn codice_stazione(&self) -> String;
+    /// Getter for water body name.
     fn corpo_idrico(&self) -> String;
+    /// Getter for region name.
     fn regione(&self) -> String;
+    /// Getter for province name.
     fn provincia(&self) -> String;
+    /// Getter for formatted date string.
     fn data(&self) -> String;
+    /// Getter for station length.
     fn lunghezza_stazione(&self) -> f32;
+    /// Getter for station width.
     fn larghezza_stazione(&self) -> f32;
+    /// Getter for community kind.
     fn tipo_comunita(&self) -> u32;
+    /// Getter for source.
     fn fonte(&self) -> String;
+    /// Getter for protocol number.
     fn numero_protocollo(&self) -> String;
+    /// Getter for hydro-eco region.
     fn idro_eco_regione(&self) -> u32;
+    /// Getter for alpine region flag.
     fn area_alpina(&self) -> u32;
+    /// Getter for water basin name.
     fn nome_bacino(&self) -> String;
 }
 
 /// Defines expected methods for a deserialized capture set record of HFBI.
 pub trait RecordCampionamentoHFBI: serde::de::DeserializeOwned {
+    /// Getter for species id.
     fn codice_specie(&self) -> String;
+    /// Getter for number of individuals.
     fn numero_individui(&self) -> u32;
+    /// Getter for weight.
     fn peso(&self) -> f32;
 }
 
 /// Defines expected methods for a deserialized additional info record of HFBI.
 pub trait RecordAnagraficaHFBI: serde::de::DeserializeOwned {
+    /// Getter for station code.
     fn codice_stazione(&self) -> String;
+    /// Getter for water body name.
     fn corpo_idrico(&self) -> String;
+    /// Getter for region name.
     fn regione(&self) -> String;
+    /// Getter for province name.
     fn provincia(&self) -> String;
+    /// Getter for formatted date string.
     fn data(&self) -> String;
+    /// Getter for station length.
     fn lunghezza_stazione(&self) -> f32;
+    /// Getter for station width.
     fn larghezza_stazione(&self) -> f32;
+    /// Getter for season. Relates to [`crate::domain::hfbi::StagioneHFBI`].
     fn stagione(&self) -> u32;
+    /// Getter for habitat. Relates to [`crate::domain::hfbi::HabitatHFBI`].
     fn habitat(&self) -> u32;
+    /// Getter for lagoon type.
     fn tipo_laguna(&self) -> u32;
 }
 
+/// Generic collecting of iterable [`Result`] into a tuple of vectors for
+/// values and errors.
 pub fn parse_serialized_records<I, T, E>(iter: I) -> (Vec<T>, Vec<E>)
 where
     I: IntoIterator<Item = Result<T, E>>,
@@ -124,6 +175,8 @@ where
     (records, errors)
 }
 
+/// Generic collecting of iterable [`Result`] into a vector of either
+/// values or errors.
 pub fn check_serialized_records<T, E>(
     iter: impl IntoIterator<Item = Result<T, E>>,
 ) -> Result<Vec<T>, Vec<E>> {
@@ -136,6 +189,8 @@ pub fn check_serialized_records<T, E>(
     }
 }
 
+/// Generic collecting of iterable [`Result`] into a vector of either
+/// values or errors. When the error case is reached, `on_error` is called.
 #[deprecated(
     note = "Use `check_serialized_records` and handle errors explicitly instead.\nItalian formatting can be used from esox::csv::stanis::giorgio::format_csv_errors"
 )]
@@ -159,22 +214,39 @@ where
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordRiferimentoNISECI {
+    /// Common name.
     pub nome_comune: String,
+    /// Latin name.
     pub nome_latino: String,
+    /// Species id.
     pub codice_specie: String,
+    /// Origin (should be one of `"AUT"` or `"ALL"`).
     pub origine: String,
+    /// Autochthonous type.
     pub tipo_autoctono: u32,
+    /// Autochthonous type.
     pub allo_nocivita: u32,
+    /// Allochthonous type.
     pub specie_attesa: u32,
+    /// Threshold for class `1` of [`crate::domain::niseci::SpecieNISECI`].
     pub cl_soglia1: u32, // in mm
+    /// Threshold for class `2` of [`crate::domain::niseci::SpecieNISECI`].
     pub cl_soglia2: u32, // in mm
+    /// Threshold for class `3` of [`crate::domain::niseci::SpecieNISECI`].
     pub cl_soglia3: u32, // in mm
+    /// Threshold for class `4` of [`crate::domain::niseci::SpecieNISECI`].
     pub cl_soglia4: u32, // in mm
+    /// Threshold for `ad_juv_soglia_1` of [`crate::domain::niseci::SpecieNISECI`].
     pub ad_juv_soglia1: f32,
+    /// Threshold for `ad_juv_soglia_2` of [`crate::domain::niseci::SpecieNISECI`].
     pub ad_juv_soglia2: f32,
+    /// Threshold for `ad_juv_soglia_3` of [`crate::domain::niseci::SpecieNISECI`].
     pub ad_juv_soglia3: f32,
+    /// Threshold for `ad_juv_soglia_4` of [`crate::domain::niseci::SpecieNISECI`].
     pub ad_juv_soglia4: f32,
+    /// Threshold for `dens_soglia_1` of [`crate::domain::niseci::SpecieNISECI`].
     pub dens_soglia1: f32,
+    /// Threshold for `dens_soglia_2` of [`crate::domain::niseci::SpecieNISECI`].
     pub dens_soglia2: f32,
 }
 
@@ -250,11 +322,17 @@ impl fmt::Display for PlainRecordRiferimentoNISECI {
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordCampionamentoNISECI {
+    /// Date of capture.
     pub data: String,
+    /// Station of capture.
     pub stazione: String,
+    /// Passage number of capture.
     pub num_passaggio: u32,
+    /// Species id of capture.
     pub codice_specie: String,
+    /// Length of capture.
     pub lunghezza: u32,
+    /// Weight of capture.
     pub peso: f32,
 }
 
@@ -294,18 +372,31 @@ impl fmt::Display for PlainRecordCampionamentoNISECI {
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordAnagraficaNISECI {
+    /// Station code.
     pub codice_stazione: String,
+    /// Water body.
     pub corpo_idrico: String,
+    /// Region of capture set.
     pub regione: String,
+    /// Province of capture set.
     pub provincia: String,
+    /// Date of capture set.
     pub data: String,
+    /// Length of station.
     pub lunghezza_stazione: f32,
+    /// Width of station.
     pub larghezza_stazione: f32,
+    /// Community kind, relates to [`crate::domain::niseci::TipoComunitaNISECI`].
     pub tipo_comunita: u32,
+    /// Source for the community.
     pub fonte: String,
+    /// Protocol number for the community.
     pub numero_protocollo: String,
+    /// Hydro-eco region.
     pub idro_eco_regione: u32,
+    /// Alpine area flag, relates to [`crate::domain::niseci::AreaNISECI`].
     pub area_alpina: u32,
+    /// Water basin.
     pub nome_bacino: String,
 }
 
@@ -381,8 +472,11 @@ impl fmt::Display for PlainRecordAnagraficaNISECI {
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordCampionamentoHFBI {
+    /// Species id.
     pub codice_specie: String,
+    /// Number of individuals.
     pub numero_individui: u32,
+    /// Weight.
     pub peso: f32,
 }
 
@@ -412,15 +506,25 @@ impl fmt::Display for PlainRecordCampionamentoHFBI {
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlainRecordAnagraficaHFBI {
+    /// Station code.
     pub codice_stazione: String,
+    /// Water body.
     pub corpo_idrico: String,
+    /// Region of capture set.
     pub regione: String,
+    /// Province of capture set.
     pub provincia: String,
+    /// Date of capture set.
     pub data: String,
+    /// Length of transept.
     pub lunghezza_stazione: f32,
+    /// Width of transept.
     pub larghezza_stazione: f32,
+    /// Season, relates to [`crate::domain::hfbi::StagioneHFBI`].
     pub stagione: u32,
+    /// Habitat, relates to [`crate::domain::hfbi::HabitatHFBI`].
     pub habitat: u32,
+    /// Lagoon type.
     pub tipo_laguna: u32,
 }
 

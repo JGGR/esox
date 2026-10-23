@@ -29,6 +29,7 @@ use crate::csv::deser::utils::diagnostic::{
 use crate::csv::stanis::field_name;
 use crate::deser::TipoRecord;
 
+/// Italian implementation of [`crate::csv::deser::utils::diagnostic::CsvDiagnosticLocalization`].
 pub struct ItalianCsvDiagnostic;
 
 impl CsvDiagnosticLocalization for ItalianCsvDiagnostic {
@@ -64,6 +65,7 @@ impl CsvDiagnosticLocalization for ItalianCsvDiagnostic {
     }
 }
 
+/// Italian implementation of [`crate::csv::deser::utils::diagnostic::CsvPositionFormatter`].
 pub struct ItalianCsvPosition;
 
 impl CsvPositionFormatter for ItalianCsvPosition {
@@ -94,6 +96,7 @@ impl CsvPositionFormatter for ItalianCsvPosition {
     }
 }
 
+/// Italian implementation of [`crate::csv::deser::utils::diagnostic::CsvFieldResolver`].
 pub struct ItalianCsvFieldResolver;
 
 impl CsvFieldResolver for ItalianCsvFieldResolver {
@@ -140,6 +143,7 @@ pub(crate) fn translate_error_message(msg: &str) -> String {
     }
 }
 
+/// Italian implementation of [`crate::csv::deser::utils::diagnostic::CsvDiagnosticLayout`].
 pub struct ItalianCsvDiagnosticLayout;
 
 impl CsvDiagnosticLayout for ItalianCsvDiagnosticLayout {
@@ -188,10 +192,12 @@ impl ItalianDiagnosticFormatter {
     }
 }
 
+/// Utility method to format a [`csv::Error`] to an italian string.
 pub fn format_csv_error(error: &csv::Error, record: TipoRecord) -> String {
     generic_format_csv_error(ItalianDiagnosticFormatter::new(), error, record)
 }
 
+/// Utility method to format a slice of [`csv::Error`] to an italian string.
 pub fn format_csv_errors(errors: &[csv::Error], record: TipoRecord) -> Vec<String> {
     errors.iter().map(|e| format_csv_error(e, record)).collect()
 }

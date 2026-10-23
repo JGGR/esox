@@ -38,8 +38,11 @@ use std::path::PathBuf;
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvCampionamentoHFBI {
+    /// Species id.
     pub codice_specie: String,
+    /// Number of individuals.
     pub numero_individui: u32,
+    /// Weight.
     pub peso: f32,
 }
 
@@ -67,6 +70,9 @@ impl fmt::Display for PlainRecordCsvCampionamentoHFBI {
     }
 }
 
+/// Generic parsing of [`crate::deser::RecordCampionamentoHFBI`], returning a
+/// tuple of vecs for values and errors.
+/// If you don't care about partial successes, use [`check_campionamento_hfbi_reader`].
 pub fn parse_csv_campionamento_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -76,6 +82,8 @@ where
     parse_serialized_records(iter)
 }
 
+/// Generic parsing of [`crate::deser::RecordCampionamentoHFBI`].
+/// If you care about partial successes, use [`parse_csv_campionamento_hfbi`].
 pub fn check_campionamento_hfbi_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -91,6 +99,9 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordCampionamentoHFBI`].
+/// Uses [`crate::csv::deser::CsvConfig`].
+/// If you care about partial successes, use [`parse_csv_campionamento_hfbi`].
 pub fn check_campionamento_hfbi_reader_conf<R: Read, T>(
     reader: R,
     config: CsvConfig,
@@ -124,6 +135,7 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordCampionamentoHFBI`] from [`PathBuf`].
 pub fn check_campionamento_hfbi_path<T>(
     path: PathBuf,
     has_headers: bool,
@@ -139,6 +151,8 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordCampionamentoHFBI`] from [`PathBuf`].
+/// Uses [`crate::csv::deser::CsvConfig`].
 pub fn check_campionamento_hfbi_path_conf<T>(
     path: PathBuf,
     config: CsvConfig,
@@ -164,15 +178,25 @@ where
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlainRecordCsvAnagraficaHFBI {
+    /// Station code.
     pub codice_stazione: String,
+    /// Water body.
     pub corpo_idrico: String,
+    /// Region.
     pub regione: String,
+    /// Province.
     pub provincia: String,
+    /// Formatted date string.
     pub data: String,
+    /// Length of transet.
     pub lunghezza_stazione: f32,
+    /// Width of transet.
     pub larghezza_stazione: f32,
+    /// Season, relates to [`crate::domain::hfbi::StagioneHFBI`].
     pub stagione: u32,
+    /// Habitat, relates to [`crate::domain::hfbi::HabitatHFBI`].
     pub habitat: u32,
+    /// Lagoon type.
     pub tipo_laguna: u32,
 }
 
@@ -233,6 +257,9 @@ impl fmt::Display for PlainRecordCsvAnagraficaHFBI {
     }
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaHFBI`], returning a
+/// tuple of vecs for values and errors.
+/// If you don't care about partial successes, use [`check_anagrafica_hfbi_reader`].
 pub fn parse_csv_anagrafica_hfbi<R, T>(mut rdr: csv::Reader<R>) -> (Vec<T>, Vec<csv::Error>)
 where
     R: std::io::Read,
@@ -242,6 +269,8 @@ where
     parse_serialized_records(iter)
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaHFBI`].
+/// If you care about partial successes, use [`parse_csv_anagrafica_hfbi`].
 pub fn check_anagrafica_hfbi_reader<R: Read, T>(
     reader: R,
     has_headers: bool,
@@ -257,6 +286,9 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaHFBI`].
+/// Uses [`crate::csv::deser::CsvConfig`].
+/// If you care about partial successes, use [`parse_csv_anagrafica_hfbi`].
 pub fn check_anagrafica_hfbi_reader_conf<R: Read, T>(
     reader: R,
     config: CsvConfig,
@@ -290,6 +322,7 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaHFBI`] from [`PathBuf`].
 pub fn check_anagrafica_hfbi_path<T>(
     path: PathBuf,
     has_headers: bool,
@@ -305,6 +338,8 @@ where
     )
 }
 
+/// Generic parsing of [`crate::deser::RecordAnagraficaHFBI`] from [`PathBuf`].
+/// Uses [`crate::csv::deser::CsvConfig`].
 pub fn check_anagrafica_hfbi_path_conf<T>(
     path: PathBuf,
     config: CsvConfig,
