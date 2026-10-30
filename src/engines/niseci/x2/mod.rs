@@ -38,6 +38,7 @@ pub struct SubmetricheX2 {
 }
 
 impl SubmetricheX2 {
+    /// Construct a new instance.
     pub fn new(
         metriche_x2_a: MetricheX2A,
         classi_eta: ClassiEtaSpecieNISECI,
@@ -49,14 +50,17 @@ impl SubmetricheX2 {
             metriche_x2_b,
         }
     }
+    /// Getter for [`crate::domain::niseci::MetricheX2A`].
     #[inline(always)]
     pub fn get_metriche_x2_a(&self) -> MetricheX2A {
         self.metriche_x2_a
     }
+    /// Getter for [`crate::domain::niseci::ClassiEtaSpecieNISECI`].
     #[inline(always)]
     pub fn get_ref_classi_eta(&self) -> &ClassiEtaSpecieNISECI {
         &self.classi_eta
     }
+    /// Getter for [`crate::domain::niseci::MetricheX2B`].
     #[inline(always)]
     pub fn get_ref_metriche_x2_b(&self) -> &MetricheX2B {
         &self.metriche_x2_b
@@ -71,6 +75,7 @@ pub struct MetricheX2 {
 }
 
 impl MetricheX2 {
+    /// Construct a new instance.
     pub fn new(
         criterio_a: f32,
         criterio_b: f32,
@@ -82,14 +87,17 @@ impl MetricheX2 {
             submetriche_map,
         }
     }
+    /// Getter for `criterio_a`.
     #[inline(always)]
     pub fn get_criterio_a(&self) -> f32 {
         self.criterio_a
     }
+    /// Getter for `criterio_b`.
     #[inline(always)]
     pub fn get_criterio_b(&self) -> f32 {
         self.criterio_b
     }
+    /// Getter for [`SubmetricheX2`] map.
     #[inline(always)]
     pub fn get_ref_submetriche_map(&self) -> &HashMap<IdSpecieNISECI, SubmetricheX2> {
         &self.submetriche_map
@@ -106,6 +114,7 @@ pub struct MetricheX2B {
 }
 
 impl MetricheX2B {
+    /// Construct a new instance.
     pub fn new(
         id_specie: IdSpecieNISECI,
         densita_stimata: f32,
@@ -119,18 +128,22 @@ impl MetricheX2B {
             x2_b,
         }
     }
+    /// Getter for species integer id.
     #[inline(always)]
     pub fn get_id(&self) -> IdSpecieNISECI {
         self.id_specie
     }
+    /// Getter for `x2_b`.
     #[inline(always)]
     pub fn get_x2_b(&self) -> f32 {
         self.x2_b
     }
+    /// Getter for `densita_stimata`.
     #[inline(always)]
     pub fn get_densita_stimata(&self) -> f32 {
         self.densita_stimata
     }
+    /// Getter for `quantita_stimata`.
     #[inline(always)]
     pub fn get_quantita_stimata(&self) -> u32 {
         self.quantita_stimata

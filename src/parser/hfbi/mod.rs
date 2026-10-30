@@ -36,7 +36,11 @@ use std::fmt;
 /// Encodes the errors kinds returned by HFBI capture set info CSV parse step.
 #[derive(Debug)]
 pub enum RecordCampionamentoHFBIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
+    /// Error for invalid value.
+    ValoreInvalido {
+        /// Message field.
+        msg: String, //TODO: add position?
+    },
 }
 
 impl fmt::Display for RecordCampionamentoHFBIError {
@@ -52,23 +56,30 @@ impl fmt::Display for RecordCampionamentoHFBIError {
 
 impl std::error::Error for RecordCampionamentoHFBIError {}
 
+/// Utility type for capturing errors of [`crate::deser::RecordCampionamentoHFBI`].
 pub struct CampionamentoHFBIParseResult(CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>);
 
 impl CampionamentoHFBIParseResult {
+    /// Generic parsing of a [`Vec`] of [`crate::deser::RecordCampionamentoHFBI`].
     pub fn parse<T: RecordCampionamentoHFBI>(records: Vec<T>) -> Self {
         parse_records_campionamento_hfbi(records)
     }
+    /// Split `Self` into a tuple.
     pub fn into_parts(self) -> (CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>) {
         (self.0, self.1)
     }
+    /// Getter for the value field.
     pub fn value(&self) -> &CampionamentoHFBI {
         &self.0
     }
+    /// Getter for the errors field.
     pub fn errors(&self) -> &Vec<RecordCampionamentoHFBIError> {
         &self.1
     }
 }
 
+/// Generic parsing of a [`Vec`] of [`crate::deser::RecordCampionamentoHFBI`].
+/// Returns partial errors.
 pub fn parse_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
 ) -> CampionamentoHFBIParseResult {
@@ -134,7 +145,11 @@ pub fn parse_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
 /// Encodes the errors kinds returned by HFBI additional info info CSV parse step.
 #[derive(Debug)]
 pub enum RecordAnagraficaHFBIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
+    /// Error for invalid value.
+    ValoreInvalido {
+        /// Message field.
+        msg: String, //TODO: add position?
+    },
 }
 
 impl fmt::Display for RecordAnagraficaHFBIError {
@@ -150,6 +165,7 @@ impl fmt::Display for RecordAnagraficaHFBIError {
 
 impl std::error::Error for RecordAnagraficaHFBIError {}
 
+/// Generic parsing of a [`Vec`] of [`crate::deser::RecordAnagraficaHFBI`].
 pub fn parse_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     records: Vec<T>,
 ) -> Result<AnagraficaHFBI, Vec<RecordAnagraficaHFBIError>> {
@@ -349,6 +365,7 @@ pub fn parse_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     Ok(res)
 }
 
+/// Generic parsing of a [`Vec`] of [`crate::deser::RecordCampionamentoHFBI`].
 pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     records: Vec<T>,
 ) -> Result<CampionamentoHFBI, Vec<RecordCampionamentoHFBIError>> {
@@ -385,6 +402,7 @@ pub fn check_records_campionamento_hfbi<T: RecordCampionamentoHFBI>(
     }
 }
 
+/// Generic parsing of a [`Vec`] of [`crate::deser::RecordAnagraficaHFBI`].
 pub fn check_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
     records: Vec<T>,
 ) -> Result<AnagraficaHFBI, Vec<RecordAnagraficaHFBIError>> {
@@ -421,12 +439,14 @@ pub fn check_records_anagrafica_hfbi<T: RecordAnagraficaHFBI>(
 }
 
 impl CampionamentoHFBI {
+    /// Generic parsing of a [`Vec`] of [`crate::deser::RecordCampionamentoHFBI`].
     pub fn parse_records<T>(vec: Vec<T>) -> CampionamentoHFBIParseResult
     where
         T: RecordCampionamentoHFBI,
     {
         CampionamentoHFBIParseResult::parse::<T>(vec)
     }
+    /// Generic parsing of a [`Vec`] of [`crate::deser::RecordCampionamentoHFBI`].
     pub fn check_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordCampionamentoHFBIError>>
     where
         T: RecordCampionamentoHFBI,
@@ -436,12 +456,14 @@ impl CampionamentoHFBI {
 }
 
 impl AnagraficaHFBI {
+    /// Generic parsing of a [`Vec`] of [`crate::deser::RecordAnagraficaHFBI`].
     pub fn parse_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaHFBIError>>
     where
         T: RecordAnagraficaHFBI,
     {
         parse_records_anagrafica_hfbi::<T>(vec)
     }
+    /// Generic parsing of a [`Vec`] of [`crate::deser::RecordAnagraficaHFBI`].
     pub fn check_records<T>(vec: Vec<T>) -> Result<Self, Vec<RecordAnagraficaHFBIError>>
     where
         T: RecordAnagraficaHFBI,

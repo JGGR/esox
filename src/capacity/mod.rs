@@ -19,13 +19,19 @@
 //! - [`crate::domain::niseci::ClassiEtaAlieniNISECI::new_with_capacity`]
 //! - Some methods in [`crate::engines::niseci::x2`]
 
+/// Denotes the starting capacity of some collections. Work-in-progress.
 pub trait Capacity {
+    /// Value for starting capacity.
     const VALUE: usize;
 }
 
+/// Preset [`Capacity`] value.
 pub struct Small;
+/// Preset [`Capacity`] value.
 pub struct Medium;
+/// Default [`Capacity`] value.
 pub struct DefaultCapacity;
+/// Custom [`Capacity`] value.
 pub struct Custom<const N: usize>;
 
 const SMALL_CAP: usize = 100;

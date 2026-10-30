@@ -25,7 +25,9 @@ use std::ops::Deref;
 /// Possible error kinds when parsing a `f32` to [`PositiveF32`].
 #[derive(Debug)]
 pub enum PositiveF32Error {
+    /// Error for not-finite values (e.g. [`INFINITY`]).
     NotFinite,
+    /// Error for not-positive values (e.g. `-1.0`).
     NotPositive,
 }
 

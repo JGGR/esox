@@ -37,9 +37,17 @@ use std::fmt;
 /// Encodes the errors kinds returned by NISECI reference CSV parse step.
 #[derive(Debug)]
 pub enum RecordRiferimentoNISECIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
-    SoglieCLNonCrescenti { msg: String },
-    SoglieADJUVNonCrescenti { msg: String },
+    /// Error for invalid value.
+    ValoreInvalido {
+        /// Message field.
+        msg: String, //TODO: add position?
+    },
+    SoglieCLNonCrescenti {
+        msg: String,
+    },
+    SoglieADJUVNonCrescenti {
+        msg: String,
+    },
 }
 
 impl fmt::Display for RecordRiferimentoNISECIError {
@@ -269,7 +277,11 @@ pub fn parse_records_riferimento_niseci<T: RecordRiferimentoNISECI>(
 /// Encodes the errors kinds returned by NISECI capture set CSV parse step.
 #[derive(Debug)]
 pub enum RecordCampionamentoNISECIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
+    /// Error for invalid value.
+    ValoreInvalido {
+        /// Message field.
+        msg: String, //TODO: add position?
+    },
 }
 
 impl fmt::Display for RecordCampionamentoNISECIError {
@@ -375,7 +387,11 @@ pub fn parse_records_campionamento_niseci<T: RecordCampionamentoNISECI>(
 /// Encodes the errors kinds returned by NISECI additional info CSV parse step.
 #[derive(Debug)]
 pub enum RecordAnagraficaNISECIError {
-    ValoreInvalido { msg: String }, //TODO: add position?
+    /// Error for invalid value.
+    ValoreInvalido {
+        /// Message field.
+        msg: String, //TODO: add position?
+    },
 }
 
 impl fmt::Display for RecordAnagraficaNISECIError {

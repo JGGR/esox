@@ -16,6 +16,7 @@
 */
 //! Crate metadata.
 const VERSION: &str = env!("CARGO_PKG_VERSION");
+/// Returns crate version as a `str`.
 pub fn version() -> &'static str {
     VERSION
 }

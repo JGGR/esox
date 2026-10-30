@@ -23,6 +23,8 @@
 
 use chrono::NaiveDate;
 
+/// Try parsing a formatted date string.
+/// Accepts `/` and `-` as field separators.
 pub fn parse_date(date_str: &str) -> Result<NaiveDate, chrono::format::ParseError> {
     let normalized = date_str.replace("/", "-"); // Replace all / with -
     NaiveDate::parse_from_str(&normalized, "%d-%m-%Y")

@@ -39,9 +39,13 @@ use std::path::Path;
 /// Encodes the possible errors returned by NISECI reference JSON deser and parse steps.
 #[derive(Debug)]
 pub enum RiferimentoNISECIError {
+    /// I/O error.
     Io(std::io::Error),
+    /// JSON errors.
     Json(Vec<serde_json::Error>),
+    /// JSON array error.
     JsonArray(serde_json::Error),
+    /// Value check errors.
     Value(Vec<RecordRiferimentoNISECIError>),
 }
 
@@ -103,9 +107,13 @@ where
 /// Encodes the possible errors returned by NISECI capture set JSON deser and parse steps.
 #[derive(Debug)]
 pub enum CampionamentoNISECIError {
+    /// I/O error.
     Io(std::io::Error),
+    /// JSON errors.
     Json(Vec<serde_json::Error>),
+    /// JSON array errors.
     JsonArray(serde_json::Error),
+    /// Value check errors.
     Value(Vec<RecordCampionamentoNISECIError>),
 }
 
@@ -170,9 +178,13 @@ where
 /// Encodes the possible errors returned by NISECI additional info JSON deser and parse steps.
 #[derive(Debug)]
 pub enum AnagraficaNISECIError {
+    /// I/O error.
     Io(std::io::Error),
+    /// JSON errors.
     Json(Vec<serde_json::Error>),
+    /// JSON array error.
     JsonArray(serde_json::Error),
+    /// Value check errors.
     Value(Vec<RecordAnagraficaNISECIError>),
 }
 

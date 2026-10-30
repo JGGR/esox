@@ -131,6 +131,7 @@ pub struct SemicolonDelimiter;
 /// Implemented by marker types like [`CommaDelimiter`]
 /// and [`SemicolonDelimiter`].
 pub trait Delimiter {
+    /// Byte delimiter.
     const DELIMITER: u8;
 }
 
@@ -159,8 +160,10 @@ impl Delimiter for SemicolonDelimiter {
 /// }
 /// ```
 pub trait RecordCsv {
+    /// Type-level delimiter.
     type D: Delimiter;
 
+    /// Utility re-export of the `D::DELIMITER` const.
     const DELIMITER: u8 = <Self::D as Delimiter>::DELIMITER;
 }
 

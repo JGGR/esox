@@ -36,10 +36,15 @@ use crate::domain::location::Location;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum GruppoEcoHFBI {
+    /// Marine migratory species.
     MigratoriMarini,
+    /// Diadromous.
     Diadromi,
+    /// Estuary residents.
     ResidentiDiEstuario,
+    /// Occasional marine.
     OccasionaliMarini,
+    /// Occasional fresh waters.
     OccasionaliDiAcqueDolci,
 }
 
@@ -768,8 +773,11 @@ where
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum TipoLagunaCostieraHFBI {
+    /// M-AT-1.
     MAt1,
+    /// M-AT-2.
     MAt2,
+    /// M-AT-3.
     MAt3,
 }
 
@@ -801,7 +809,9 @@ impl TryFrom<i32> for TipoLagunaCostieraHFBI {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum StagioneHFBI {
+    /// Spring.
     Primavera,
+    /// Autumn.
     Autunno,
 }
 
@@ -831,7 +841,9 @@ impl TryFrom<i32> for StagioneHFBI {
 #[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum HabitatHFBI {
+    /// With vegetation.
     Vegetato,
+    /// Without vegetation.
     NonVegetato,
 }
 
@@ -1144,11 +1156,17 @@ pub struct CondizioniRiferimentoKeyHFBI {
 /// Utility struct used in [`engines::hfbi::full`].
 #[derive(Clone)]
 pub struct CondizioniRiferimentoHFBI {
+    /// Coefficient for `bn` calc.
     pub bn: f32,
+    /// Coefficient for `ddom` calc.
     pub ddom: f32,
+    /// Coefficient for `dmig` calc.
     pub dmig: f32,
+    /// Coefficient for `bbent` calc.
     pub bbent: f32,
+    /// Coefficient for `dbent` calc.
     pub dbent: f32,
+    /// Coefficient for `dhzp` calc.
     pub dhzp: f32,
 }
 
@@ -1356,10 +1374,15 @@ static CONDIZIONI_RIFERIMENTO_HFBI_HASHMAP: LazyLock<
 /// See:
 /// - [`crate::engines::hfbi::full::calculate_stato_ecologico_hfbi`]
 pub enum StatoEcologicoHFBI {
+    /// Excellent.
     Eccellente,
+    /// Good.
     Buono,
+    /// Sufficient.
     Sufficiente,
+    /// Poor.
     Scarso,
+    /// Bad.
     Cattivo,
 }
 
@@ -1382,7 +1405,7 @@ const STATO_ECOLOGICO_HFBI_SOGLIA_ECCELLENTE: f32 = 0.94;
 const STATO_ECOLOGICO_HFBI_SOGLIA_BUONO: f32 = 0.55;
 /// Threshold for sufficient HFBI ecological status.
 const STATO_ECOLOGICO_HFBI_SOGLIA_SUFFICIENTE: f32 = 0.33;
-/// Threshold for poop HFBI ecological status.
+/// Threshold for poor HFBI ecological status.
 const STATO_ECOLOGICO_HFBI_SOGLIA_SCARSO: f32 = 0.11;
 
 impl From<f32> for StatoEcologicoHFBI {
